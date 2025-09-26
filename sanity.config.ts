@@ -13,7 +13,7 @@ const baseConfig = {
   projectId,
   dataset,
   basePath: process.env.SANITY_STUDIO_BASEPATH || "/",
-  plugins: [structureTool(), visionTool(), muxInput()],
+  plugins: [structureTool({ name: "studio", title: "Content" }), visionTool(), muxInput()],
   schema: {
     types: schemas,
   },
