@@ -14,8 +14,9 @@ export async function GET(req: NextRequest) {
     if (slug) revalidatePath(slug, "page");
     revalidateTag("sanity:site");
     return NextResponse.json({ ok: true, revalidated: { slug, tag } });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, message: e?.message }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Unknown error";
+    return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
 
@@ -32,8 +33,8 @@ export async function POST(req: NextRequest) {
     if (slug) revalidatePath(slug.startsWith("/") ? slug : `/${slug}`, "page");
     revalidateTag("sanity:site");
     return NextResponse.json({ ok: true, revalidated: { slug, tag } });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, message: e?.message }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Unknown error";
+    return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
-

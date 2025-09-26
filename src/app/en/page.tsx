@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { fetchSanity } from "@/lib/sanity.client";
 import { siteSettingsQuery } from "@/lib/sanity.queries";
-import { seoToMetadata } from "@/lib/seo";
+import { seoToMetadata, type Seo } from "@/lib/seo";
+
+type SiteSettings = { seo?: Seo };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await fetchSanity<any>(siteSettingsQuery, {}, ["sanity:site"]);
+  const settings = await fetchSanity<SiteSettings>(siteSettingsQuery, {});
   return seoToMetadata({ seo: settings?.seo, pathname: "/en", locale: "en" });
 }
 
@@ -16,4 +18,3 @@ export default function HomeEN() {
     </div>
   );
 }
-

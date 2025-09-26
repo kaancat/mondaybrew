@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { urlFor } from "./image";
+import { ogUrlFor } from "./image";
 
-type Seo = {
+export type Seo = {
   title?: string;
   description?: string;
-  image?: any;
+  image?: unknown;
   canonical?: string;
   noindex?: boolean;
 };
@@ -13,7 +13,7 @@ export function seoToMetadata({ seo, pathname = "/", locale = "da" }: { seo?: Se
   const base = process.env.NEXT_PUBLIC_SITE_URL || "https://mondaybrew-website.vercel.app";
   const title = seo?.title || (locale === "da" ? "mondaybrew — Websites, Webapps & PPC" : "mondaybrew — Websites, Webapps & PPC");
   const description = seo?.description || (locale === "da" ? "Digitalt bureau i Danmark med fokus på websites, webapps og PPC." : "Digital agency in Denmark specializing in websites, webapps, and PPC.");
-  const image = seo?.image ? urlFor(seo.image).width(1200).height(630).fit("crop").url() : undefined;
+  const image = seo?.image ? ogUrlFor(seo.image, 1200, 630) : undefined;
   const canonical = seo?.canonical || new URL(pathname, base).toString();
 
   const languages: Record<string, string> = {
@@ -46,4 +46,3 @@ export function seoToMetadata({ seo, pathname = "/", locale = "da" }: { seo?: Se
     },
   } satisfies Metadata;
 }
-
