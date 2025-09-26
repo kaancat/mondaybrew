@@ -10,7 +10,6 @@ export default defineType({
     defineField({ name: "subheading", type: "text" }),
     defineField({ name: "primary", type: "button" }),
     defineField({ name: "secondary", type: "button" }),
-    defineField({ name: "media", type: "videoAsset" }),
+    defineField({ name: "media", type: "imageWithAlt" }),
   ],
 });
-

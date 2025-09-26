@@ -5,8 +5,7 @@ export default defineType({
   title: "Media Block",
   type: "object",
   fields: [
-    defineField({ name: "media", type: "videoAsset" }),
+    defineField({ name: "media", type: "imageWithAlt" }),
     defineField({ name: "caption", type: "string" }),
   ],
 });
-
