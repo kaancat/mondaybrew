@@ -24,3 +24,16 @@ export const allRoutesQuery = `*[_type in ["page","post","caseStudy"]]{
 export const postsQuery = `*[_type=="post"] | order(date desc){
   title, slug, date, excerpt, seo
 }`;
+
+export const postBySlugQuery = `*[_type=="post" && slug.current==$slug && (defined(locale) => locale==$locale)][0]{
+  _id,
+  title,
+  slug,
+  locale,
+  date,
+  excerpt,
+  seo,
+  "authorName": author->name,
+  mainImage,
+  body
+}`;
