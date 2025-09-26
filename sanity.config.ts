@@ -9,10 +9,10 @@ export default defineConfig({
   title: "mondaybrew Studio",
   projectId: process.env.SANITY_PROJECT_ID || "",
   dataset: process.env.SANITY_DATASET || "production",
-  basePath: "/studio",
+  // Use /studio for embedded Next.js; use "/" for hosted sanity.studio
+  basePath: process.env.STUDIO_BASEPATH || "/studio",
   plugins: [structureTool(), visionTool(), muxInput()],
   schema: {
     types: schemas,
   },
 });
-

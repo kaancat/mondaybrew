@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "studio:deploy": "STUDIO_BASEPATH=/ sanity deploy",
+    "studio:dev": "sanity dev"
   },
   "dependencies": {
     "@mux/mux-player-react": "^3.6.0",
