@@ -4,15 +4,24 @@ import { visionTool } from "@sanity/vision";
 import { muxInput } from "sanity-plugin-mux-input";
 import schemas from "./src/sanity/schema";
 
-export default defineConfig({
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || process.env.SANITY_PROJECT_ID || "";
+const dataset = process.env.SANITY_STUDIO_DATASET || process.env.SANITY_DATASET || "production";
+
+const baseConfig = {
   name: "default",
   title: "mondaybrew Studio",
-  projectId: process.env.SANITY_PROJECT_ID || "",
-  dataset: process.env.SANITY_DATASET || "production",
-  // Use /studio for embedded Next.js; use "/" for hosted sanity.studio
-  basePath: process.env.STUDIO_BASEPATH || "/studio",
+  projectId,
+  dataset,
+  basePath: process.env.SANITY_STUDIO_BASEPATH || "/",
   plugins: [structureTool(), visionTool(), muxInput()],
   schema: {
     types: schemas,
   },
+};
+
+export const embeddedStudioConfig = defineConfig({
+  ...baseConfig,
+  basePath: "/studio",
 });
+
+export default defineConfig(baseConfig);
