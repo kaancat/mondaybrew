@@ -17,10 +17,10 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (defin
 export const allRoutesQuery = `*[_type in ["page","post","caseStudy"]]{
   _type,
   "slug": slug.current,
-  locale
+  locale,
+  _updatedAt
 }`;
 
 export const postsQuery = `*[_type=="post"] | order(date desc){
   title, slug, date, excerpt, seo
 }`;
-

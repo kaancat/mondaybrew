@@ -1,0 +1,10 @@
+{
+  "_id": "siteSettings",
+  "_type": "siteSettings",
+  "title": "mondaybrew",
+  "seo": {
+    "_type": "seo",
+    "title": "mondaybrew — Websites, Webapps & PPC",
+    "description": "Digitalt bureau i Danmark med fokus på websites, webapps og PPC."
+  }
+}
