@@ -6,6 +6,8 @@ import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
 import { GA } from "@/components/shared/ga";
 import { ConsentBanner } from "@/components/shared/consent";
+import { JsonLd } from "@/components/shared/json-ld";
+import { jsonLd } from "@/lib/jsonld";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -29,6 +31,21 @@ export default function RootLayout({
   return (
     <html lang="da">
       <body className={`${sailec.variable} ${heywow.variable} ${geistMono.variable} antialiased`}>
+        <JsonLd
+          id="org-jsonld"
+          data={jsonLd.organization({
+            name: "mondaybrew",
+            url: process.env.NEXT_PUBLIC_SITE_URL || "https://mondaybrew-website.vercel.app",
+            logo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://mondaybrew-website.vercel.app"}/brand/MondayBrew%20-%20Logo%20Stor%20-%201.png`,
+          })}
+        />
+        <JsonLd
+          id="website-jsonld"
+          data={jsonLd.website({
+            name: "mondaybrew",
+            url: process.env.NEXT_PUBLIC_SITE_URL || "https://mondaybrew-website.vercel.app",
+          })}
+        />
         <GA />
         <ConsentBanner />
         <Navbar />

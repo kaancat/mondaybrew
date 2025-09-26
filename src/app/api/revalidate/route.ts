@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, message: "Invalid secret" }, { status: 401 });
   }
   const body = await req.json().catch(() => ({}));
-  const slug = body?.slug || body?.document?.slug?.current || body?.slug?.current || undefined;
+  const rawSlug: string | undefined = body?.slug || body?.document?.slug?.current || body?.slug?.current;
+  const locale: string | undefined = body?.locale || body?.document?.locale;
+  const slug = rawSlug ? `${locale === "en" ? "/en" : ""}/${rawSlug}`.replace(/\/+/, "/") : undefined;
   const tag = body?.tag || undefined;
   try {
     if (tag) revalidateTag(tag);
