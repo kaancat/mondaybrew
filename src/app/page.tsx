@@ -1,4 +1,13 @@
 import Image from "next/image";
+import type { Metadata } from "next";
+import { fetchSanity } from "@/lib/sanity.client";
+import { siteSettingsQuery } from "@/lib/sanity.queries";
+import { seoToMetadata } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await fetchSanity<any>(siteSettingsQuery, {}, ["sanity:site"]);
+  return seoToMetadata({ seo: settings?.seo, pathname: "/", locale: "da" });
+}
 
 export default function Home() {
   return (
