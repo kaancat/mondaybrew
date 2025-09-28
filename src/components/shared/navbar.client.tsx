@@ -111,7 +111,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#6f6f74] px-3 py-1.5 text-xs font-semibold text-[#111] transition-colors hover:bg-[#5f5f64] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2"
             >
               <Globe className="size-[16px]" aria-hidden="true" />
-              <span className="uppercase">{localeConfig.active}</span>
+              <span>{localeConfig.active}</span>
             </Link>
           </div>
 
