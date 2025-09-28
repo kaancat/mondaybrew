@@ -1,7 +1,55 @@
 export const siteSettingsQuery = `*[_type=="siteSettings"][0]{
   title,
+  logo {
+    asset->{
+      url,
+      metadata{
+        dimensions
+      }
+    },
+    alt
+  },
+  favicon {
+    asset->{
+      url
+    }
+  },
   seo,
-  nav,
+  mainNavigation[]{
+    title,
+    variant,
+    link {
+      label,
+      description,
+      href,
+      reference->{
+        "slug": slug.current,
+        locale
+      }
+    },
+    groups[]{
+      title,
+      description,
+      items[]{
+        label,
+        description,
+        href,
+        reference->{
+          "slug": slug.current,
+          locale
+        }
+      }
+    }
+  },
+  headerCta {
+    label,
+    description,
+    href,
+    reference->{
+      "slug": slug.current,
+      locale
+    }
+  },
   footer
 }`;
 
