@@ -7,6 +7,7 @@
 - Sanity Studio (hosted at https://mondaybrew.sanity.studio/ and embedded at `/studio`)
 - Mux-ready video components (placeholder; media blocks use images for now)
 - GA4 with Consent Mode plus lightweight cookie banner
+- Layout primitives: `Container` / `Section` components + global spacing/typography tokens in `globals.css`
 
 ## SEO & Content
 - Metadata helper maps Sanity SEO fields to Next metadata (canonical + hreflang)
@@ -28,7 +29,8 @@
 - Repo: https://github.com/kaancat/mondaybrew (branch `main`)
 
 ## Next Steps (suggested)
-- Build CMS-driven sections & home page layout
+- Build global navigation/header + hero with new layout system
+- Implement CMS-driven sections & home page layout
 - Implement case study/service routes with JSON-LD
 - Add Sanity preview mode (read token)
 - Layer in GSAP scroll experiences and production content
