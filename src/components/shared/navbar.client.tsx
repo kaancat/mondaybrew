@@ -61,7 +61,7 @@ type Props = {
   };
 };
 
-const DEFAULT_CTA_LABEL = "Let\u2019s talk";
+const DEFAULT_CTA_LABEL = "Let’s talk";
 const FALLBACK_LOCALE = "da";
 
 export function NavbarClient({ brand, sections, cta, locales }: Props) {
@@ -91,81 +91,77 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const ctaHref = cta?.href ?? "/kontakt";
   const ctaLabel = cta?.label || DEFAULT_CTA_LABEL;
 
+  const menuShell =
+    "rounded-[5px] border border-white/12 bg-[rgba(24,24,24,0.6)] text-white shadow-[0_24px_48px_rgba(0,0,0,0.22)] backdrop-blur-[12px] transition-all duration-300";
+
   return (
-    <header className="sticky top-3 z-50 flex justify-center px-4 sm:px-6">
-      <div className="layout-container-full">
-        <div className="flex justify-center">
-          <div
-            className="relative flex w-full max-w-[calc(var(--layout-max)+var(--layout-gutter)*2)] items-center justify-between gap-6 rounded-full border border-white/10 bg-[rgba(28,22,32,0.72)] px-4 py-2 text-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] backdrop-blur-xl transition-colors duration-300"
+    <header className="fixed inset-x-0 top-4 z-50">
+      <div className="layout-container">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <Link
+              href={ctaHref}
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#FF914D] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#ff8233] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)]"
+            >
+              <span>{ctaLabel}</span>
+              <ArrowRight className="size-[16px]" aria-hidden="true" />
+            </Link>
+            <Link
+              href={localeConfig.href}
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#6f6f74] px-3 py-1.5 text-xs font-semibold text-[#111] transition-colors hover:bg-[#5f5f64] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2"
+            >
+              <Globe className="size-[16px]" aria-hidden="true" />
+              <span className="uppercase">{localeConfig.active}</span>
+            </Link>
+          </div>
+
+          <div className={cn(menuShell, "flex items-center gap-4 px-5 py-2.5 md:flex-row")}
+            style={{ justifyContent: "space-between" }}
           >
-            <div className="flex flex-1 items-center gap-2 sm:gap-3">
-              <Link
-                href={ctaHref}
-                className="inline-flex items-center gap-2 rounded-full bg-[var(--mb-accent)] px-4 py-2 text-sm font-semibold text-[var(--mb-ink)] shadow-sm transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[var(--mb-accent)]"
-              >
-                <span>{ctaLabel}</span>
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-              <Link
-                href={localeConfig.href}
-                className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-white/80 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-              >
-                <Globe className="size-3.5" aria-hidden="true" />
-                <span>{localeConfig.active}</span>
-              </Link>
-            </div>
-
-            <div className="flex flex-[1.6] items-center justify-end gap-4 sm:gap-6">
-              <Link
-                href="/"
-                className="hidden whitespace-nowrap text-sm font-semibold tracking-tight text-white/90 transition hover:text-white sm:inline-flex"
-              >
-                {brand.logo?.url ? (
-                  <Image
-                    src={brand.logo.url}
-                    alt={brand.logo.alt || brand.title}
-                    width={brand.logo.width ?? 112}
-                    height={brand.logo.height ?? 32}
-                    className="h-6 w-auto"
-                    priority
-                  />
-                ) : (
-                  brand.title
-                )}
-              </Link>
-              <nav className="flex gap-3 overflow-x-auto text-xs font-medium uppercase tracking-[0.08em] text-white/70 sm:text-sm sm:tracking-[0.12em]">
-                {sections.map((section) => {
-                  if (section.kind === "link") {
-                    const href = section.href ?? "#";
-                    const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                    return (
-                      <Link
-                        key={section.label}
-                        href={href}
-                        className={cn(
-                          "whitespace-nowrap rounded-full px-3 py-1.5 transition",
-                          active
-                            ? "bg-white/15 text-white font-semibold"
-                            : "hover:bg-white/10 hover:text-white",
-                        )}
-                      >
-                        {section.label}
-                      </Link>
-                    );
-                  }
-
+            <Link href="/" className="inline-flex items-center">
+              {brand.logo?.url ? (
+                <Image
+                  src={brand.logo.url}
+                  alt={brand.logo.alt || brand.title}
+                  width={brand.logo.width ?? 150}
+                  height={brand.logo.height ?? 32}
+                  className="h-6 w-auto"
+                  priority
+                />
+              ) : (
+                <span className="text-sm font-semibold text-white/90">{brand.title}</span>
+              )}
+            </Link>
+            <nav className="flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium text-white/85 md:flex-nowrap">
+              {sections.map((section) => {
+                if (section.kind === "link") {
+                  const href = section.href ?? "#";
+                  const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
                   return (
-                    <button
+                    <Link
                       key={section.label}
-                      type="button"
-                      className="whitespace-nowrap rounded-full px-3 py-1.5 text-left text-white/70 transition hover:bg-white/10 hover:text-white"
+                      href={href}
+                      className={cn(
+                        "whitespace-nowrap rounded-[5px] px-3 py-1.5 transition",
+                        active ? "bg-white/18 text-white" : "hover:bg-white/10 hover:text-white",
+                      )}
                     >
                       {section.label}
-                    </button>
+                    </Link>
                   );
-                })}
-              </nav>
-            </div>
+                }
+
+                return (
+                  <button
+                    key={section.label}
+                    type="button"
+                    className="whitespace-nowrap rounded-[5px] px-3 py-1.5 text-left transition hover:bg-white/10 hover:text-white"
+                  >
+                    {section.label}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
         </div>
       </div>
