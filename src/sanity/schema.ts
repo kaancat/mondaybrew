@@ -22,6 +22,9 @@ import cta from "./types/objects/cta";
 import button from "./types/objects/button";
 import imageWithAlt from "./types/objects/imageWithAlt";
 import badge from "./types/objects/badge";
+import navigationLink from "./types/objects/navigationLink";
+import navigationGroup from "./types/objects/navigationGroup";
+import navigationSection from "./types/objects/navigationSection";
 
 const schemas = [
   // documents
@@ -49,6 +52,9 @@ const schemas = [
   button,
   imageWithAlt,
   badge,
+  navigationLink,
+  navigationGroup,
+  navigationSection,
 ];
 
 export default schemas;
