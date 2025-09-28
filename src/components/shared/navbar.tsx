@@ -2,13 +2,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu";
+import { Container } from "@/components/layout/container";
 
 export function Navbar() {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href;
   return (
-    <header className="sticky top-0 z-50 backdrop-blur bg-background/70 border-b">
-      <div className="mx-auto max-w-7xl px-4 h-14 flex items-center justify-between">
+    <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <Container className="h-16 flex items-center justify-between">
         <Link href="/" className="font-semibold">mondaybrew</Link>
         <NavigationMenu>
           <NavigationMenuList className="gap-4 text-sm">
@@ -29,8 +30,7 @@ export function Navbar() {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-      </div>
+      </Container>
     </header>
   );
 }
-

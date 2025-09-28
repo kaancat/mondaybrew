@@ -1,11 +1,9 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { createClient } from "@sanity/client";
 import { getCliClient } from "sanity/cli";
 
 async function main() {
   const projectId = process.env.SANITY_PROJECT_ID;
-  const dataset = process.env.SANITY_DATASET || "production";
   if (!projectId) {
     throw new Error("SANITY_PROJECT_ID is required");
   }
