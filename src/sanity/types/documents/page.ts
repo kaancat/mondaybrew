@@ -1,4 +1,7 @@
 import { defineType, defineField } from "sanity";
+import type { PreviewProps } from "sanity";
+
+const homeIcon = () => "🏠";
 
 export default defineType({
   name: "page",
@@ -7,6 +10,13 @@ export default defineType({
   fields: [
     defineField({ name: "title", type: "string" }),
     defineField({ name: "slug", type: "slug", options: { source: "title" } }),
+    defineField({
+      name: "isHome",
+      title: "Homepage",
+      type: "boolean",
+      description: "Markér hvis dette er forsiden.",
+      initialValue: false,
+    }),
     defineField({ name: "locale", type: "string", options: { list: ["da", "en"] }, initialValue: "da" }),
     defineField({
       name: "sections",
@@ -27,5 +37,13 @@ export default defineType({
     }),
     defineField({ name: "seo", type: "seo" }),
   ],
+  preview: {
+    select: { title: "title", isHome: "isHome" },
+    prepare({ title, isHome }: { title: string; isHome?: boolean }): PreviewProps {
+      return {
+        title,
+        media: isHome ? homeIcon : undefined,
+      };
+    },
+  },
 });
-
