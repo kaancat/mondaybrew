@@ -1,5 +1,4 @@
 import { defineType, defineField } from "sanity";
-import type { PreviewProps } from "sanity";
 
 const homeIcon = () => "🏠";
 
@@ -39,9 +38,10 @@ export default defineType({
   ],
   preview: {
     select: { title: "title", isHome: "isHome" },
-    prepare({ title, isHome }: { title: string; isHome?: boolean }): PreviewProps {
+    prepare({ title, isHome }: { title?: string; isHome?: boolean }) {
       return {
         title,
+        subtitle: isHome ? "Homepage" : undefined,
         media: isHome ? homeIcon : undefined,
       };
     },
