@@ -7,6 +7,12 @@ export default defineType({
   fields: [
     defineField({ name: "title", type: "string" }),
     defineField({ name: "logo", type: "image" }),
+    defineField({
+      name: "logoOnDark",
+      title: "Logo (dark backgrounds)",
+      type: "image",
+      description: "Optional logo variant optimized for dark UI surfaces like the header.",
+    }),
     defineField({ name: "favicon", type: "image", description: "Shown in the browser tab." }),
     defineField({ name: "seo", type: "seo" }),
     defineField({

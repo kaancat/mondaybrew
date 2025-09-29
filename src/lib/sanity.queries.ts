@@ -9,6 +9,15 @@ export const siteSettingsQuery = `*[_type=="siteSettings"][0]{
     },
     alt
   },
+  logoOnDark {
+    asset->{
+      url,
+      metadata{
+        dimensions
+      }
+    },
+    alt
+  },
   favicon {
     asset->{
       url

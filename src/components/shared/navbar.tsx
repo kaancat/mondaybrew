@@ -32,20 +32,23 @@ type SanityNavigationSection = {
   }>;
 };
 
-type SiteSettingsResult = {
-  title?: string;
-  logo?: {
-    asset?: {
-      url?: string;
-      metadata?: {
-        dimensions?: {
-          width?: number;
-          height?: number;
-        };
+type SanityLogo = {
+  asset?: {
+    url?: string;
+    metadata?: {
+      dimensions?: {
+        width?: number;
+        height?: number;
       };
     };
-    alt?: string;
-  } | null;
+  };
+  alt?: string;
+} | null;
+
+type SiteSettingsResult = {
+  title?: string;
+  logo?: SanityLogo;
+  logoOnDark?: SanityLogo;
   mainNavigation?: SanityNavigationSection[];
   headerCta?: SanityNavigationLink | null;
 };
@@ -105,15 +108,16 @@ function mapSections(sections?: SanityNavigationSection[]): NavbarSection[] {
 
 function mapBrand(settings?: SiteSettingsResult): NavbarBrand {
   const title = settings?.title || DEFAULT_BRAND;
-  const url = settings?.logo?.asset?.url;
-  const dimensions = settings?.logo?.asset?.metadata?.dimensions;
+  const preferredLogo = settings?.logoOnDark?.asset?.url ? settings.logoOnDark : settings?.logo;
+  const url = preferredLogo?.asset?.url;
+  const dimensions = preferredLogo?.asset?.metadata?.dimensions;
 
   return {
     title,
     logo: url
       ? {
           url,
-          alt: settings?.logo?.alt || title,
+          alt: preferredLogo?.alt || settings?.logo?.alt || title,
           width: dimensions?.width,
           height: dimensions?.height,
         }
@@ -144,4 +148,3 @@ export async function Navbar() {
     />
   );
 }
-
