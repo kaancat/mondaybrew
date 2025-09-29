@@ -134,6 +134,12 @@ function mapCta(link?: SanityNavigationLink | null): NavbarCta {
 
 export async function Navbar() {
   const settings = await fetchSanity<SiteSettingsResult>(siteSettingsQuery, {});
+  if (process.env.NODE_ENV !== "production") {
+    console.log("Fetched site settings", {
+      hasLogo: Boolean(settings?.logo?.asset?.url),
+      hasLogoOnDark: Boolean(settings?.logoOnDark?.asset?.url),
+    });
+  }
 
   const sections = mapSections(settings?.mainNavigation);
   const brand = mapBrand(settings);
