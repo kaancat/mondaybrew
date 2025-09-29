@@ -101,7 +101,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
           <div className="flex items-center gap-3">
             <Link
               href={ctaHref}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#FF914D] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#ff8233] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)]"
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#FF914D] px-3 py-1.5 text-xs font-semibold text-[#f5f7fd] transition-colors hover:bg-[#ff8233] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)]"
             >
               <span>{ctaLabel}</span>
               <ArrowRight className="size-[16px]" aria-hidden="true" />
@@ -115,7 +115,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             </Link>
           </div>
 
-          <div className={cn(menuShell, "flex items-center gap-4 px-5 py-2.5 md:flex-row")}
+          <div className={cn(menuShell, "flex items-center gap-4 px-5 py-2.5 md:flex-row text-[#f5f7fd]")}
             style={{ justifyContent: "space-between" }}
           >
             <Link href="/" className="inline-flex items-center">
