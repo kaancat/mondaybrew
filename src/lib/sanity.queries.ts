@@ -62,6 +62,80 @@ export const siteSettingsQuery = `*[_type=="siteSettings"][0]{
   footer
 }`;
 
+export const homePageQuery = `*[_type=="page" && isHome == true && locale==$locale][0]{
+  _id,
+  title,
+  locale,
+  seo,
+  sections[]{
+    ...,
+    background {
+      alt,
+      videoUrl,
+      image {
+        alt,
+        image {
+          asset->{
+            url,
+            metadata{
+              lqip,
+              dimensions
+            }
+          }
+        }
+      },
+      poster {
+        alt,
+        image {
+          asset->{
+            url,
+            metadata{
+              lqip,
+              dimensions
+            }
+          }
+        }
+      }
+    },
+    cta {
+      label,
+      href,
+      variant
+    },
+    helper,
+    feature {
+      title,
+      excerpt,
+      href,
+      metaLabel,
+      image {
+        alt,
+        image {
+          asset->{
+            url,
+            metadata{
+              lqip,
+              dimensions
+            }
+          }
+        }
+      }
+    },
+    media {
+      alt,
+      image {
+        asset->{
+          url,
+          metadata{
+            lqip,
+            dimensions
+          }
+        }
+      }
+    }
+  }
+}`;
+
 export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (defined(locale) => locale==$locale)][0]{
   _id,
   title,
