@@ -10,7 +10,11 @@ export default defineType({
       title: "Items",
       type: "array",
       of: [{ type: "heroFeatureItem" }],
-      validation: (Rule) => Rule.max(6),
+      options: {
+        layout: "grid",
+        sortable: true,
+      },
+      validation: (Rule) => Rule.max(8),
     }),
     defineField({
       name: "title",
