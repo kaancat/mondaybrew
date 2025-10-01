@@ -117,24 +117,8 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     <header ref={headerRef} className="fixed inset-x-0 top-4 z-50">
       <div className="layout-container">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href={ctaHref}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#FF914D] px-3 py-1.5 text-xs font-semibold text-[#f5f7fd] transition-colors hover:bg-[#ff8233] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)]"
-            >
-              <span>{ctaLabel}</span>
-              <ArrowRight className="size-[16px]" aria-hidden="true" />
-            </Link>
-            <Link
-              href={localeConfig.href}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#6f6f74] px-3 py-1.5 text-xs font-semibold text-[#f5f7fd] transition-colors hover:bg-[#5f5f64] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2"
-            >
-              <Globe className="size-[16px]" aria-hidden="true" />
-              <span>{localeConfig.active}</span>
-            </Link>
-          </div>
-
-          <div className={cn(menuShell, "flex items-center gap-4 px-5 py-2.5 md:flex-row text-[#f5f7fd]")}
+          <div
+            className={cn(menuShell, "flex items-center gap-4 px-5 py-2.5 md:flex-row text-[#f5f7fd]")}
             style={{ justifyContent: "space-between" }}
           >
             <Link href="/" className="inline-flex items-center">
@@ -181,6 +165,23 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 );
               })}
             </nav>
+          </div>
+
+          <div className="flex items-center gap-3 md:justify-end md:pl-4">
+            <Link
+              href={ctaHref}
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#FF914D] px-3 py-1.5 text-xs font-semibold text-[#f5f7fd] transition-colors hover:bg-[#ff8233] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)]"
+            >
+              <span>{ctaLabel}</span>
+              <ArrowRight className="size-[16px]" aria-hidden="true" />
+            </Link>
+            <Link
+              href={localeConfig.href}
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#6f6f74] px-3 py-1.5 text-xs font-semibold text-[#f5f7fd] transition-colors hover:bg-[#5f5f64] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2"
+            >
+              <Globe className="size-[16px]" aria-hidden="true" />
+              <span>{localeConfig.active}</span>
+            </Link>
           </div>
         </div>
       </div>
