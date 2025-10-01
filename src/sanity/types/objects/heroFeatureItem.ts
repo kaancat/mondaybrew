@@ -60,11 +60,23 @@ export default defineType({
       validation: (Rule) =>
         Rule.custom((value, context) => {
           const linkType = (context.parent as ParentContext | undefined)?.linkType;
-          if (linkType === "manual" && !value) {
+          if (linkType !== "manual") return true;
+          if (!value) {
             return "Provide a URL for manual cards.";
           }
+          const normalized = value.trim();
+          const allowed =
+            normalized.startsWith("http://") ||
+            normalized.startsWith("https://") ||
+            normalized.startsWith("mailto:") ||
+            normalized.startsWith("tel:") ||
+            normalized.startsWith("/") ||
+            normalized.startsWith("#");
+          if (!allowed) {
+            return "Start with https://, mailto:, tel:, /, or # for manual links.";
+          }
           return true;
-        }).uri({ allowRelative: true, scheme: ["http", "https", "mailto", "tel"] }),
+        }),
     }),
     defineField({
       name: "title",
@@ -135,4 +147,3 @@ export default defineType({
     },
   },
 });
-
