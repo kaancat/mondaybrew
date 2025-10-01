@@ -57,10 +57,10 @@ export function HeroFeatureCarousel({ items }: Props) {
   return (
     <div className="group relative w-full max-w-lg text-white sm:max-w-md md:absolute md:bottom-16 md:right-16">
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-70 transition duration-500 group-hover:opacity-100">
-        <div className="absolute inset-0 translate-y-8 scale-110 rounded-[32px] bg-[radial-gradient(circle_at_30%_20%,rgba(118,105,255,0.38),transparent_60%)] blur-3xl" />
+        <div className="absolute inset-0 translate-y-6 scale-110 rounded-[5px] bg-[radial-gradient(circle_at_30%_20%,rgba(118,105,255,0.38),transparent_62%)] blur-3xl" />
       </div>
-      <div className="relative rounded-[28px] bg-gradient-to-br from-white/55 via-white/15 to-white/5 p-[1px]">
-        <div className="relative flex h-full flex-col overflow-hidden rounded-[27px] border border-white/15 bg-[rgba(20,18,28,0.85)] shadow-[0_40px_80px_rgba(8,6,20,0.45)] backdrop-blur-2xl">
+      <div className="relative rounded-[5px] bg-gradient-to-br from-white/45 via-white/12 to-white/4 p-[1px]">
+        <div className="relative flex h-full flex-col overflow-hidden rounded-[5px] border border-white/15 bg-[rgba(20,18,28,0.85)] shadow-[0_40px_80px_rgba(8,6,20,0.45)] backdrop-blur-2xl">
           <CardWrapper
             {...(isLink ? { href: cardHref } : {})}
             className={cn(
@@ -70,7 +70,7 @@ export function HeroFeatureCarousel({ items }: Props) {
             )}
           >
             {active.image?.url ? (
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[5px]">
                 <Image
                   src={active.image.url}
                   alt={active.image.alt || active.title || "Hero feature"}
@@ -80,7 +80,7 @@ export function HeroFeatureCarousel({ items }: Props) {
                   blurDataURL={active.image.lqip}
                   className="object-cover"
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/60" />
+                <div className="pointer-events-none absolute inset-0 rounded-t-[5px] bg-gradient-to-b from-white/10 via-transparent to-black/60" />
                 <div className="absolute left-6 top-6 flex size-10 items-center justify-center rounded-full bg-white/14 backdrop-blur-md ring-1 ring-white/35">
                   <span className="text-base font-semibold leading-none text-white/90">{"//"}</span>
                 </div>
@@ -122,8 +122,8 @@ export function HeroFeatureCarousel({ items }: Props) {
                         }}
                         aria-label="Previous hero feature"
                         className={cn(
-                          "inline-flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/8 text-white transition",
-                          "hover:border-white/35 hover:bg-white/16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60",
+                          "inline-flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition",
+                          "hover:border-white/35 hover:bg-white/18 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60",
                         )}
                       >
                         <ArrowLeft className="size-4" aria-hidden="true" />
@@ -137,25 +137,14 @@ export function HeroFeatureCarousel({ items }: Props) {
                         }}
                         aria-label="Next hero feature"
                         className={cn(
-                          "inline-flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/12 text-white transition",
-                          "hover:border-white/40 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60",
+                          "inline-flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/14 text-white transition",
+                          "hover:border-white/40 hover:bg-white/24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60",
                         )}
                       >
                         <ArrowRight className="size-4" aria-hidden="true" />
                       </button>
                     </div>
                   ) : null}
-                  <span
-                    className={cn(
-                      "inline-flex size-12 items-center justify-center rounded-full border border-white/18 bg-white/12 text-white transition",
-                      isLink
-                        ? "group-hover:border-white/35 group-hover:bg-white/20"
-                        : "text-white/50",
-                    )}
-                    aria-hidden="true"
-                  >
-                    <ArrowRight className="size-5" />
-                  </span>
                 </div>
               </div>
             </div>

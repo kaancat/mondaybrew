@@ -7,48 +7,16 @@ export default defineType({
   fields: [
     defineField({
       name: "items",
-      title: "Items",
+      title: "Cards",
+      description:
+        "Add one or more featured cards. Each card can link to CMS content or a manual URL, and you can override the image, title, and copy per card.",
       type: "array",
       of: [{ type: "heroFeatureItem" }],
       options: {
         layout: "grid",
         sortable: true,
       },
-      validation: (Rule) => Rule.max(8),
-    }),
-    defineField({
-      name: "title",
-      type: "string",
-      hidden: ({ parent }) => Boolean(parent?.items?.length),
-    }),
-    defineField({
-      name: "excerpt",
-      type: "text",
-      rows: 3,
-      hidden: ({ parent }) => Boolean(parent?.items?.length),
-    }),
-    defineField({
-      name: "href",
-      type: "string",
-      hidden: ({ parent }) => Boolean(parent?.items?.length),
-    }),
-    defineField({
-      name: "metaLabel",
-      type: "string",
-      hidden: ({ parent }) => Boolean(parent?.items?.length),
-    }),
-    defineField({
-      name: "image",
-      type: "imageWithAlt",
-      hidden: ({ parent }) => Boolean(parent?.items?.length),
-    }),
-    defineField({
-      name: "reference",
-      title: "Linked content",
-      type: "reference",
-      to: [{ type: "page" }, { type: "post" }, { type: "caseStudy" }],
-      weak: true,
-      hidden: ({ parent }) => Boolean(parent?.items?.length),
+      validation: (Rule) => Rule.required().min(1).max(8),
     }),
   ],
 });

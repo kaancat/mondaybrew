@@ -166,6 +166,7 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
         )
       },
       items[]{
+        linkType,
         title,
         excerpt,
         href,

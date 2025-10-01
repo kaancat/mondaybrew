@@ -56,6 +56,7 @@ export type HeroFeatureItem = {
   metaLabel?: string;
   image?: WithImageAsset;
   reference?: HeroFeatureReference | null;
+  linkType?: "reference" | "manual" | null;
 } | null;
 
 export type HeroFeature = {
@@ -213,7 +214,12 @@ export function HeroSection({
       const reference = item.reference || null;
       const title = item.title || reference?.title || null;
       const excerpt = item.excerpt || reference?.excerpt || null;
-      const href = item.href || buildReferenceHref(reference) || fallbackHref;
+      const linkType = item.linkType || (reference ? "reference" : null);
+      const manualHref = item.href?.trim() || undefined;
+      const href =
+        linkType === "manual"
+          ? manualHref
+          : buildReferenceHref(reference) || manualHref || fallbackHref;
       if (!href) return null;
       const imageSource = item.image || reference?.image || null;
       const resolvedImage = resolveImageAsset(imageSource);
