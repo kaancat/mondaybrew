@@ -55,6 +55,7 @@ export type HeroSectionData = {
   cta?: HeroButton;
   feature?: HeroFeature;
   background?: HeroBackground;
+  alignment?: "start" | "center" | "end";
   // legacy fallbacks
   primary?: HeroButton;
   secondary?: HeroButton;
@@ -121,6 +122,7 @@ export function HeroSection({
   cta,
   feature,
   background,
+  alignment = "center",
   primary,
   secondary,
   media,
@@ -145,7 +147,10 @@ export function HeroSection({
   const featureMeta = feature?.metaLabel || FEATURE_META_FALLBACK[locale];
 
   const offsetVar = "var(--hero-offset, 140px)";
-  const heroHeight = `min(940px, max(560px, calc(100vh - ${offsetVar})))`;
+  const heroHeight = `min(880px, max(520px, calc(100vh - ${offsetVar})))`;
+
+  const contentJustify = alignment === "start" ? "flex-start" : alignment === "end" ? "flex-end" : "center";
+  const contentGap = alignment === "center" ? "gap-12" : "gap-10";
 
   return (
     <Section padding="none" innerClassName="pb-20" style={{ marginTop: offsetVar }}>
@@ -180,7 +185,10 @@ export function HeroSection({
           <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/55 to-black/82" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col justify-between gap-12 px-6 py-10 sm:px-10 lg:px-16">
+        <div
+          className={`relative z-10 flex h-full flex-col ${contentGap} px-6 py-10 sm:px-10 lg:px-16`}
+          style={{ justifyContent: contentJustify }}
+        >
           <div className="max-w-2xl text-white">
             {eyebrow ? <span className="mb-4 block text-sm font-medium text-white/80">{eyebrow}</span> : null}
             {Array.isArray(headline) ? (

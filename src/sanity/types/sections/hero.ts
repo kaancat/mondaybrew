@@ -37,6 +37,20 @@ export default defineType({
     defineField({ name: "helper", type: "string" }),
     defineField({ name: "cta", title: "CTA", type: "button" }),
     defineField({
+      name: "alignment",
+      title: "Text alignment",
+      type: "string",
+      options: {
+        list: [
+          { title: "Top", value: "start" },
+          { title: "Center", value: "center" },
+          { title: "Bottom", value: "end" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "center",
+    }),
+    defineField({
       name: "feature",
       title: "Feature card",
       type: "heroFeature",
