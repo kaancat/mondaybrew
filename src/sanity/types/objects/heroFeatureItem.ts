@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import type { PreviewValue } from "sanity";
 
 type ParentContext = {
   linkType?: "reference" | "manual";
@@ -142,8 +143,8 @@ export default defineType({
       return {
         title: title || fallbackTitle || "Untitled feature",
         subtitle: metaLabel || (linkType === "manual" ? "Manual" : "Linked content"),
-        media,
-      };
+        media: media as PreviewValue["media"],
+      } satisfies PreviewValue;
     },
   },
 });
