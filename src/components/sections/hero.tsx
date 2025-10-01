@@ -59,6 +59,12 @@ export type HeroSectionData = {
   media?: WithImageAsset;
 };
 
+export function isHeroSection(
+  section: { _type?: string } | null | undefined,
+): section is HeroSectionData & { _type: "hero" } {
+  return Boolean(section && section._type === "hero");
+}
+
 type HeroSectionProps = HeroSectionData & { locale?: "da" | "en" };
 
 const CTA_FALLBACK: Record<"da" | "en", string> = {
