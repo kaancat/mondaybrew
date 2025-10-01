@@ -222,7 +222,8 @@ export function HeroSection({
         : null;
       const referenceMeta = reference?._type ? FEATURE_META_BY_TYPE[reference._type]?.[locale] : undefined;
       const metaLabel = item.metaLabel || referenceMeta || FEATURE_META_FALLBACK[locale];
-      const key = reference?._type ? `${reference._type}:${reference.slug || idx}` : `manual-${idx}`;
+      const slugKey = reference?.slug ? reference.slug.replace(/^\/+|\/+$/g, "") : "";
+      const key = reference?._type ? `${reference._type}:${slugKey || idx}` : `manual-${idx}`;
       return { key, title, excerpt, href, metaLabel, image } satisfies HeroFeatureDisplayItem;
     })
     .filter(Boolean) as HeroFeatureDisplayItem[];
