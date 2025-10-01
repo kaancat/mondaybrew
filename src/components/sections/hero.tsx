@@ -145,17 +145,17 @@ export function HeroSection({
   const featureMeta = feature?.metaLabel || FEATURE_META_FALLBACK[locale];
 
   return (
-    <Section padding="none" className="pt-16 md:pt-24" innerClassName="pb-16">
+    <Section padding="none" className="mt-28 md:mt-36 lg:mt-40 xl:mt-44" innerClassName="pb-20">
       <div
-        className="relative isolate flex w-full flex-col overflow-hidden rounded-[5px] border border-white/10 bg-black/60"
-        style={{ minHeight: "560px", height: "min(90vh, 980px)" }}
+        className="relative isolate flex w-full flex-col overflow-hidden rounded-[5px] border border-white/10 bg-black/60 shadow-[0_50px_120px_rgba(8,6,20,0.35)]"
+        style={{ minHeight: "560px", height: "min(85vh, 940px)" }}
       >
         <div className="absolute inset-0">
           {videoUrl ? (
             <video
               className="h-full w-full object-cover"
               src={videoUrl}
-              poster={poster.url}
+              poster={poster.url || backgroundUrl}
               preload="metadata"
               autoPlay
               muted
@@ -174,7 +174,7 @@ export function HeroSection({
               className="object-cover"
             />
           ) : null}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/55 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/55 to-black/82" />
         </div>
 
         <div className="relative z-10 flex h-full flex-col justify-between gap-12 px-6 py-10 sm:px-10 lg:px-16">
