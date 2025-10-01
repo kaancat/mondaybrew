@@ -124,7 +124,7 @@ export function HeroSection({
   media,
 }: HeroSectionProps) {
   const backgroundMedia = background?.image ?? media ?? null;
-  const posterMedia = background?.poster;
+  const posterMedia = background?.poster ?? null;
   const { url: backgroundUrl, lqip: backgroundLqip, alt: backgroundAlt } =
     resolveImageAsset(backgroundMedia);
   const poster = resolveImageAsset(posterMedia);
