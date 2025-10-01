@@ -38,12 +38,23 @@ export type HeroBackground = {
   poster?: WithImageAsset;
 } | null;
 
+export type HeroFeatureReference = {
+  _type?: 'page' | 'post' | 'caseStudy';
+  title?: string;
+  locale?: string;
+  slug?: string;
+  href?: string;
+  excerpt?: string;
+  image?: WithImageAsset;
+} | null;
+
 export type HeroFeature = {
   title?: string;
   excerpt?: string;
   href?: string;
   metaLabel?: string;
   image?: WithImageAsset;
+  reference?: HeroFeatureReference;
 } | null;
 
 export type HeroSectionData = {
@@ -80,6 +91,12 @@ const FEATURE_META_FALLBACK: Record<"da" | "en", string> = {
   en: "Latest entries",
 };
 
+const FEATURE_META_BY_TYPE: Record<string, Record<"da" | "en", string>> = {
+  post: { da: "Blogindlæg", en: "Blog post" },
+  caseStudy: { da: "Case study", en: "Case study" },
+  page: { da: "Side", en: "Page" },
+};
+
 const portableComponents: Partial<PortableTextReactComponents> = {
   marks: {
     em: ({ children }: { children?: ReactNode }) => <em className="italic">{children}</em>,
@@ -112,6 +129,27 @@ function resolveImageAsset(media: WithImageAsset): {
   return { url, dimensions, lqip, alt };
 }
 
+function buildReferenceHref(ref?: HeroFeatureReference | null): string | undefined {
+  if (!ref?._type) return undefined;
+  const slug = ref.slug?.replace(/^\/+|\/+$/g, '') || '';
+  const locale = ref.locale || 'da';
+
+  switch (ref._type) {
+    case 'post':
+      return slug ? `${locale === 'en' ? '/en/blog/' : '/blog/'}${slug}` : locale === 'en' ? '/en/blog' : '/blog';
+    case 'caseStudy':
+      return slug ? `${locale === 'en' ? '/en/cases/' : '/cases/'}${slug}` : locale === 'en' ? '/en/cases' : '/cases';
+    case 'page': {
+      if (!slug || slug === 'home') {
+        return locale === 'en' ? '/en' : '/';
+      }
+      return `${locale === 'en' ? '/en/' : '/'}${slug}`.replace(/\/+$/g, '');
+    }
+    default:
+      return undefined;
+  }
+}
+
 export function HeroSection({
   locale = "da",
   eyebrow,
@@ -142,9 +180,17 @@ export function HeroSection({
 
   const helperText = helper || null;
 
-  const featureHref = feature?.href || secondaryData?.href || "/cases";
-  const featureImage = resolveImageAsset(feature?.image ?? null);
-  const featureMeta = feature?.metaLabel || FEATURE_META_FALLBACK[locale];
+  const featureReference = feature?.reference;
+  const featureTitle = feature?.title || featureReference?.title || null;
+  const featureExcerpt = feature?.excerpt || featureReference?.excerpt || null;
+  const referenceHref = buildReferenceHref(featureReference);
+  const featureHref = feature?.href || referenceHref || secondaryData?.href || "/cases";
+  const featureImageSource = feature?.image ?? featureReference?.image ?? null;
+  const featureImage = resolveImageAsset(featureImageSource);
+  const referenceMeta = featureReference?._type
+    ? FEATURE_META_BY_TYPE[featureReference._type]?.[locale]
+    : undefined;
+  const featureMeta = feature?.metaLabel || referenceMeta || FEATURE_META_FALLBACK[locale];
 
   const offsetVar = "var(--hero-offset, 140px)";
   const bottomGapVar = "var(--hero-bottom-gap, 96px)";
@@ -226,16 +272,16 @@ export function HeroSection({
             ) : null}
           </div>
 
-          {feature ? (
+          {feature && (featureTitle || featureExcerpt || featureImage.url || featureReference) ? (
             <Link
               href={featureHref}
-              className="group mt-10 w-full max-w-md rounded-[5px] border border-white/10 bg-black/55 text-white shadow-[0_32px_80px_rgba(15,10,30,0.35)] backdrop-blur-xl transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[rgba(255,145,77,0.55)] hover:border-white/20 hover:bg-black/70 hover:shadow-[0_40px_90px_rgba(11,8,20,0.45)] sm:max-w-sm md:mt-0 md:max-w-xs md:hover:-translate-y-1 lg:max-w-sm xl:max-w-md md:absolute md:bottom-12 md:right-12"
+              className="group mt-10 w-full max-w-md rounded-[5px] border border-white/12 bg-[rgba(24,24,24,0.65)] text-white shadow-[0_32px_80px_rgba(12,10,24,0.35)] backdrop-blur-[14px] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[rgba(255,145,77,0.55)] hover:border-white/25 hover:bg-[rgba(24,24,24,0.72)] hover:shadow-[0_40px_90px_rgba(11,8,20,0.45)] sm:max-w-sm md:mt-0 md:max-w-xs md:hover:-translate-y-1 lg:max-w-sm xl:max-w-md md:absolute md:bottom-12 md:right-12"
             >
               {featureImage.url ? (
                 <div className="relative aspect-[16/10] w-full overflow-hidden rounded-t-[5px]">
                   <Image
                     src={featureImage.url}
-                    alt={featureImage.alt || feature?.title || "Feature"}
+                    alt={featureImage.alt || featureTitle || "Feature"}
                     fill
                     sizes="(max-width: 768px) 100vw, 420px"
                     placeholder={featureImage.lqip ? "blur" : undefined}
@@ -245,10 +291,10 @@ export function HeroSection({
                 </div>
               ) : null}
               <div className="flex flex-col gap-3 px-5 py-6">
-                {feature?.title ? <h3 className="text-lg font-semibold leading-tight">{feature.title}</h3> : null}
-                {feature?.excerpt ? (
+                {featureTitle ? <h3 className="text-lg font-semibold leading-tight">{featureTitle}</h3> : null}
+                {featureExcerpt ? (
                   <p className="text-sm text-white/80">
-                    {feature.excerpt}
+                    {featureExcerpt}
                   </p>
                 ) : null}
                 <div className="mt-2 flex items-center justify-between text-xs font-medium text-white/65">

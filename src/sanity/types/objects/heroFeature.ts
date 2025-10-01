@@ -14,5 +14,12 @@ export default defineType({
     defineField({ name: "href", type: "string" }),
     defineField({ name: "metaLabel", type: "string" }),
     defineField({ name: "image", type: "imageWithAlt" }),
+    defineField({
+      name: "reference",
+      title: "Linked content",
+      type: "reference",
+      to: [{ type: "page" }, { type: "post" }, { type: "caseStudy" }],
+      weak: true,
+    }),
   ],
 });

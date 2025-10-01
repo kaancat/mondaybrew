@@ -119,6 +119,51 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
             }
           }
         }
+      },
+      reference->{
+        _type,
+        title,
+        locale,
+        "slug": slug.current,
+        "excerpt": coalesce(excerpt, summary, description),
+        "image": coalesce(
+          mainImage{
+            alt,
+            "image": {
+              "asset": asset->{
+                url,
+                metadata{
+                  lqip,
+                  dimensions
+                }
+              }
+            }
+          },
+          heroImage.image{
+            alt,
+            "image": {
+              "asset": asset->{
+                url,
+                metadata{
+                  lqip,
+                  dimensions
+                }
+              }
+            }
+          },
+          coverImage{
+            alt,
+            "image": {
+              "asset": asset->{
+                url,
+                metadata{
+                  lqip,
+                  dimensions
+                }
+              }
+            }
+          }
+        )
       }
     },
     media {
