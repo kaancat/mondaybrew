@@ -7,6 +7,7 @@ import type { PortableTextReactComponents } from "@portabletext/react";
 import type { ReactNode } from "react";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
+import { HeroFeatureCarousel, type HeroFeatureDisplayItem } from "./hero-feature-carousel";
 
 const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "ghost", "link"]);
 
@@ -48,13 +49,23 @@ export type HeroFeatureReference = {
   image?: WithImageAsset;
 } | null;
 
+export type HeroFeatureItem = {
+  title?: string;
+  excerpt?: string;
+  href?: string;
+  metaLabel?: string;
+  image?: WithImageAsset;
+  reference?: HeroFeatureReference | null;
+} | null;
+
 export type HeroFeature = {
   title?: string;
   excerpt?: string;
   href?: string;
   metaLabel?: string;
   image?: WithImageAsset;
-  reference?: HeroFeatureReference;
+  reference?: HeroFeatureReference | null;
+  items?: HeroFeatureItem[] | null;
 } | null;
 
 export type HeroSectionData = {
@@ -180,21 +191,45 @@ export function HeroSection({
 
   const helperText = helper || null;
 
-  const featureReference = feature?.reference;
-  const featureTitle = feature?.title || featureReference?.title || null;
-  const featureExcerpt = feature?.excerpt || featureReference?.excerpt || null;
-  const referenceHref = buildReferenceHref(featureReference);
-  const featureHref = feature?.href || referenceHref || secondaryData?.href || "/cases";
-  const featureImageSource = feature?.image ?? featureReference?.image ?? null;
-  const featureImage = resolveImageAsset(featureImageSource);
-  const referenceMeta = featureReference?._type
-    ? FEATURE_META_BY_TYPE[featureReference._type]?.[locale]
-    : undefined;
-  const featureMeta = feature?.metaLabel || referenceMeta || FEATURE_META_FALLBACK[locale];
+  const fallbackHref = secondaryData?.href || "/cases";
+  const featureItemsSource = feature?.items?.length
+    ? feature.items
+    : feature
+    ? [
+        {
+          title: feature.title,
+          excerpt: feature.excerpt,
+          href: feature.href,
+          metaLabel: feature.metaLabel,
+          image: feature.image,
+          reference: feature.reference,
+        },
+      ]
+    : [];
+
+  const featureItems = featureItemsSource
+    .map((item, idx) => {
+      if (!item) return null;
+      const reference = item.reference || null;
+      const title = item.title || reference?.title || null;
+      const excerpt = item.excerpt || reference?.excerpt || null;
+      const href = item.href || buildReferenceHref(reference) || fallbackHref;
+      if (!href) return null;
+      const imageSource = item.image || reference?.image || null;
+      const resolvedImage = resolveImageAsset(imageSource);
+      const image = resolvedImage.url
+        ? { url: resolvedImage.url, alt: resolvedImage.alt || title || undefined, lqip: resolvedImage.lqip }
+        : null;
+      const referenceMeta = reference?._type ? FEATURE_META_BY_TYPE[reference._type]?.[locale] : undefined;
+      const metaLabel = item.metaLabel || referenceMeta || FEATURE_META_FALLBACK[locale];
+      const key = reference?._type ? `${reference._type}:${reference.slug || idx}` : `manual-${idx}`;
+      return { key, title, excerpt, href, metaLabel, image } satisfies HeroFeatureDisplayItem;
+    })
+    .filter(Boolean) as HeroFeatureDisplayItem[];
 
   const offsetVar = "var(--hero-offset, 140px)";
   const bottomGapVar = "var(--hero-bottom-gap, 96px)";
-  const heroHeight = `min(820px, max(480px, calc(100vh - ${offsetVar} - ${bottomGapVar})))`;
+  const heroHeight = `min(820px, max(500px, calc(100vh - ${offsetVar} - ${bottomGapVar})))`;
 
   const contentJustify = alignment === "start" ? "flex-start" : alignment === "end" ? "flex-end" : "center";
   const contentGap = alignment === "center" ? "gap-12" : "gap-10";
@@ -266,46 +301,16 @@ export function HeroSection({
             {ctaData ? (
               <div className="mt-6">
                 <Button asChild size="lg" variant={resolveVariant(ctaData, "default")}>
-                  <Link href={ctaHref}>{ctaLabel}</Link>
+                  <Link href={ctaHref} className="inline-flex items-center gap-2">
+                    <span>{ctaLabel}</span>
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
                 </Button>
               </div>
             ) : null}
           </div>
 
-          {feature && (featureTitle || featureExcerpt || featureImage.url || featureReference) ? (
-            <Link
-              href={featureHref}
-              className="group mt-10 w-full max-w-md rounded-[5px] border border-white/12 bg-[rgba(24,24,24,0.65)] text-white shadow-[0_32px_80px_rgba(12,10,24,0.35)] backdrop-blur-[14px] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[rgba(255,145,77,0.55)] hover:border-white/25 hover:bg-[rgba(24,24,24,0.72)] hover:shadow-[0_40px_90px_rgba(11,8,20,0.45)] sm:max-w-sm md:mt-0 md:max-w-xs md:hover:-translate-y-1 lg:max-w-sm xl:max-w-md md:absolute md:bottom-12 md:right-12"
-            >
-              {featureImage.url ? (
-                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-t-[5px]">
-                  <Image
-                    src={featureImage.url}
-                    alt={featureImage.alt || featureTitle || "Feature"}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 420px"
-                    placeholder={featureImage.lqip ? "blur" : undefined}
-                    blurDataURL={featureImage.lqip}
-                    className="object-cover"
-                  />
-                </div>
-              ) : null}
-              <div className="flex flex-col gap-3 px-5 py-6">
-                {featureTitle ? <h3 className="text-lg font-semibold leading-tight">{featureTitle}</h3> : null}
-                {featureExcerpt ? (
-                  <p className="text-sm text-white/80">
-                    {featureExcerpt}
-                  </p>
-                ) : null}
-                <div className="mt-2 flex items-center justify-between text-xs font-medium text-white/65">
-                  <span>{featureMeta}</span>
-                  <span className="inline-flex size-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition group-hover:border-white/25 group-hover:bg-white/20">
-                    <ArrowRight className="size-4" aria-hidden="true" />
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ) : null}
+          {featureItems.length ? <HeroFeatureCarousel items={featureItems} /> : null}
         </div>
 
         {feature ? (

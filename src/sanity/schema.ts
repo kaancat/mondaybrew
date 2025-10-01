@@ -27,6 +27,7 @@ import navigationGroup from "./types/objects/navigationGroup";
 import navigationSection from "./types/objects/navigationSection";
 import heroBackground from "./types/objects/heroBackground";
 import heroFeature from "./types/objects/heroFeature";
+import heroFeatureItem from "./types/objects/heroFeatureItem";
 
 const schemas = [
   // documents
@@ -59,6 +60,7 @@ const schemas = [
   navigationSection,
   heroBackground,
   heroFeature,
+  heroFeatureItem,
 ];
 
 export default schemas;
