@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PortableText } from "@portabletext/react";
 import type { PortableTextBlock } from "@portabletext/types";
+import type { PortableTextReactComponents } from "@portabletext/react";
+import type { ReactNode } from "react";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 
@@ -77,13 +79,13 @@ const FEATURE_META_FALLBACK: Record<"da" | "en", string> = {
   en: "Latest entries",
 };
 
-const portableComponents = {
+const portableComponents: Partial<PortableTextReactComponents> = {
   marks: {
-    em: ({ children }: { children: React.ReactNode }) => <em className="italic">{children}</em>,
-    strong: ({ children }: { children: React.ReactNode }) => <strong className="font-semibold">{children}</strong>,
+    em: ({ children }: { children?: ReactNode }) => <em className="italic">{children}</em>,
+    strong: ({ children }: { children?: ReactNode }) => <strong className="font-semibold">{children}</strong>,
   },
   block: {
-    normal: ({ children }: { children: React.ReactNode }) => (
+    normal: ({ children }: { children?: ReactNode }) => (
       <h1 className="text-balance text-[clamp(2.5rem,4vw+1rem,4.5rem)] font-semibold leading-[1.05] text-white">
         {children}
       </h1>
