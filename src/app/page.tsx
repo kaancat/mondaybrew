@@ -41,6 +41,7 @@ export default async function Home() {
           heading={hero.heading}
           subheading={hero.subheading}
           helper={hero.helper}
+          alignment={hero.alignment as "start" | "center" | "end" | undefined}
           primary={hero.primary}
           secondary={hero.secondary}
           cta={hero.cta}

@@ -147,13 +147,18 @@ export function HeroSection({
   const featureMeta = feature?.metaLabel || FEATURE_META_FALLBACK[locale];
 
   const offsetVar = "var(--hero-offset, 140px)";
-  const heroHeight = `min(880px, max(520px, calc(100vh - ${offsetVar})))`;
+  const bottomGapVar = "var(--hero-bottom-gap, 96px)";
+  const heroHeight = `min(820px, max(480px, calc(100vh - ${offsetVar} - ${bottomGapVar})))`;
 
   const contentJustify = alignment === "start" ? "flex-start" : alignment === "end" ? "flex-end" : "center";
   const contentGap = alignment === "center" ? "gap-12" : "gap-10";
 
   return (
-    <Section padding="none" innerClassName="pb-20" style={{ marginTop: offsetVar }}>
+    <Section
+      padding="none"
+      innerClassName="pb-16"
+      style={{ marginTop: offsetVar, marginBottom: bottomGapVar }}
+    >
       <div
         className="relative isolate flex w-full flex-col overflow-hidden rounded-[5px] border border-white/10 bg-black/60 shadow-[0_50px_120px_rgba(8,6,20,0.35)]"
         style={{ minHeight: "560px", height: heroHeight }}
