@@ -144,11 +144,14 @@ export function HeroSection({
   const featureImage = resolveImageAsset(feature?.image ?? null);
   const featureMeta = feature?.metaLabel || FEATURE_META_FALLBACK[locale];
 
+  const offsetVar = "var(--hero-offset, 140px)";
+  const heroHeight = `min(940px, max(560px, calc(100vh - ${offsetVar})))`;
+
   return (
-    <Section padding="none" className="mt-28 md:mt-36 lg:mt-40 xl:mt-44" innerClassName="pb-20">
+    <Section padding="none" innerClassName="pb-20" style={{ marginTop: offsetVar }}>
       <div
         className="relative isolate flex w-full flex-col overflow-hidden rounded-[5px] border border-white/10 bg-black/60 shadow-[0_50px_120px_rgba(8,6,20,0.35)]"
-        style={{ minHeight: "560px", height: "min(85vh, 940px)" }}
+        style={{ minHeight: "560px", height: heroHeight }}
       >
         <div className="absolute inset-0">
           {videoUrl ? (

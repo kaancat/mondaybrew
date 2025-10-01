@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Globe } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 export type NavbarLink = {
@@ -67,6 +67,7 @@ const FALLBACK_LOCALE = "da";
 export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const pathname = usePathname();
   const normalizedPath = pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
+  const headerRef = useRef<HTMLElement>(null);
 
   const localeConfig = useMemo(() => {
     const available = locales?.available?.length ? locales.available : [FALLBACK_LOCALE, "en"];
@@ -94,8 +95,26 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const menuShell =
     "rounded-[5px] border border-white/12 bg-[rgba(24,24,24,0.6)] text-white shadow-[0_24px_48px_rgba(0,0,0,0.22)] backdrop-blur-[12px] transition-all duration-300";
 
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el || typeof window === "undefined") return;
+
+    const updateOffset = () => {
+      const rect = el.getBoundingClientRect();
+      const style = window.getComputedStyle(el);
+      const top = parseFloat(style.top || "0");
+      const gap = 24;
+      const offset = Math.round(top + rect.height + gap);
+      document.documentElement.style.setProperty("--hero-offset", `${offset}px`);
+    };
+
+    updateOffset();
+    window.addEventListener("resize", updateOffset);
+    return () => window.removeEventListener("resize", updateOffset);
+  }, []);
+
   return (
-    <header className="fixed inset-x-0 top-4 z-50">
+    <header ref={headerRef} className="fixed inset-x-0 top-4 z-50">
       <div className="layout-container">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
