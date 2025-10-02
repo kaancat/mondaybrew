@@ -19,7 +19,6 @@ import type {
   PillarsSectionData,
   PillarsServiceItem,
 } from "./pillars.types";
-import { isPillarsSection } from "./pillars.types";
 
 const TRANSITION_EASE = [0.22, 0.61, 0.36, 1] as const;
 
@@ -332,5 +331,4 @@ export function PillarsSection({ sectionTitle, groups }: PillarsSectionProps) {
   );
 }
 
-export { isPillarsSection };
 export type { PillarsSectionData };

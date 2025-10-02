@@ -3,7 +3,8 @@ import { fetchSanity } from "@/lib/sanity.client";
 import { siteSettingsQuery, homePageQuery } from "@/lib/sanity.queries";
 import { seoToMetadata, type Seo } from "@/lib/seo";
 import { HeroSection, isHeroSection, type HeroSectionData } from "@/components/sections/hero";
-import { PillarsSection, isPillarsSection, type PillarsSectionData } from "@/components/sections/pillars";
+import { PillarsSection } from "@/components/sections/pillars";
+import { isPillarsSection, type PillarsSectionData } from "@/components/sections/pillars.types";
 import { Section } from "@/components/layout/section";
 
 type SiteSettings = { seo?: Seo };
