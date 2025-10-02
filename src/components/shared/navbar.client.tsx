@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe, Moon, Sun } from "lucide-react";
+import { ArrowRight, Globe, Moon, Palette, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { defaultThemeId, getThemeDefinition, themeOrder, ThemeId } from "@/theme/registry";
 
 export type NavbarLink = {
   label: string;
@@ -176,18 +177,38 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
           </div>
 
           <div className="flex items-center gap-3 md:justify-end md:pl-4">
-            <button
-              type="button"
-              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-              className="inline-flex size-9 items-center justify-center rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_28%,var(--mb-bg)_72%)] bg-[color:color-mix(in_oklch,var(--surface-dark)_75%,var(--surface-base)_25%)] text-[color:var(--mb-bg)] transition hover:border-[color:color-mix(in_oklch,var(--mb-ink)_35%,var(--mb-bg)_65%)] hover:bg-[color:color-mix(in_oklch,var(--surface-dark)_85%,var(--surface-base)_15%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)] focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-dark)_80%,var(--surface-base)_20%)]"
-              aria-label="Toggle color theme"
-            >
-              {mounted && resolvedTheme === "dark" ? (
-                <Sun className="size-[16px]" aria-hidden="true" />
-              ) : (
-                <Moon className="size-[16px]" aria-hidden="true" />
-              )}
-            </button>
+            {(() => {
+              const currentTheme = (resolvedTheme as ThemeId | undefined) ?? defaultThemeId;
+              const cycle = themeOrder;
+              const currentIndex = cycle.indexOf(currentTheme);
+              const nextThemeId = cycle[(currentIndex + 1) % cycle.length] ?? cycle[0];
+              const nextTheme = getThemeDefinition(nextThemeId);
+
+              const icon = (() => {
+                if (!mounted) {
+                  return <Sun className="size-[16px]" aria-hidden="true" />;
+                }
+                switch (nextThemeId) {
+                  case "light-alt":
+                    return <Palette className="size-[16px]" aria-hidden="true" />;
+                  case "dark":
+                    return <Moon className="size-[16px]" aria-hidden="true" />;
+                  default:
+                    return <Sun className="size-[16px]" aria-hidden="true" />;
+                }
+              })();
+
+              return (
+                <button
+                  type="button"
+                  onClick={() => setTheme(nextThemeId)}
+                  className="inline-flex size-9 items-center justify-center rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_28%,var(--mb-bg)_72%)] bg-[color:color-mix(in_oklch,var(--surface-dark)_75%,var(--surface-base)_25%)] text-[color:var(--mb-bg)] transition hover:border-[color:color-mix(in_oklch,var(--mb-ink)_35%,var(--mb-bg)_65%)] hover:bg-[color:color-mix(in_oklch,var(--surface-dark)_85%,var(--surface-base)_15%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)] focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-dark)_80%,var(--surface-base)_20%)]"
+                  aria-label={`Switch to ${nextTheme.label}`}
+                >
+                  {icon}
+                </button>
+              );
+            })()}
             <Link
               href={ctaHref}
               className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[color:var(--mb-accent)] px-3 py-1.5 text-xs font-semibold text-[color:var(--mb-bg)] transition-colors hover:bg-[color:color-mix(in_oklch,var(--mb-accent)_88%,white_12%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)] focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-dark)_80%,var(--surface-base)_20%)]"
