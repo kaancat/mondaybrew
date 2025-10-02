@@ -1,18 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import {
   motion,
-  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { Section } from "@/components/layout/section";
-import { cn } from "@/lib/utils";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   PillarLinkReference,
   PillarsGroup,
@@ -20,52 +17,7 @@ import type {
   PillarsServiceItem,
 } from "./pillars.types";
 
-const TRANSITION_EASE = [0.22, 0.61, 0.36, 1] as const;
-
-const chipsContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      delayChildren: 0.05,
-      staggerChildren: 0.055,
-      ease: TRANSITION_EASE,
-    },
-  },
-};
-
-const chipItemVariants = {
-  hidden: { opacity: 0, scale: 0.94 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.18, ease: TRANSITION_EASE },
-  },
-};
-
-const listContainerVariants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.22,
-      ease: TRANSITION_EASE,
-      staggerChildren: 0.06,
-    },
-  },
-};
-
-const listItemVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.18, ease: TRANSITION_EASE },
-  },
-};
-
-type DisplayServiceItem = {
+type DisplayItem = {
   key: string;
   label: string;
   href?: string;
@@ -73,11 +25,15 @@ type DisplayServiceItem = {
 
 type DisplayGroup = {
   key: string;
-  headline: string;
+  title: string;
   description: string;
   chips: string[];
   listLabel: string;
-  items: DisplayServiceItem[];
+  items: DisplayItem[];
+};
+
+type PillarsSectionProps = PillarsSectionData & {
+  locale?: "da" | "en";
 };
 
 function resolveReferenceHref(reference?: PillarLinkReference | null): string | undefined {
@@ -107,13 +63,12 @@ function normalizeServiceItem(
   item: PillarsServiceItem,
   groupIndex: number,
   itemIndex: number,
-): DisplayServiceItem | null {
-  if (!item?.label) return null;
-  const label = item.label.trim();
+): DisplayItem | null {
+  const label = item?.label?.trim();
   if (!label) return null;
 
-  const manualHref = item.href?.trim();
-  const referenceHref = resolveReferenceHref(item.reference);
+  const manualHref = item?.href?.trim();
+  const referenceHref = resolveReferenceHref(item?.reference);
   const href = referenceHref || manualHref || undefined;
 
   return {
@@ -126,32 +81,31 @@ function normalizeServiceItem(
 function normalizeGroup(group: PillarsGroup, index: number): DisplayGroup | null {
   if (!group) return null;
 
-  const headline = group.headline?.trim();
+  const title = group.headline?.trim();
   const description = group.description?.trim();
   const listLabel = group.listLabel?.trim();
 
-  if (!headline || !description || !listLabel) return null;
+  if (!title || !description || !listLabel) return null;
 
-  const chips = (group.chips || []).filter((chip): chip is string => Boolean(chip?.trim())).map((chip) => chip.trim());
+  const chips = (group.chips || [])
+    .map((chip) => chip?.trim())
+    .filter((chip): chip is string => Boolean(chip));
+
   const items = (group.items || [])
     .map((item, itemIndex) => normalizeServiceItem(item, index, itemIndex))
-    .filter((value): value is DisplayServiceItem => Boolean(value));
+    .filter((value): value is DisplayItem => Boolean(value));
 
   if (!chips.length || !items.length) return null;
 
   return {
     key: group.key?.trim() || `pillar-${index}`,
-    headline,
+    title,
     description,
     chips,
     listLabel,
     items,
   };
 }
-
-type PillarsSectionProps = PillarsSectionData & {
-  locale?: "da" | "en";
-};
 
 export function PillarsSection({ sectionTitle, groups }: PillarsSectionProps) {
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -176,252 +130,155 @@ export function PillarsSection({ sectionTitle, groups }: PillarsSectionProps) {
   const webY = useTransform(scrollYProgress, [0.3, 0.85], [24, 0]);
   const webPointer = useTransform(scrollYProgress, [0.45, 0.5], ["none", "auto"]);
 
-  const [isMounted, setIsMounted] = useState(false);
-  const [shouldOverlay, setShouldOverlay] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const lastIndexRef = useRef(0);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    const media = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   const marketingGroup = displayGroups[0];
   const webGroup = displayGroups[1];
   const trailingGroups = displayGroups.slice(2);
-  const hasOverlayCandidates = Boolean(marketingGroup && webGroup);
+  const overlayActive = Boolean(
+    marketingGroup &&
+      webGroup &&
+      isDesktop &&
+      !shouldReduceMotion,
+  );
 
-  const hasGroups = displayGroups.length > 0;
-
-  useEffect(() => {
-    if (!isMounted) return;
-    if (shouldReduceMotion || !hasOverlayCandidates) {
-      setShouldOverlay(false);
-      return;
-    }
-    const media = window.matchMedia("(min-width: 1024px)");
-    const update = () => setShouldOverlay(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, [hasOverlayCandidates, isMounted, shouldReduceMotion]);
-
-  useMotionValueEvent(scrollYProgress, "change", (value) => {
-    if (!shouldOverlay) return;
-    const nextIndex = value < 0.5 ? 0 : 1;
-    if (nextIndex !== lastIndexRef.current) {
-      lastIndexRef.current = nextIndex;
-      setActiveIndex(nextIndex);
-    }
-  });
-
-  const commonStyle = {
-    willChange: "transform, opacity" as const,
-    transform: "translateZ(0)",
-  };
-
-  const overlayActive = shouldOverlay && hasOverlayCandidates;
-
-  if (!hasGroups) {
+  if (!displayGroups.length) {
     return null;
   }
 
   return (
-    <Section padding="lg" className="relative">
-      <div ref={sectionRef} className="relative">
-        <div className="relative">
-          <div
-            className={cn(
-              "isolate rounded-[28px] border border-black/5 bg-white/80 p-8 shadow-[0_45px_120px_rgba(73,68,75,0.12)] backdrop-blur-[36px] sm:p-10 lg:p-12",
-              overlayActive ? "lg:sticky lg:top-[88px]" : undefined,
-            )}
-          >
-            {sectionTitle ? (
-              <p className="mb-8 text-sm font-semibold uppercase tracking-[0.32em] text-muted-foreground">
-                {sectionTitle}
-              </p>
-            ) : null}
+    <section ref={sectionRef} className="layout-section layout-section-lg relative">
+      <div className="layout-container space-y-12">
+        {sectionTitle ? (
+          <p className="text-sm font-semibold uppercase tracking-[0.32em] text-muted-foreground">
+            {sectionTitle}
+          </p>
+        ) : null}
 
-            {overlayActive ? (
-              <div className="relative min-h-[clamp(90vh,120vh,140vh)]">
+        {overlayActive ? (
+          <div className="relative isolate">
+            <div className="relative isolate rounded-[5px] border border-black/8 bg-white/85 px-6 py-10 shadow-[0_45px_120px_rgba(73,68,75,0.14)] backdrop-blur lg:sticky lg:top-[88px] lg:px-10 lg:py-14">
+              <div className="min-h-[clamp(90vh,120vh,140vh)]">
                 <motion.div
                   className="absolute inset-0 will-change-transform"
                   style={{
-                    ...commonStyle,
                     opacity: marketingOpacity,
                     y: marketingY,
                     pointerEvents: marketingPointer,
                   }}
                 >
-                  {marketingGroup ? (
-                    <GroupColumns
-                      group={marketingGroup}
-                      isActive={activeIndex === 0}
-                      overlayMode
-                    />
-                  ) : null}
+                  <PillarLayout data={marketingGroup} />
                 </motion.div>
 
                 <motion.div
                   className="absolute inset-0 will-change-transform"
                   style={{
-                    ...commonStyle,
                     opacity: webOpacity,
                     y: webY,
                     pointerEvents: webPointer,
                   }}
                 >
-                  {webGroup ? (
-                    <GroupColumns
-                      group={webGroup}
-                      isActive={activeIndex === 1}
-                      overlayMode
-                    />
-                  ) : null}
+                  <PillarLayout data={webGroup} />
                 </motion.div>
               </div>
-            ) : (
-              <div className="space-y-16">
-                {displayGroups.map((group) => (
+            </div>
+            {trailingGroups.length ? (
+              <div className="mt-16 space-y-12">
+                {trailingGroups.map((group) => (
                   <div
                     key={group.key}
-                    className="grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-start"
+                    className="rounded-[5px] border border-black/8 bg-white/85 px-6 py-10 shadow-[0_35px_90px_rgba(73,68,75,0.14)] backdrop-blur lg:px-10 lg:py-14"
                   >
-                    <GroupColumns group={group} isActive overlayMode={false} />
+                    <PillarLayout data={group} />
                   </div>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
-
-          {overlayActive && trailingGroups.length ? (
-            <div className="mt-20 space-y-16">
-              {trailingGroups.map((group) => (
-                <div
-                  key={group.key}
-                  className="grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-start"
-                >
-                  <GroupColumns group={group} isActive overlayMode={false} />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
+        ) : (
+          <div className="space-y-12">
+            {displayGroups.map((group) => (
+              <div
+                key={group.key}
+                className="rounded-[5px] border border-black/8 bg-white/85 px-6 py-10 shadow-[0_35px_90px_rgba(73,68,75,0.14)] backdrop-blur lg:px-10 lg:py-14"
+              >
+                <PillarLayout data={group} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Debug overlay — uncomment while tuning */}
+      {/* Debug overlay – uncomment while tuning */}
       {/* <DebugBar progress={scrollYProgress} peA={marketingPointer} peB={webPointer} /> */}
-    </Section>
+    </section>
   );
 }
 
-function GroupColumns({
-  group,
-  isActive,
-  overlayMode,
-}: {
-  group: DisplayGroup;
-  isActive: boolean;
-  overlayMode: boolean;
-}) {
-  const headingAnimate = overlayMode ? (isActive ? { opacity: 1, y: 0 } : { opacity: 0.6, y: -12 }) : { opacity: 1, y: 0 };
-  const bodyAnimate = overlayMode ? (isActive ? { opacity: 1, y: 0 } : { opacity: 0.48, y: -12 }) : { opacity: 1, y: 0 };
-  const listAnimate = overlayMode ? (isActive ? { opacity: 1, y: 0 } : { opacity: 0.5, y: 18 }) : { opacity: 1, y: 0 };
-
+function PillarLayout({ data }: { data: DisplayGroup }) {
   return (
-    <>
-      <div className="space-y-8 pr-2">
-        <motion.h2
-          className="text-balance text-[clamp(2.5rem,4vw+1rem,4.5rem)] font-semibold leading-[1.05] text-[#1b1720]"
-          initial={false}
-          animate={headingAnimate}
-          transition={{ duration: 0.22, ease: TRANSITION_EASE }}
-        >
-          {group.headline}
-        </motion.h2>
-        <motion.p
-          className="max-w-[48ch] text-[clamp(1.05rem,1.3vw+0.8rem,1.3rem)] leading-relaxed text-[#49444b]/80"
-          initial={false}
-          animate={bodyAnimate}
-          transition={{ duration: 0.2, ease: TRANSITION_EASE, delay: overlayMode ? 0.04 : 0 }}
-        >
-          {group.description}
-        </motion.p>
-
-        <motion.ul
-          className="flex flex-wrap gap-3"
-          variants={chipsContainerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-20% 0px -20% 0px" }}
-        >
-          {group.chips.map((chip, chipIndex) => (
-            <motion.li
-              key={`${group.key}-chip-${chipIndex}`}
-              variants={chipItemVariants}
-              className="rounded-[12px] border border-black/5 bg-white/70 px-4 py-2 text-[0.95rem] font-medium text-[#1b1720]/80 shadow-[0_6px_24px_rgba(73,68,75,0.08)] backdrop-blur"
+    <div className="grid grid-cols-1 gap-10 py-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:gap-14">
+      <div className="max-w-[52ch] space-y-6">
+        <h2 className="text-balance text-[clamp(2rem,4.6vw,4rem)] font-semibold leading-[1.05] text-[#1b1720]">
+          {data.title}
+        </h2>
+        <p className="text-[clamp(1rem,1.6vw,1.25rem)] text-[#49444b]/80">
+          {data.description}
+        </p>
+        <ul className="flex flex-wrap gap-3 pt-2">
+          {data.chips.map((chip) => (
+            <li
+              key={chip}
+              className="rounded-[5px] bg-[#1b1720]/[0.06] px-4 py-2 text-[0.95rem] font-medium text-[#1b1720]/80"
             >
               {chip}
-            </motion.li>
+            </li>
           ))}
-        </motion.ul>
+        </ul>
       </div>
 
-      <motion.div
-        className="right-list flex flex-col gap-6 rounded-[20px] border border-black/6 bg-white/70 p-6 shadow-[0_30px_80px_-50px_rgba(73,68,75,0.55)] backdrop-blur"
-        initial={false}
-        animate={listAnimate}
-        transition={{ duration: 0.22, ease: TRANSITION_EASE, delay: overlayMode ? 0.04 : 0 }}
-        style={{ transform: "translateZ(0)" }}
-      >
-        <span className="text-[0.82rem] font-semibold uppercase tracking-[0.42em] text-[#1b1720]/60">
-          {group.listLabel}
-        </span>
-        <motion.ul
-          className="divide-y divide-black/10 will-change-transform"
-          variants={listContainerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-20% 0px -20% 0px" }}
-        >
-          {group.items.map((item) => (
-            <motion.li key={item.key} variants={listItemVariants} className="will-change-transform">
+      <div className="right-list">
+        <div className="mb-4 text-[12px] font-medium uppercase tracking-[0.18em] text-[#1b1720]/55">
+          {data.listLabel}
+        </div>
+        <ul className="divide-y divide-black/10 rounded-[5px] bg-white/92">
+          {data.items.map((item) => (
+            <li key={item.key}>
               {item.href ? (
                 <Link
                   href={item.href}
-                  className="group/list block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/15 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                  className="group flex items-center justify-between gap-6 px-2 py-4 text-left text-[clamp(1.35rem,2.4vw,2rem)] font-semibold text-[#1b1720]"
                   aria-label={`Open ${item.label}`}
-                  style={{ transform: "translateZ(0)" }}
                 >
-                  <div className="flex items-center justify-between gap-6 py-4 text-left transition-colors duration-150 ease-out group-hover/list:bg-black/[0.035]">
-                    <span className="text-[clamp(1.35rem,2.2vw+0.5rem,1.8rem)] font-semibold tracking-tight text-[#1b1720]">
-                      {item.label}
-                    </span>
-                    <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/80 text-[#1b1720]/70 transition duration-150 ease-out group-hover/list:-translate-x-[2px] group-hover/list:text-[#1b1720] group-focus-visible/list:-translate-x-[2px]">
-                      <ArrowUpRight className="size-5 transition-transform duration-150 ease-out group-hover/list:translate-x-[4px] group-focus-visible/list:translate-x-[4px]" />
-                    </span>
-                  </div>
+                  <span className="leading-tight">{item.label}</span>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[5px] bg-[#1b1720]/[0.05] text-[#1b1720]/75 transition-transform duration-150 ease-out group-hover:translate-x-1 group-hover:text-[#1b1720]">
+                    <ArrowUpRight className="size-5" aria-hidden="true" />
+                  </span>
                 </Link>
               ) : (
                 <span
-                  className="block cursor-default select-none opacity-75"
+                  className="flex cursor-default items-center justify-between gap-6 px-2 py-4 text-[clamp(1.35rem,2.4vw,2rem)] font-semibold text-[#1b1720]/65"
                   aria-disabled="true"
-                  style={{ transform: "translateZ(0)" }}
                 >
-                  <div className="flex items-center justify-between gap-6 py-4 text-left">
-                    <span className="text-[clamp(1.35rem,2.2vw+0.5rem,1.8rem)] font-semibold tracking-tight text-[#1b1720]/70">
-                      {item.label}
-                    </span>
-                    <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/60 text-[#1b1720]/40">
-                      <ArrowUpRight className="size-5" />
-                    </span>
-                  </div>
+                  <span className="leading-tight">{item.label}</span>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[5px] bg-[#1b1720]/[0.04] text-[#1b1720]/40">
+                    <ArrowUpRight className="size-5" aria-hidden="true" />
+                  </span>
                 </span>
               )}
-            </motion.li>
+            </li>
           ))}
-        </motion.ul>
-      </motion.div>
-    </>
+        </ul>
+      </div>
+    </div>
   );
 }
 
