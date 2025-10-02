@@ -311,7 +311,7 @@ export function ServicesSplit({
                 animate="visible"
                 exit="hidden"
                 variants={listVariants}
-                className="divide-y divide-[color:color-mix(in_oklch,var(--mb-ink)_12%,var(--mb-bg)_88%)] overflow-hidden rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_14%,var(--mb-bg)_86%)] bg-[color:var(--surface-base)]"
+                className="divide-y divide-[color:color-mix(in_oklch,var(--mb-ink)_18%,var(--mb-bg)_82%)] border-b border-[color:color-mix(in_oklch,var(--mb-ink)_18%,var(--mb-bg)_82%)]"
               >
                 {activeTab.services.map((service) => {
                   const isActiveService = service.id === activeService?.id;
@@ -321,10 +321,10 @@ export function ServicesSplit({
                       <button
                         type="button"
                         className={cn(
-                          "group flex w-full items-center justify-between gap-6 rounded-[5px] border border-transparent px-6 py-5 text-left text-[18px] font-medium transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-base)]",
+                          "group flex w-full items-center justify-between gap-6 px-0 py-4 text-left text-[18px] font-medium transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-dark)]",
                           isActiveService
-                            ? "border-[color:color-mix(in_oklch,var(--mb-ink)_18%,var(--mb-bg)_82%)] bg-[color:color-mix(in_oklch,var(--mb-bg)_88%,var(--mb-ink)_12%)] text-[color:var(--mb-ink)]"
-                            : "text-[color:color-mix(in_oklch,var(--mb-ink)_62%,var(--mb-bg)_38%)] hover:border-[color:color-mix(in_oklch,var(--mb-ink)_16%,var(--mb-bg)_84%)] hover:bg-[color:color-mix(in_oklch,var(--mb-bg)_92%,var(--mb-ink)_8%)] hover:text-[color:var(--mb-ink)]",
+                            ? "font-semibold text-[color:var(--mb-ink)]"
+                            : "text-[color:color-mix(in_oklch,var(--mb-ink)_62%,var(--mb-bg)_38%)] hover:text-[color:var(--mb-ink)]",
                         )}
                         onClick={() => setActiveServiceId(service.id)}
                         aria-current={isActiveService ? "true" : undefined}
@@ -332,8 +332,8 @@ export function ServicesSplit({
                         <span className="truncate">{service.title}</span>
                         <span
                           className={cn(
-                            "inline-flex size-9 min-h-9 min-w-9 items-center justify-center rounded-[5px] border border-transparent bg-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--mb-ink)_10%)] text-[color:color-mix(in_oklch,var(--mb-ink)_58%,var(--mb-bg)_42%)] transition-transform duration-200 group-hover:translate-x-[0.35rem]",
-                            isActiveService && "bg-[color:var(--surface-dark)] text-[color:var(--mb-bg)]",
+                            "inline-flex size-9 min-h-9 min-w-9 items-center justify-center text-[color:color-mix(in_oklch,var(--mb-ink)_58%,var(--mb-bg)_42%)] transition-transform duration-200 group-hover:translate-x-[0.35rem]",
+                            isActiveService && "text-[color:var(--mb-ink)]",
                           )}
                           aria-hidden
                         >
