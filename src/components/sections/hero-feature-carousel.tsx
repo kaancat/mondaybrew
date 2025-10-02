@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type ElementType } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type HeroFeatureDisplayItem = {
@@ -47,6 +47,7 @@ export function HeroFeatureCarousel({ items }: Props) {
   const active = normalized[safeIndex];
 
   const goNext = () => setIndex((prev) => (prev + 1) % normalized.length);
+  const goPrev = () => setIndex((prev) => (prev - 1 + normalized.length) % normalized.length);
 
   const cardHref = active.href?.trim();
   const isLink = Boolean(cardHref);
@@ -80,9 +81,6 @@ export function HeroFeatureCarousel({ items }: Props) {
                   className="object-cover"
                 />
                 <div className="pointer-events-none absolute inset-0 rounded-t-[5px] bg-gradient-to-b from-white/12 via-transparent to-black/50" />
-                <div className="absolute left-6 top-6 flex size-10 items-center justify-center rounded-full bg-white/14 backdrop-blur-md ring-1 ring-white/35">
-                  <span className="text-base font-semibold leading-none text-white/90">{"//"}</span>
-                </div>
                 {normalized.length > 1 ? (
                   <div className="absolute right-6 top-6 rounded-full bg-black/28 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/85">
                     {String(safeIndex + 1).padStart(2, "0")} / {String(normalized.length).padStart(2, "0")}
@@ -110,21 +108,38 @@ export function HeroFeatureCarousel({ items }: Props) {
                   ) : null}
                 </div>
                 {normalized.length > 1 ? (
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      goNext();
-                    }}
-                    aria-label="Next hero feature"
-                    className={cn(
-                      "inline-flex size-11 items-center justify-center rounded-full border border-white/18 bg-white/16 text-white transition",
-                      "hover:border-white/32 hover:bg-white/24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/65",
-                    )}
-                  >
-                    <ArrowRight className="size-5" aria-hidden="true" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        goPrev();
+                      }}
+                      aria-label="Previous hero feature"
+                      className={cn(
+                        "inline-flex size-10 items-center justify-center rounded-full border border-white/18 bg-white/14 text-white transition",
+                        "hover:border-white/30 hover:bg-white/22 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60",
+                      )}
+                    >
+                      <ArrowLeft className="size-[18px]" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        goNext();
+                      }}
+                      aria-label="Next hero feature"
+                      className={cn(
+                        "inline-flex size-11 items-center justify-center rounded-full border border-white/18 bg-white/16 text-white transition",
+                        "hover:border-white/32 hover:bg-white/24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/65",
+                      )}
+                    >
+                      <ArrowRight className="size-5" aria-hidden="true" />
+                    </button>
+                  </div>
                 ) : null}
               </div>
             </div>
