@@ -31,6 +31,12 @@ type SanityServicesSplitMedia = {
   image?: SanityImageWithAlt;
   videoUrl?: string | null;
   poster?: SanityImageWithAlt;
+  videoFile?: {
+    asset?: {
+      url?: string | null;
+      mimeType?: string | null;
+    } | null;
+  } | null;
 } | null;
 
 type SanityServicesSplitService = {
@@ -165,13 +171,15 @@ function mapServiceMedia(media?: SanityServicesSplitMedia | null): ServicesSplit
   const mode = media.mode || (media.videoUrl ? "video" : "image");
 
   if (mode === "video") {
-    const src = media.videoUrl?.trim();
+    const fileSrc = media.videoFile?.asset?.url?.trim();
+    const src = fileSrc || media.videoUrl?.trim();
     if (!src) return undefined;
     const poster = resolveImageWithAlt(media.poster);
     return {
       type: "video",
       src,
       poster: poster.url,
+      fileType: media.videoFile?.asset?.mimeType || undefined,
     } satisfies ServicesSplitMedia;
   }
 

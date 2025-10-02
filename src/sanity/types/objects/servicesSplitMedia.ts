@@ -41,13 +41,26 @@ export default defineType({
       hidden: ({ parent }) => (parent as { mode?: string } | undefined)?.mode !== "video",
       validation: (Rule) =>
         Rule.custom((value, context) => {
-          const parent = context.parent as { mode?: string } | undefined;
+          const parent = context.parent as {
+            mode?: string;
+            videoFile?: { asset?: unknown } | null;
+          } | undefined;
           const url = value as string | undefined;
-          if (parent?.mode === "video" && !url) {
-            return "Enter a video URL";
+          if (parent?.mode === "video" && !url && !parent?.videoFile) {
+            return "Provide a video URL or upload a file";
           }
           return true;
         }).uri({ allowRelative: false, scheme: ["http", "https"] }),
+    }),
+    defineField({
+      name: "videoFile",
+      title: "Video file",
+      type: "file",
+      options: {
+        accept: "video/*",
+      },
+      hidden: ({ parent }) => (parent as { mode?: string } | undefined)?.mode !== "video",
+      description: "Upload an MP4 or WebM file. Optional if a video URL is provided.",
     }),
     defineField({
       name: "poster",

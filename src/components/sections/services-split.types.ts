@@ -9,6 +9,7 @@ export type ServicesSplitMedia =
       type: "video";
       src: string;
       poster?: string;
+      fileType?: string;
     };
 
 export type ServicesSplitCta = {

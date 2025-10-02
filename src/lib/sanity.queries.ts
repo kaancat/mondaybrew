@@ -289,6 +289,12 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
                 }
               },
               videoUrl,
+              videoFile{
+                asset->{
+                  url,
+                  mimeType
+                }
+              },
               poster{
                 alt,
                 image{
@@ -333,6 +339,12 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
                 }
               },
               videoUrl,
+              videoFile{
+                asset->{
+                  url,
+                  mimeType
+                }
+              },
               poster{
                 alt,
                 image{
