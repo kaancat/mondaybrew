@@ -230,26 +230,6 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
         }
       }
     },
-    _type == "pillars" => {
-      sectionTitle,
-      groups[]{
-        key,
-        headline,
-        description,
-        chips,
-        listLabel,
-        items[]{
-          label,
-          href,
-          reference->{
-            _type,
-            title,
-            locale,
-            "slug": slug.current
-          }
-        }
-      }
-    },
     media {
       alt,
       image {

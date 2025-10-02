@@ -3,16 +3,13 @@ import { fetchSanity } from "@/lib/sanity.client";
 import { siteSettingsQuery, homePageQuery } from "@/lib/sanity.queries";
 import { seoToMetadata, type Seo } from "@/lib/seo";
 import { HeroSection, isHeroSection, type HeroSectionData } from "@/components/sections/hero";
-import { PillarsSection } from "@/components/sections/pillars";
-import { isPillarsSection, type PillarsSectionData } from "@/components/sections/pillars.types";
 import { Section } from "@/components/layout/section";
 
 type SiteSettings = { seo?: Seo };
 
-type PillarsSectionWithType = PillarsSectionData & { _type: "pillars" };
 type HeroSectionWithType = HeroSectionData & { _type: "hero" };
 
-type HomePageSection = HeroSectionWithType | PillarsSectionWithType | { _type?: string };
+type HomePageSection = HeroSectionWithType | { _type?: string };
 
 type HomePagePayload = {
   seo?: Seo;
@@ -37,7 +34,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomeEN() {
   const page = await fetchSanity<HomePagePayload>(homePageQuery, { locale: "en" });
   const hero = page?.sections?.find(isHeroSection);
-  const pillars = page?.sections?.find(isPillarsSection);
 
   return (
     <main className="space-y-24 pb-24">
@@ -66,9 +62,6 @@ export default async function HomeEN() {
           </p>
         </Section>
       )}
-      {pillars ? (
-        <PillarsSection sectionTitle={pillars.sectionTitle} groups={pillars.groups} locale="en" />
-      ) : null}
     </main>
   );
 }

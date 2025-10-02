@@ -16,7 +16,6 @@ import faq from "./types/sections/faq";
 import richText from "./types/sections/richText";
 import mediaBlock from "./types/sections/mediaBlock";
 import ctaBanner from "./types/sections/ctaBanner";
-import pillars from "./types/sections/pillars";
 
 import seo from "./types/objects/seo";
 import cta from "./types/objects/cta";
@@ -29,8 +28,6 @@ import navigationSection from "./types/objects/navigationSection";
 import heroBackground from "./types/objects/heroBackground";
 import heroFeature from "./types/objects/heroFeature";
 import heroFeatureItem from "./types/objects/heroFeatureItem";
-import pillarServiceLink from "./types/objects/pillarServiceLink";
-import pillarGroup from "./types/objects/pillarGroup";
 
 const schemas = [
   // documents
@@ -52,7 +49,6 @@ const schemas = [
   richText,
   mediaBlock,
   ctaBanner,
-  pillars,
   // objects
   seo,
   cta,
@@ -65,8 +61,6 @@ const schemas = [
   heroBackground,
   heroFeature,
   heroFeatureItem,
-  pillarServiceLink,
-  pillarGroup,
 ];
 
 export default schemas;

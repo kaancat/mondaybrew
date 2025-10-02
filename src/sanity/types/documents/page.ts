@@ -32,7 +32,6 @@ export default defineType({
         { type: "richText" },
         { type: "mediaBlock" },
         { type: "ctaBanner" },
-        { type: "pillars" },
       ],
     }),
     defineField({ name: "seo", type: "seo" }),
