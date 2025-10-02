@@ -3,16 +3,23 @@ import { fetchSanity } from "@/lib/sanity.client";
 import { siteSettingsQuery, homePageQuery } from "@/lib/sanity.queries";
 import { seoToMetadata, type Seo } from "@/lib/seo";
 import { HeroSection, isHeroSection, type HeroSectionData } from "@/components/sections/hero";
+import {
+  ServicesSplitSection,
+  isServicesSplitSection,
+  type ServicesSplitSectionData,
+} from "@/components/sections/services-split";
 import { Section } from "@/components/layout/section";
 
 type SiteSettings = { seo?: Seo };
 
-type HeroSectionWithType = HeroSectionData & { _type: "hero" };
+type HeroSectionWithType = HeroSectionData & { _type: "hero"; _key?: string };
+type ServicesSplitSectionWithType = ServicesSplitSectionData & { _type: "servicesSplit"; _key?: string };
 
-type HomePageSection = HeroSectionWithType | { _type?: string };
+type HomePageSection = HeroSectionWithType | ServicesSplitSectionWithType | { _type?: string; _key?: string };
 
 type HomePagePayload = {
   seo?: Seo;
+  locale?: "da" | "en";
   sections?: HomePageSection[];
 };
 
@@ -33,27 +40,43 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const page = await fetchSanity<HomePagePayload>(homePageQuery, { locale: "da" });
-  const hero = page?.sections?.find(isHeroSection);
+  const sections = page?.sections ?? [];
+  const locale = (page?.locale as "da" | "en" | undefined) ?? "da";
+  const hasHero = sections.some(isHeroSection);
 
   return (
     <main className="space-y-24 pb-24">
-      {hero ? (
-        <HeroSection
-          locale="da"
-          eyebrow={hero.eyebrow}
-          headline={hero.headline}
-          heading={hero.heading}
-          subheading={hero.subheading}
-          helper={hero.helper}
-          alignment={hero.alignment as "start" | "center" | "end" | undefined}
-          primary={hero.primary}
-          secondary={hero.secondary}
-          cta={hero.cta}
-          background={hero.background}
-          feature={hero.feature}
-          media={hero.media}
-        />
-      ) : (
+      {sections.map((section, index) => {
+        const key = section?._key ?? `section-${index}`;
+
+        if (isHeroSection(section)) {
+          return (
+            <HeroSection
+              key={key}
+              locale={locale}
+              eyebrow={section.eyebrow}
+              headline={section.headline}
+              heading={section.heading}
+              subheading={section.subheading}
+              helper={section.helper}
+              alignment={section.alignment as "start" | "center" | "end" | undefined}
+              primary={section.primary}
+              secondary={section.secondary}
+              cta={section.cta}
+              background={section.background}
+              feature={section.feature}
+              media={section.media}
+            />
+          );
+        }
+
+        if (isServicesSplitSection(section)) {
+          return <ServicesSplitSection key={key} {...section} />;
+        }
+
+        return null;
+      })}
+      {!hasHero ? (
         <Section innerClassName="flow">
           <span className="text-sm uppercase tracking-[0.25em] text-muted-foreground">Homepage</span>
           <h1>Heroindhold mangler i Sanity</h1>
@@ -61,7 +84,7 @@ export default async function Home() {
             Tilføj en Hero sektion til forsiden i Sanity (Forside → sektioner) for at se indholdet her.
           </p>
         </Section>
-      )}
+      ) : null}
     </main>
   );
 }

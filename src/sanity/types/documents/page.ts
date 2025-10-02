@@ -20,7 +20,7 @@ export default defineType({
     defineField({
       name: "sections",
       type: "array",
-      of: [{ type: "hero" }],
+      of: [{ type: "hero" }, { type: "servicesSplit" }],
     }),
     defineField({ name: "seo", type: "seo" }),
   ],

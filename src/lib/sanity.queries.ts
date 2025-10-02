@@ -68,69 +68,38 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
   locale,
   seo,
   sections[]{
-    ...,
-    background {
-      alt,
-      videoUrl,
-      image {
-        alt,
-        image {
-          asset->{
-            url,
-            metadata{
-              lqip,
-              dimensions
-            }
-          }
-        }
-      },
-      poster {
-        alt,
-        image {
-          asset->{
-            url,
-            metadata{
-              lqip,
-              dimensions
-            }
-          }
-        }
-      }
-    },
-    cta {
-      label,
-      href,
-      variant
-    },
-    helper,
-    feature {
-      title,
-      excerpt,
-      href,
-      metaLabel,
-      image {
-        alt,
-        image {
-          asset->{
-            url,
-            metadata{
-              lqip,
-              dimensions
-            }
-          }
-        }
-      },
-      reference->{
-        _type,
-        title,
-        locale,
-        "slug": slug.current,
-        "excerpt": coalesce(excerpt, summary, description),
-        "image": coalesce(
-          mainImage{
+    _type,
+    _key,
+    ...select(
+      _type == "hero" => {
+        eyebrow,
+        headline,
+        heading,
+        subheading,
+        helper,
+        alignment,
+        cta {
+          label,
+          href,
+          variant
+        },
+        primary {
+          label,
+          href,
+          variant
+        },
+        secondary {
+          label,
+          href,
+          variant
+        },
+        background {
+          alt,
+          videoUrl,
+          image {
             alt,
-            "image": {
-              "asset": asset->{
+            image {
+              asset->{
                 url,
                 metadata{
                   lqip,
@@ -139,22 +108,10 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
               }
             }
           },
-          heroImage.image{
+          poster {
             alt,
-            "image": {
-              "asset": asset->{
-                url,
-                metadata{
-                  lqip,
-                  dimensions
-                }
-              }
-            }
-          },
-          coverImage{
-            alt,
-            "image": {
-              "asset": asset->{
+            image {
+              asset->{
                 url,
                 metadata{
                   lqip,
@@ -163,15 +120,135 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
               }
             }
           }
-        )
-      },
-      items[]{
-        linkType,
-        title,
-        excerpt,
-        href,
-        metaLabel,
-        image {
+        },
+        feature {
+          title,
+          excerpt,
+          href,
+          metaLabel,
+          image {
+            alt,
+            image {
+              asset->{
+                url,
+                metadata{
+                  lqip,
+                  dimensions
+                }
+              }
+            }
+          },
+          reference->{
+            _type,
+            title,
+            locale,
+            "slug": slug.current,
+            "excerpt": coalesce(excerpt, summary, description),
+            "image": coalesce(
+              mainImage{
+                alt,
+                "image": {
+                  "asset": asset->{
+                    url,
+                    metadata{
+                      lqip,
+                      dimensions
+                    }
+                  }
+                }
+              },
+              heroImage.image{
+                alt,
+                "image": {
+                  "asset": asset->{
+                    url,
+                    metadata{
+                      lqip,
+                      dimensions
+                    }
+                  }
+                }
+              },
+              coverImage{
+                alt,
+                "image": {
+                  "asset": asset->{
+                    url,
+                    metadata{
+                      lqip,
+                      dimensions
+                    }
+                  }
+                }
+              }
+            )
+          },
+          items[]{
+            linkType,
+            title,
+            excerpt,
+            href,
+            metaLabel,
+            image {
+              alt,
+              image {
+                asset->{
+                  url,
+                  metadata{
+                    lqip,
+                    dimensions
+                  }
+                }
+              }
+            },
+            reference->{
+              _type,
+              title,
+              locale,
+              "slug": slug.current,
+              "excerpt": coalesce(excerpt, summary, description),
+              "image": coalesce(
+                mainImage{
+                  alt,
+                  "image": {
+                    "asset": asset->{
+                      url,
+                      metadata{
+                        lqip,
+                        dimensions
+                      }
+                    }
+                  }
+                },
+                heroImage.image{
+                  alt,
+                  "image": {
+                    "asset": asset->{
+                      url,
+                      metadata{
+                        lqip,
+                        dimensions
+                      }
+                    }
+                  }
+                },
+                coverImage{
+                  alt,
+                  "image": {
+                    "asset": asset->{
+                      url,
+                      metadata{
+                        lqip,
+                        dimensions
+                      }
+                    }
+                  }
+                }
+              )
+            }
+          }
+        },
+        media {
           alt,
           image {
             asset->{
@@ -182,66 +259,62 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
               }
             }
           }
-        },
-        reference->{
-          _type,
-          title,
-          locale,
-          "slug": slug.current,
-          "excerpt": coalesce(excerpt, summary, description),
-          "image": coalesce(
-            mainImage{
-              alt,
-              "image": {
-                "asset": asset->{
-                  url,
-                  metadata{
-                    lqip,
-                    dimensions
-                  }
-                }
-              }
-            },
-            heroImage.image{
-              alt,
-              "image": {
-                "asset": asset->{
-                  url,
-                  metadata{
-                    lqip,
-                    dimensions
-                  }
-                }
-              }
-            },
-            coverImage{
-              alt,
-              "image": {
-                "asset": asset->{
-                  url,
-                  metadata{
-                    lqip,
-                    dimensions
-                  }
-                }
-              }
-            }
-          )
         }
-      }
-    },
-    media {
-      alt,
-      image {
-        asset->{
-          url,
-          metadata{
-            lqip,
-            dimensions
+      },
+      _type == "servicesSplit" => {
+        eyebrow,
+        title,
+        description,
+        tabs[]{
+          _key,
+          label,
+          services[]{
+            _key,
+            label,
+            title,
+            summary,
+            description,
+            media{
+              mode,
+              image{
+                alt,
+                image{
+                  asset->{
+                    url,
+                    metadata{
+                      lqip
+                    }
+                  }
+                }
+              },
+              videoUrl,
+              poster{
+                alt,
+                image{
+                  asset->{
+                    url,
+                    metadata{
+                      lqip
+                    }
+                  }
+                }
+              }
+            },
+            primaryCta{
+              label,
+              href,
+              variant
+            },
+            secondaryCta{
+              label,
+              href,
+              variant
+            }
           }
         }
-      }
-    }
+      },
+      true => {}
+    )
   }
 }`;
 
