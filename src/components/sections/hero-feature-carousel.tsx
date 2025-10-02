@@ -8,49 +8,23 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const cardVariants = {
-  enter: { opacity: 0.45, y: 18, scale: 0.99 },
-  center: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.6, ease: [0.2, 0.9, 0.25, 1] },
-  },
-  exit: {
-    opacity: 0.45,
-    y: -16,
-    scale: 0.995,
-    transition: { duration: 0.55, ease: [0.55, 0, 0.1, 1] },
-  },
-} as const;
-
-const imageVariants = {
-  enter: { opacity: 0.65, y: 16, scale: 1.02 },
-  center: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.6, ease: [0.19, 1, 0.22, 1] },
-  },
-  exit: {
-    opacity: 0.5,
-    y: -14,
-    scale: 0.997,
-    transition: { duration: 0.55, ease: [0.55, 0, 0.1, 1] },
-  },
-} as const;
-
-const contentVariants = {
-  enter: { opacity: 0, y: 14 },
-  center: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: [0.19, 1, 0.22, 1], delay: 0.08 },
-  },
-  exit: {
+  enter: (direction: 1 | -1) => ({
+    x: direction > 0 ? 48 : -48,
     opacity: 0,
-    y: -12,
-    transition: { duration: 0.38, ease: [0.55, 0, 0.1, 1] },
+    scale: 0.98,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.35, ease: [0.33, 1, 0.68, 1] },
   },
+  exit: (direction: 1 | -1) => ({
+    x: direction > 0 ? -40 : 40,
+    opacity: 0,
+    scale: 0.98,
+    transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] },
+  }),
 } as const;
 
 export type HeroFeatureDisplayItem = {
@@ -83,6 +57,7 @@ export function HeroFeatureCarousel({ items }: Props) {
     [items],
   );
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState<1 | -1>(1);
 
   useEffect(() => {
     setIndex(0);
@@ -93,31 +68,38 @@ export function HeroFeatureCarousel({ items }: Props) {
   const safeIndex = Math.min(index, normalized.length - 1);
   const active = normalized[safeIndex];
 
-  const goNext = () => setIndex((prev) => (prev + 1) % normalized.length);
-  const goPrev = () => setIndex((prev) => (prev - 1 + normalized.length) % normalized.length);
-
   const cardHref = active.href?.trim();
   const isLink = Boolean(cardHref);
   const CardWrapper: ElementType = isLink ? Link : "div";
   const cardMetaLabel = active.metaLabel?.trim() || "Last entries";
 
+  const goNext = () => {
+    setDirection(1);
+    setIndex((prev) => (prev + 1) % normalized.length);
+  };
+
+  const goPrev = () => {
+    setDirection(-1);
+    setIndex((prev) => (prev - 1 + normalized.length) % normalized.length);
+  };
+
   return (
-    <div className="group relative w-full max-w-lg text-white sm:max-w-md md:absolute md:bottom-16 md:right-16">
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-85 transition duration-500 group-hover:opacity-100">
-        <div className="absolute inset-0 translate-y-6 scale-[1.1] rounded-[6px] bg-[radial-gradient(circle_at_20%_12%,rgba(134,118,255,0.32),transparent_72%)] blur-[44px]" />
+    <div className="group relative w-full max-w-md text-white sm:max-w-sm md:absolute md:bottom-12 md:right-12">
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-85 transition-opacity duration-500 group-hover:opacity-100">
+        <div className="absolute inset-0 translate-y-5 scale-[1.06] rounded-[6px] bg-[radial-gradient(circle_at_24%_14%,rgba(134,118,255,0.32),transparent_70%)] blur-[38px]" />
       </div>
 
-      <AnimatePresence initial={false}>
+      <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={active.key}
+          custom={direction}
           variants={cardVariants}
           initial="enter"
           animate="center"
           exit="exit"
-          layout
-          className="relative rounded-[6px] bg-gradient-to-br from-white/38 via-white/14 to-white/0 p-[1.2px]"
+          className="relative rounded-[6px] bg-gradient-to-br from-white/32 via-white/12 to-white/0 p-[1px]"
         >
-          <div className="relative flex h-full flex-col overflow-hidden rounded-[6px] border border-white/14 bg-[rgba(14,12,26,0.38)] shadow-[0_46px_120px_rgba(8,7,18,0.38)] backdrop-blur-[32px]">
+          <div className="relative flex h-full flex-col overflow-hidden rounded-[6px] border border-white/14 bg-[rgba(14,12,26,0.4)] shadow-[0_40px_110px_rgba(8,7,18,0.35)] backdrop-blur-[26px]">
             <CardWrapper
               {...(isLink ? { href: cardHref } : {})}
               className={cn(
@@ -127,49 +109,30 @@ export function HeroFeatureCarousel({ items }: Props) {
               )}
             >
               {active.image?.url ? (
-                <motion.div
-                  className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[6px] px-5 pb-3 pt-5"
-                  variants={imageVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  layout
-                >
-                  <div className="relative h-full w-full overflow-hidden rounded-[10px]">
+                <div className="px-4 pb-3 pt-4">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[9px]">
                     <Image
                       src={active.image.url}
                       alt={active.image.alt || active.title || "Hero feature"}
                       fill
-                      sizes="(max-width: 768px) 100vw, 560px"
+                      sizes="(max-width: 768px) 100vw, 520px"
                       placeholder={active.image.lqip ? "blur" : undefined}
                       blurDataURL={active.image.lqip}
                       className="object-cover"
                     />
-                    <div className="pointer-events-none absolute inset-0 rounded-[10px] bg-gradient-to-b from-white/14 via-transparent to-black/45" />
+                    <div className="pointer-events-none absolute inset-0 rounded-[9px] bg-gradient-to-b from-white/12 via-transparent to-black/45" />
                   </div>
                   {normalized.length > 1 ? (
-                    <motion.div
-                      className="absolute right-7 top-7 rounded-full bg-black/32 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/90"
-                      initial={{ opacity: 0, y: -12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -12 }}
-                      transition={{ duration: 0.28, ease: [0.19, 1, 0.22, 1] }}
-                    >
+                    <div className="absolute right-7 top-7 rounded-full bg-black/28 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/85">
                       {String(safeIndex + 1).padStart(2, "0")} / {String(normalized.length).padStart(2, "0")}
-                    </motion.div>
+                    </div>
                   ) : null}
-                </motion.div>
+                </div>
               ) : null}
 
-              <motion.div
-                className="flex flex-1 flex-col gap-3 px-6 pb-6 pt-3 sm:px-8 sm:pb-9 sm:pt-4"
-                variants={contentVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-              >
+              <div className="flex flex-1 flex-col gap-3 px-6 pb-6 pt-2 sm:px-7 sm:pb-7 sm:pt-3">
                 {active.title ? (
-                  <h3 className="text-[1.5rem] font-semibold leading-tight tracking-tight text-white">
+                  <h3 className="text-[1.35rem] font-semibold leading-tight tracking-tight text-white">
                     {active.title}
                   </h3>
                 ) : null}
@@ -177,11 +140,11 @@ export function HeroFeatureCarousel({ items }: Props) {
                   <p className="text-base text-white/78 sm:text-lg line-clamp-3">{active.excerpt}</p>
                 ) : null}
 
-                <div className="mt-auto flex flex-col gap-3 pt-3">
-                  <div className="flex flex-col gap-1 text-sm font-medium text-white/72">
+                <div className="mt-auto flex flex-col gap-3 pt-2">
+                  <div className="flex flex-col gap-1 text-sm font-medium text-white/70">
                     <span>{cardMetaLabel}</span>
                     {normalized.length > 1 ? (
-                      <span className="text-[0.68rem] uppercase tracking-[0.28em] text-white/52">
+                      <span className="text-[0.64rem] uppercase tracking-[0.28em] text-white/45">
                         {String(safeIndex + 1).padStart(2, "0")} — {String(normalized.length).padStart(2, "0")}
                       </span>
                     ) : null}
@@ -190,8 +153,8 @@ export function HeroFeatureCarousel({ items }: Props) {
                   <div className="flex items-center justify-between">
                     <div className="h-px flex-1 rounded-full bg-white/14" aria-hidden="true" />
                     {normalized.length > 1 ? (
-                      <div className="ml-3 flex items-center gap-0 rounded-full border border-white/22 bg-white/12 p-[2px] backdrop-blur-sm">
-                        <div className="flex items-center overflow-hidden rounded-full border border-white/14 bg-black/24">
+                      <div className="ml-3 flex items-center gap-0 rounded-full border border-white/20 bg-white/10 p-[1.5px] backdrop-blur-sm">
+                        <div className="flex items-center overflow-hidden rounded-full border border-white/16 bg-black/22">
                           <button
                             type="button"
                             onClick={(event) => {
@@ -201,13 +164,13 @@ export function HeroFeatureCarousel({ items }: Props) {
                             }}
                             aria-label="Previous hero feature"
                             className={cn(
-                              "inline-flex h-10 w-16 items-center justify-center border-r border-white/18 text-white/70 transition",
+                              "inline-flex h-8 w-10 items-center justify-center text-white/70 transition",
                               "hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
                             )}
                           >
-                            <ArrowLeft className="size-[18px]" aria-hidden="true" />
+                            <ArrowLeft className="size-[14px]" aria-hidden="true" />
                           </button>
-                          <div className="h-full w-px bg-white/20" aria-hidden="true" />
+                          <div className="h-6 w-px bg-white/20" aria-hidden="true" />
                           <button
                             type="button"
                             onClick={(event) => {
@@ -217,18 +180,18 @@ export function HeroFeatureCarousel({ items }: Props) {
                             }}
                             aria-label="Next hero feature"
                             className={cn(
-                              "inline-flex h-10 w-16 items-center justify-center text-white transition",
+                              "inline-flex h-8 w-10 items-center justify-center text-white transition",
                               "hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60",
                             )}
                           >
-                            <ArrowRight className="size-5" aria-hidden="true" />
+                            <ArrowRight className="size-[14px]" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
                     ) : null}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </CardWrapper>
           </div>
         </motion.div>
