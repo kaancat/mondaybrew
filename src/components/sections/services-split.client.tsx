@@ -448,7 +448,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
     return index === 0 ? "primary" : "secondary";
   })();
   const baseStyles =
-    "inline-flex h-11 items-center justify-center gap-2 rounded-[999px] px-6 text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-base)_92%,white_8%)]";
+    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[999px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-base)_92%,white_8%)]";
 
   if (resolvedVariant === "primary") {
     return (
