@@ -321,7 +321,7 @@ export function ServicesSplit({
                       <button
                         type="button"
                         className={cn(
-                          "group flex w-full items-center justify-between gap-6 px-0 py-4 text-left text-[18px] font-medium transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-dark)]",
+                          "group flex w-full items-center justify-between gap-6 px-0 py-4 text-left text-[20px] font-medium transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-dark)]",
                           isActiveService
                             ? "font-semibold text-[color:var(--mb-ink)]"
                             : "text-[color:color-mix(in_oklch,var(--mb-ink)_62%,var(--mb-bg)_38%)] hover:text-[color:var(--mb-ink)]",
