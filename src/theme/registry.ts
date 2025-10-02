@@ -59,7 +59,7 @@ const themeDefinitions: ThemeDefinition[] = [
     label: "Dark",
     appearance: "dark",
     description: "Brand-aligned night mode — deep ink surfaces and warm orange highlights.",
-    className: "dark theme-dark",
+    className: "dark",
     tokens: {
       background: "#121017",
       surface: "color-mix(in oklch, #121017 96%, black 4%)",
