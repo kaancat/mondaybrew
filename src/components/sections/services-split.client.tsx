@@ -357,27 +357,27 @@ export function ServicesSplit({
                 animate="visible"
                 exit="hidden"
                 variants={detailVariants}
-                className="rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_12%,var(--mb-bg)_88%)] bg-[color:color-mix(in_oklch,var(--surface-base)_95%,white_5%)] p-6 shadow-[0_36px_110px_rgba(18,15,33,0.18)]"
+                className="rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] p-6 text-[color:var(--mb-bg)] shadow-[0_36px_110px_rgba(18,15,33,0.28)]"
               >
                 {renderMedia(activeService.media)}
 
                 <div className="mt-6 flex flex-col gap-4">
                   <header className="space-y-3">
-                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:color-mix(in_oklch,var(--mb-ink)_58%,var(--mb-bg)_42%)]">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:color-mix(in_oklch,var(--mb-bg)_75%,var(--mb-ink)_25%)]">
                       {activeTab.label}
                     </p>
-                    <h3 className="text-[clamp(24px,3vw,34px)] font-semibold leading-tight text-[color:var(--mb-ink)]">
+                    <h3 className="text-[clamp(24px,3vw,34px)] font-semibold leading-tight text-[color:var(--mb-bg)]">
                       {activeService.detailTitle || activeService.title}
                     </h3>
                     {activeService.summary ? (
-                      <p className="text-[17px] leading-relaxed text-[color:color-mix(in_oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)]">
+                      <p className="text-[17px] leading-relaxed text-[color:color-mix(in_oklch,var(--mb-bg)_82%,var(--mb-ink)_18%)]">
                         {activeService.summary}
                       </p>
                     ) : null}
                   </header>
 
                   {activeService.description ? (
-                    <p className="text-[16px] leading-relaxed text-[color:color-mix(in_oklch,var(--mb-ink)_64%,var(--mb-bg)_36%)]">
+                    <p className="text-[16px] leading-relaxed text-[color:color-mix(in_oklch,var(--mb-bg)_76%,var(--mb-ink)_24%)]">
                       {activeService.description}
                     </p>
                   ) : null}
@@ -448,7 +448,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
     return index === 0 ? "primary" : "secondary";
   })();
   const baseStyles =
-    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[999px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-base)_92%,white_8%)]";
+    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[999px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--mb-ink)]";
 
   if (resolvedVariant === "primary") {
     return (
