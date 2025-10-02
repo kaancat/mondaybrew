@@ -2,30 +2,45 @@ import { defineField, defineType } from "sanity";
 
 export default defineType({
   name: "servicesSplitService",
-  title: "Service entry",
+  title: "Service",
   type: "object",
   fields: [
     defineField({
-      name: "label",
-      title: "Label",
+      name: "title",
+      title: "Service title",
       type: "string",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: "title",
-      title: "Title",
+      name: "detailTitle",
+      title: "Detail title",
       type: "string",
-      description: "Optional alternate title for the detail panel. Defaults to the label.",
+      description: "Optional title used in the right-hand detail panel. Defaults to the service title.",
+    }),
+    defineField({
+      name: "key",
+      title: "Key",
+      type: "slug",
+      options: {
+        source: "title",
+        slugify: (input: string) =>
+          input
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)+/g, ""),
+      },
+      description: "Used to create stable IDs for the frontend. Leave as generated unless you have a specific requirement.",
     }),
     defineField({
       name: "summary",
       title: "Summary",
       type: "text",
       rows: 3,
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "description",
-      title: "Description",
+      title: "Supporting copy",
       type: "text",
       rows: 5,
     }),
@@ -35,19 +50,16 @@ export default defineType({
       type: "servicesSplitMedia",
     }),
     defineField({
-      name: "primaryCta",
-      title: "Primary CTA",
-      type: "button",
-    }),
-    defineField({
-      name: "secondaryCta",
-      title: "Secondary CTA",
-      type: "button",
+      name: "ctas",
+      title: "CTAs",
+      type: "array",
+      of: [{ type: "button" }],
+      validation: (Rule) => Rule.max(2),
     }),
   ],
   preview: {
     select: {
-      title: "label",
+      title: "title",
       summary: "summary",
     },
     prepare({ title, summary }: { title?: string; summary?: string }) {

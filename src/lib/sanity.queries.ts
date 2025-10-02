@@ -265,13 +265,14 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
         eyebrow,
         title,
         description,
-        tabs[]{
-          _key,
+        marketing{
           label,
+          intro,
           services[]{
             _key,
-            label,
+            key,
             title,
+            detailTitle,
             summary,
             description,
             media{
@@ -300,12 +301,52 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
                 }
               }
             },
-            primaryCta{
+            ctas[]{
+              _key,
               label,
               href,
               variant
+            }
+          }
+        },
+        web{
+          label,
+          intro,
+          services[]{
+            _key,
+            key,
+            title,
+            detailTitle,
+            summary,
+            description,
+            media{
+              mode,
+              image{
+                alt,
+                image{
+                  asset->{
+                    url,
+                    metadata{
+                      lqip
+                    }
+                  }
+                }
+              },
+              videoUrl,
+              poster{
+                alt,
+                image{
+                  asset->{
+                    url,
+                    metadata{
+                      lqip
+                    }
+                  }
+                }
+              }
             },
-            secondaryCta{
+            ctas[]{
+              _key,
               label,
               href,
               variant

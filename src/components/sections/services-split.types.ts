@@ -12,27 +12,29 @@ export type ServicesSplitMedia =
     };
 
 export type ServicesSplitCta = {
+  id: string;
   label: string;
   href: string;
+  style?: "primary" | "secondary";
   target?: string;
   rel?: string;
-  variant?: "primary" | "secondary";
 };
 
 export type ServicesSplitService = {
   id: string;
-  label: string;
-  title?: string;
+  title: string;
+  detailTitle?: string;
   summary?: string;
   description?: string;
   media?: ServicesSplitMedia | null;
-  primaryCta?: ServicesSplitCta;
-  secondaryCta?: ServicesSplitCta;
+  ctas?: ServicesSplitCta[];
 };
 
 export type ServicesSplitTab = {
   id: string;
   label: string;
+  headline?: string;
+  description?: string;
   services: ServicesSplitService[];
 };
 

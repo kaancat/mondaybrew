@@ -1,9 +1,14 @@
-import type { ServicesSplitCta, ServicesSplitMedia, ServicesSplitService, ServicesSplitTab } from "./services-split.types";
 import { ServicesSplit } from "./services-split.client";
-
-import type { ServicesSplitProps } from "./services-split.types";
+import type {
+  ServicesSplitCta,
+  ServicesSplitMedia,
+  ServicesSplitProps,
+  ServicesSplitService,
+  ServicesSplitTab,
+} from "./services-split.types";
 
 type SanityButton = {
+  _key?: string;
   label?: string | null;
   href?: string | null;
   variant?: string | null;
@@ -30,18 +35,19 @@ type SanityServicesSplitMedia = {
 
 type SanityServicesSplitService = {
   _key?: string;
-  label?: string | null;
+  key?: { current?: string | null } | null;
   title?: string | null;
+  detailTitle?: string | null;
   summary?: string | null;
   description?: string | null;
   media?: SanityServicesSplitMedia;
-  primaryCta?: SanityButton;
-  secondaryCta?: SanityButton;
+  ctas?: SanityButton[] | null;
 } | null;
 
-type SanityServicesSplitTab = {
-  _key?: string;
+type SanityServicesSplitPillar = {
   label?: string | null;
+  headline?: string | null;
+  description?: string | null;
   services?: SanityServicesSplitService[] | null;
 } | null;
 
@@ -49,7 +55,8 @@ export type ServicesSplitSectionData = {
   eyebrow?: string | null;
   title?: string | null;
   description?: string | null;
-  tabs?: SanityServicesSplitTab[] | null;
+  marketing?: SanityServicesSplitPillar;
+  web?: SanityServicesSplitPillar;
 };
 
 export function isServicesSplitSection(
@@ -59,67 +66,97 @@ export function isServicesSplitSection(
 }
 
 export function ServicesSplitSection(data: ServicesSplitSectionData) {
-  const mappedTabs = mapSanityTabs(data.tabs);
+  const tabs = mapSanityPillars([
+    { fallbackId: "marketing", fallbackLabel: "Marketing", pillar: data.marketing },
+    { fallbackId: "web", fallbackLabel: "Web", pillar: data.web },
+  ]);
 
   return (
     <ServicesSplit
       eyebrow={data.eyebrow || undefined}
       title={data.title || undefined}
       description={data.description || undefined}
-      tabs={mappedTabs.length ? mappedTabs : undefined}
+      tabs={tabs.length ? tabs : undefined}
     />
   );
 }
 
-function mapSanityTabs(tabs?: SanityServicesSplitTab[] | null): ServicesSplitTab[] {
-  if (!tabs?.length) return [];
+function mapSanityPillars(
+  pillars: Array<{ fallbackId: string; fallbackLabel: string; pillar: SanityServicesSplitPillar | null | undefined }>,
+): ServicesSplitTab[] {
+  return pillars
+    .map(({ fallbackId, fallbackLabel, pillar }) => mapSanityPillar(fallbackId, fallbackLabel, pillar))
+    .filter((pillar): pillar is ServicesSplitTab => Boolean(pillar));
+}
 
-  const normalized = tabs
-    .map((tab, tabIndex) => {
-      const label = tab?.label?.trim();
-      if (!label) return null;
+function mapSanityPillar(
+  fallbackId: string,
+  fallbackLabel: string,
+  pillar: SanityServicesSplitPillar | null | undefined,
+): ServicesSplitTab | null {
+  const label = pillar?.label?.trim() || fallbackLabel;
+  const headline = pillar?.headline?.trim();
+  const description = pillar?.description?.trim();
+  const baseId = slugify(pillar?.label?.trim() || fallbackId);
 
-      const idSource = tab?._key ? `${tab._key}` : `${label}-${tabIndex}`;
-      const id = slugify(idSource);
-      const services = (tab?.services ?? [])
-        .map((service, serviceIndex) => mapSanityService(service, id, serviceIndex))
-        .filter((service): service is ServicesSplitService => Boolean(service));
+  const services = (pillar?.services ?? [])
+    .map((service, index) => mapSanityService(service, baseId, index))
+    .filter((service): service is ServicesSplitService => Boolean(service));
 
-      if (!services.length) return null;
+  if (!services.length) return null;
 
-      return {
-        id,
-        label,
-        services,
-      } satisfies ServicesSplitTab;
-    })
-    .filter((tab): tab is ServicesSplitTab => Boolean(tab));
-
-  return normalized;
+  return {
+    id: baseId,
+    label,
+    headline,
+    description,
+    services,
+  } satisfies ServicesSplitTab;
 }
 
 function mapSanityService(
   service: SanityServicesSplitService,
-  tabId: string,
+  pillarId: string,
   serviceIndex: number,
 ): ServicesSplitService | null {
-  const label = service?.label?.trim();
-  if (!label) return null;
+  const title = service?.title?.trim();
+  if (!title) return null;
 
-  const idSource = service?._key ? `${service._key}` : `${tabId}-${label}-${serviceIndex}`;
-  const id = slugify(idSource);
+  const slug = service?.key?.current?.trim();
+  const rawId = slug || service?._key || `${pillarId}-${serviceIndex}`;
+  const id = slugify(rawId);
   const media = mapServiceMedia(service?.media);
+  const ctas = mapCtas(service?.ctas, id);
 
   return {
     id,
-    label,
-    title: service?.title || undefined,
+    title,
+    detailTitle: service?.detailTitle?.trim() || undefined,
     summary: service?.summary || undefined,
     description: service?.description || undefined,
     media: media ?? null,
-    primaryCta: mapButtonToCta(service?.primaryCta) ?? undefined,
-    secondaryCta: mapButtonToCta(service?.secondaryCta, "secondary") ?? undefined,
+    ctas: ctas.length ? ctas : undefined,
   } satisfies ServicesSplitService;
+}
+
+function mapCtas(ctas: (SanityButton | null | undefined)[] | null | undefined, serviceId: string): ServicesSplitCta[] {
+  return (ctas ?? []).reduce<ServicesSplitCta[]>((acc, cta, index) => {
+    const label = cta?.label?.trim();
+    const href = cta?.href?.trim();
+    if (!label || !href) return acc;
+
+    const style = selectCtaStyle(cta?.variant);
+    const id = cta?._key?.trim() || slugify(`${serviceId}-cta-${index}`);
+
+    acc.push({
+      id,
+      label,
+      href,
+      style,
+    });
+
+    return acc;
+  }, []);
 }
 
 function mapServiceMedia(media?: SanityServicesSplitMedia | null): ServicesSplitMedia | undefined {
@@ -169,26 +206,10 @@ function resolveImageWithAlt(image?: SanityImageWithAlt | null) {
   };
 }
 
-function mapButtonToCta(button?: SanityButton, fallback: "primary" | "secondary" = "primary") {
-  const label = button?.label?.trim();
-  const href = button?.href?.trim();
-  if (!label || !href) return undefined;
-
-  const variant = selectCtaVariant(button?.variant, fallback);
-
-  return {
-    label,
-    href,
-    variant,
-  } satisfies ServicesSplitCta;
-}
-
-function selectCtaVariant(variant?: string | null, fallback: "primary" | "secondary" = "primary") {
-  const normalized = variant?.toLowerCase();
-  if (!normalized) return fallback;
-  if (["secondary", "outline", "ghost"].includes(normalized)) {
-    return "secondary" as const;
-  }
+function selectCtaStyle(variant?: string | null): ServicesSplitCta["style"] {
+  const value = variant?.toLowerCase();
+  if (!value) return undefined;
+  if (value === "secondary" || value === "outline" || value === "ghost") return "secondary";
   return "primary";
 }
 

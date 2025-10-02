@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -34,118 +34,94 @@ const DEFAULT_CONTENT: Required<Pick<ServicesSplitProps, "eyebrow" | "title" | "
     {
       id: "marketing",
       label: "Marketing",
+      headline: "We help brands grow across the full funnel.",
+      description: "From acquisition to retention, we plan and optimize the touchpoints that matter.",
       services: [
         {
           id: "marketing-full-funnel",
-          label: "Full-Funnel Performance",
-          description:
+          title: "Full-Funnel Performance",
+          summary:
             "Campaign architecture that follows your customer from awareness to retention with measurable milestones along the way.",
-          summary: "Multi-channel campaigns engineered for compounding growth.",
-          primaryCta: {
-            label: "Explore marketing",
-            href: "#",
-            variant: "primary",
-          },
-          secondaryCta: {
-            label: "Book intro call",
-            href: "#",
-            variant: "secondary",
-          },
+          description:
+            "We design experiments and reporting loops that connect every stage of the funnel, so we can re-invest in what compounds.",
+          ctas: [
+            { id: "marketing-full-funnel-primary", label: "Explore marketing", href: "#", style: "primary" },
+            { id: "marketing-full-funnel-secondary", label: "Book intro call", href: "#", style: "secondary" },
+          ],
         },
         {
           id: "marketing-paid-search",
-          label: "Paid Search",
-          description:
+          title: "Paid Search",
+          summary:
             "High-intent capture on Google and Microsoft Ads with creative testing, negative keyword hygiene, and live dashboards.",
-          summary: "Capture intent, protect brand terms, and scale conversion volume.",
-          primaryCta: {
-            label: "Start a campaign",
-            href: "#",
-            variant: "primary",
-          },
+          description:
+            "From keyword mining to smart bidding calibration, we keep your account efficient while scaling profitable conversions.",
+          ctas: [{ id: "marketing-paid-search-primary", label: "Start a campaign", href: "#", style: "primary" }],
         },
         {
           id: "marketing-paid-social",
-          label: "Paid Social",
-          description:
+          title: "Paid Social",
+          summary:
             "Stories and feeds that convert. We iterate fast across Meta, TikTok, and LinkedIn with creative sprints and cohort reporting.",
-          summary: "Creative-led growth for Meta, TikTok, and LinkedIn.",
-          primaryCta: {
-            label: "See social playbook",
-            href: "#",
-            variant: "primary",
-          },
+          description:
+            "Lean into creative volume and audience insights to keep your acquisition curve healthy across every platform.",
+          ctas: [{ id: "marketing-paid-social-primary", label: "See social playbook", href: "#", style: "primary" }],
         },
         {
           id: "marketing-email",
-          label: "E-Mail Marketing",
+          title: "E-Mail Marketing",
+          summary:
+            "Lifecycle flows, broadcast campaigns, and segmentation that keeps customers moving without feeling spammed.",
           description:
-            "Lifecycle flows, broadcast campaigns, and segmentation that keeps customers moving forward without feeling spammed.",
-          summary: "Automations and campaigns that feel personal and perform.",
-          primaryCta: {
-            label: "Review lifecycle",
-            href: "#",
-            variant: "primary",
-          },
+            "Automations and newsletters tuned for retention—mixing personalization, testing, and deliverability best practice.",
+          ctas: [{ id: "marketing-email-primary", label: "Review lifecycle", href: "#", style: "primary" }],
         },
       ],
     },
     {
       id: "web",
       label: "Web",
+      headline: "We design and ship fast, resilient web experiences.",
+      description: "Websites, products, and commerce—built to scale and easy to maintain.",
       services: [
         {
           id: "web-sites",
-          label: "Hjemmesider",
-          description:
+          title: "Hjemmesider",
+          summary:
             "Conversion-first marketing sites built with Next.js, tuned for performance, localization, and a design system you can scale.",
-          summary: "Flagship marketing sites that load fast and edit faster.",
-          primaryCta: {
-            label: "Plan your build",
-            href: "#",
-            variant: "primary",
-          },
-          secondaryCta: {
-            label: "See case studies",
-            href: "#",
-            variant: "secondary",
-          },
+          description:
+            "Launch a flagship experience with CMS workflows, modular sections, and analytics wired in from day one.",
+          ctas: [
+            { id: "web-sites-primary", label: "Plan your build", href: "#", style: "primary" },
+            { id: "web-sites-secondary", label: "See case studies", href: "#", style: "secondary" },
+          ],
         },
         {
-          id: "web-digital-products",
-          label: "Digital Products",
+          id: "web-crm",
+          title: "CRM",
+          summary:
+            "Implementations and automations that keep your pipeline visible and optimised across marketing and sales teams.",
           description:
-            "From prototypes to production-ready apps. We deliver resilient frontends, CMS workflows, and documentation that grows with you.",
-          summary: "Ship new product surfaces without compromising reliability.",
-          primaryCta: {
-            label: "Scope a product",
-            href: "#",
-            variant: "primary",
-          },
+            "We audit, migrate, and extend tools like HubSpot and Salesforce so your data syncs cleanly across the stack.",
+          ctas: [{ id: "web-crm-primary", label: "Map your CRM", href: "#", style: "primary" }],
         },
         {
           id: "web-ai",
-          label: "AI",
-          description:
+          title: "AI",
+          summary:
             "Pragmatic AI integrations powered by your real workflows—assistants, automation, and data loops that actually save time.",
-          summary: "Embed AI where it compounds, not where it adds noise.",
-          primaryCta: {
-            label: "Workshop ideas",
-            href: "#",
-            variant: "primary",
-          },
+          description:
+            "Experiment quickly with prototypes, then harden the winners into production features with clear guardrails.",
+          ctas: [{ id: "web-ai-primary", label: "Workshop ideas", href: "#", style: "primary" }],
         },
         {
           id: "web-ecommerce",
-          label: "eCommerce",
-          description:
+          title: "eCommerce",
+          summary:
             "Composable commerce experiences with fast product discovery, checkout clarity, and analytics wired in from day one.",
-          summary: "Better merchandising, faster checkouts, happier customers.",
-          primaryCta: {
-            label: "Optimize store",
-            href: "#",
-            variant: "primary",
-          },
+          description:
+            "Optimise merchandising, PDP storytelling, and retention journeys with a modern commerce stack.",
+          ctas: [{ id: "web-ecommerce-primary", label: "Optimise store", href: "#", style: "primary" }],
         },
       ],
     },
@@ -162,42 +138,76 @@ export function ServicesSplit({
   const normalized = useMemo<NormalizedData>(() => {
     const sourceTabs = (tabs && tabs.length ? tabs : DEFAULT_CONTENT.tabs) ?? [];
 
-    const normalizedTabs = sourceTabs
-      .map((tab, tabIndex) => {
-        const label = tab.label?.trim();
-        if (!label) return null;
+    const normalizedTabs = sourceTabs.reduce<NormalizedTab[]>((acc, tab, tabIndex) => {
+      const label = tab.label?.trim();
+      if (!label) return acc;
 
-        const id = tab.id?.trim() || slugify(`${label}-${tabIndex}`);
-        const services = (tab.services ?? [])
-          .map((service, serviceIndex) => {
-            const serviceLabel = service.label?.trim();
-            if (!serviceLabel) return null;
-            const serviceId = service.id?.trim() || slugify(`${id}-${serviceLabel}-${serviceIndex}`);
+      const id = tab.id?.trim() || slugify(`${label}-${tabIndex}`);
+      const headline = tab.headline?.trim();
+      const descriptionCopy = tab.description?.trim();
+      const services = (tab.services ?? [])
+        .map((service, serviceIndex) => {
+          const serviceTitle = service.title?.trim();
+          if (!serviceTitle) return null;
+          const serviceId = service.id?.trim() || slugify(`${id}-${serviceTitle}-${serviceIndex}`);
 
-            return {
-              ...service,
-              label: serviceLabel,
-              id: serviceId,
-            } as ServicesSplitService;
-          })
-          .filter((service): service is ServicesSplitService => Boolean(service && service.id));
+          return {
+            ...service,
+            title: serviceTitle,
+            id: serviceId,
+            ctas: service.ctas?.map((cta, ctaIndex) => ({
+              ...cta,
+              id: cta.id?.trim() || slugify(`${serviceId}-cta-${ctaIndex}`),
+            })),
+          } as ServicesSplitService;
+        })
+        .filter((service): service is ServicesSplitService => Boolean(service && service.id));
 
-        if (!services.length) return null;
+      if (!services.length) return acc;
 
-        return {
-          ...tab,
-          id,
-          label,
-          services,
-        } satisfies NormalizedTab;
-      })
-      .filter((tab): tab is NormalizedTab => Boolean(tab));
+      acc.push({
+        ...tab,
+        id,
+        label,
+        headline,
+        description: descriptionCopy,
+        services,
+      } satisfies NormalizedTab);
+
+      return acc;
+    }, []);
 
     return { tabs: normalizedTabs };
   }, [tabs]);
 
   const [activeTabId, setActiveTabId] = useState<string>(() => normalized.tabs[0]?.id ?? "");
   const [activeServiceId, setActiveServiceId] = useState<string>(() => normalized.tabs[0]?.services[0]?.id ?? "");
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const tabCount = normalized.tabs.length;
+
+  const focusTabAtIndex = (index: number) => {
+    const nextTab = normalized.tabs[index];
+    if (!nextTab) return;
+    setActiveTabId(nextTab.id);
+    setActiveServiceId(nextTab.services[0]?.id ?? "");
+    tabRefs.current[index]?.focus();
+  };
+
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    if (!tabCount) return;
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+      event.preventDefault();
+      const direction = event.key === "ArrowRight" ? 1 : -1;
+      const nextIndex = (index + direction + tabCount) % tabCount;
+      focusTabAtIndex(nextIndex);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      focusTabAtIndex(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      focusTabAtIndex(tabCount - 1);
+    }
+  };
 
   useEffect(() => {
     if (!normalized.tabs.length) return;
@@ -226,32 +236,38 @@ export function ServicesSplit({
   const activeService =
     activeTab.services.find((service) => service.id === activeServiceId) ?? activeTab.services[0];
 
+  const fallbackTitle = title ?? DEFAULT_CONTENT.title;
+  const fallbackDescription = description ?? DEFAULT_CONTENT.description;
+  const activeHeadline = activeTab.headline ?? fallbackTitle;
+  const activeDescription = activeTab.description ?? fallbackDescription;
+
   return (
     <section className={cn("py-24", className)}>
-      <Container className="grid gap-12 lg:grid-cols-[0.4fr_0.6fr]">
+      <Container className="grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
         <div className="flex flex-col">
           {eyebrow ? (
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-black/55">
               {eyebrow}
             </span>
           ) : null}
-          {title ? (
+          {activeHeadline ? (
             <h2 className="mt-3 text-[clamp(32px,6vw,58px)] font-semibold leading-[1.05] tracking-tight text-black">
-              {title}
+              {activeHeadline}
             </h2>
           ) : null}
-          {description ? (
+          {activeDescription ? (
             <p className="mt-5 max-w-xl text-[clamp(16px,1.9vw,20px)] leading-relaxed text-black/70">
-              {description}
+              {activeDescription}
             </p>
           ) : null}
 
           <div
             role="tablist"
             aria-label="Service pillars"
+            aria-orientation="horizontal"
             className="mt-10 flex flex-wrap items-center gap-3"
           >
-            {normalized.tabs.map((tab) => {
+            {normalized.tabs.map((tab, tabIndex) => {
               const isActive = tab.id === activeTab.id;
 
               return (
@@ -263,15 +279,19 @@ export function ServicesSplit({
                   aria-controls={`${tab.id}-service-list`}
                   id={`${tab.id}-tab`}
                   tabIndex={isActive ? 0 : -1}
+                  ref={(node) => {
+                    tabRefs.current[tabIndex] = node;
+                  }}
                   onClick={() => {
                     setActiveTabId(tab.id);
                     setActiveServiceId(tab.services[0]?.id ?? "");
                   }}
+                  onKeyDown={(event) => handleTabKeyDown(event, tabIndex)}
                   className={cn(
-                    "rounded-full border px-5 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/60",
+                    "relative inline-flex items-center border-b-2 border-transparent px-1 pb-2 text-base font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/60",
                     isActive
-                      ? "border-black bg-black text-white"
-                      : "border-black/10 bg-white text-black/70 hover:border-black/30 hover:text-black",
+                      ? "border-black text-black"
+                      : "text-black/55 hover:border-black/30 hover:text-black",
                   )}
                 >
                   {tab.label}
@@ -301,15 +321,15 @@ export function ServicesSplit({
                       <button
                         type="button"
                         className={cn(
-                          "group flex w-full items-center justify-between gap-6 px-6 py-5 text-left text-[18px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/60",
+                          "group flex w-full items-center justify-between gap-6 rounded-[5px] border border-transparent px-6 py-5 text-left text-[18px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/60",
                           isActiveService
-                            ? "bg-black/[0.04] text-black"
-                            : "text-black/60 hover:bg-black/[0.03] hover:text-black",
+                            ? "border-black/15 bg-black/[0.04] text-black"
+                            : "text-black/60 hover:border-black/10 hover:bg-black/[0.03] hover:text-black",
                         )}
                         onClick={() => setActiveServiceId(service.id)}
                         aria-current={isActiveService ? "true" : undefined}
                       >
-                        <span className="truncate">{service.label}</span>
+                        <span className="truncate">{service.title}</span>
                         <span
                           className={cn(
                             "inline-flex size-9 min-h-9 min-w-9 items-center justify-center rounded-[5px] border border-transparent bg-black/[0.04] text-black/60 transition-transform group-hover:translate-x-1",
@@ -347,7 +367,7 @@ export function ServicesSplit({
                       {activeTab.label}
                     </p>
                     <h3 className="text-[clamp(24px,3vw,34px)] font-semibold leading-tight text-black">
-                      {activeService.title || activeService.label}
+                      {activeService.detailTitle || activeService.title}
                     </h3>
                     {activeService.summary ? (
                       <p className="text-[17px] leading-relaxed text-black/70">
@@ -363,12 +383,9 @@ export function ServicesSplit({
                   ) : null}
 
                   <div className="mt-2 flex flex-wrap gap-3">
-                    {activeService.primaryCta ? (
-                      <CtaButton key="primary" cta={activeService.primaryCta} />
-                    ) : null}
-                    {activeService.secondaryCta ? (
-                      <CtaButton key="secondary" cta={activeService.secondaryCta} variant="secondary" />
-                    ) : null}
+                    {activeService.ctas?.map((cta, index) => (
+                      <CtaButton key={cta.id || `${activeService.id}-cta-${index}`} cta={cta} index={index} />
+                    ))}
                   </div>
                 </div>
               </motion.article>
@@ -381,9 +398,12 @@ export function ServicesSplit({
 }
 
 function renderMedia(media?: ServicesSplitMedia | null) {
+  const wrapperClasses = "relative w-full overflow-hidden rounded-[5px] bg-black/[0.04]";
+  const heightClasses = "h-[clamp(280px,32vh,420px)]";
+
   if (!media) {
     return (
-      <div className="flex aspect-[8/5] w-full items-center justify-center rounded-[5px] bg-black/[0.04] text-sm text-black/45">
+      <div className={`flex ${heightClasses} items-center justify-center rounded-[5px] bg-black/[0.04] text-sm text-black/45`}>
         Add media in Sanity
       </div>
     );
@@ -391,13 +411,13 @@ function renderMedia(media?: ServicesSplitMedia | null) {
 
   if (media.type === "image") {
     return (
-      <div className="relative aspect-[8/5] w-full overflow-hidden rounded-[5px] bg-black/[0.04]">
+      <div className={`${wrapperClasses} ${heightClasses}`}>
         <Image
           src={media.src}
           alt={media.alt || "Service visual"}
           fill
           className="object-cover"
-          sizes="(min-width: 1280px) 640px, (min-width: 768px) 60vw, 100vw"
+          sizes="(min-width: 1280px) 60vw, (min-width: 768px) 70vw, 100vw"
           placeholder={media.blurDataURL ? "blur" : undefined}
           blurDataURL={media.blurDataURL}
         />
@@ -406,7 +426,7 @@ function renderMedia(media?: ServicesSplitMedia | null) {
   }
 
   return (
-    <div className="relative aspect-[8/5] w-full overflow-hidden rounded-[5px] bg-black/[0.04]">
+    <div className={`${wrapperClasses} ${heightClasses}`}>
       <video
         src={media.src}
         poster={media.poster}
@@ -420,8 +440,13 @@ function renderMedia(media?: ServicesSplitMedia | null) {
   );
 }
 
-function CtaButton({ cta, variant }: { cta: ServicesSplitCta; variant?: "primary" | "secondary" }) {
-  const resolvedVariant = variant ?? cta.variant ?? "primary";
+function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
+  if (!cta.href) return null;
+  const resolvedVariant: "primary" | "secondary" = (() => {
+    if (cta.style === "secondary") return "secondary";
+    if (cta.style === "primary") return "primary";
+    return index === 0 ? "primary" : "secondary";
+  })();
   const baseStyles =
     "inline-flex items-center justify-center rounded-[999px] px-6 py-2.5 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/60";
 
