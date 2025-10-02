@@ -10,10 +10,13 @@ export default defineType({
     defineField({ name: "slug", type: "slug", options: { source: "title" } }),
     defineField({ name: "locale", type: "string", options: { list: ["da", "en"] }, initialValue: "da" }),
     defineField({ name: "summary", type: "text" }),
-    defineField({ name: "sections", type: "array", of: [
-      { type: "richText" }, { type: "mediaBlock" }, { type: "splitContent" }, { type: "stats" }, { type: "ctaBanner" }
-    ]}),
+    defineField({
+      name: "sections",
+      title: "Sections",
+      description: "Structured content blocks coming soon — use the summary field for now.",
+      type: "array",
+      of: [{ type: "block" }],
+    }),
     defineField({ name: "seo", type: "seo" }),
   ],
 });
-
