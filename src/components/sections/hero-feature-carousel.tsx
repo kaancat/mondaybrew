@@ -61,13 +61,13 @@ export function HeroFeatureCarousel({ items }: Props) {
         <div className="absolute inset-0 translate-y-5 scale-[1.08] rounded-[5px] bg-[radial-gradient(circle_at_18%_14%,rgba(118,105,255,0.26),transparent_70%)] blur-[38px]" />
       </div>
 
-      <AnimatePresence mode="wait" initial={false}>
+      <AnimatePresence initial={false}>
         <motion.div
           key={active.key}
-          initial={{ opacity: 0, y: 24, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.98 }}
-          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
           className="relative rounded-[5px] bg-gradient-to-br from-white/30 via-white/10 to-white/0 p-[1px]"
         >
           <div className="relative flex h-full flex-col overflow-hidden rounded-[5px] border border-white/12 bg-[rgba(20,18,28,0.58)] shadow-[0_32px_80px_rgba(8,6,20,0.35)] backdrop-blur-[22px]">
@@ -82,9 +82,11 @@ export function HeroFeatureCarousel({ items }: Props) {
               {active.image?.url ? (
                 <motion.div
                   className="relative aspect-[16/10] w-full overflow-hidden rounded-t-[5px]"
-                  initial={{ opacity: 0.6, scale: 1.02 }}
+                  initial={{ opacity: 0.65, scale: 1.015 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  exit={{ opacity: 0.45, scale: 0.995 }}
+                  transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+                  layout
                 >
                   <Image
                     src={active.image.url}
@@ -99,10 +101,10 @@ export function HeroFeatureCarousel({ items }: Props) {
                   {normalized.length > 1 ? (
                     <motion.div
                       className="absolute right-6 top-6 rounded-full bg-black/28 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/85"
-                      initial={{ opacity: 0, y: -12 }}
+                      initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -12 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     >
                       {String(safeIndex + 1).padStart(2, "0")} / {String(normalized.length).padStart(2, "0")}
                     </motion.div>
@@ -112,10 +114,10 @@ export function HeroFeatureCarousel({ items }: Props) {
 
               <motion.div
                 className="flex flex-1 flex-col gap-3 px-6 pb-6 pt-5 sm:px-8 sm:pb-8 sm:pt-6"
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
               >
                 {active.title ? (
                   <h3 className="text-[1.45rem] font-semibold leading-tight tracking-tight text-white">
