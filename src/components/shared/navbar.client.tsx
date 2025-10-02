@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { ArrowRight, Globe, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export type NavbarLink = {
@@ -68,6 +69,12 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const pathname = usePathname();
   const normalizedPath = pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
   const headerRef = useRef<HTMLElement>(null);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const localeConfig = useMemo(() => {
     const available = locales?.available?.length ? locales.available : [FALLBACK_LOCALE, "en"];
@@ -93,7 +100,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const ctaLabel = cta?.label || DEFAULT_CTA_LABEL;
 
   const menuShell =
-    "rounded-[5px] border border-white/12 bg-[rgba(24,24,24,0.6)] text-white shadow-[0_24px_48px_rgba(0,0,0,0.22)] backdrop-blur-[12px] transition-all duration-300";
+    "rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_22%,var(--mb-bg)_78%)] bg-[color:color-mix(in_oklch,var(--surface-dark)_82%,var(--surface-base)_18%)] text-[color:var(--mb-bg)] shadow-[0_24px_48px_rgba(10,8,18,0.28)] backdrop-blur-[12px] transition-all duration-300";
 
   useEffect(() => {
     const el = headerRef.current;
@@ -117,8 +124,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     <header ref={headerRef} className="fixed inset-x-0 top-4 z-50">
       <div className="layout-container">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div
-            className={cn(menuShell, "flex items-center gap-4 px-5 py-2.5 md:flex-row text-[#f5f7fd]")}
+          <div className={cn(menuShell, "flex items-center gap-4 px-5 py-2.5 md:flex-row")}
             style={{ justifyContent: "space-between" }}
           >
             <Link href="/" className="inline-flex items-center">
@@ -135,7 +141,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <span className="text-sm font-semibold text-white/90">{brand.title}</span>
               )}
             </Link>
-            <nav className="flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium text-white/85 md:flex-nowrap">
+            <nav className="flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium text-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--surface-dark)_10%)] md:flex-nowrap">
               {sections.map((section) => {
                 if (section.kind === "link") {
                   const href = section.href ?? "#";
@@ -146,7 +152,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       href={href}
                       className={cn(
                         "whitespace-nowrap rounded-[5px] px-3 py-1.5 transition",
-                        active ? "bg-white/18 text-white" : "hover:bg-white/10 hover:text-white",
+                        active
+                          ? "bg-[color:color-mix(in_oklch,var(--mb-bg)_18%,transparent)] text-[color:var(--mb-bg)]"
+                          : "hover:bg-[color:color-mix(in_oklch,var(--mb-bg)_12%,transparent)] hover:text-[color:var(--mb-bg)]",
                       )}
                     >
                       {section.label}
@@ -158,7 +166,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   <button
                     key={section.label}
                     type="button"
-                    className="whitespace-nowrap rounded-[5px] px-3 py-1.5 text-left transition hover:bg-white/10 hover:text-white"
+                    className="whitespace-nowrap rounded-[5px] px-3 py-1.5 text-left transition hover:bg-[color:color-mix(in_oklch,var(--mb-bg)_12%,transparent)] hover:text-[color:var(--mb-bg)]"
                   >
                     {section.label}
                   </button>
@@ -168,16 +176,28 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
           </div>
 
           <div className="flex items-center gap-3 md:justify-end md:pl-4">
+            <button
+              type="button"
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="inline-flex size-9 items-center justify-center rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_28%,var(--mb-bg)_72%)] bg-[color:color-mix(in_oklch,var(--surface-dark)_75%,var(--surface-base)_25%)] text-[color:var(--mb-bg)] transition hover:border-[color:color-mix(in_oklch,var(--mb-ink)_35%,var(--mb-bg)_65%)] hover:bg-[color:color-mix(in_oklch,var(--surface-dark)_85%,var(--surface-base)_15%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)] focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-dark)_80%,var(--surface-base)_20%)]"
+              aria-label="Toggle color theme"
+            >
+              {mounted && resolvedTheme === "dark" ? (
+                <Sun className="size-[16px]" aria-hidden="true" />
+              ) : (
+                <Moon className="size-[16px]" aria-hidden="true" />
+              )}
+            </button>
             <Link
               href={ctaHref}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#FF914D] px-3 py-1.5 text-xs font-semibold text-[#f5f7fd] transition-colors hover:bg-[#ff8233] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)]"
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[color:var(--mb-accent)] px-3 py-1.5 text-xs font-semibold text-[color:var(--mb-bg)] transition-colors hover:bg-[color:color-mix(in_oklch,var(--mb-accent)_88%,white_12%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)] focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-dark)_80%,var(--surface-base)_20%)]"
             >
               <span>{ctaLabel}</span>
               <ArrowRight className="size-[16px]" aria-hidden="true" />
             </Link>
             <Link
               href={localeConfig.href}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#6f6f74] px-3 py-1.5 text-xs font-semibold text-[#f5f7fd] transition-colors hover:bg-[#5f5f64] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2"
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[color:color-mix(in_oklch,var(--surface-dark)_70%,var(--surface-base)_30%)] px-3 py-1.5 text-xs font-semibold text-[color:var(--mb-bg)] transition-colors hover:bg-[color:color-mix(in_oklch,var(--surface-dark)_85%,var(--surface-base)_15%)] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2"
             >
               <Globe className="size-[16px]" aria-hidden="true" />
               <span>{localeConfig.active}</span>

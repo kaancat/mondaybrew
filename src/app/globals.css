@@ -80,39 +80,6 @@
 
 @media
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
 
 /* Brand + layout system */
 :root {
@@ -174,20 +141,29 @@
 
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: var(--mb-bg);
-  --card: oklch(0.205 0 0);
-  --card-foreground: var(--mb-bg);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: var(--mb-bg);
+  --mb-bg: #121017;
+  --mb-ink: #f5f7fd;
+  --surface-base: color-mix(in oklch, var(--mb-bg) 96%, black 4%);
+  --surface-elevated: color-mix(in oklch, var(--mb-bg) 88%, #1b1823 12%);
+  --surface-dark: color-mix(in oklch, #06040a 74%, var(--mb-bg) 26%);
+  --surface-gradient: linear-gradient(135deg, color-mix(in oklch, #1b1823 65%, var(--mb-accent) 35%) 0%, color-mix(in oklch, var(--mb-accent) 55%, #06040a) 100%);
+
+  --background: var(--surface-base);
+  --foreground: var(--mb-ink);
+  --card: var(--surface-dark);
+  --card-foreground: var(--mb-ink);
+  --popover: var(--surface-dark);
+  --popover-foreground: var(--mb-ink);
   --primary: var(--mb-bg);
-  --primary-foreground: var(--mb-ink);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: var(--mb-bg);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --primary-foreground: #0d0b12;
+  --secondary: color-mix(in oklch, var(--surface-base) 80%, #1f1b28 20%);
+  --secondary-foreground: var(--mb-ink);
+  --muted: color-mix(in oklch, var(--surface-base) 72%, #1b1823 28%);
+  --muted-foreground: color-mix(in oklch, var(--mb-ink) 72%, var(--surface-base) 28%);
   --accent: var(--mb-accent);
   --accent-foreground: #1a1a1a;
+  --border: color-mix(in oklch, var(--mb-ink) 12%, var(--surface-base) 88%);
+  --ring: color-mix(in oklch, var(--mb-accent) 45%, var(--surface-base) 55%);
 }
 
 @layer base {
