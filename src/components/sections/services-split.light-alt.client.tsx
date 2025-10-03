@@ -251,12 +251,12 @@ export function ServicesSplitLightAlt({
             </span>
           ) : null}
           {activeHeadline ? (
-            <h2 className="mt-3 text-[clamp(40px,6vw,64px)] font-extrabold leading-[1.02] tracking-tight text-[color:var(--foreground)]">
+            <h2 className="mt-3 text-[clamp(40px,6vw,64px)] font-semibold leading-[1.02] tracking-tight text-[color:var(--services-ink-strong)]">
               {activeHeadline}
             </h2>
           ) : null}
           {activeDescription ? (
-            <p className="mt-5 max-w-xl text-[clamp(16px,1.9vw,20px)] leading-relaxed text-[color:color-mix(in_oklch,var(--foreground)_78%,white_22%)]">
+            <p className="mt-5 max-w-xl text-[clamp(16px,1.9vw,20px)] leading-relaxed text-[color:var(--services-ink-strong)]/80">
               {activeDescription}
             </p>
           ) : null}
@@ -265,7 +265,7 @@ export function ServicesSplitLightAlt({
             role="tablist"
             aria-label="Service pillars"
             aria-orientation="horizontal"
-            className="mt-12 flex flex-wrap items-center gap-4 border-b border-[color:color-mix(in_oklch,var(--foreground)_22%,white_78%)] text-[color:var(--foreground)]"
+            className="mt-12 flex flex-wrap items-center gap-4 border-b border-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)] text-[color:var(--services-ink-strong)]"
           >
             {normalized.tabs.map((tab, tabIndex) => {
               const isActive = tab.id === activeTab.id;
@@ -291,7 +291,7 @@ export function ServicesSplitLightAlt({
                     "relative inline-flex items-center justify-center rounded-[4px] px-3 py-2 text-[15px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
                     isActive
                       ? "after:absolute after:bottom-[-1px] after:left-1 after:right-1 after:h-[2px] after:rounded-full after:bg-[color:var(--mb-accent)]"
-                      : "text-[color:color-mix(in_oklch,var(--foreground)_68%,white_32%)] hover:text-[color:var(--foreground)]",
+                      : "text-[color:color-mix(in_oklch,var(--services-ink-strong)_68%,white_32%)] hover:text-[color:var(--services-ink-strong)]",
                   )}
                 >
                   {tab.label}
@@ -311,7 +311,7 @@ export function ServicesSplitLightAlt({
                 animate="visible"
                 exit="hidden"
                 variants={listVariants}
-                className="divide-y divide-[color:color-mix(in_oklch,var(--foreground)_85%,white_15%)] border-b border-[color:color-mix(in_oklch,var(--foreground)_85%,white_15%)]"
+                className="divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)] border-b border-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)]"
               >
                 {activeTab.services.map((service) => {
                   const isActiveService = service.id === activeService?.id;
@@ -323,8 +323,8 @@ export function ServicesSplitLightAlt({
                         className={cn(
                           "group flex w-full items-center justify-between gap-6 px-0 py-4 text-left text-[20px] font-medium transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
                           isActiveService
-                            ? "font-semibold text-[color:var(--foreground)] underline underline-offset-[3px] decoration-[color:color-mix(in_oklch,var(--foreground)_70%,white_30%)]"
-                            : "text-[color:color-mix(in_oklch,var(--foreground)_70%,white_30%)] hover:text-[color:var(--foreground)]",
+                            ? "font-semibold text-[color:var(--services-ink-strong)] underline underline-offset-[3px] decoration-[color:color-mix(in_oklch,var(--services-ink-strong)_70%,white_30%)]"
+                            : "text-[color:color-mix(in_oklch,var(--services-ink-strong)_70%,white_30%)] hover:text-[color:var(--services-ink-strong)]",
                         )}
                         onClick={() => setActiveServiceId(service.id)}
                         aria-current={isActiveService ? "true" : undefined}
@@ -332,8 +332,8 @@ export function ServicesSplitLightAlt({
                         <span className="truncate">{service.title}</span>
                         <span
                           className={cn(
-                            "inline-flex size-9 min-h-9 min-w-9 items-center justify-center text-[color:color-mix(in_oklch,var(--foreground)_65%,white_35%)] transition-transform duration-200 group-hover:translate-x-[0.35rem]",
-                            isActiveService && "text-[color:var(--foreground)]",
+                            "inline-flex size-9 min-h-9 min-w-9 items-center justify-center text-[color:color-mix(in_oklch,var(--services-ink-strong)_65%,white_35%)] transition-transform duration-200 group-hover:translate-x-[0.35rem]",
+                            isActiveService && "text-[color:var(--services-ink-strong)]",
                           )}
                           aria-hidden
                         >
@@ -357,7 +357,7 @@ export function ServicesSplitLightAlt({
                 animate="visible"
                 exit="hidden"
                 variants={detailVariants}
-                className="rounded-[5px] border border-[color:color-mix(in_oklch,var(--foreground)_30%,white_70%)] bg-[color:var(--mb-bg)] p-7 text-[color:var(--foreground)] shadow-[0_24px_64px_rgba(10,10,10,0.08)]"
+                className="rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--services-card-bg)] p-7 text-[color:var(--services-ink-strong)] shadow-[0_24px_64px_rgba(10,10,10,0.08)]"
               >
                 {renderMedia(activeService.media)}
 
@@ -370,14 +370,14 @@ export function ServicesSplitLightAlt({
                       {activeService.detailTitle || activeService.title}
                     </h3>
                     {activeService.summary ? (
-                    <p className="text-[17px] leading-relaxed text-[color:color-mix(in_oklch,var(--foreground)_72%,white_28%)]">
+                    <p className="text-[17px] leading-relaxed text-[color:var(--services-ink-strong)]/75">
                       {activeService.summary}
                     </p>
                     ) : null}
                   </header>
 
                   {activeService.description ? (
-                    <p className="text-[16px] leading-relaxed text-[color:color-mix(in_oklch,var(--foreground)_70%,white_30%)]">
+                    <p className="text-[16px] leading-relaxed text-[color:var(--services-ink-strong)]/72">
                       {activeService.description}
                     </p>
                   ) : null}
@@ -448,7 +448,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
     return index === 0 ? "primary" : "secondary";
   })();
   const baseStyles =
-    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[999px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--mb-bg)]";
+    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[999px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--services-card-bg)]";
 
   if (resolvedVariant === "primary") {
     return (
@@ -456,10 +456,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
         href={cta.href}
         target={cta.target}
         rel={cta.rel}
-        className={cn(
-          baseStyles,
-          "bg-[color:var(--mb-accent)] text-[color:var(--mb-bg)] hover:bg-[color:color-mix(in_oklch,var(--mb-accent)_88%,white_12%)]",
-        )}
+        className={cn(baseStyles, "bg-[color:var(--mb-accent)] text-[color:var(--services-card-bg)] hover:bg-[color:color-mix(in_oklch,var(--mb-accent)_88%,white_12%)]")}
       >
         {cta.label}
       </Link>
@@ -471,10 +468,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
       href={cta.href}
       target={cta.target}
       rel={cta.rel}
-      className={cn(
-        baseStyles,
-        "border border-[color:var(--foreground)] bg-[color:var(--mb-bg)] text-[color:var(--foreground)] hover:border-[color:color-mix(in_oklch,var(--foreground)_80%,white_20%)]",
-      )}
+      className={cn(baseStyles, "border border-[color:var(--services-ink-strong)] bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] hover:border-[color:color-mix(in_oklch,var(--services-ink-strong)_80%,white_20%)]")}
     >
       {cta.label}
     </Link>

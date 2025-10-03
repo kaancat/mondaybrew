@@ -213,6 +213,10 @@ html.light-alt {
   --nav-locale-text: var(--foreground);
   --nav-locale-border: transparent;
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 65%, transparent);
+
+  /* Services: strict black & white ink for Light-Alt */
+  --services-ink-strong: #0a0a0a; /* exact black requested */
+  --services-card-bg: oklch(1 0 0); /* pure white */
 }
 
 html.dark {
