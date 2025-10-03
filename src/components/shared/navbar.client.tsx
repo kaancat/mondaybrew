@@ -79,7 +79,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
   const effectiveTheme = (mounted ? resolvedTheme : undefined) as ThemeId | undefined;
   const currentThemeId = effectiveTheme ?? defaultThemeId;
-  const isLightAlt = currentThemeId === "light-alt";
 
   const localeConfig = useMemo(() => {
     const available = locales?.available?.length ? locales.available : [FALLBACK_LOCALE, "en"];
@@ -104,7 +103,8 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const ctaHref = cta?.href ?? "/kontakt";
   const ctaLabel = cta?.label || DEFAULT_CTA_LABEL;
 
-  const menuShell = "rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)] text-[color:var(--nav-shell-text)] shadow-[0_24px_48px_rgba(10,8,18,0.28)] backdrop-blur-[12px] transition-all duration-300";
+  const menuShell =
+    "rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)] text-[color:var(--nav-shell-text)] shadow-[var(--nav-shell-shadow)] backdrop-blur-[12px] transition-all duration-300";
 
   useEffect(() => {
     const el = headerRef.current;
@@ -142,14 +142,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   priority
                 />
               ) : (
-                <span
-                  className={cn(
-                    "text-sm font-semibold",
-                    isLightAlt ? "text-black" : "text-white/90",
-                  )}
-                >
-                  {brand.title}
-                </span>
+                <span className="text-sm font-semibold">{brand.title}</span>
               )}
             </Link>
             <nav className={cn("flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium md:flex-nowrap", "text-[color:var(--nav-link-text)]")}>
@@ -186,7 +179,12 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             </nav>
           </div>
 
-          <div className="flex items-center gap-3 md:justify-end md:pl-4">
+          <div
+            className={cn(
+              menuShell,
+              "flex flex-wrap items-center gap-2 px-3 py-2.5 sm:gap-3 md:flex-nowrap md:justify-end md:pl-4",
+            )}
+          >
             {(() => {
               const cycle = themeOrder;
               const currentIndex = cycle.indexOf(currentThemeId);
@@ -220,24 +218,14 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             })()}
             <Link
               href={ctaHref}
-              className={cn(
-                "inline-flex items-center justify-center gap-2 rounded-[5px] px-3 py-1.5 text-xs font-semibold transition-colors",
-                isLightAlt
-                  ? "border border-black/12 bg-white text-black hover:border-black/25 hover:bg-[#f7f7f7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/25"
-                  : "bg-[color:var(--mb-accent)] text-[color:var(--mb-bg)] hover:bg-[color:color-mix(in oklch,var(--mb-accent)_88%,white_12%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)] focus-visible:ring-offset-[color:color-mix(in oklch,var(--surface-dark)_80%,var(--surface-base)_20%)]",
-              )}
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-1.5 text-xs font-semibold text-[color:var(--nav-cta-text)] transition-colors hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
             >
               <span>{ctaLabel}</span>
               <ArrowRight className="size-[16px]" aria-hidden="true" />
             </Link>
             <Link
               href={localeConfig.href}
-              className={cn(
-                "inline-flex items-center justify-center gap-2 rounded-[5px] px-3 py-1.5 text-xs font-semibold transition-colors",
-                isLightAlt
-                  ? "border border-black/12 bg-white text-black/80 hover:border-black/20 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/25"
-                  : "bg-[color:var(--nav-locale-bg)] text-[color:var(--nav-locale-text)] hover:bg-[color:var(--nav-locale-hover-bg)] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2",
-              )}
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-locale-border)] bg-[color:var(--nav-locale-bg)] px-3 py-1.5 text-xs font-semibold text-[color:var(--nav-locale-text)] transition-colors hover:bg-[color:var(--nav-locale-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
             >
               <Globe className="size-[16px]" aria-hidden="true" />
               <span>{localeConfig.active}</span>
