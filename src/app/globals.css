@@ -115,19 +115,20 @@ html.light-primary {
   --sidebar-border: color-mix(in oklch, var(--mb-ink) 12%, var(--mb-bg) 88%);
   --sidebar-ring: color-mix(in oklch, var(--mb-ink) 35%, white 65%);
 
-  --nav-shell-bg: color-mix(in oklch, var(--surface-dark) 58%, transparent);
-  --nav-shell-border: color-mix(in oklch, var(--mb-bg) 28%, transparent);
-  --nav-shell-text: color-mix(in oklch, var(--mb-bg) 96%, var(--surface-dark) 4%);
-  --nav-shell-shadow: 0 24px 48px color-mix(in oklch, var(--surface-dark) 32%, transparent);
+  /* Bring back classic glass recipe from earlier builds */
+  --nav-shell-bg: rgba(24, 24, 24, 0.6);
+  --nav-shell-border: rgba(255, 255, 255, 0.12);
+  --nav-shell-text: var(--mb-bg);
+  --nav-shell-shadow: 0 24px 48px rgba(0, 0, 0, 0.22);
   --nav-cta-bg: var(--mb-accent);
   --nav-cta-border: transparent;
   --nav-cta-hover-bg: color-mix(in oklch, var(--mb-accent) 88%, var(--mb-bg) 12%);
   --nav-cta-text: color-mix(in oklch, var(--mb-bg) 98%, var(--surface-dark) 2%);
   --nav-cta-ring: color-mix(in oklch, var(--mb-accent) 70%, transparent);
   --nav-cta-ring-offset: color-mix(in oklch, var(--surface-dark) 22%, transparent);
-  --nav-link-text: color-mix(in oklch, var(--mb-bg) 88%, var(--surface-dark) 12%);
-  --nav-link-hover-bg: color-mix(in oklch, var(--mb-bg) 12%, transparent);
-  --nav-link-hover-text: var(--mb-bg);
+  --nav-link-text: rgba(245, 247, 253, 0.85); /* text-white/85 */
+  --nav-link-hover-bg: rgba(255, 255, 255, 0.10); /* bg-white/10 */
+  --nav-link-hover-text: var(--mb-bg); /* text-white */
   /* no explicit active state in 160f45d navbar for light alt */
   --nav-toggle-border: transparent;
   --nav-toggle-bg: color-mix(in oklch, var(--surface-dark) 75%, var(--surface-base) 25%);
