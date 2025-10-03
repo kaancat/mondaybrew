@@ -403,3 +403,25 @@ export const postBySlugQuery = `*[_type=="post" && slug.current==$slug && (defin
   mainImage,
   body
 }`;
+
+export const caseStudiesQuery = `*[_type=="caseStudy" && (defined(locale) => locale==$locale)] | order(coalesce(publishedAt,_updatedAt) desc){
+  _id,
+  title,
+  client,
+  "excerpt": coalesce(excerpt, summary),
+  "slug": slug.current,
+  tags,
+  media{
+    mode,
+    image{
+      alt,
+      image{asset->{url,metadata{lqip,dimensions}}}
+    },
+    videoUrl,
+    videoFile{asset->{url,mimeType}},
+    poster{
+      alt,
+      image{asset->{url,metadata{lqip,dimensions}}}
+    }
+  }
+}`;

@@ -10,6 +10,19 @@ export default defineType({
     defineField({ name: "slug", type: "slug", options: { source: "title" } }),
     defineField({ name: "locale", type: "string", options: { list: ["da", "en"] }, initialValue: "da" }),
     defineField({ name: "summary", type: "text" }),
+    defineField({ name: "excerpt", type: "text", description: "Short teaser shown in listings" }),
+    defineField({
+      name: "tags",
+      type: "array",
+      of: [{ type: "string" }],
+    }),
+    defineField({
+      name: "media",
+      title: "Media",
+      type: "servicesSplitMedia",
+      description: "Upload image or video. If both are present, video is preferred.",
+    }),
+    defineField({ name: "publishedAt", type: "datetime" }),
     defineField({
       name: "sections",
       title: "Sections",
