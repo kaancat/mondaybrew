@@ -251,12 +251,12 @@ export function ServicesSplitLightAlt({
             </span>
           ) : null}
           {activeHeadline ? (
-            <h2 className="mt-3 text-[clamp(40px,6vw,64px)] font-semibold leading-[1.02] tracking-tight text-[color:var(--services-ink-strong)]">
+            <h2 className="mt-3 text-[clamp(32px,6vw,58px)] font-semibold leading-[1.05] tracking-tight text-[color:var(--services-ink-strong)]">
               {activeHeadline}
             </h2>
           ) : null}
           {activeDescription ? (
-            <p className="mt-5 max-w-xl text-[clamp(16px,1.9vw,20px)] leading-relaxed text-[color:var(--services-ink-strong)]/80">
+            <p className="mt-5 max-w-xl text-[clamp(16px,1.9vw,20px)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)]">
               {activeDescription}
             </p>
           ) : null}
@@ -265,7 +265,7 @@ export function ServicesSplitLightAlt({
             role="tablist"
             aria-label="Service pillars"
             aria-orientation="horizontal"
-            className="mt-12 flex flex-wrap items-center gap-4 border-b border-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)] text-[color:var(--services-ink-strong)]"
+            className="mt-10 flex flex-wrap items-center gap-2 border-b border-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)] text-[color:var(--services-ink-strong)]"
           >
             {normalized.tabs.map((tab, tabIndex) => {
               const isActive = tab.id === activeTab.id;
@@ -357,7 +357,7 @@ export function ServicesSplitLightAlt({
                 animate="visible"
                 exit="hidden"
                 variants={detailVariants}
-                className="rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--services-card-bg)] p-7 text-[color:var(--services-ink-strong)] shadow-[0_24px_64px_rgba(10,10,10,0.08)]"
+                className="rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--services-card-bg)] p-6 text-[color:var(--services-ink-strong)] shadow-[0_24px_64px_rgba(10,10,10,0.08)]"
               >
                 {renderMedia(activeService.media)}
 
@@ -370,14 +370,14 @@ export function ServicesSplitLightAlt({
                       {activeService.detailTitle || activeService.title}
                     </h3>
                     {activeService.summary ? (
-                    <p className="text-[17px] leading-relaxed text-[color:var(--services-ink-strong)]/75">
+                    <p className="text-[17px] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_88%,white_12%)]">
                       {activeService.summary}
                     </p>
                     ) : null}
                   </header>
 
                   {activeService.description ? (
-                    <p className="text-[16px] leading-relaxed text-[color:var(--services-ink-strong)]/72">
+                    <p className="text-[16px] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_84%,white_16%)]">
                       {activeService.description}
                     </p>
                   ) : null}
@@ -398,8 +398,8 @@ export function ServicesSplitLightAlt({
 }
 
 function renderMedia(media?: ServicesSplitMedia | null) {
-  const wrapperClasses = "relative w-full overflow-hidden rounded-[5px] bg-[color:var(--mb-bg)]";
-  const heightClasses = "aspect-[16/9]";
+  const wrapperClasses = "relative w-full overflow-hidden rounded-[5px] bg-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--mb-ink)_10%)]";
+  const heightClasses = "h-[clamp(340px,40vh,500px)]";
 
   if (!media) {
     return (
