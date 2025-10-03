@@ -204,7 +204,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <button
                   type="button"
                   onClick={() => setTheme(nextThemeId)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                  className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent px-2 py-1.5 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                   aria-label={`Switch to ${nextTheme.label}`}
                 >
                   {icon}
