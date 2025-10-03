@@ -131,14 +131,14 @@ html.light-primary {
   /* no explicit active state in 160f45d navbar for light alt */
   --nav-toggle-border: color-mix(in oklch, var(--mb-ink) 28%, var(--mb-bg) 72%);
   --nav-toggle-bg: color-mix(in oklch, var(--surface-dark) 75%, var(--surface-base) 25%);
-  --nav-toggle-text: var(--mb-bg);
+  --nav-toggle-text: var(--foreground);
   --nav-toggle-hover-border: color-mix(in oklch, var(--mb-ink) 35%, var(--mb-bg) 65%);
   --nav-toggle-hover-bg: color-mix(in oklch, var(--surface-dark) 85%, var(--surface-base) 15%);
   --nav-toggle-ring: rgba(255, 145, 77, 0.7);
   --nav-toggle-ring-offset: color-mix(in oklch, var(--surface-dark) 80%, var(--surface-base) 20%);
   --nav-locale-bg: color-mix(in oklch, var(--surface-dark) 70%, var(--surface-base) 30%);
   --nav-locale-hover-bg: color-mix(in oklch, var(--surface-dark) 85%, var(--surface-base) 15%);
-  --nav-locale-text: var(--mb-bg);
+  --nav-locale-text: var(--foreground);
   --nav-locale-border: color-mix(in oklch, var(--mb-bg) 24%, transparent);
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 68%, transparent);
 }
@@ -202,14 +202,14 @@ html.light-alt {
   --nav-link-active-text: color-mix(in oklch, var(--mb-ink) 98%, black 2%);
   --nav-toggle-border: color-mix(in oklch, var(--mb-ink) 55%, white 45%);
   --nav-toggle-bg: oklch(1 0 0);
-  --nav-toggle-text: color-mix(in oklch, var(--mb-ink) 95%, black 5%);
+  --nav-toggle-text: var(--foreground);
   --nav-toggle-hover-border: color-mix(in oklch, var(--mb-ink) 70%, white 30%);
   --nav-toggle-hover-bg: color-mix(in oklch, var(--mb-ink) 8%, white 92%);
   --nav-toggle-ring: color-mix(in oklch, var(--mb-ink) 18%, transparent 82%);
   --nav-toggle-ring-offset: color-mix(in oklch, var(--mb-ink) 16%, white 84%);
   --nav-locale-bg: oklch(1 0 0);
   --nav-locale-hover-bg: color-mix(in oklch, var(--mb-ink) 10%, white 90%);
-  --nav-locale-text: color-mix(in oklch, var(--mb-ink) 95%, black 5%);
+  --nav-locale-text: var(--foreground);
   --nav-locale-border: color-mix(in oklch, var(--mb-ink) 12%, transparent);
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 65%, transparent);
 }
@@ -273,14 +273,14 @@ html.dark {
   --nav-link-active-text: var(--mb-ink);
   --nav-toggle-border: color-mix(in oklch, var(--mb-ink) 28%, var(--surface-base) 72%);
   --nav-toggle-bg: color-mix(in oklch, var(--surface-dark) 65%, var(--surface-base) 35%);
-  --nav-toggle-text: var(--mb-ink);
+  --nav-toggle-text: var(--foreground);
   --nav-toggle-hover-border: color-mix(in oklch, var(--mb-ink) 38%, var(--surface-base) 62%);
   --nav-toggle-hover-bg: color-mix(in oklch, var(--surface-dark) 78%, var(--surface-base) 22%);
   --nav-toggle-ring: color-mix(in oklch, var(--mb-accent) 70%, transparent 30%);
   --nav-toggle-ring-offset: color-mix(in oklch, var(--surface-dark) 82%, var(--surface-base) 18%);
   --nav-locale-bg: color-mix(in oklch, var(--surface-dark) 78%, var(--surface-base) 22%);
   --nav-locale-hover-bg: color-mix(in oklch, var(--surface-dark) 88%, var(--surface-base) 12%);
-  --nav-locale-text: var(--mb-ink);
+  --nav-locale-text: var(--foreground);
   --nav-locale-border: color-mix(in oklch, var(--mb-ink) 22%, transparent);
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 68%, transparent);
 }
