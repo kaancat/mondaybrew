@@ -209,7 +209,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <button
                   type="button"
                   onClick={() => setTheme(nextThemeId)}
-                  className="inline-flex size-9 items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-[color:var(--nav-toggle-bg)] text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] hover:bg-[color:var(--nav-toggle-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                  className="inline-flex size-9 items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                   aria-label={`Switch to ${nextTheme.label}`}
                 >
                   {icon}
@@ -225,7 +225,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             </Link>
             <Link
               href={localeConfig.href}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-locale-border)] bg-[color:var(--nav-locale-bg)] px-3 py-1.5 text-xs font-semibold text-[color:var(--nav-locale-text)] transition-colors hover:bg-[color:var(--nav-locale-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-locale-border)] bg-transparent px-3 py-1.5 text-xs font-semibold text-[color:var(--nav-locale-text)] transition-colors hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
             >
               <Globe className="size-[16px]" aria-hidden="true" />
               <span>{localeConfig.active}</span>
