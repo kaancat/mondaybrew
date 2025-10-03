@@ -1,6 +1,5 @@
 import { CaseStudyCarousel } from "./case-study-carousel.client";
 import { getCaseStudies } from "@/lib/caseStudies";
-import type { CaseStudy } from "@/types/caseStudy";
 
 type Props = {
   locale?: string;

@@ -1,9 +1,5 @@
 import { Section } from "@/components/layout/section";
-import dynamic from "next/dynamic";
-
-const CaseStudyCarouselSection = dynamic(() => import("@/components/sections/case-study-carousel"), {
-  ssr: true,
-});
+import CaseStudyCarouselSection from "@/components/sections/case-study-carousel";
 
 export default function CasesPage() {
   return (
@@ -15,8 +11,6 @@ export default function CasesPage() {
         projekter.
       </p>
       <div className="mt-8">
-        {/* Server component fetches from Sanity and falls back to mock data */}
-        {/* @ts-expect-error Async Server Component */}
         <CaseStudyCarouselSection />
       </div>
     </Section>
