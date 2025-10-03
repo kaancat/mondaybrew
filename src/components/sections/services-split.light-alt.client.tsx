@@ -451,12 +451,13 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
     "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--services-card-bg)]";
 
   if (resolvedVariant === "primary") {
+    // Light Alt primary is text-only (no orange fill)
     return (
       <Link
         href={cta.href}
         target={cta.target}
         rel={cta.rel}
-        className={cn(baseStyles, "bg-[color:var(--mb-accent)] text-[color:var(--services-card-bg)] hover:bg-[color:color-mix(in_oklch,var(--mb-accent)_88%,white_12%)]")}
+        className={cn(baseStyles, "bg-transparent text-[color:var(--services-ink-strong)] hover:underline underline-offset-[2px]")}
       >
         {cta.label}
       </Link>

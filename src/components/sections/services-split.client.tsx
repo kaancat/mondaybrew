@@ -529,7 +529,7 @@ function CtaButton({ cta, index, isLightAlt }: { cta: ServicesSplitCta; index: n
     return index === 0 ? "primary" : "secondary";
   })();
   const baseStyles =
-    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[999px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors";
+    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors";
 
   if (resolvedVariant === "primary") {
     return (

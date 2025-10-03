@@ -214,6 +214,12 @@ html.light-alt {
   --nav-locale-border: transparent;
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 65%, transparent);
 
+  /* Header CTA (Light Alt): text-only, no orange */
+  --nav-cta-bg: transparent;
+  --nav-cta-border: transparent;
+  --nav-cta-text: var(--foreground);
+  --nav-cta-hover-bg: transparent;
+
   /* Services: strict black & white ink for Light-Alt */
   --services-ink-strong: #0a0a0a; /* exact black requested */
   --services-card-bg: oklch(1 0 0); /* pure white */
