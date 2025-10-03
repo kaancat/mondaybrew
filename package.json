@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint && npm run lint:colors",
-    "lint:colors": "bash -lc 'set -e; rg -n --no-heading -S -e "#([0-9a-fA-F]{3,8})\b" -e "rgba?\(" -e "oklch\(" web/src --glob '!web/src/app/globals.css' --glob '!**/*.json' && { echo \"\n[colors lint] Found raw color values in components. Use tokens.\"; exit 1; } || exit 0'",
+    "lint:colors": "bash -lc 'set -e; rg -n --no-heading -S -e "#([0-9a-fA-F]{3,8})\\b" -e "rgba?\\(" -e "oklch\\(" web/src --glob '!web/src/app/globals.css' --glob '!**/*.json' && { echo \"\n[colors lint] Found raw color values in components. Use tokens.\"; exit 1; } || exit 0'",
     "studio:deploy": "SANITY_STUDIO_BASEPATH=/ sanity deploy",
     "studio:dev": "sanity dev"
   },
