@@ -8,6 +8,7 @@ import {
   isServicesSplitSection,
   type ServicesSplitSectionData,
 } from "@/components/sections/services-split";
+import CaseStudyCarouselSection from "@/components/sections/case-study-carousel";
 import { Section } from "@/components/layout/section";
 
 type SiteSettings = { seo?: Seo };
@@ -15,7 +16,12 @@ type SiteSettings = { seo?: Seo };
 type HeroSectionWithType = HeroSectionData & { _type: "hero"; _key?: string };
 type ServicesSplitSectionWithType = ServicesSplitSectionData & { _type: "servicesSplit"; _key?: string };
 
-type HomePageSection = HeroSectionWithType | ServicesSplitSectionWithType | { _type?: string; _key?: string };
+type CaseStudyCarouselSectionWithType = { _type: "caseStudyCarousel"; _key?: string };
+type HomePageSection =
+  | HeroSectionWithType
+  | ServicesSplitSectionWithType
+  | CaseStudyCarouselSectionWithType
+  | { _type?: string; _key?: string };
 
 type HomePagePayload = {
   seo?: Seo;
@@ -72,6 +78,10 @@ export default async function Home() {
 
         if (isServicesSplitSection(section)) {
           return <ServicesSplitSection key={key} {...section} />;
+        }
+
+        if (section._type === "caseStudyCarousel") {
+          return <CaseStudyCarouselSection key={key} />;
         }
 
         return null;

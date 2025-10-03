@@ -366,6 +366,9 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
           }
         }
       },
+      _type == "caseStudyCarousel" => {
+        _type,
+      },
       true => {}
     )
   }

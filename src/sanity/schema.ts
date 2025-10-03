@@ -7,6 +7,7 @@ import author from "./types/documents/author";
 
 import hero from "./types/sections/hero";
 import servicesSplit from "./types/sections/servicesSplit";
+import caseStudyCarousel from "./types/sections/caseStudyCarousel";
 
 import seo from "./types/objects/seo";
 import cta from "./types/objects/cta";
@@ -34,6 +35,7 @@ const schemas = [
   // sections
   hero,
   servicesSplit,
+  caseStudyCarousel,
   // objects
   seo,
   cta,
