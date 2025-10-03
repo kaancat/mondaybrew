@@ -289,12 +289,7 @@ export function ServicesSplit({
             role="tablist"
             aria-label="Service pillars"
             aria-orientation="horizontal"
-            className={cn(
-              "mt-10 flex flex-wrap items-center gap-2 rounded-[5px] transition-colors",
-              isLightAlt
-                ? "border border-black/10 bg-white/98 p-1.5 text-black/70 shadow-[0_24px_64px_rgba(14,14,20,0.12)]"
-                : "bg-[color:var(--surface-dark)] p-1 text-[color:color-mix(in oklch,var(--mb-bg)_84%,var(--surface-dark)_16%)] shadow-[0_20px_60px_rgba(18,15,33,0.22)]",
-            )}
+            className="mt-10 flex flex-wrap items-center gap-2 border-b border-[color:color-mix(in_oklch,var(--mb-ink)_22%,var(--mb-bg)_78%)] text-[color:var(--mb-ink)]"
           >
             {normalized.tabs.map((tab, tabIndex) => {
               const isActive = tab.id === activeTab.id;
@@ -317,20 +312,10 @@ export function ServicesSplit({
                   }}
                   onKeyDown={(event) => handleTabKeyDown(event, tabIndex)}
                   className={cn(
-                    "relative inline-flex items-center justify-center rounded-[4px] px-4 py-2 text-[15px] font-medium transition-colors",
-                    isLightAlt
-                      ? cn(
-                          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/35",
-                          isActive
-                            ? "text-[#111015] after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-[3px] after:rounded-full after:bg-[#111015]"
-                            : "text-black/55 hover:text-[#111015]",
-                        )
-                      : cn(
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-dark)]",
-                          isActive
-                            ? "border-b-2 border-[color:var(--mb-accent)] bg-[color:color-mix(in oklch,var(--surface-dark)_55%,white_45%)] text-[color:var(--mb-bg)]"
-                            : "text-[color:color-mix(in oklch,var(--mb-bg)_72%,var(--surface-dark)_28%)] hover:bg-[color:color-mix(in oklch,var(--surface-dark)_70%,white_30%)] hover:text-[color:var(--mb-bg)]",
-                        ),
+                    "relative inline-flex items-center justify-center rounded-[4px] px-3 py-2 text-[15px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
+                    isActive
+                      ? "after:absolute after:bottom-[-1px] after:left-1 after:right-1 after:h-[2px] after:rounded-full after:bg-[color:var(--mb-accent)]"
+                      : "text-[color:color-mix(in oklch,var(--mb-ink)_68%,var(--mb-bg)_32%)] hover:text-[color:var(--mb-ink)]",
                   )}
                 >
                   {tab.label}
