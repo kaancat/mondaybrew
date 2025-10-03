@@ -108,20 +108,25 @@ function mapSections(sections?: SanityNavigationSection[]): NavbarSection[] {
 
 function mapBrand(settings?: SiteSettingsResult): NavbarBrand {
   const title = settings?.title || DEFAULT_BRAND;
-  const preferredLogo = settings?.logoOnDark?.asset?.url ? settings.logoOnDark : settings?.logo;
-  const url = preferredLogo?.asset?.url;
-  const dimensions = preferredLogo?.asset?.metadata?.dimensions;
+  const toUi = (entry?: SanityLogo | null) => {
+    const url = entry?.asset?.url;
+    const dims = entry?.asset?.metadata?.dimensions;
+    return url
+      ? {
+          url,
+          alt: entry?.alt || title,
+          width: dims?.width,
+          height: dims?.height,
+        }
+      : null;
+  };
 
   return {
     title,
-    logo: url
-      ? {
-          url,
-          alt: preferredLogo?.alt || settings?.logo?.alt || title,
-          width: dimensions?.width,
-          height: dimensions?.height,
-        }
-      : null,
+    logoLight: toUi(settings?.logo),
+    logoDark: toUi(settings?.logoOnDark),
+    // Fallback for existing consumers
+    logo: toUi(settings?.logoOnDark) ?? toUi(settings?.logo),
   };
 }
 

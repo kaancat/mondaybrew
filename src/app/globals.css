@@ -191,16 +191,16 @@ html.light-alt {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Navbar tokens tuned for Light Alt white/ink treatment */
-  --nav-shell-bg: color-mix(in oklch, var(--background) 72%, transparent);
-  --nav-shell-border: color-mix(in oklch, var(--mb-ink) 18%, transparent);
-  --nav-shell-text: color-mix(in oklch, var(--mb-ink) 96%, transparent);
-  --nav-shell-shadow: 0 24px 48px color-mix(in oklch, var(--mb-ink) 12%, transparent);
-  --nav-link-text: color-mix(in oklch, var(--mb-ink) 94%, black 6%);
-  --nav-link-hover-bg: color-mix(in oklch, var(--mb-ink) 12%, transparent);
-  --nav-link-hover-text: color-mix(in oklch, var(--mb-ink) 98%, black 2%);
-  --nav-link-active-bg: color-mix(in oklch, var(--mb-ink) 18%, transparent);
-  --nav-link-active-text: color-mix(in oklch, var(--mb-ink) 98%, black 2%);
+  /* Navbar tokens tuned for Light Alt white/glass + black ink */
+  --nav-shell-bg: color-mix(in oklch, white 86%, transparent); /* translucent white */
+  --nav-shell-border: color-mix(in oklch, var(--foreground) 92%, transparent); /* crisp dark stroke */
+  --nav-shell-text: var(--foreground); /* near-black text in shell */
+  --nav-shell-shadow: 0 24px 48px color-mix(in oklch, var(--foreground) 12%, transparent);
+  --nav-link-text: var(--foreground);
+  --nav-link-hover-bg: transparent; /* no card fill */
+  --nav-link-hover-text: var(--foreground);
+  --nav-link-active-bg: transparent;
+  --nav-link-active-text: var(--foreground);
   --nav-toggle-border: transparent;
   --nav-toggle-bg: oklch(1 0 0);
   --nav-toggle-text: var(--foreground);

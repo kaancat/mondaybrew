@@ -40,6 +40,21 @@ export type NavbarSection =
 
 export type NavbarBrand = {
   title: string;
+  /** Logo optimized for light UI (Light Alt). */
+  logoLight?: {
+    url: string;
+    alt: string;
+    width?: number;
+    height?: number;
+  } | null;
+  /** Logo optimized for dark UI (Primary/Dark). */
+  logoDark?: {
+    url: string;
+    alt: string;
+    width?: number;
+    height?: number;
+  } | null;
+  /** Back-compat single logo; used as fallback. */
   logo?: {
     url: string;
     alt: string;
@@ -79,6 +94,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
   const effectiveTheme = (mounted ? resolvedTheme : undefined) as ThemeId | undefined;
   const currentThemeId = effectiveTheme ?? defaultThemeId;
+  const isLightAlt = currentThemeId === "light-alt";
 
   const localeConfig = useMemo(() => {
     const available = locales?.available?.length ? locales.available : [FALLBACK_LOCALE, "en"];
@@ -132,18 +148,24 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             style={{ justifyContent: "space-between" }}
           >
             <Link href="/" className="inline-flex items-center">
-              {brand.logo?.url ? (
-                <Image
-                  src={brand.logo.url}
-                  alt={brand.logo.alt || brand.title}
-                  width={brand.logo.width ?? 150}
-                  height={brand.logo.height ?? 32}
-                  className="h-6 w-auto"
-                  priority
-                />
-              ) : (
-                <span className="text-sm font-semibold">{brand.title}</span>
-              )}
+              {(() => {
+                const chosen = isLightAlt
+                  ? brand.logoLight ?? brand.logo ?? brand.logoDark
+                  : brand.logoDark ?? brand.logo ?? brand.logoLight;
+                if (chosen?.url) {
+                  return (
+                    <Image
+                      src={chosen.url}
+                      alt={chosen.alt || brand.title}
+                      width={chosen.width ?? 150}
+                      height={chosen.height ?? 32}
+                      className="h-6 w-auto"
+                      priority
+                    />
+                  );
+                }
+                return <span className="text-sm font-semibold">{brand.title}</span>;
+              })()}
             </Link>
             <nav className={cn("flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium md:flex-nowrap", "text-[color:var(--nav-link-text)]")}>
               {sections.map((section) => {
@@ -155,10 +177,19 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       key={section.label}
                       href={href}
                       className={cn(
-                        "whitespace-nowrap rounded-[5px] px-3 py-1.5 transition",
-                        active
-                          ? "bg-[color:var(--nav-link-active-bg)] text-[color:var(--nav-link-active-text)]"
-                          : "hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]",
+                        "whitespace-nowrap rounded-[5px] px-3 py-1.5 transition text-[color:var(--nav-link-text)]",
+                        isLightAlt
+                          ? cn(
+                              active
+                                ? "font-semibold underline underline-offset-[3px] decoration-[color:var(--nav-link-text)]"
+                                : "hover:underline underline-offset-[3px] decoration-[color:var(--nav-link-text)]",
+                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]",
+                            )
+                          : cn(
+                              active
+                                ? "bg-[color:var(--nav-link-active-bg)] text-[color:var(--nav-link-active-text)]"
+                                : "hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]",
+                            ),
                       )}
                     >
                       {section.label}
