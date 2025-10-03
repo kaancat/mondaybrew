@@ -114,38 +114,57 @@ html.light-primary {
   --sidebar-accent-foreground: var(--mb-ink);
   --sidebar-border: color-mix(in oklch, var(--mb-ink) 12%, var(--mb-bg) 88%);
   --sidebar-ring: color-mix(in oklch, var(--mb-ink) 35%, white 65%);
+
+  --nav-shell-bg: color-mix(in oklch, var(--surface-dark) 82%, var(--surface-base) 18%);
+  --nav-shell-border: color-mix(in oklch, var(--mb-ink) 22%, var(--mb-bg) 78%);
+  --nav-shell-text: color-mix(in oklch, var(--mb-bg) 92%, var(--surface-dark) 8%);
+  --nav-link-text: color-mix(in oklch, var(--mb-bg) 88%, var(--surface-dark) 12%);
+  --nav-link-hover-bg: color-mix(in oklch, var(--mb-bg) 12%, transparent);
+  --nav-link-hover-text: var(--mb-bg);
+  --nav-link-active-bg: color-mix(in oklch, var(--mb-bg) 18%, transparent);
+  --nav-link-active-text: var(--mb-bg);
+  --nav-toggle-border: color-mix(in oklch, var(--mb-ink) 28%, var(--mb-bg) 72%);
+  --nav-toggle-bg: color-mix(in oklch, var(--surface-dark) 75%, var(--surface-base) 25%);
+  --nav-toggle-text: var(--mb-bg);
+  --nav-toggle-hover-border: color-mix(in oklch, var(--mb-ink) 35%, var(--mb-bg) 65%);
+  --nav-toggle-hover-bg: color-mix(in oklch, var(--surface-dark) 85%, var(--surface-base) 15%);
+  --nav-toggle-ring: rgba(255, 145, 77, 0.7);
+  --nav-toggle-ring-offset: color-mix(in oklch, var(--surface-dark) 80%, var(--surface-base) 20%);
+  --nav-locale-bg: color-mix(in oklch, var(--surface-dark) 70%, var(--surface-base) 30%);
+  --nav-locale-hover-bg: color-mix(in oklch, var(--surface-dark) 85%, var(--surface-base) 15%);
+  --nav-locale-text: var(--mb-bg);
 }
 
 html.light-alt {
   color-scheme: light;
 
-  --mb-ink: oklch(0.18 0 0);
+  --mb-ink: #201f25;
   --mb-accent: #ff914d;
-  --mb-bg: oklch(0.985 0 0);
+  --mb-bg: #fbfbfe;
 
-  --surface-base: oklch(0.985 0 0);
-  --surface-elevated: oklch(0.97 0 0);
-  --surface-dark: oklch(0.86 0 0);
-  --surface-gradient: linear-gradient(135deg, color-mix(in oklch, #ffffff 72%, var(--mb-accent) 28%) 0%, color-mix(in oklch, #ffffff 18%, var(--mb-accent) 82%) 100%);
+  --surface-base: color-mix(in oklch, #ffffff 94%, #f1f2f7 6%);
+  --surface-elevated: color-mix(in oklch, #ffffff 88%, #e4e7f0 12%);
+  --surface-dark: color-mix(in oklch, #191920 88%, #0b0b11 12%);
+  --surface-gradient: linear-gradient(135deg, color-mix(in oklch, #f5f6fb 72%, #ffffff 28%) 0%, color-mix(in oklch, #ff914d 48%, #ffffff 52%) 100%);
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: oklch(0.995 0 0);
+  --foreground: var(--mb-ink);
+  --card: color-mix(in oklch, #ffffff 96%, #f2f3f8 4%);
+  --card-foreground: var(--mb-ink);
+  --popover: color-mix(in oklch, #ffffff 96%, #f2f3f8 4%);
+  --popover-foreground: var(--mb-ink);
+  --primary: var(--mb-ink);
+  --primary-foreground: #f7f8ff;
+  --secondary: color-mix(in oklch, #f5f6fb 78%, #ffffff 22%);
+  --secondary-foreground: var(--mb-ink);
+  --muted: color-mix(in oklch, #f1f2f7 90%, #ffffff 10%);
+  --muted-foreground: color-mix(in oklch, var(--mb-ink) 60%, white 40%);
+  --accent: var(--mb-accent);
+  --accent-foreground: #2a1410;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: color-mix(in oklch, var(--mb-ink) 12%, white 88%);
+  --input: color-mix(in oklch, var(--mb-ink) 12%, white 88%);
+  --ring: color-mix(in oklch, var(--mb-ink) 32%, white 68%);
 
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -153,14 +172,33 @@ html.light-alt {
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
 
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: color-mix(in oklch, #181821 86%, #1f1f29 14%);
+  --sidebar-foreground: #f5f7fd;
+  --sidebar-primary: color-mix(in oklch, #ff914d 65%, #1b1b24 35%);
+  --sidebar-primary-foreground: #f5f7fd;
+  --sidebar-accent: color-mix(in oklch, #ff914d 24%, #1b1b24 76%);
+  --sidebar-accent-foreground: #f5f7fd;
+  --sidebar-border: color-mix(in oklch, #f5f7fd 20%, #1b1b24 80%);
+  --sidebar-ring: color-mix(in oklch, #ff914d 42%, #1b1b24 58%);
+
+  --nav-shell-bg: rgba(24, 24, 24, 0.72);
+  --nav-shell-border: rgba(255, 255, 255, 0.16);
+  --nav-shell-text: rgba(245, 247, 253, 0.96);
+  --nav-link-text: rgba(245, 247, 253, 0.85);
+  --nav-link-hover-bg: rgba(255, 255, 255, 0.12);
+  --nav-link-hover-text: rgba(245, 247, 253, 0.98);
+  --nav-link-active-bg: rgba(255, 255, 255, 0.18);
+  --nav-link-active-text: rgba(245, 247, 253, 0.98);
+  --nav-toggle-border: rgba(245, 247, 253, 0.32);
+  --nav-toggle-bg: rgba(24, 24, 24, 0.78);
+  --nav-toggle-text: #f5f7fd;
+  --nav-toggle-hover-border: rgba(245, 247, 253, 0.48);
+  --nav-toggle-hover-bg: rgba(18, 18, 18, 0.85);
+  --nav-toggle-ring: rgba(255, 145, 77, 0.7);
+  --nav-toggle-ring-offset: rgba(15, 15, 18, 0.82);
+  --nav-locale-bg: #6f6f74;
+  --nav-locale-hover-bg: #5f5f64;
+  --nav-locale-text: #f5f7fd;
 }
 
 html.dark {
@@ -208,6 +246,23 @@ html.dark {
   --sidebar-accent-foreground: var(--mb-ink);
   --sidebar-border: color-mix(in oklch, var(--mb-ink) 18%, var(--surface-base) 82%);
   --sidebar-ring: color-mix(in oklch, var(--mb-accent) 48%, var(--surface-base) 52%);
+
+  --nav-shell-text: var(--mb-ink);
+  --nav-link-text: color-mix(in oklch, var(--mb-ink) 85%, transparent 15%);
+  --nav-link-hover-bg: color-mix(in oklch, var(--mb-accent) 18%, transparent);
+  --nav-link-hover-text: var(--mb-ink);
+  --nav-link-active-bg: color-mix(in oklch, var(--mb-accent) 26%, transparent);
+  --nav-link-active-text: var(--mb-ink);
+  --nav-toggle-border: color-mix(in oklch, var(--mb-ink) 28%, var(--surface-base) 72%);
+  --nav-toggle-bg: color-mix(in oklch, var(--surface-dark) 65%, var(--surface-base) 35%);
+  --nav-toggle-text: var(--mb-ink);
+  --nav-toggle-hover-border: color-mix(in oklch, var(--mb-ink) 38%, var(--surface-base) 62%);
+  --nav-toggle-hover-bg: color-mix(in oklch, var(--surface-dark) 78%, var(--surface-base) 22%);
+  --nav-toggle-ring: color-mix(in oklch, var(--mb-accent) 70%, transparent 30%);
+  --nav-toggle-ring-offset: color-mix(in oklch, var(--surface-dark) 82%, var(--surface-base) 18%);
+  --nav-locale-bg: color-mix(in oklch, var(--surface-dark) 78%, var(--surface-base) 22%);
+  --nav-locale-hover-bg: color-mix(in oklch, var(--surface-dark) 88%, var(--surface-base) 12%);
+  --nav-locale-text: var(--mb-ink);
 }
 
 @media (min-width: 1920px) {

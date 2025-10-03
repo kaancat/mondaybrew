@@ -101,7 +101,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const ctaLabel = cta?.label || DEFAULT_CTA_LABEL;
 
   const menuShell =
-    "rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_22%,var(--mb-bg)_78%)] bg-[color:color-mix(in_oklch,var(--surface-dark)_82%,var(--surface-base)_18%)] text-[color:var(--mb-bg)] shadow-[0_24px_48px_rgba(10,8,18,0.28)] backdrop-blur-[12px] transition-all duration-300";
+    "rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)] text-[color:var(--nav-shell-text)] shadow-[0_24px_48px_rgba(10,8,18,0.28)] backdrop-blur-[12px] transition-all duration-300";
 
   useEffect(() => {
     const el = headerRef.current;
@@ -142,7 +142,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <span className="text-sm font-semibold text-white/90">{brand.title}</span>
               )}
             </Link>
-            <nav className="flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium text-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--surface-dark)_10%)] md:flex-nowrap">
+            <nav className="flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium text-[color:var(--nav-link-text)] md:flex-nowrap">
               {sections.map((section) => {
                 if (section.kind === "link") {
                   const href = section.href ?? "#";
@@ -154,8 +154,8 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       className={cn(
                         "whitespace-nowrap rounded-[5px] px-3 py-1.5 transition",
                         active
-                          ? "bg-[color:color-mix(in_oklch,var(--mb-bg)_18%,transparent)] text-[color:var(--mb-bg)]"
-                          : "hover:bg-[color:color-mix(in_oklch,var(--mb-bg)_12%,transparent)] hover:text-[color:var(--mb-bg)]",
+                          ? "bg-[color:var(--nav-link-active-bg)] text-[color:var(--nav-link-active-text)]"
+                          : "hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]",
                       )}
                     >
                       {section.label}
@@ -167,7 +167,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   <button
                     key={section.label}
                     type="button"
-                    className="whitespace-nowrap rounded-[5px] px-3 py-1.5 text-left transition hover:bg-[color:color-mix(in_oklch,var(--mb-bg)_12%,transparent)] hover:text-[color:var(--mb-bg)]"
+                    className="whitespace-nowrap rounded-[5px] px-3 py-1.5 text-left transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]"
                   >
                     {section.label}
                   </button>
@@ -202,7 +202,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <button
                   type="button"
                   onClick={() => setTheme(nextThemeId)}
-                  className="inline-flex size-9 items-center justify-center rounded-[5px] border border-[color:color-mix(in_oklch,var(--mb-ink)_28%,var(--mb-bg)_72%)] bg-[color:color-mix(in_oklch,var(--surface-dark)_75%,var(--surface-base)_25%)] text-[color:var(--mb-bg)] transition hover:border-[color:color-mix(in_oklch,var(--mb-ink)_35%,var(--mb-bg)_65%)] hover:bg-[color:color-mix(in_oklch,var(--surface-dark)_85%,var(--surface-base)_15%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,145,77,0.7)] focus-visible:ring-offset-[color:color-mix(in_oklch,var(--surface-dark)_80%,var(--surface-base)_20%)]"
+                  className="inline-flex size-9 items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-[color:var(--nav-toggle-bg)] text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] hover:bg-[color:var(--nav-toggle-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                   aria-label={`Switch to ${nextTheme.label}`}
                 >
                   {icon}
@@ -218,7 +218,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             </Link>
             <Link
               href={localeConfig.href}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[color:color-mix(in_oklch,var(--surface-dark)_70%,var(--surface-base)_30%)] px-3 py-1.5 text-xs font-semibold text-[color:var(--mb-bg)] transition-colors hover:bg-[color:color-mix(in_oklch,var(--surface-dark)_85%,var(--surface-base)_15%)] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2"
+              className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[color:var(--nav-locale-bg)] px-3 py-1.5 text-xs font-semibold text-[color:var(--nav-locale-text)] transition-colors hover:bg-[color:var(--nav-locale-hover-bg)] focus:outline-none focus-visible:outline-2 focus-visible:outline-[rgba(255,145,77,0.7)] focus-visible:outline-offset-2"
             >
               <Globe className="size-[16px]" aria-hidden="true" />
               <span>{localeConfig.active}</span>
