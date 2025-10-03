@@ -335,11 +335,7 @@ export function ServicesSplit({
                 animate="visible"
                 exit="hidden"
                 variants={listVariants}
-                className={cn(
-                  isLightAlt
-                    ? "divide-y divide-black/10 overflow-hidden rounded-[6px] border border-black/10 bg-white"
-                    : "divide-y divide-[color:color-mix(in oklch,var(--mb-ink)_18%,var(--mb-bg)_82%)] border-b border-[color:color-mix(in oklch,var(--mb-ink)_18%,var(--mb-bg)_82%)]",
-                )}
+                className="divide-y divide-[color:color-mix(in_oklch,var(--mb-ink)_18%,var(--mb-bg)_82%)] border-b border-[color:color-mix(in_oklch,var(--mb-ink)_18%,var(--mb-bg)_82%)]"
               >
                 {activeTab.services.map((service) => {
                   const isActiveService = service.id === activeService?.id;
@@ -349,20 +345,10 @@ export function ServicesSplit({
                       <button
                         type="button"
                         className={cn(
-                          "group flex w-full items-center justify-between gap-6 text-left font-medium transition-transform",
-                          isLightAlt
-                            ? cn(
-                                "px-6 py-5 text-[18px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/25",
-                                isActiveService
-                                  ? "text-[#18171b]"
-                                  : "text-black/60 hover:text-[#18171b]",
-                              )
-                            : cn(
-                                "px-0 py-4 text-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-dark)]",
-                                isActiveService
-                                  ? "font-semibold text-[color:var(--mb-ink)]"
-                                  : "text-[color:color-mix(in oklch,var(--mb-ink)_62%,var(--mb-bg)_38%)] hover:text-[color:var(--mb-ink)]",
-                              ),
+                          "group flex w-full items-center justify-between gap-6 px-0 py-4 text-left text-[20px] font-medium transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
+                          isActiveService
+                            ? "font-semibold text-[color:var(--mb-ink)]"
+                            : "text-[color:color-mix(in oklch,var(--mb-ink)_62%,var(--mb-bg)_38%)] hover:text-[color:var(--mb-ink)]",
                         )}
                         onClick={() => setActiveServiceId(service.id)}
                         aria-current={isActiveService ? "true" : undefined}
@@ -371,15 +357,8 @@ export function ServicesSplit({
                         <span
                           className={cn(
                             "inline-flex size-9 min-h-9 min-w-9 items-center justify-center transition-transform duration-200 group-hover:translate-x-[0.35rem]",
-                            isLightAlt
-                              ? cn(
-                                  "rounded-[5px] border border-transparent bg-black/[0.04] text-black/55",
-                                  isActiveService && "bg-black/[0.08] text-black",
-                                )
-                              : cn(
-                                  "text-[color:color-mix(in oklch,var(--mb-ink)_58%,var(--mb-bg)_42%)]",
-                                  isActiveService && "text-[color:var(--mb-ink)]",
-                                ),
+                            "text-[color:color-mix(in oklch,var(--mb-ink)_58%,var(--mb-bg)_42%)]",
+                            isActiveService && "text-[color:var(--mb-ink)]",
                           )}
                           aria-hidden
                         >
