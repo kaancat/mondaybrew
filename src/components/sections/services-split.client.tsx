@@ -252,8 +252,6 @@ export function ServicesSplit({
         title={title}
         description={description}
         tabs={tabs}
-        marketingSummary={marketingSummary}
-        webSummary={webSummary}
       />
     );
   }

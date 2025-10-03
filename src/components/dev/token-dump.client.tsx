@@ -25,10 +25,8 @@ export default function TokenDump() {
     const style = getComputedStyle(root);
     const values: Record<string, string> = {};
     VARS.forEach((k) => (values[k] = style.getPropertyValue(k).trim()));
-    // eslint-disable-next-line no-console
     console.log("[Light Alt Token Dump]", values);
   }, [resolvedTheme]);
 
   return null;
 }
-
