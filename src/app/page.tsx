@@ -16,7 +16,15 @@ type SiteSettings = { seo?: Seo };
 type HeroSectionWithType = HeroSectionData & { _type: "hero"; _key?: string };
 type ServicesSplitSectionWithType = ServicesSplitSectionData & { _type: "servicesSplit"; _key?: string };
 
-type CaseStudyCarouselSectionWithType = { _type: "caseStudyCarousel"; _key?: string };
+type CaseStudyCarouselSectionWithType = {
+  _type: "caseStudyCarousel";
+  _key?: string;
+  eyebrow?: string;
+  headline?: Array<{ children?: Array<{ text?: string }> }>;
+  intro?: string;
+  initialIndex?: number;
+  explore?: { label?: string; href?: string; variant?: string } | null;
+};
 type HomePageSection =
   | HeroSectionWithType
   | ServicesSplitSectionWithType
@@ -81,7 +89,17 @@ export default async function Home() {
         }
 
         if (section._type === "caseStudyCarousel") {
-          return <CaseStudyCarouselSection key={key} />;
+          return (
+            <CaseStudyCarouselSection
+              key={key}
+              locale={locale}
+              initialIndex={section.initialIndex}
+              eyebrow={section.eyebrow}
+              headline={section.headline}
+              intro={section.intro}
+              explore={section.explore}
+            />
+          );
         }
 
         return null;

@@ -8,9 +8,13 @@ export interface CaseStudyCarouselProps {
   items: CaseStudy[];
   initialIndex?: number;
   exploreHref?: string;
+  exploreLabel?: string;
+  eyebrow?: string;
+  headlineText?: string;
+  intro?: string;
 }
 
-export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref }: CaseStudyCarouselProps) {
+export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, exploreLabel = "Explore all cases", eyebrow, headlineText, intro }: CaseStudyCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(initialIndex);
   const [perView, setPerView] = useState(1);
@@ -49,11 +53,21 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref }: Case
 
   return (
     <div className="group/section">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Our work</h2>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          {eyebrow ? (
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">{eyebrow}</div>
+          ) : null}
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground break-words">
+            {headlineText || "Our work"}
+          </h2>
+          {intro ? (
+            <p className="mt-2 max-w-prose text-sm text-muted-foreground">{intro}</p>
+          ) : null}
+        </div>
         {exploreHref && (
-          <a href={exploreHref} className="text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-[5px] px-2 py-1">
-            Explore all cases
+          <a href={exploreHref} className="text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-[5px] px-2 py-1 whitespace-nowrap self-start">
+            {exploreLabel}
           </a>
         )}
       </div>
@@ -66,6 +80,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref }: Case
           if (e.key === "ArrowRight") next();
         }}
         aria-roledescription="carousel"
+        tabIndex={0}
       >
         <div className="overflow-hidden">
           <ul
@@ -210,4 +225,3 @@ function ArrowRightIcon() {
     </svg>
   );
 }
-

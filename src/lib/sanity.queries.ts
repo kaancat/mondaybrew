@@ -368,6 +368,18 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
       },
       _type == "caseStudyCarousel" => {
         _type,
+        eyebrow,
+        headline,
+        intro,
+        initialIndex,
+        explore{
+          label,
+          href,
+          variant
+        },
+        feature{
+          items[]{ _key }
+        }
       },
       true => {}
     )
