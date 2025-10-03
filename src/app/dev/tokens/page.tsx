@@ -1,4 +1,6 @@
 "use client";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "next-themes";
@@ -12,9 +14,10 @@ const TOKENS = [
   "--shadow-elevated-md","--shadow-elevated-lg","--shadow-hero","--shadow-glass-lg",
 ];
 
-function readTokens(): Record<string,string> {
+function readTokens(): Record<string, string> {
+  if (typeof window === "undefined") return {};
   const style = getComputedStyle(document.documentElement);
-  const out: Record<string,string> = {};
+  const out: Record<string, string> = {};
   TOKENS.forEach((k) => (out[k] = style.getPropertyValue(k).trim()));
   return out;
 }
@@ -22,24 +25,22 @@ function readTokens(): Record<string,string> {
 export default function TokenPage() {
   const { resolvedTheme, setTheme } = useTheme();
   const [all, setAll] = useState<Record<string, Record<string,string>>>({});
-  const current = useMemo(readTokens, [resolvedTheme]);
+  const current = useMemo(() => (typeof window !== "undefined" ? readTokens() : {}), [resolvedTheme]);
 
   useEffect(() => {
     document.title = "Token Dump";
   }, []);
 
   const captureAll = async () => {
+    if (typeof window === "undefined") return;
     const original = resolvedTheme as string | undefined;
-    const results: Record<string, Record<string,string>> = {};
+    const results: Record<string, Record<string, string>> = {};
     for (const t of themeOrder) {
-      await setTheme(t);
-      // Allow repaint
-      await new Promise((r) => setTimeout(r, 30));
+      setTheme(t);
+      await new Promise((r) => setTimeout(r, 40));
       results[t] = readTokens();
     }
-    if (original) {
-      await setTheme(original);
-    }
+    if (original) setTheme(original);
     setAll(results);
   };
 
@@ -74,4 +75,3 @@ export default function TokenPage() {
     </main>
   );
 }
-
