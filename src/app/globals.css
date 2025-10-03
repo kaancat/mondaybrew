@@ -213,16 +213,6 @@ html.light-alt {
   --nav-locale-text: var(--foreground);
   --nav-locale-border: transparent;
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 65%, transparent);
-
-  /* Services (Light-Alt) north-star tokens */
-  --services-ink: var(--foreground);
-  --services-ink-muted: color-mix(in oklch, var(--foreground) 78%, white 22%);
-  --services-divider: color-mix(in oklch, var(--foreground) 80%, white 20%);
-  --services-tabbar-bg: color-mix(in oklch, var(--foreground) 12%, white 88%);
-  --services-tabbar-text: color-mix(in oklch, white 92%, var(--foreground) 8%);
-  --services-tab-underline: var(--mb-accent);
-  --services-card-dark: color-mix(in oklch, var(--foreground) 92%, black 8%);
-  --services-card-ink: oklch(0.985 0 0);
 }
 
 html.dark {
