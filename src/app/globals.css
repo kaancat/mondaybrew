@@ -70,6 +70,12 @@
   /* Brand constants used across themes */
   --brand-light: #f5f7fd; /* primary light background */
   --brand-ink-strong: #0a0a0a; /* strict black for outlines/text on white */
+
+  /* Shared shadow tokens (used by components) */
+  --shadow-elevated-md: 0 24px 64px rgba(10,10,10,0.08);
+  --shadow-elevated-lg: 0 36px 110px rgba(18,15,33,0.28);
+  --shadow-hero: 0 50px 120px rgba(8,6,20,0.35);
+  --shadow-glass-lg: 0 36px 110px rgba(6,5,16,0.32);
 }
 
 :root,
@@ -146,6 +152,15 @@ html.light-primary {
   --nav-locale-text: var(--foreground);
   --nav-locale-border: transparent;
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 68%, transparent);
+
+  /* CTA tokens */
+  --cta-primary-bg: var(--mb-accent);
+  --cta-primary-text: var(--brand-light);
+  --cta-primary-hover-bg: color-mix(in oklch, var(--mb-accent) 88%, white 12%);
+  --cta-secondary-bg: var(--brand-light);
+  --cta-secondary-text: var(--brand-ink-strong);
+  --cta-secondary-border: var(--brand-ink-strong);
+  --cta-secondary-hover-border: color-mix(in oklch, var(--brand-ink-strong) 80%, white 20%);
 }
 
 html.light-alt {
@@ -227,6 +242,15 @@ html.light-alt {
   /* Services: strict black & white ink for Light-Alt */
   --services-ink-strong: #0a0a0a; /* exact black requested */
   --services-card-bg: oklch(1 0 0); /* pure white */
+
+  /* CTA tokens (Light Alt) */
+  --cta-primary-bg: transparent; /* text-only */
+  --cta-primary-text: var(--services-ink-strong);
+  --cta-primary-hover-bg: transparent;
+  --cta-secondary-bg: var(--services-card-bg);
+  --cta-secondary-text: var(--services-ink-strong);
+  --cta-secondary-border: var(--services-ink-strong);
+  --cta-secondary-hover-border: color-mix(in oklch, var(--services-ink-strong) 80%, white 20%);
 }
 
 html.dark {
@@ -298,6 +322,15 @@ html.dark {
   --nav-locale-text: var(--foreground);
   --nav-locale-border: transparent;
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 68%, transparent);
+
+  /* CTA tokens (Dark) */
+  --cta-primary-bg: var(--mb-accent);
+  --cta-primary-text: var(--brand-light);
+  --cta-primary-hover-bg: color-mix(in oklch, var(--mb-accent) 88%, white 12%);
+  --cta-secondary-bg: var(--brand-light);
+  --cta-secondary-text: var(--brand-ink-strong);
+  --cta-secondary-border: var(--brand-ink-strong);
+  --cta-secondary-hover-border: color-mix(in oklch, var(--brand-ink-strong) 80%, white 20%);
 }
 
 @media (min-width: 1920px) {

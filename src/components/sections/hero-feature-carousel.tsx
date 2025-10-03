@@ -49,7 +49,7 @@ export function HeroFeatureCarousel({ items }: Props) {
       </div>
 
       <div className="relative rounded-[10px] bg-gradient-to-br from-white/36 via-white/14 to-white/4 p-[1px]">
-        <div className="relative flex h-full flex-col overflow-hidden rounded-[10px] border border-white/16 bg-[rgba(14,12,26,0.42)] shadow-[0_36px_110px_rgba(6,5,16,0.32)] backdrop-blur-[26px]">
+                        <div className="relative flex h-full flex-col overflow-hidden rounded-[10px] border border-white/16 bg-[rgba(14,12,26,0.42)] shadow-[var(--shadow-glass-lg)] backdrop-blur-[26px]">
           <div className="overflow-hidden">
             <div
               className="flex transition-transform duration-300 ease-out"

@@ -248,7 +248,7 @@ export function HeroSection({
       style={{ marginTop: offsetVar, marginBottom: bottomGapVar }}
     >
       <div
-        className="relative isolate flex w-full flex-col overflow-hidden rounded-[5px] border border-white/10 bg-black/60 shadow-[0_50px_120px_rgba(8,6,20,0.35)]"
+        className="relative isolate flex w-full flex-col overflow-hidden rounded-[5px] border border-white/10 bg-black/60 shadow-[var(--shadow-hero)]"
         style={{ minHeight: "560px", height: heroHeight }}
       >
         <div className="absolute inset-0">

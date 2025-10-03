@@ -357,7 +357,7 @@ export function ServicesSplitLightAlt({
                 animate="visible"
                 exit="hidden"
                 variants={detailVariants}
-                className="rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--services-card-bg)] p-6 text-[color:var(--services-ink-strong)] shadow-[0_24px_64px_rgba(10,10,10,0.08)]"
+                className="rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--services-card-bg)] p-6 text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
               >
                 {renderMedia(activeService.media)}
 
@@ -451,13 +451,12 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
     "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--services-card-bg)]";
 
   if (resolvedVariant === "primary") {
-    // Light Alt primary is text-only (no orange fill)
     return (
       <Link
         href={cta.href}
         target={cta.target}
         rel={cta.rel}
-        className={cn(baseStyles, "bg-transparent text-[color:var(--services-ink-strong)] hover:underline underline-offset-[2px]")}
+        className={cn(baseStyles, "bg-[color:var(--cta-primary-bg)] text-[color:var(--cta-primary-text)] hover:bg-[color:var(--cta-primary-hover-bg)]")}
       >
         {cta.label}
       </Link>
@@ -469,7 +468,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
       href={cta.href}
       target={cta.target}
       rel={cta.rel}
-      className={cn(baseStyles, "border border-[color:var(--services-ink-strong)] bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] hover:border-[color:color-mix(in_oklch,var(--services-ink-strong)_80%,white_20%)]")}
+      className={cn(baseStyles, "border border-[color:var(--cta-secondary-border)] bg-[color:var(--cta-secondary-bg)] text-[color:var(--cta-secondary-text)] hover:border-[color:var(--cta-secondary-hover-border)]")}
     >
       {cta.label}
     </Link>

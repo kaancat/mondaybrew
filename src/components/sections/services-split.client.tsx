@@ -385,8 +385,8 @@ export function ServicesSplit({
                 className={cn(
                   "rounded-[5px] p-6",
                   isLightAlt
-                    ? "border border-black/10 bg-white text-[#151418] shadow-[0_40px_110px_rgba(17,17,31,0.12)]"
-                    : "border border-[color:color-mix(in oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[0_36px_110px_rgba(18,15,33,0.28)]",
+                    ? "border border-black/10 bg-white text-[#151418] shadow-[var(--shadow-elevated-md)]"
+                    : "border border-[color:color-mix(in oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
                 )}
               >
                 {renderMedia(activeService.media, isLightAlt)}
@@ -503,9 +503,7 @@ function CtaButton({ cta, index, isLightAlt }: { cta: ServicesSplitCta; index: n
         rel={cta.rel}
         className={cn(
           baseStyles,
-          isLightAlt
-            ? "border border-black/10 bg-[#fff4ea] text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30 hover:border-black/25 hover:bg-[#ffe8d5]"
-            : "bg-[color:var(--mb-accent)] text-[color:var(--brand-light)] hover:bg-[color:color-mix(in oklch,var(--mb-accent)_88%,white_12%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--mb-ink)]",
+          "bg-[color:var(--cta-primary-bg)] text-[color:var(--cta-primary-text)] hover:bg-[color:var(--cta-primary-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--mb-ink)]",
         )}
       >
         {cta.label}
@@ -520,9 +518,7 @@ function CtaButton({ cta, index, isLightAlt }: { cta: ServicesSplitCta; index: n
       rel={cta.rel}
       className={cn(
         baseStyles,
-        isLightAlt
-          ? "border border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
-          : "border border-[color:var(--brand-ink-strong)] bg-[color:var(--brand-light)] text-[color:var(--brand-ink-strong)] hover:border-[color:color-mix(in oklch,var(--brand-ink-strong)_80%,white_20%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--mb-ink)]",
+        "border border-[color:var(--cta-secondary-border)] bg-[color:var(--cta-secondary-bg)] text-[color:var(--cta-secondary-text)] hover:border-[color:var(--cta-secondary-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--mb-ink)]",
       )}
     >
       {cta.label}
