@@ -9,9 +9,7 @@ import { ConsentBanner } from "@/components/shared/consent";
 import { JsonLd } from "@/components/shared/json-ld";
 import { jsonLd } from "@/lib/jsonld";
 import { ThemeProvider } from "@/components/shared/theme-provider";
-import dynamic from "next/dynamic";
-
-const TokenDump = dynamic(() => import("@/components/dev/token-dump.client"), { ssr: false });
+import TokenDump from "@/components/dev/token-dump.client";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
