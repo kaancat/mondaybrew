@@ -323,7 +323,7 @@ export function ServicesSplitLightAlt({
                         className={cn(
                           "group flex w-full items-center justify-between gap-6 px-0 py-4 text-left text-[20px] font-medium transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
                           isActiveService
-                            ? "font-semibold text-[color:var(--services-ink-strong)] underline underline-offset-[3px] decoration-[color:color-mix(in_oklch,var(--services-ink-strong)_70%,white_30%)]"
+                            ? "font-semibold text-[color:var(--services-ink-strong)]"
                             : "text-[color:color-mix(in_oklch,var(--services-ink-strong)_70%,white_30%)] hover:text-[color:var(--services-ink-strong)]",
                         )}
                         onClick={() => setActiveServiceId(service.id)}
@@ -363,10 +363,10 @@ export function ServicesSplitLightAlt({
 
                 <div className="mt-6 flex flex-col gap-4">
                   <header className="space-y-3">
-                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:color-mix(in_oklch,var(--mb-bg)_75%,var(--mb-ink)_25%)]">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--services-ink-strong)]">
                       {activeTab.label}
                     </p>
-                    <h3 className="text-[clamp(24px,3vw,34px)] font-semibold leading-tight text-[color:var(--mb-bg)]">
+                    <h3 className="text-[clamp(24px,3vw,34px)] font-semibold leading-tight text-[color:var(--services-ink-strong)]">
                       {activeService.detailTitle || activeService.title}
                     </h3>
                     {activeService.summary ? (
@@ -448,7 +448,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
     return index === 0 ? "primary" : "secondary";
   })();
   const baseStyles =
-    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[999px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--services-card-bg)]";
+    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--services-card-bg)]";
 
   if (resolvedVariant === "primary") {
     return (
