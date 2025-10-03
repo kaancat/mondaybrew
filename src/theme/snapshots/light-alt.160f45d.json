@@ -1,0 +1,52 @@
+{
+  "core": {
+    "--background": "oklch(1 0 0)",
+    "--foreground": "oklch(0.145 0 0)",
+    "--card": "oklch(1 0 0)",
+    "--card-foreground": "oklch(0.145 0 0)",
+    "--popover": "oklch(1 0 0)",
+    "--popover-foreground": "oklch(0.145 0 0)",
+    "--primary": "oklch(0.205 0 0)",
+    "--primary-foreground": "oklch(0.985 0 0)",
+    "--secondary": "oklch(0.97 0 0)",
+    "--secondary-foreground": "oklch(0.205 0 0)",
+    "--muted": "oklch(0.97 0 0)",
+    "--muted-foreground": "oklch(0.556 0 0)",
+    "--accent": "oklch(0.97 0 0)",
+    "--accent-foreground": "oklch(0.205 0 0)",
+    "--destructive": "oklch(0.577 0.245 27.325)",
+    "--border": "oklch(0.922 0 0)",
+    "--input": "oklch(0.922 0 0)",
+    "--ring": "oklch(0.708 0 0)",
+    "--mb-ink": "#49444b",
+    "--mb-bg": "#f5f7fd",
+    "--mb-accent": "#ff914d"
+  },
+  "surfaces": {
+    "--surface-base": "var(--mb-bg)",
+    "--surface-elevated": "color-mix(in oklch, white 30%, var(--mb-bg))",
+    "--surface-dark": "color-mix(in oklch, var(--mb-ink) 88%, black 12%)",
+    "--surface-gradient": "linear-gradient(135deg, color-mix(in oklch, var(--mb-bg) 85%, white) 0%, color-mix(in oklch, var(--mb-accent) 45%, white) 100%)"
+  },
+  "navbar": {
+    "--nav-shell-bg": "color-mix(in oklch, var(--surface-dark) 82%, var(--surface-base) 18%)",
+    "--nav-shell-border": "color-mix(in oklch, var(--mb-ink) 22%, var(--mb-bg) 78%)",
+    "--nav-shell-text": "var(--mb-bg)",
+    "--nav-link-text": "color-mix(in oklch, var(--mb-bg) 90%, var(--surface-dark) 10%)",
+    "--nav-link-hover-bg": "color-mix(in oklch, var(--mb-bg) 12%, transparent)",
+    "--nav-link-hover-text": "var(--mb-bg)",
+    "--nav-link-active-bg": "color-mix(in oklch, var(--mb-bg) 18%, transparent)",
+    "--nav-link-active-text": "var(--mb-bg)",
+    "--nav-toggle-border": "color-mix(in oklch, var(--mb-ink) 28%, var(--mb-bg) 72%)",
+    "--nav-toggle-bg": "color-mix(in oklch, var(--surface-dark) 75%, var(--surface-base) 25%)",
+    "--nav-toggle-text": "var(--mb-bg)",
+    "--nav-toggle-hover-border": "color-mix(in oklch, var(--mb-ink) 35%, var(--mb-bg) 65%)",
+    "--nav-toggle-hover-bg": "color-mix(in oklch, var(--surface-dark) 85%, var(--surface-base) 15%)",
+    "--nav-toggle-ring": "rgba(255,145,77,0.7)",
+    "--nav-toggle-ring-offset": "color-mix(in oklch, var(--surface-dark) 80%, var(--surface-base) 20%)",
+    "--nav-locale-bg": "color-mix(in oklch, var(--surface-dark) 70%, var(--surface-base) 30%)",
+    "--nav-locale-hover-bg": "color-mix(in oklch, var(--surface-dark) 85%, var(--surface-base) 15%)",
+    "--nav-locale-text": "var(--mb-bg)"
+  }
+}
+

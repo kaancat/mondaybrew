@@ -138,6 +138,7 @@ html.light-primary {
 html.light-alt {
   color-scheme: light;
 
+  /* Snapshot from commit 160f45d */
   --mb-ink: #49444b;
   --mb-accent: #ff914d;
   --mb-bg: #f5f7fd;
@@ -181,10 +182,11 @@ html.light-alt {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
+  /* Navbar tokens lifted from navbar.client.tsx at 160f45d */
   --nav-shell-bg: color-mix(in oklch, var(--surface-dark) 82%, var(--surface-base) 18%);
   --nav-shell-border: color-mix(in oklch, var(--mb-ink) 22%, var(--mb-bg) 78%);
-  --nav-shell-text: color-mix(in oklch, var(--mb-bg) 92%, var(--surface-dark) 8%);
-  --nav-link-text: color-mix(in oklch, var(--mb-bg) 88%, var(--surface-dark) 12%);
+  --nav-shell-text: var(--mb-bg);
+  --nav-link-text: color-mix(in oklch, var(--mb-bg) 90%, var(--surface-dark) 10%);
   --nav-link-hover-bg: color-mix(in oklch, var(--mb-bg) 12%, transparent);
   --nav-link-hover-text: var(--mb-bg);
   --nav-link-active-bg: color-mix(in oklch, var(--mb-bg) 18%, transparent);

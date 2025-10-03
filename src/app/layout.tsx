@@ -9,6 +9,9 @@ import { ConsentBanner } from "@/components/shared/consent";
 import { JsonLd } from "@/components/shared/json-ld";
 import { jsonLd } from "@/lib/jsonld";
 import { ThemeProvider } from "@/components/shared/theme-provider";
+import dynamic from "next/dynamic";
+
+const TokenDump = dynamic(() => import("@/components/dev/token-dump.client"), { ssr: false });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -33,6 +36,7 @@ export default function RootLayout({
     <html lang="da" suppressHydrationWarning>
       <body className={`${sailec.variable} ${heywow.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
+          {process.env.NEXT_PUBLIC_DUMP_TOKENS === "1" ? <TokenDump /> : null}
           <JsonLd
             id="org-jsonld"
             data={jsonLd.organization({
