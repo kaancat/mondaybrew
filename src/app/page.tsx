@@ -39,6 +39,12 @@ type HomePagePayload = {
 
 export const revalidate = 60;
 
+function isCaseStudyCarouselSection(
+  section: HomePageSection | undefined,
+): section is CaseStudyCarouselSectionWithType {
+  return !!section && section._type === "caseStudyCarousel";
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, page] = await Promise.all([
     fetchSanity<SiteSettings>(siteSettingsQuery, {}),
@@ -88,7 +94,7 @@ export default async function Home() {
           return <ServicesSplitSection key={key} {...section} />;
         }
 
-        if (section._type === "caseStudyCarousel") {
+        if (isCaseStudyCarouselSection(section)) {
           return (
             <CaseStudyCarouselSection
               key={key}
