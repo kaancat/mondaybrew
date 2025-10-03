@@ -404,7 +404,7 @@ export const postBySlugQuery = `*[_type=="post" && slug.current==$slug && (defin
   body
 }`;
 
-export const caseStudiesQuery = `*[_type=="caseStudy" && (defined(locale) => locale==$locale)] | order(coalesce(publishedAt,_updatedAt) desc){
+export const caseStudiesQuery = `*[_type=="caseStudy"] | order(coalesce(publishedAt,_updatedAt) desc){
   _id,
   title,
   client,
