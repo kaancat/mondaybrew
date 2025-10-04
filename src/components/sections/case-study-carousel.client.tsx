@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CaseStudy } from "@/types/caseStudy";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export interface CaseStudyCarouselProps {
   items: CaseStudy[];
@@ -151,7 +152,13 @@ function CaseCard({ item }: { item: CaseStudy }) {
           {videoSrc ? (
             <VideoHover src={videoSrc} poster={poster} />
           ) : poster ? (
-            <img src={poster} alt={imageAlt || ""} loading="lazy" className="h-full w-full object-cover" />
+            <Image
+              src={poster}
+              alt={imageAlt || ""}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
+            />
           ) : (
             <div className="h-full w-full bg-muted" />
           )}

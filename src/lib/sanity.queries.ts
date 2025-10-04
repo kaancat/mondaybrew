@@ -378,7 +378,34 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
           variant
         },
         feature{
-          items[]{ _key }
+          items[]{
+            linkType,
+            title,
+            excerpt,
+            href,
+            metaLabel,
+            image {
+              alt,
+              image {
+                asset->{
+                  url,
+                  metadata{ lqip, dimensions }
+                }
+              }
+            },
+            reference->{
+              _type,
+              title,
+              locale,
+              "slug": slug.current,
+              "excerpt": coalesce(excerpt, summary, description),
+              "image": coalesce(
+                mainImage{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } },
+                heroImage.image{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } },
+                coverImage{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } }
+              )
+            }
+          }
         }
       },
       true => {}

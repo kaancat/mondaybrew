@@ -24,6 +24,24 @@ type CaseStudyCarouselSectionWithType = {
   intro?: string;
   initialIndex?: number;
   explore?: { label?: string; href?: string; variant?: string } | null;
+  feature?: {
+    items?: Array<{
+      linkType?: "reference" | "manual";
+      title?: string;
+      excerpt?: string;
+      href?: string;
+      metaLabel?: string;
+      image?: { alt?: string; image?: { asset?: { url?: string; metadata?: { lqip?: string } } } };
+      reference?: {
+        _type?: "page" | "post" | "caseStudy";
+        title?: string;
+        locale?: string;
+        slug?: string;
+        excerpt?: string;
+        image?: { alt?: string; image?: { asset?: { url?: string; metadata?: { lqip?: string } } } };
+      } | null;
+    }> | null;
+  } | null;
 };
 type HomePageSection =
   | HeroSectionWithType
@@ -104,6 +122,7 @@ export default async function Home() {
               headline={section.headline}
               intro={section.intro}
               explore={section.explore}
+              feature={section.feature}
             />
           );
         }
