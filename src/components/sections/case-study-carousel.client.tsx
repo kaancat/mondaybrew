@@ -26,6 +26,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const draggingRef = useRef(false);
   const pointerDownX = useRef(0);
   const movedRef = useRef(false);
+  const dragStartScrollLeft = useRef(0);
 
   // Responsive items per view
   useEffect(() => {
