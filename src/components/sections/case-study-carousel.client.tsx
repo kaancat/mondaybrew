@@ -37,24 +37,51 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     return () => ro.disconnect();
   }, []);
 
-  const pageCount = Math.max(1, Math.ceil(items.length / perView));
-  const clampedIndex = Math.min(index, pageCount - 1);
+  // Layout constants derived from container width
+  const gapPx = useMemo(() => (containerWidth >= 1200 ? 32 : 24), [containerWidth]); // lg:gap-8, base:gap-6
+  const peekPx = useMemo(() => {
+    if (!containerWidth) return 0;
+    const pct = Math.round(containerWidth * 0.1); // 10% of visible width
+    return Math.min(pct, 120); // cap at 120px
+  }, [containerWidth]);
+
+  // Derived card width and paging math
+  const cardWidth = useMemo(() => {
+    if (!containerWidth || perView < 1) return 0;
+    // cardW = (Wv - P - (C-1)*G) / C
+    const w = (containerWidth - peekPx - (perView - 1) * gapPx) / perView;
+    return Math.max(0, Math.floor(w));
+  }, [containerWidth, perView, gapPx, peekPx]);
+
+  const stepX = useMemo(() => perView * (cardWidth + gapPx), [perView, cardWidth, gapPx]);
+  const totalWidth = useMemo(() => (items.length * cardWidth) + Math.max(0, items.length - 1) * gapPx, [items.length, cardWidth, gapPx]);
+  const maxOffset = useMemo(() => Math.max(0, totalWidth - containerWidth), [totalWidth, containerWidth]);
+  const maxIndex = useMemo(() => (stepX > 0 ? Math.ceil(maxOffset / stepX) : 0), [maxOffset, stepX]);
+  const pageCount = maxIndex + 1;
+
+  // Keep index clamped if layout changes
   useEffect(() => {
-    if (clampedIndex !== index) setIndex(clampedIndex);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clampedIndex]);
+    if (index > maxIndex) setIndex(maxIndex);
+  }, [maxIndex, index]);
 
   const prev = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
-  const next = useCallback(() => setIndex((i) => Math.min(pageCount - 1, i + 1)), [pageCount]);
+  const next = useCallback(() => setIndex((i) => Math.min(maxIndex, i + 1)), [maxIndex]);
 
   const prefersReduced = useMemo(() =>
     typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   []);
 
+  const offset = useMemo(() => {
+    const raw = index * stepX;
+    const clamped = Math.min(raw, maxOffset);
+    return Math.round(clamped);
+  }, [index, stepX, maxOffset]);
+
   const slideStyle = useMemo(() => ({
-    transform: `translate3d(${-index * containerWidth}px, 0, 0)`,
+    transform: `translate3d(${-offset}px, 0, 0)`,
     transition: prefersReduced ? undefined : "transform 420ms var(--ease-out)",
-  }), [index, containerWidth, prefersReduced]);
+    gap: `${gapPx}px`,
+  }), [offset, prefersReduced, gapPx]);
 
   return (
     <div className="group/section">
@@ -89,12 +116,12 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       >
         <div className="overflow-hidden">
           <ul
-            className="flex gap-6 md:gap-6 lg:gap-8 will-change-transform"
+            className="flex will-change-transform"
             style={slideStyle}
             aria-live="polite"
           >
             {items.map((item, i) => (
-              <li key={item._id || i} className="shrink-0" style={{ width: `${100 / perView}%` }}>
+              <li key={item._id || i} className="shrink-0" style={{ width: `${cardWidth}px` }}>
                 <CaseCard item={item} />
               </li>
             ))}
@@ -105,7 +132,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           <button
             type="button"
             onClick={prev}
-            disabled={index === 0}
+            disabled={index <= 0}
             aria-label="Previous cases"
             className={cn(
               "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border text-foreground transition",
@@ -118,7 +145,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           <button
             type="button"
             onClick={next}
-            disabled={index >= pageCount - 1}
+            disabled={index >= maxIndex}
             aria-label="Next cases"
             className={cn(
               "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border text-foreground transition",
