@@ -60,6 +60,11 @@
   --section-padding-lg: clamp(5rem, 10vw, 8rem);
   --flow-space: clamp(1.5rem, 3vw, 2.5rem);
 
+  /* Vertical rhythm tokens */
+  --section-gap-sm: clamp(32px, 4vw, 48px);
+  --section-gap-md: clamp(48px, 6vw, 72px);
+  --section-gap-lg: clamp(64px, 8vw, 96px);
+
   --font-display: clamp(2.625rem, 4vw + 1rem, 4.375rem);
   --font-h2: clamp(2.25rem, 3vw + 0.5rem, 3rem);
   --font-h3: clamp(1.75rem, 2.5vw + 0.25rem, 2.375rem);
@@ -464,6 +469,22 @@ html.dark {
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome/Safari */
+  }
+
+  /* Vertical rhythm helpers (margin-based; avoid double stacking) */
+  .vr-hero { margin-bottom: var(--section-gap-md); }
+  @media (min-width: 1280px) { .vr-hero { margin-bottom: var(--section-gap-lg); } }
+
+  .vr-section { margin-top: var(--section-gap-sm); }
+  @media (min-width: 768px) { .vr-section { margin-top: var(--section-gap-md); } }
+  .vr-section-tight { margin-top: var(--section-gap-sm); }
+  .vr-section-none { margin-top: 0; }
+
+  /* Last content section to footer spacing */
+  main > .vr-hero:last-child,
+  main > .vr-section:last-child,
+  main > .vr-section-tight:last-child {
+    margin-bottom: var(--section-gap-lg);
   }
 
   .surface-base {

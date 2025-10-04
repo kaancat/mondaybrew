@@ -36,23 +36,25 @@ export default async function HomeEN() {
   const hero = page?.sections?.find(isHeroSection);
 
   return (
-    <main className="space-y-24 pb-24">
+    <main>
       {hero ? (
-        <HeroSection
-          locale="en"
-          eyebrow={hero.eyebrow}
-          headline={hero.headline}
-          heading={hero.heading}
-          subheading={hero.subheading}
-          helper={hero.helper}
-          alignment={hero.alignment as "start" | "center" | "end" | undefined}
-          primary={hero.primary}
-          secondary={hero.secondary}
-          cta={hero.cta}
-          background={hero.background}
-          feature={hero.feature}
-          media={hero.media}
-        />
+        <div className="vr-hero">
+          <HeroSection
+            locale="en"
+            eyebrow={hero.eyebrow}
+            headline={hero.headline}
+            heading={hero.heading}
+            subheading={hero.subheading}
+            helper={hero.helper}
+            alignment={hero.alignment as "start" | "center" | "end" | undefined}
+            primary={hero.primary}
+            secondary={hero.secondary}
+            cta={hero.cta}
+            background={hero.background}
+            feature={hero.feature}
+            media={hero.media}
+          />
+        </div>
       ) : (
         <Section innerClassName="flow">
           <span className="text-sm uppercase tracking-[0.25em] text-muted-foreground">Homepage</span>

@@ -83,47 +83,53 @@ export default async function Home() {
   const hasHero = sections.some(isHeroSection);
 
   return (
-    <main className="space-y-24 pb-24">
+    <main>
       {sections.map((section, index) => {
         const key = section?._key ?? `section-${index}`;
 
         if (isHeroSection(section)) {
           return (
-            <HeroSection
-              key={key}
-              locale={locale}
-              eyebrow={section.eyebrow}
-              headline={section.headline}
-              heading={section.heading}
-              subheading={section.subheading}
-              helper={section.helper}
-              alignment={section.alignment as "start" | "center" | "end" | undefined}
-              primary={section.primary}
-              secondary={section.secondary}
-              cta={section.cta}
-              background={section.background}
-              feature={section.feature}
-              media={section.media}
-            />
+            <div className="vr-hero" key={key}>
+              <HeroSection
+                locale={locale}
+                eyebrow={section.eyebrow}
+                headline={section.headline}
+                heading={section.heading}
+                subheading={section.subheading}
+                helper={section.helper}
+                alignment={section.alignment as "start" | "center" | "end" | undefined}
+                primary={section.primary}
+                secondary={section.secondary}
+                cta={section.cta}
+                background={section.background}
+                feature={section.feature}
+                media={section.media}
+              />
+            </div>
           );
         }
 
         if (isServicesSplitSection(section)) {
-          return <ServicesSplitSection key={key} {...section} />;
+          return (
+            <div className="vr-section" key={key}>
+              <ServicesSplitSection {...section} />
+            </div>
+          );
         }
 
         if (isCaseStudyCarouselSection(section)) {
           return (
-            <CaseStudyCarouselSection
-              key={key}
-              locale={locale}
-              initialIndex={section.initialIndex}
-              eyebrow={section.eyebrow}
-              headline={section.headline}
-              intro={section.intro}
-              explore={section.explore}
-              feature={section.feature}
-            />
+            <div className="vr-section" key={key}>
+              <CaseStudyCarouselSection
+                locale={locale}
+                initialIndex={section.initialIndex}
+                eyebrow={section.eyebrow}
+                headline={section.headline}
+                intro={section.intro}
+                explore={section.explore}
+                feature={section.feature}
+              />
+            </div>
           );
         }
 
