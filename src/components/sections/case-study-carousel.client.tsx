@@ -23,6 +23,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const [containerWidth, setContainerWidth] = useState(0);
   const [announce, setAnnounce] = useState("");
   const snapTimeoutRef = useRef<number | null>(null);
+  const draggingRef = useRef(false);
+  const pointerDownX = useRef(0);
+  const movedRef = useRef(false);
 
   // Responsive items per view
   useEffect(() => {
@@ -131,7 +134,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       >
         <div
           ref={scrollerRef}
-          className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x"
+          className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x select-none"
           onScroll={() => {
             const el = scrollerRef.current;
             if (!el || stepX <= 0) return;
@@ -139,10 +142,41 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             if (i !== index) setIndex(Math.min(Math.max(0, i), maxIndex));
             // snap after idle
             if (snapTimeoutRef.current) window.clearTimeout(snapTimeoutRef.current);
-            snapTimeoutRef.current = window.setTimeout(() => {
-              const target = Math.round(el.scrollLeft / stepX);
-              scrollToIndex(Math.min(Math.max(0, target), maxIndex));
-            }, 120);
+            if (!draggingRef.current) {
+              snapTimeoutRef.current = window.setTimeout(() => {
+                const target = Math.round(el.scrollLeft / stepX);
+                scrollToIndex(Math.min(Math.max(0, target), maxIndex));
+              }, 140);
+            }
+          }}
+          onPointerDown={(e) => {
+            draggingRef.current = false;
+            movedRef.current = false;
+            pointerDownX.current = e.clientX;
+            if (snapTimeoutRef.current) window.clearTimeout(snapTimeoutRef.current);
+          }}
+          onPointerMove={(e) => {
+            if (Math.abs(e.clientX - pointerDownX.current) > 6) {
+              draggingRef.current = true;
+              movedRef.current = true;
+            }
+          }}
+          onPointerUp={() => {
+            const el = scrollerRef.current;
+            draggingRef.current = false;
+            if (!el || stepX <= 0) return;
+            const target = Math.round(el.scrollLeft / stepX);
+            scrollToIndex(Math.min(Math.max(0, target), maxIndex));
+          }}
+          onPointerCancel={() => {
+            draggingRef.current = false;
+          }}
+          onClickCapture={(e) => {
+            if (movedRef.current) {
+              e.preventDefault();
+              e.stopPropagation();
+              movedRef.current = false;
+            }
           }}
         >
           <ul
@@ -157,40 +191,35 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             ))}
           </ul>
         </div>
-
-        {/* Fixed controls anchored to frame edges */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between">
-          <div className="pointer-events-auto pl-1">
-            <button
-              type="button"
-              onClick={() => scrollToIndex(Math.max(0, index - 1))}
-              disabled={index <= 0}
-              aria-label="Previous cases"
-              className={cn(
-                "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
-                "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-              )}
-            >
-              <ArrowLeftIcon />
-            </button>
-          </div>
-          <div className="pointer-events-auto pr-1">
-            <button
-              type="button"
-              onClick={() => scrollToIndex(Math.min(maxIndex, index + 1))}
-              disabled={index >= maxIndex}
-              aria-label="Next cases"
-              className={cn(
-                "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
-                "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-              )}
-            >
-              <ArrowRightIcon />
-            </button>
-          </div>
-        </div>
+      </div>
+      {/* Controls bar below, fixed (not inside scroller) */}
+      <div className="mt-6 flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => scrollToIndex(Math.max(0, index - 1))}
+          disabled={index <= 0}
+          aria-label="Previous cases"
+          className={cn(
+            "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+            "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+          )}
+        >
+          <ArrowLeftIcon />
+        </button>
+        <button
+          type="button"
+          onClick={() => scrollToIndex(Math.min(maxIndex, index + 1))}
+          disabled={index >= maxIndex}
+          aria-label="Next cases"
+          className={cn(
+            "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+            "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+          )}
+        >
+          <ArrowRightIcon />
+        </button>
       </div>
       {/* polite announcement for screen readers */}
       <div aria-live="polite" className="sr-only" role="status">{announce}</div>
