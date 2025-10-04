@@ -25,7 +25,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     if (!el) return;
     const ro = new ResizeObserver(([entry]) => {
       const w = entry.contentRect.width;
-      const next = w >= 1280 ? 3 : w >= 880 ? 2 : 1;
+      // Align with site breakpoints and enforce larger cards:
+      // 1 on mobile (< 768), 2 on tablet (>= 768), 3 on desktop (>= 1200)
+      const next = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
       setPerView(next);
     });
     ro.observe(el);
@@ -53,12 +55,12 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
 
   return (
     <div className="group/section">
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div className="min-w-0">
           {eyebrow ? (
             <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">{eyebrow}</div>
           ) : null}
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground break-words">
+          <h2 className="font-semibold text-foreground break-words">
             {headlineText || "Our work"}
           </h2>
           {intro ? (
@@ -84,7 +86,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       >
         <div className="overflow-hidden">
           <ul
-            className="flex gap-4 will-change-transform"
+            className="flex gap-6 md:gap-6 lg:gap-8 will-change-transform"
             style={slideStyle}
             aria-live="polite"
           >
@@ -96,7 +98,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           </ul>
         </div>
 
-        <div className="mt-4 flex items-center justify-end gap-2">
+        <div className="mt-6 flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={prev}
@@ -145,7 +147,7 @@ function CaseCard({ item }: { item: CaseStudy }) {
       className="group block focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-[5px]"
     >
       <div className="relative rounded-[5px] shadow-[var(--shadow-card,0_24px_48px_rgba(0,0,0,0.12))] overflow-hidden">
-        <div className="aspect-video bg-muted/20">
+        <div className="aspect-[16/9] bg-muted/20">
           {videoSrc ? (
             <VideoHover src={videoSrc} poster={poster} />
           ) : poster ? (
@@ -155,7 +157,7 @@ function CaseCard({ item }: { item: CaseStudy }) {
           )}
         </div>
       </div>
-      <div className="mt-3">
+      <div className="mt-4">
         {tags.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2">
             {tags.map((t, i) => (
@@ -168,8 +170,8 @@ function CaseCard({ item }: { item: CaseStudy }) {
             ))}
           </div>
         )}
-        <div className="text-foreground text-xl font-semibold leading-snug">{item.title}</div>
-        {item.excerpt && <p className="text-muted-foreground mt-1 text-sm leading-relaxed line-clamp-3">{item.excerpt}</p>}
+        <div className="text-foreground text-[1.25rem] font-semibold leading-snug">{item.title}</div>
+        {item.excerpt && <p className="text-muted-foreground mt-2 text-sm leading-relaxed line-clamp-3">{item.excerpt}</p>}
       </div>
     </a>
   );
