@@ -16,7 +16,8 @@ export interface CaseStudyCarouselProps {
 }
 
 export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, exploreLabel = "Explore all cases", eyebrow, headlineText, intro }: CaseStudyCarouselProps) {
-  const containerRef = useRef<HTMLDivElement>(null); // scroll container
+  const frameRef = useRef<HTMLDivElement>(null); // non-scrolling frame
+  const scrollerRef = useRef<HTMLDivElement>(null); // scrollable track
   const [index, setIndex] = useState(initialIndex);
   const [perView, setPerView] = useState(1);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -24,7 +25,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
 
   // Responsive items per view
   useEffect(() => {
-    const el = containerRef.current;
+    const el = frameRef.current;
     if (!el) return;
     const ro = new ResizeObserver(([entry]) => {
       const w = entry.contentRect.width;
@@ -86,7 +87,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
 
   // Programmatic paging using native scrollLeft
   const scrollToIndex = useCallback((target: number) => {
-    const el = containerRef.current;
+    const el = scrollerRef.current;
     if (!el) return;
     const raw = target * stepX;
     const left = Math.min(Math.max(0, Math.round(raw)), Math.round(maxOffset));
@@ -120,61 +121,76 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       </div>
 
       <div
-        ref={containerRef}
-        className="relative overflow-x-auto overscroll-contain scroll-smooth"
+        ref={frameRef}
+        className="relative"
         onKeyDown={(e) => {
           if (e.key === "ArrowLeft") scrollToIndex(Math.max(0, index - 1));
           if (e.key === "ArrowRight") scrollToIndex(Math.min(maxIndex, index + 1));
         }}
         aria-roledescription="carousel"
         tabIndex={0}
-        onScroll={() => {
-          const el = containerRef.current;
-          if (!el || stepX <= 0) return;
-          // debounce-ish snap detection
-          const i = Math.round(el.scrollLeft / stepX);
-          if (i !== index) setIndex(Math.min(Math.max(0, i), maxIndex));
-        }}
       >
-        <ul
-          className="flex"
-          style={{ gap: `${gapPx}px`, width: `${Math.max(totalWidth, containerWidth)}px` }}
-          aria-live="polite"
+        <div
+          ref={scrollerRef}
+          className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x"
+          onScroll={() => {
+            const el = scrollerRef.current;
+            if (!el || stepX <= 0) return;
+            const i = Math.round(el.scrollLeft / stepX);
+            if (i !== index) setIndex(Math.min(Math.max(0, i), maxIndex));
+            // snap after idle
+            window.clearTimeout((scrollToIndex as any)._t);
+            (scrollToIndex as any)._t = window.setTimeout(() => {
+              const target = Math.round(el.scrollLeft / stepX);
+              scrollToIndex(Math.min(Math.max(0, target), maxIndex));
+            }, 120);
+          }}
         >
-          {items.map((item, i) => (
-            <li key={item._id || i} className="shrink-0" style={{ width: `${cardWidth}px` }}>
-              <CaseCard item={item} />
-            </li>
-          ))}
-        </ul>
+          <ul
+            className="flex"
+            style={{ gap: `${gapPx}px`, width: `${Math.max(totalWidth, containerWidth)}px` }}
+            aria-live="polite"
+          >
+            {items.map((item, i) => (
+              <li key={item._id || i} className="shrink-0" style={{ width: `${cardWidth}px` }}>
+                <CaseCard item={item} />
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <div className="mt-6 flex items-center justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => scrollToIndex(Math.max(0, index - 1))}
-            disabled={index <= 0}
-            aria-label="Previous cases"
-            className={cn(
-              "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border text-foreground transition",
-              "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-            )}
-          >
-            <ArrowLeftIcon />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToIndex(Math.min(maxIndex, index + 1))}
-            disabled={index >= maxIndex}
-            aria-label="Next cases"
-            className={cn(
-              "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border text-foreground transition",
-              "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-            )}
-          >
-            <ArrowRightIcon />
-          </button>
+        {/* Fixed controls anchored to frame edges */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between">
+          <div className="pointer-events-auto pl-1">
+            <button
+              type="button"
+              onClick={() => scrollToIndex(Math.max(0, index - 1))}
+              disabled={index <= 0}
+              aria-label="Previous cases"
+              className={cn(
+                "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+                "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+                "disabled:opacity-50 disabled:cursor-not-allowed",
+              )}
+            >
+              <ArrowLeftIcon />
+            </button>
+          </div>
+          <div className="pointer-events-auto pr-1">
+            <button
+              type="button"
+              onClick={() => scrollToIndex(Math.min(maxIndex, index + 1))}
+              disabled={index >= maxIndex}
+              aria-label="Next cases"
+              className={cn(
+                "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+                "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+                "disabled:opacity-50 disabled:cursor-not-allowed",
+              )}
+            >
+              <ArrowRightIcon />
+            </button>
+          </div>
         </div>
       </div>
       {/* polite announcement for screen readers */}

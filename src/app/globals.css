@@ -457,6 +457,15 @@ html.dark {
     margin-right: calc(50% - 50vw);
   }
 
+  /* Hide native scrollbars but keep scrolling accessible */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
   .surface-base {
     background: var(--surface-base);
   }
