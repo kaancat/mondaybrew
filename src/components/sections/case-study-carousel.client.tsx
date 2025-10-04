@@ -35,7 +35,19 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       setContainerWidth(Math.floor(w));
     });
     ro.observe(el);
-    return () => ro.disconnect();
+    // Fallback for browsers where RO may not fire as expected
+    const update = () => {
+      const w = el.getBoundingClientRect().width;
+      const next = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
+      setPerView(next);
+      setContainerWidth(Math.floor(w));
+    };
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   // Layout constants derived from container width
@@ -124,19 +136,17 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           if (i !== index) setIndex(Math.min(Math.max(0, i), maxIndex));
         }}
       >
-        <div className="overflow-hidden">
-          <ul
-            className="flex"
-            style={{ gap: `${gapPx}px`, width: `${Math.max(totalWidth, containerWidth)}px` }}
-            aria-live="polite"
-          >
-            {items.map((item, i) => (
-              <li key={item._id || i} className="shrink-0" style={{ width: `${cardWidth}px` }}>
-                <CaseCard item={item} />
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul
+          className="flex"
+          style={{ gap: `${gapPx}px`, width: `${Math.max(totalWidth, containerWidth)}px` }}
+          aria-live="polite"
+        >
+          {items.map((item, i) => (
+            <li key={item._id || i} className="shrink-0" style={{ width: `${cardWidth}px` }}>
+              <CaseCard item={item} />
+            </li>
+          ))}
+        </ul>
 
         <div className="mt-6 flex items-center justify-end gap-2">
           <button
