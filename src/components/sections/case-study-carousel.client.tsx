@@ -22,6 +22,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const [perView, setPerView] = useState(1);
   const [containerWidth, setContainerWidth] = useState(0);
   const [announce, setAnnounce] = useState("");
+  const snapTimeoutRef = useRef<number | null>(null);
 
   // Responsive items per view
   useEffect(() => {
@@ -71,15 +72,13 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const totalWidth = useMemo(() => (items.length * cardWidth) + Math.max(0, items.length - 1) * gapPx, [items.length, cardWidth, gapPx]);
   const maxOffset = useMemo(() => Math.max(0, totalWidth - containerWidth), [totalWidth, containerWidth]);
   const maxIndex = useMemo(() => (stepX > 0 ? Math.ceil(maxOffset / stepX) : 0), [maxOffset, stepX]);
-  const pageCount = maxIndex + 1;
 
   // Keep index clamped if layout changes
   useEffect(() => {
     if (index > maxIndex) setIndex(maxIndex);
   }, [maxIndex, index]);
 
-  const prev = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
-  const next = useCallback(() => setIndex((i) => Math.min(maxIndex, i + 1)), [maxIndex]);
+  // Arrows use scrollToIndex; no standalone prev/next needed
 
   const prefersReduced = useMemo(() =>
     typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -139,8 +138,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             const i = Math.round(el.scrollLeft / stepX);
             if (i !== index) setIndex(Math.min(Math.max(0, i), maxIndex));
             // snap after idle
-            window.clearTimeout((scrollToIndex as any)._t);
-            (scrollToIndex as any)._t = window.setTimeout(() => {
+            if (snapTimeoutRef.current) window.clearTimeout(snapTimeoutRef.current);
+            snapTimeoutRef.current = window.setTimeout(() => {
               const target = Math.round(el.scrollLeft / stepX);
               scrollToIndex(Math.min(Math.max(0, target), maxIndex));
             }, 120);

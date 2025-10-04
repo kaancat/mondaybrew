@@ -34,7 +34,7 @@ export async function fetchSanity<T>(query: string, params: Record<string, unkno
       useCdn: false,
     });
     return await noCdnClient.fetch<T>(query, params);
-  } catch (e) {
+  } catch {
     // Fallback to CDN client
     return sanityClient.fetch<T>(query, params);
   }
