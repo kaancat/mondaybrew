@@ -23,10 +23,6 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const [containerWidth, setContainerWidth] = useState(0);
   const [announce, setAnnounce] = useState("");
   const snapTimeoutRef = useRef<number | null>(null);
-  const draggingRef = useRef(false);
-  const pointerDownX = useRef(0);
-  const movedRef = useRef(false);
-  const dragStartScrollLeft = useRef(0);
 
   // Responsive items per view
   useEffect(() => {
@@ -135,7 +131,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       >
         <div
           ref={scrollerRef}
-          className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x select-none cursor-grab active:cursor-grabbing"
+          className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x"
           onScroll={() => {
             const el = scrollerRef.current;
             if (!el || stepX <= 0) return;
@@ -143,59 +139,10 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             if (i !== index) setIndex(Math.min(Math.max(0, i), maxIndex));
             // snap after idle
             if (snapTimeoutRef.current) window.clearTimeout(snapTimeoutRef.current);
-            if (!draggingRef.current) {
-              snapTimeoutRef.current = window.setTimeout(() => {
-                const target = Math.round(el.scrollLeft / stepX);
-                scrollToIndex(Math.min(Math.max(0, target), maxIndex));
-              }, 140);
-            }
-          }}
-          onPointerDown={(e) => {
-            draggingRef.current = false;
-            movedRef.current = false;
-            pointerDownX.current = e.clientX;
-            if (snapTimeoutRef.current) window.clearTimeout(snapTimeoutRef.current);
-            const el = scrollerRef.current;
-            if (el) {
-              dragStartScrollLeft.current = el.scrollLeft;
-              try { el.setPointerCapture?.(e.pointerId); } catch {}
-              // Disable smooth behavior while dragging to avoid elastic feel
-              (el.style as unknown as { scrollBehavior?: string }).scrollBehavior = 'auto';
-            }
-          }}
-          onPointerMove={(e) => {
-            if (Math.abs(e.clientX - pointerDownX.current) > 6) {
-              draggingRef.current = true;
-              movedRef.current = true;
-              const el = scrollerRef.current;
-              if (el) {
-                const dx = e.clientX - pointerDownX.current;
-                el.scrollLeft = dragStartScrollLeft.current - dx;
-              }
-              e.preventDefault();
-            }
-          }}
-          onPointerUp={(e) => {
-            const el = scrollerRef.current;
-            draggingRef.current = false;
-            if (!el || stepX <= 0) return;
-            const target = Math.round(el.scrollLeft / stepX);
-            scrollToIndex(Math.min(Math.max(0, target), maxIndex));
-            // Restore smooth behavior for keyboard/arrow paging
-            (el.style as unknown as { scrollBehavior?: string }).scrollBehavior = '';
-            try { el.releasePointerCapture?.(e.pointerId); } catch {}
-          }}
-          onPointerCancel={() => {
-            draggingRef.current = false;
-            const el = scrollerRef.current;
-            if (el) (el.style as unknown as { scrollBehavior?: string }).scrollBehavior = '';
-          }}
-          onClickCapture={(e) => {
-            if (movedRef.current) {
-              e.preventDefault();
-              e.stopPropagation();
-              movedRef.current = false;
-            }
+            snapTimeoutRef.current = window.setTimeout(() => {
+              const target = Math.round(el.scrollLeft / stepX);
+              scrollToIndex(Math.min(Math.max(0, target), maxIndex));
+            }, 140);
           }}
         >
           <ul
