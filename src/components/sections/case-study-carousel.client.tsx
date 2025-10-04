@@ -134,7 +134,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       >
         <div
           ref={scrollerRef}
-          className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x select-none"
+          className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x select-none cursor-grab active:cursor-grabbing"
           onScroll={() => {
             const el = scrollerRef.current;
             if (!el || stepX <= 0) return;
@@ -154,22 +154,40 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             movedRef.current = false;
             pointerDownX.current = e.clientX;
             if (snapTimeoutRef.current) window.clearTimeout(snapTimeoutRef.current);
+            const el = scrollerRef.current;
+            if (el) {
+              dragStartScrollLeft.current = el.scrollLeft;
+              try { el.setPointerCapture?.(e.pointerId); } catch {}
+              // Disable smooth behavior while dragging to avoid elastic feel
+              (el.style as unknown as { scrollBehavior?: string }).scrollBehavior = 'auto';
+            }
           }}
           onPointerMove={(e) => {
             if (Math.abs(e.clientX - pointerDownX.current) > 6) {
               draggingRef.current = true;
               movedRef.current = true;
+              const el = scrollerRef.current;
+              if (el) {
+                const dx = e.clientX - pointerDownX.current;
+                el.scrollLeft = dragStartScrollLeft.current - dx;
+              }
+              e.preventDefault();
             }
           }}
-          onPointerUp={() => {
+          onPointerUp={(e) => {
             const el = scrollerRef.current;
             draggingRef.current = false;
             if (!el || stepX <= 0) return;
             const target = Math.round(el.scrollLeft / stepX);
             scrollToIndex(Math.min(Math.max(0, target), maxIndex));
+            // Restore smooth behavior for keyboard/arrow paging
+            (el.style as unknown as { scrollBehavior?: string }).scrollBehavior = '';
+            try { el.releasePointerCapture?.(e.pointerId); } catch {}
           }}
           onPointerCancel={() => {
             draggingRef.current = false;
+            const el = scrollerRef.current;
+            if (el) (el.style as unknown as { scrollBehavior?: string }).scrollBehavior = '';
           }}
           onClickCapture={(e) => {
             if (movedRef.current) {
