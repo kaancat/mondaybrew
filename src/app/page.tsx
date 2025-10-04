@@ -119,7 +119,7 @@ export default async function Home() {
 
         if (isCaseStudyCarouselSection(section)) {
           return (
-            <div className="vr-section" key={key}>
+            <div className="vr-section-tight" key={key}>
               <CaseStudyCarouselSection
                 locale={locale}
                 initialIndex={section.initialIndex}

@@ -61,7 +61,8 @@
   --flow-space: clamp(1.5rem, 3vw, 2.5rem);
 
   /* Vertical rhythm tokens */
-  --section-gap-sm: clamp(32px, 4vw, 48px);
+  /* Slightly tighter on mobile */
+  --section-gap-sm: clamp(28px, 3.6vw, 44px);
   --section-gap-md: clamp(48px, 6vw, 72px);
   --section-gap-lg: clamp(64px, 8vw, 96px);
 
@@ -472,8 +473,8 @@ html.dark {
   }
 
   /* Vertical rhythm helpers (margin-based; avoid double stacking) */
+  /* Hero uses medium gap on all breakpoints */
   .vr-hero { margin-bottom: var(--section-gap-md); }
-  @media (min-width: 1280px) { .vr-hero { margin-bottom: var(--section-gap-lg); } }
 
   .vr-section { margin-top: var(--section-gap-sm); }
   @media (min-width: 768px) { .vr-section { margin-top: var(--section-gap-md); } }
