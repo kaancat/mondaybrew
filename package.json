@@ -10,7 +10,8 @@
     "lint:colors": "bash scripts/lint-colors.sh",
     "studio:deploy": "SANITY_STUDIO_BASEPATH=/ sanity deploy",
     "studio:dev": "sanity dev",
-    "studio:seed:cases": "sanity exec scripts/seed-cases.ts --with-user-token"
+    "studio:seed:cases": "sanity exec scripts/seed-cases.ts --with-user-token",
+    "studio:seed:clients": "sanity exec scripts/seed-clients.ts --with-user-token"
   },
   "dependencies": {
     "@mux/mux-player-react": "^3.6.0",

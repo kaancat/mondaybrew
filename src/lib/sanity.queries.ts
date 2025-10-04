@@ -408,6 +408,20 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
           }
         }
       },
+      _type == "clientsSection" => {
+        _type,
+        eyebrow,
+        headline,
+        subheading,
+        logos[]{
+          title,
+          url,
+          image{
+            alt,
+            image{asset->{url,metadata{dimensions,lqip}}}
+          }
+        }
+      },
       true => {}
     )
   }

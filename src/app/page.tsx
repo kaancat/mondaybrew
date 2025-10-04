@@ -9,6 +9,7 @@ import {
   type ServicesSplitSectionData,
 } from "@/components/sections/services-split";
 import CaseStudyCarouselSection from "@/components/sections/case-study-carousel";
+import ClientsSection from "@/components/sections/clients-section";
 import { Section } from "@/components/layout/section";
 
 type SiteSettings = { seo?: Seo };
@@ -43,10 +44,23 @@ type CaseStudyCarouselSectionWithType = {
     }> | null;
   } | null;
 };
+type ClientsSectionWithType = {
+  _type: "clientsSection";
+  _key?: string;
+  eyebrow?: string;
+  headline?: string;
+  subheading?: string;
+  logos?: Array<{
+    title?: string;
+    url?: string;
+    image?: { alt?: string; image?: { asset?: { url?: string; metadata?: { lqip?: string; dimensions?: { width?: number; height?: number } } } } };
+  }>;
+};
 type HomePageSection =
   | HeroSectionWithType
   | ServicesSplitSectionWithType
   | CaseStudyCarouselSectionWithType
+  | ClientsSectionWithType
   | { _type?: string; _key?: string };
 
 type HomePagePayload = {
@@ -61,6 +75,10 @@ function isCaseStudyCarouselSection(
   section: HomePageSection | undefined,
 ): section is CaseStudyCarouselSectionWithType {
   return !!section && section._type === "caseStudyCarousel";
+}
+
+function isClientsSection(section: HomePageSection | undefined): section is ClientsSectionWithType {
+  return !!section && section._type === "clientsSection";
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -128,6 +146,19 @@ export default async function Home() {
                 intro={section.intro}
                 explore={section.explore}
                 feature={section.feature}
+              />
+            </div>
+          );
+        }
+
+        if (isClientsSection(section)) {
+          return (
+            <div className="vr-section-tight" key={key}>
+              <ClientsSection
+                eyebrow={section.eyebrow}
+                headline={section.headline}
+                subheading={section.subheading}
+                logos={section.logos}
               />
             </div>
           );
