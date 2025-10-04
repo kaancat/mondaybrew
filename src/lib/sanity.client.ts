@@ -20,7 +20,22 @@ export const serverClient = createClient({
 });
 
 export async function fetchSanity<T>(query: string, params: Record<string, unknown> = {}): Promise<T> {
-  // Prefer the server client when a read token is available (private datasets)
-  const client = hasReadToken ? serverClient : sanityClient;
-  return client.fetch<T>(query, params);
+  // Prefer the server client when a read token is available.
+  // If no token is present, first try the non-CDN path to avoid stale CDN responses for freshly seeded content.
+  if (hasReadToken) {
+    return serverClient.fetch<T>(query, params);
+  }
+  try {
+    // Non-CDN, no-token client (works for public datasets)
+    const noCdnClient = createClient({
+      projectId: process.env.SANITY_PROJECT_ID!,
+      dataset: process.env.SANITY_DATASET || "production",
+      apiVersion: "2024-09-01",
+      useCdn: false,
+    });
+    return await noCdnClient.fetch<T>(query, params);
+  } catch (e) {
+    // Fallback to CDN client
+    return sanityClient.fetch<T>(query, params);
+  }
 }

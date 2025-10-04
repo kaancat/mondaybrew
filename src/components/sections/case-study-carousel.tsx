@@ -12,7 +12,6 @@ type Props = {
 
 export default async function CaseStudyCarouselSection({ locale, initialIndex, eyebrow, headline, intro, explore }: Props) {
   const items = await getCaseStudies(locale);
-  if (!items?.length) return null;
   return (
     <CaseStudyCarousel
       items={items}
