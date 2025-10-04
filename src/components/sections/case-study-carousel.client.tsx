@@ -22,7 +22,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const [perView, setPerView] = useState(1);
   const [containerWidth, setContainerWidth] = useState(0);
   const [announce, setAnnounce] = useState("");
-  const snapTimeoutRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   // Responsive items per view
   useEffect(() => {
@@ -71,23 +71,14 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const stepX = useMemo(() => perView * (cardWidth + gapPx), [perView, cardWidth, gapPx]);
   const totalWidth = useMemo(() => (items.length * cardWidth) + Math.max(0, items.length - 1) * gapPx, [items.length, cardWidth, gapPx]);
   const maxOffset = useMemo(() => Math.max(0, totalWidth - containerWidth), [totalWidth, containerWidth]);
-  const epsilon = 1; // px tolerance
-  const snapPoints = useMemo(() => {
-    const pts: number[] = [];
-    if (stepX <= 0) return [0];
-    for (let p = 0; p * stepX <= maxOffset + epsilon; p++) {
-      const val = Math.round(Math.min(p * stepX, maxOffset));
-      if (!pts.length || Math.abs(pts[pts.length - 1] - val) > epsilon) pts.push(val);
-    }
-    if (pts[pts.length - 1] !== Math.round(maxOffset)) pts.push(Math.round(maxOffset));
-    return pts;
-  }, [stepX, maxOffset]);
-  const lastIndex = snapPoints.length - 1;
 
   // Keep index clamped if layout changes
   useEffect(() => {
-    if (index > lastIndex) setIndex(lastIndex);
-  }, [lastIndex, index]);
+    const el = scrollerRef.current;
+    if (!el) return;
+    const approx = Math.round((el.scrollLeft || 0) / Math.max(cardWidth + gapPx, 1));
+    setIndex(approx);
+  }, [cardWidth, gapPx]);
 
   // Arrows use scrollToIndex; no standalone prev/next needed
 
@@ -95,29 +86,27 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   []);
 
-  // Programmatic paging using native scrollLeft
-  const scrollToIndex = useCallback((target: number) => {
+  // Arrow chunk scroll (nudge)
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+  const updateEdges = useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
-    const clamped = Math.max(0, Math.min(target, lastIndex));
-    const left = snapPoints[clamped] ?? 0;
-    el.scrollTo({ left, behavior: prefersReduced ? "auto" : "smooth" });
-    setIndex(clamped);
-    // Announce visible range
-    const start = clamped * perView + 1;
-    const end = Math.min(items.length, (clamped + 1) * perView);
-    setAnnounce(`Showing cases ${start}–${end} of ${items.length}`);
-  }, [prefersReduced, perView, items.length, lastIndex, snapPoints]);
+    const max = el.scrollWidth - el.clientWidth;
+    const sl = el.scrollLeft;
+    const eps = 1;
+    setCanPrev(sl > eps);
+    setCanNext(max - sl > eps);
+  }, []);
 
-  const nearestIndex = useCallback((left: number) => {
-    let best = 0;
-    let bestDist = Number.POSITIVE_INFINITY;
-    for (let i = 0; i < snapPoints.length; i++) {
-      const d = Math.abs(snapPoints[i] - left);
-      if (d < bestDist) { bestDist = d; best = i; }
-    }
-    return best;
-  }, [snapPoints]);
+  const scrollByChunk = useCallback((dir: -1 | 1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const one = cardWidth + gapPx;
+    const chunk = Math.max(one, containerWidth - one);
+    const next = Math.min(Math.max(0, Math.round(el.scrollLeft + dir * chunk)), Math.round(maxOffset));
+    el.scrollTo({ left: next, behavior: prefersReduced ? "auto" : "smooth" });
+  }, [cardWidth, gapPx, containerWidth, maxOffset, prefersReduced]);
 
   return (
     <div className="group/section">
@@ -144,8 +133,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         ref={frameRef}
         className="relative"
         onKeyDown={(e) => {
-          if (e.key === "ArrowLeft") scrollToIndex(index - 1);
-          if (e.key === "ArrowRight") scrollToIndex(index + 1);
+          if (e.key === "ArrowLeft") scrollByChunk(-1);
+          if (e.key === "ArrowRight") scrollByChunk(1);
         }}
         aria-roledescription="carousel"
         tabIndex={0}
@@ -154,25 +143,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           ref={scrollerRef}
           className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x"
           onScroll={() => {
-            const el = scrollerRef.current;
-            if (!el || stepX <= 0) return;
-            const i = nearestIndex(el.scrollLeft);
-            if (i !== index) setIndex(i);
-            // snap after idle
-            if (snapTimeoutRef.current) window.clearTimeout(snapTimeoutRef.current);
-            const anchor = index;
-            const threshold = Math.max(0.2 * stepX, 1);
-            snapTimeoutRef.current = window.setTimeout(() => {
-              if (!el) return;
-              const sl = el.scrollLeft;
-              const base = snapPoints[anchor] ?? 0;
-              const delta = sl - base;
-              let target = anchor;
-              if (delta > threshold && anchor < lastIndex) target = anchor + 1;
-              else if (delta < -threshold && anchor > 0) target = anchor - 1;
-              else target = nearestIndex(sl);
-              scrollToIndex(target);
-            }, 140);
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+            rafRef.current = requestAnimationFrame(() => updateEdges());
           }}
         >
           <ul
@@ -192,9 +164,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       <div className="mt-6 flex items-center justify-end gap-2">
         <button
           type="button"
-          onClick={() => scrollToIndex(index - 1)}
-          disabled={index <= 0}
-          aria-label="Previous cases"
+          onClick={() => scrollByChunk(-1)}
+          disabled={!canPrev}
+          aria-label="Scroll left"
           className={cn(
             "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
             "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
@@ -205,9 +177,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         </button>
         <button
           type="button"
-          onClick={() => scrollToIndex(index + 1)}
-          disabled={index >= lastIndex}
-          aria-label="Next cases"
+          onClick={() => scrollByChunk(1)}
+          disabled={!canNext}
+          aria-label="Scroll right"
           className={cn(
             "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
             "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
