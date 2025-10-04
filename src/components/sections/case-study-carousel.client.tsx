@@ -71,12 +71,23 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const stepX = useMemo(() => perView * (cardWidth + gapPx), [perView, cardWidth, gapPx]);
   const totalWidth = useMemo(() => (items.length * cardWidth) + Math.max(0, items.length - 1) * gapPx, [items.length, cardWidth, gapPx]);
   const maxOffset = useMemo(() => Math.max(0, totalWidth - containerWidth), [totalWidth, containerWidth]);
-  const maxIndex = useMemo(() => (stepX > 0 ? Math.ceil(maxOffset / stepX) : 0), [maxOffset, stepX]);
+  const epsilon = 1; // px tolerance
+  const snapPoints = useMemo(() => {
+    const pts: number[] = [];
+    if (stepX <= 0) return [0];
+    for (let p = 0; p * stepX <= maxOffset + epsilon; p++) {
+      const val = Math.round(Math.min(p * stepX, maxOffset));
+      if (!pts.length || Math.abs(pts[pts.length - 1] - val) > epsilon) pts.push(val);
+    }
+    if (pts[pts.length - 1] !== Math.round(maxOffset)) pts.push(Math.round(maxOffset));
+    return pts;
+  }, [stepX, maxOffset]);
+  const lastIndex = snapPoints.length - 1;
 
   // Keep index clamped if layout changes
   useEffect(() => {
-    if (index > maxIndex) setIndex(maxIndex);
-  }, [maxIndex, index]);
+    if (index > lastIndex) setIndex(lastIndex);
+  }, [lastIndex, index]);
 
   // Arrows use scrollToIndex; no standalone prev/next needed
 
@@ -88,15 +99,25 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const scrollToIndex = useCallback((target: number) => {
     const el = scrollerRef.current;
     if (!el) return;
-    const raw = target * stepX;
-    const left = Math.min(Math.max(0, Math.round(raw)), Math.round(maxOffset));
+    const clamped = Math.max(0, Math.min(target, lastIndex));
+    const left = snapPoints[clamped] ?? 0;
     el.scrollTo({ left, behavior: prefersReduced ? "auto" : "smooth" });
-    setIndex(target);
+    setIndex(clamped);
     // Announce visible range
-    const start = target * perView + 1;
-    const end = Math.min(items.length, (target + 1) * perView);
+    const start = clamped * perView + 1;
+    const end = Math.min(items.length, (clamped + 1) * perView);
     setAnnounce(`Showing cases ${start}–${end} of ${items.length}`);
-  }, [maxOffset, prefersReduced, perView, stepX, items.length]);
+  }, [prefersReduced, perView, items.length, lastIndex, snapPoints]);
+
+  const nearestIndex = useCallback((left: number) => {
+    let best = 0;
+    let bestDist = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < snapPoints.length; i++) {
+      const d = Math.abs(snapPoints[i] - left);
+      if (d < bestDist) { bestDist = d; best = i; }
+    }
+    return best;
+  }, [snapPoints]);
 
   return (
     <div className="group/section">
@@ -123,8 +144,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         ref={frameRef}
         className="relative"
         onKeyDown={(e) => {
-          if (e.key === "ArrowLeft") scrollToIndex(Math.max(0, index - 1));
-          if (e.key === "ArrowRight") scrollToIndex(Math.min(maxIndex, index + 1));
+          if (e.key === "ArrowLeft") scrollToIndex(index - 1);
+          if (e.key === "ArrowRight") scrollToIndex(index + 1);
         }}
         aria-roledescription="carousel"
         tabIndex={0}
@@ -135,13 +156,22 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           onScroll={() => {
             const el = scrollerRef.current;
             if (!el || stepX <= 0) return;
-            const i = Math.round(el.scrollLeft / stepX);
-            if (i !== index) setIndex(Math.min(Math.max(0, i), maxIndex));
+            const i = nearestIndex(el.scrollLeft);
+            if (i !== index) setIndex(i);
             // snap after idle
             if (snapTimeoutRef.current) window.clearTimeout(snapTimeoutRef.current);
+            const anchor = index;
+            const threshold = Math.max(0.2 * stepX, 1);
             snapTimeoutRef.current = window.setTimeout(() => {
-              const target = Math.round(el.scrollLeft / stepX);
-              scrollToIndex(Math.min(Math.max(0, target), maxIndex));
+              if (!el) return;
+              const sl = el.scrollLeft;
+              const base = snapPoints[anchor] ?? 0;
+              const delta = sl - base;
+              let target = anchor;
+              if (delta > threshold && anchor < lastIndex) target = anchor + 1;
+              else if (delta < -threshold && anchor > 0) target = anchor - 1;
+              else target = nearestIndex(sl);
+              scrollToIndex(target);
             }, 140);
           }}
         >
@@ -162,7 +192,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       <div className="mt-6 flex items-center justify-end gap-2">
         <button
           type="button"
-          onClick={() => scrollToIndex(Math.max(0, index - 1))}
+          onClick={() => scrollToIndex(index - 1)}
           disabled={index <= 0}
           aria-label="Previous cases"
           className={cn(
@@ -175,8 +205,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         </button>
         <button
           type="button"
-          onClick={() => scrollToIndex(Math.min(maxIndex, index + 1))}
-          disabled={index >= maxIndex}
+          onClick={() => scrollToIndex(index + 1)}
+          disabled={index >= lastIndex}
           aria-label="Next cases"
           className={cn(
             "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
