@@ -16,10 +16,11 @@ export interface CaseStudyCarouselProps {
 }
 
 export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, exploreLabel = "Explore all cases", eyebrow, headlineText, intro }: CaseStudyCarouselProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null); // scroll container
   const [index, setIndex] = useState(initialIndex);
   const [perView, setPerView] = useState(1);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [announce, setAnnounce] = useState("");
 
   // Responsive items per view
   useEffect(() => {
@@ -71,17 +72,19 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   []);
 
-  const offset = useMemo(() => {
-    const raw = index * stepX;
-    const clamped = Math.min(raw, maxOffset);
-    return Math.round(clamped);
-  }, [index, stepX, maxOffset]);
-
-  const slideStyle = useMemo(() => ({
-    transform: `translate3d(${-offset}px, 0, 0)`,
-    transition: prefersReduced ? undefined : "transform 420ms var(--ease-out)",
-    gap: `${gapPx}px`,
-  }), [offset, prefersReduced, gapPx]);
+  // Programmatic paging using native scrollLeft
+  const scrollToIndex = useCallback((target: number) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const raw = target * stepX;
+    const left = Math.min(Math.max(0, Math.round(raw)), Math.round(maxOffset));
+    el.scrollTo({ left, behavior: prefersReduced ? "auto" : "smooth" });
+    setIndex(target);
+    // Announce visible range
+    const start = target * perView + 1;
+    const end = Math.min(items.length, (target + 1) * perView);
+    setAnnounce(`Showing cases ${start}–${end} of ${items.length}`);
+  }, [maxOffset, prefersReduced, perView, stepX, items.length]);
 
   return (
     <div className="group/section">
@@ -106,18 +109,25 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
 
       <div
         ref={containerRef}
-        className="relative"
+        className="relative overflow-x-auto overscroll-contain scroll-smooth"
         onKeyDown={(e) => {
-          if (e.key === "ArrowLeft") prev();
-          if (e.key === "ArrowRight") next();
+          if (e.key === "ArrowLeft") scrollToIndex(Math.max(0, index - 1));
+          if (e.key === "ArrowRight") scrollToIndex(Math.min(maxIndex, index + 1));
         }}
         aria-roledescription="carousel"
         tabIndex={0}
+        onScroll={() => {
+          const el = containerRef.current;
+          if (!el || stepX <= 0) return;
+          // debounce-ish snap detection
+          const i = Math.round(el.scrollLeft / stepX);
+          if (i !== index) setIndex(Math.min(Math.max(0, i), maxIndex));
+        }}
       >
         <div className="overflow-hidden">
           <ul
-            className="flex will-change-transform"
-            style={slideStyle}
+            className="flex"
+            style={{ gap: `${gapPx}px`, width: `${Math.max(totalWidth, containerWidth)}px` }}
             aria-live="polite"
           >
             {items.map((item, i) => (
@@ -131,7 +141,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         <div className="mt-6 flex items-center justify-end gap-2">
           <button
             type="button"
-            onClick={prev}
+            onClick={() => scrollToIndex(Math.max(0, index - 1))}
             disabled={index <= 0}
             aria-label="Previous cases"
             className={cn(
@@ -144,7 +154,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           </button>
           <button
             type="button"
-            onClick={next}
+            onClick={() => scrollToIndex(Math.min(maxIndex, index + 1))}
             disabled={index >= maxIndex}
             aria-label="Next cases"
             className={cn(
@@ -157,6 +167,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           </button>
         </div>
       </div>
+      {/* polite announcement for screen readers */}
+      <div aria-live="polite" className="sr-only" role="status">{announce}</div>
     </div>
   );
 }
@@ -179,7 +191,7 @@ function CaseCard({ item }: { item: CaseStudy }) {
       <div className="relative rounded-[5px] shadow-[var(--shadow-card,0_24px_48px_rgba(0,0,0,0.12))] overflow-hidden">
         <div className="bg-muted/20 h-[240px] sm:h-[280px] md:h-[320px] lg:h-[380px] xl:h-[420px] relative">
           {videoSrc ? (
-            <VideoHover src={videoSrc} poster={poster} />
+            <VideoAuto src={videoSrc} poster={poster} />
           ) : poster ? (
             <Image
               src={poster}
@@ -213,27 +225,28 @@ function CaseCard({ item }: { item: CaseStudy }) {
   );
 }
 
-function VideoHover({ src, poster }: { src: string; poster?: string }) {
+function VideoAuto({ src, poster }: { src: string; poster?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const onEnter = () => {
-      el.muted = true;
-      el.play().catch(() => {});
+    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return; // Respect reduced motion: no autoplay
+    let observer: IntersectionObserver | null = null;
+    const onVisible = (entries: IntersectionObserverEntry[]) => {
+      const entry = entries[0];
+      if (!el) return;
+      if (entry.isIntersecting) {
+        el.muted = true;
+        el.play().catch(() => {});
+      } else {
+        el.pause();
+      }
     };
-    const onLeave = () => {
-      el.pause();
-      el.currentTime = 0;
-    };
-    const parent = el.parentElement?.parentElement;
-    parent?.addEventListener("mouseenter", onEnter);
-    parent?.addEventListener("mouseleave", onLeave);
-    return () => {
-      parent?.removeEventListener("mouseenter", onEnter);
-      parent?.removeEventListener("mouseleave", onLeave);
-    };
+    observer = new IntersectionObserver(onVisible, { rootMargin: "0px", threshold: 0.35 });
+    observer.observe(el);
+    return () => observer?.disconnect();
   }, []);
 
   return (
@@ -244,6 +257,8 @@ function VideoHover({ src, poster }: { src: string; poster?: string }) {
       preload="metadata"
       playsInline
       muted
+      loop
+      autoPlay
       className="h-full w-full object-cover"
     />
   );
