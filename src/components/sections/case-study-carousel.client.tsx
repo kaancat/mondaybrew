@@ -19,6 +19,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const containerRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(initialIndex);
   const [perView, setPerView] = useState(1);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   // Responsive items per view
   useEffect(() => {
@@ -30,6 +31,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       // 1 on mobile (< 768), 2 on tablet (>= 768), 3 on desktop (>= 1200)
       const next = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
       setPerView(next);
+      setContainerWidth(Math.floor(w));
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -49,10 +51,10 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   []);
 
-  const slideStyle = {
-    transform: `translateX(-${(100 / perView) * index}%)`,
-    transition: prefersReduced ? undefined : "transform 400ms var(--ease-out)",
-  } as const;
+  const slideStyle = useMemo(() => ({
+    transform: `translate3d(${-index * containerWidth}px, 0, 0)`,
+    transition: prefersReduced ? undefined : "transform 420ms var(--ease-out)",
+  }), [index, containerWidth, prefersReduced]);
 
   return (
     <div className="group/section">
@@ -148,7 +150,7 @@ function CaseCard({ item }: { item: CaseStudy }) {
       className="group block focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-[5px]"
     >
       <div className="relative rounded-[5px] shadow-[var(--shadow-card,0_24px_48px_rgba(0,0,0,0.12))] overflow-hidden">
-        <div className="aspect-[16/9] bg-muted/20">
+        <div className="bg-muted/20 h-[240px] sm:h-[280px] md:h-[320px] lg:h-[380px] xl:h-[420px] relative">
           {videoSrc ? (
             <VideoHover src={videoSrc} poster={poster} />
           ) : poster ? (
