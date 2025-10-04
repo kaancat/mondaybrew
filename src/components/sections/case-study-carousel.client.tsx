@@ -92,7 +92,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             aria-live="polite"
           >
             {items.map((item, i) => (
-              <li key={item._id || i} className="min-w-0" style={{ width: `${100 / perView}%` }}>
+              <li key={item._id || i} className="shrink-0" style={{ width: `${100 / perView}%` }}>
                 <CaseCard item={item} />
               </li>
             ))}
