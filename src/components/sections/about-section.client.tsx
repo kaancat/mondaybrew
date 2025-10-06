@@ -80,6 +80,13 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
   const isInView = useInView(sectionRef, { once: true, amount: 0.55 });
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  const imageMotionStyle = prefersReducedMotion
+    ? undefined
+    : {
+        y: parallaxY,
+        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
+        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
+      } as const;
 
   useEffect(() => {
     if (isInView) {
@@ -122,7 +129,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
 
       <div className="relative isolate">
         <motion.div
-          style={prefersReducedMotion ? undefined : { y: parallaxY }}
+          style={imageMotionStyle}
           className={cn(
             "relative overflow-hidden rounded-[5px] shadow-[var(--shadow-hero)]",
             "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,color-mix(in_oklch,var(--accent)_15%,transparent)_0%,transparent_60%)]",
@@ -163,20 +170,39 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             initial="hidden"
             animate={overlayControls}
             className={cn(
-              "relative z-10 mt-[var(--flow-space)] flex flex-col md:mt-[calc(var(--flow-space)*-0.45)]",
-              "rounded-[5px] border border-[color:var(--border)] shadow-[var(--shadow-glass-lg)] backdrop-blur-[12px]",
-              "bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--card)_0%,transparent_100%),color-mix(in_oklch,var(--card)_95%,transparent_5%))]",
-              "dark:bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--background)_0%,transparent_100%),color-mix(in_oklch,var(--background)_90%,transparent_10%))]",
-              "p-[calc(var(--flow-space)*0.85)] md:p-[calc(var(--flow-space)*1.05)]",
-              "md:-translate-y-[35%] xl:-translate-y-[30%]",
+              "relative z-10 mt-[var(--flow-space)] flex flex-col gap-[clamp(20px,3vw,36px)] md:mt-[calc(var(--flow-space)*-0.4)]",
+              "rounded-[5px] border border-[color:var(--border)] backdrop-blur-[14px]",
+              "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05),rgba(255,255,255,0.6))]",
+              "dark:bg-[linear-gradient(to_bottom,rgba(0,0,0,0.3),rgba(0,0,0,0.7))]",
+              "shadow-[0_8px_24px_rgba(10,8,20,0.15)]",
+              "px-[clamp(24px,5vw,64px)] py-[clamp(32px,6vh,64px)]",
+              "md:-translate-y-[38%] xl:-translate-y-[35%]",
             )}
           >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(to_right,rgba(255,255,255,0.75),rgba(255,255,255,0))] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.35),rgba(255,255,255,0))]"
+            />
+            {!prefersReducedMotion ? (
+              <motion.span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-[5px] opacity-0 md:opacity-100"
+                style={{
+                  background:
+                    "linear-gradient(120deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.12) 100%)",
+                  backgroundSize: "200% 200%",
+                }}
+                animate={{ backgroundPosition: ["-200% 0%", "200% 0%", "-200% 0%"] }}
+                transition={{ duration: 6, ease: EASE_OUT, repeat: Infinity }}
+              />
+            ) : null}
             <dl
               className={cn(
-                "grid gap-[calc(var(--flow-space)/1.4)] sm:grid-cols-2",
+                "grid w-full gap-y-[clamp(18px,4vh,32px)] gap-x-[clamp(20px,4vw,40px)]",
+                "sm:grid-cols-2",
                 gridCols,
-                "lg:[&>div]:relative lg:[&>div]:pl-[calc(var(--flow-space)/1.2)]",
-                "lg:[&>div:not(:first-child)]:before:absolute lg:[&>div:not(:first-child)]:left-0 lg:[&>div:not(:first-child)]:top-[12%] lg:[&>div:not(:first-child)]:bottom-[12%] lg:[&>div:not(:first-child)]:w-px lg:[&>div:not(:first-child)]:before:bg-[color:color-mix(in_oklch,var(--border)_80%,transparent)]",
+                "lg:[&>div]:relative lg:[&>div]:flex lg:[&>div]:flex-col lg:[&>div]:items-center lg:[&>div]:justify-center",
+                "lg:[&>div:not(:first-child)]:before:absolute lg:[&>div:not(:first-child)]:left-[-clamp(12px,1.2vw,20px)] lg:[&>div:not(:first-child)]:top-[15%] lg:[&>div:not(:first-child)]:bottom-[15%] lg:[&>div:not(:first-child)]:w-px lg:[&>div:not(:first-child)]:before:bg-[rgba(255,255,255,0.22)] dark:lg:[&>div:not(:first-child)]:before:bg-[rgba(255,255,255,0.12)]",
               )}
             >
               {stats.map((stat, index) => (
@@ -254,19 +280,19 @@ function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedS
       initial="hidden"
       animate={controls}
       custom={index}
-      className="flex flex-col gap-[calc(var(--flow-space)/4)]"
+      className="flex flex-col items-center justify-center gap-3 text-center"
     >
-      <dd className="text-balance text-[clamp(3.25rem,8vw,6.5rem)] font-semibold leading-[0.95] text-[color:var(--foreground)]">
+      <dd className="text-balance text-[clamp(3rem,7vw,6rem)] font-semibold leading-[1.1] text-[color:var(--foreground)]">
         {displayValue || "—"}
       </dd>
-      <dt className="flex items-center gap-[calc(var(--flow-space)/6)] text-[length:var(--font-tight)] uppercase tracking-[0.26em] text-muted-foreground">
+      <dt className="mt-2 flex items-center justify-center gap-2 text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.05em] text-muted-foreground">
         {icon?.url ? (
           <Image
             src={icon.url}
             alt={icon.alt || ""}
-            width={icon.width ? Math.min(48, Math.round(icon.width)) : 40}
-            height={icon.height ? Math.min(48, Math.round(icon.height)) : 40}
-            className="h-8 w-8 shrink-0 object-contain opacity-80"
+            width={icon.width ? Math.min(44, Math.round(icon.width)) : 36}
+            height={icon.height ? Math.min(44, Math.round(icon.height)) : 36}
+            className="h-7 w-7 shrink-0 object-contain opacity-80"
             placeholder={icon.lqip ? "blur" : undefined}
             blurDataURL={icon.lqip || undefined}
             aria-hidden={icon.alt ? undefined : true}
