@@ -175,7 +175,7 @@ function StatItem({ stat }: { stat: AboutSectionStat }) {
   );
 }
 
-function resolveImage(image: SanityImageAsset | SanityIconImage) {
+function resolveImage(image?: SanityImageAsset | SanityIconImage | null) {
   const url = image?.asset?.url?.trim() || null;
   const alt = image?.alt?.trim() || null;
   const lqip = image?.asset?.metadata?.lqip?.trim() || null;
