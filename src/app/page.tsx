@@ -50,6 +50,7 @@ type ClientsSectionWithType = {
   eyebrow?: string;
   headline?: string;
   subheading?: string;
+  more?: { label?: string; href?: string; variant?: string } | null;
   logos?: Array<{
     title?: string;
     url?: string;
@@ -159,6 +160,7 @@ export default async function Home() {
                 headline={section.headline}
                 subheading={section.subheading}
                 logos={section.logos}
+                more={section.more}
               />
             </div>
           );

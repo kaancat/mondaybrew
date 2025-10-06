@@ -413,6 +413,7 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
         eyebrow,
         headline,
         subheading,
+        more{ label, href, variant },
         logos[]{
           title,
           url,

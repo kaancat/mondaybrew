@@ -9,6 +9,13 @@ export default defineType({
     defineField({ name: "headline", title: "Headline", type: "string" }),
     defineField({ name: "subheading", title: "Subheading", type: "text", rows: 3 }),
     defineField({
+      name: "more",
+      title: "More link (final cell)",
+      type: "button",
+      description: "Controls the final 'Many more' cell. Leave empty to hide it.",
+      initialValue: { label: "+ Many more →", href: "/cases", variant: "link" },
+    }),
+    defineField({
       name: "logos",
       title: "Logos",
       type: "array",
@@ -24,4 +31,3 @@ export default defineType({
     },
   },
 });
-

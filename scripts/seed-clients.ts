@@ -79,7 +79,13 @@ async function run() {
   const section = doc.sections[idx];
   const hasEnough = (section.logos || []).length >= 16;
   if (!inserted && hasEnough) {
-    console.log("clientsSection already has logos; skipping seeding");
+    // Ensure default 'more' is present
+    await client
+      .patch(doc._id)
+      .setIfMissing({ sections: [] })
+      .set({ [`sections[${idx}].more`]: { _type: "button", label: "+ Many more →", href: "/cases", variant: "link" } })
+      .commit();
+    console.log("clientsSection already had logos; ensured default 'more' link");
     return;
   }
 
@@ -107,7 +113,7 @@ async function run() {
   await client
     .patch(doc._id)
     .setIfMissing({ sections: [] })
-    .set({ [`sections[${idx}].logos`]: logos })
+    .set({ [`sections[${idx}].logos`]: logos, [`sections[${idx}].more`]: { _type: "button", label: "+ Many more →", href: "/cases", variant: "link" } })
     .commit();
 
   console.log(`Seeded ${logos.length} logos into clientsSection`);

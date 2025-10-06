@@ -14,9 +14,10 @@ export type ClientsSectionData = {
   headline?: string;
   subheading?: string;
   logos?: ClientLogo[];
+  more?: { label?: string; href?: string } | null;
 };
 
-export default function ClientsSection({ eyebrow, headline, subheading, logos }: ClientsSectionData) {
+export default function ClientsSection({ eyebrow, headline, subheading, logos, more }: ClientsSectionData) {
   const items = (logos || []).filter((l) => (l?.title || l?.image?.image?.asset?.url)).slice(0, 60);
 
   return (
@@ -65,7 +66,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos }:
 
       {/* Desktop/Tablet: lined grid */}
       <div className="layout-container hidden md:block">
-        <LinedGrid items={items} />
+        <LinedGrid items={items} more={more} />
       </div>
 
       {/* Mobile: marquee rows (prefers-reduced-motion handled inside) */}
@@ -76,7 +77,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos }:
   );
 }
 
-function LinedGrid({ items }: { items: ClientLogo[] }) {
+function LinedGrid({ items, more }: { items: ClientLogo[]; more?: { label?: string; href?: string } | null }) {
   // 5 columns on large, 4 on md, 3 on sm
   return (
     <div
@@ -96,8 +97,8 @@ function LinedGrid({ items }: { items: ClientLogo[] }) {
         {items.map((logo, i) => (
           <GridCell key={i} logo={logo} />
         ))}
-        {/* Optional tail cell: + Many more → */}
-        <MoreCell />
+        {/* Optional tail cell from Sanity */}
+        {more?.label && more?.href ? <MoreCell label={more.label} href={more.href} /> : null}
       </div>
     </div>
   );
@@ -154,10 +155,10 @@ function GridCell({ logo }: { logo: ClientLogo }) {
   return content;
 }
 
-function MoreCell() {
+function MoreCell({ label = "+ Many more →", href = "/cases" }: { label?: string; href?: string }) {
   return (
     <a
-      href="/cases"
+      href={href}
       className={cn(
         "group flex items-center justify-center text-[15px]",
         "min-h-[92px] lg:min-h-[112px]",
@@ -169,10 +170,10 @@ function MoreCell() {
         // @ts-ignore
         "--color-border": "var(--border)",
       }}
-      aria-label="Browse more clients"
+      aria-label={`Browse more clients`}
     >
       <span className="inline-flex items-center gap-2 opacity-80 group-hover:opacity-100 transition">
-        + Many more <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5"/></svg>
+        {label} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5"/></svg>
       </span>
     </a>
   );
