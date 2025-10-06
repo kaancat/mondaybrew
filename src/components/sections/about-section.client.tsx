@@ -42,32 +42,34 @@ type AboutSectionClientProps = {
   } | null;
 };
 
+const EASE_OUT = [0.16, 1, 0.3, 1] as const;
+
 const overlayVariants = {
   hidden: { opacity: 0, y: 32 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: "easeOut" },
+    transition: { duration: 0.8, ease: EASE_OUT },
   },
-};
+} as const;
 
 const headlineVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: "easeOut" },
+    transition: { duration: 0.6, ease: EASE_OUT },
   },
-};
+} as const;
 
 const statVariants = {
   hidden: { opacity: 0, y: 18 },
   visible: (index: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: "easeOut", delay: 0.25 + index * 0.08 },
+    transition: { duration: 0.55, ease: EASE_OUT, delay: 0.25 + index * 0.08 },
   }),
-};
+} as const;
 
 export function AboutSectionClient({ eyebrow, headline, subheading, image, stats = [], cta }: AboutSectionClientProps) {
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -228,7 +230,7 @@ function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedS
     const { number, suffix } = parsed;
     const controls = animate(0, number, {
       duration: 1.4,
-      ease: "easeOut",
+      ease: EASE_OUT,
       onUpdate(latest) {
         setDisplayValue(`${formatNumber(latest)}${suffix}`);
       },
