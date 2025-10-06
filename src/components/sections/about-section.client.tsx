@@ -207,7 +207,7 @@ type AnimatedStatProps = {
   stat: AboutSectionResolvedStat;
   index: number;
   isActive: boolean;
-  prefersReducedMotion: boolean;
+  prefersReducedMotion: boolean | null;
 };
 
 function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedStatProps) {
@@ -222,7 +222,7 @@ function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedS
     }
 
     const parsed = parseNumericValue(raw);
-    if (!parsed || prefersReducedMotion || !isActive) {
+    if (!parsed || prefersReducedMotion === true || !isActive) {
       setDisplayValue(raw);
       return;
     }
