@@ -65,7 +65,7 @@ export function AboutSection({ eyebrow, headline, subheading, mainImage, stats, 
       if (!value && !label && !icon?.url) return null;
       return { value, label, icon } satisfies AboutSectionResolvedStat;
     })
-    .filter((stat): stat is AboutSectionResolvedStat => Boolean(stat));
+    .filter((stat): stat is AboutSectionResolvedStat => stat !== null);
 
   return (
     <Section innerClassName="flex flex-col gap-[var(--flow-space)]">
