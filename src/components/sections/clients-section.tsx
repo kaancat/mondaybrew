@@ -24,7 +24,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos }:
       <div className="layout-container">
         <div
           className={cn(
-            "rounded-[5px] shadow-[var(--shadow-elevated-md)]",
+            "clients-hero-strip rounded-[5px] shadow-[var(--shadow-elevated-md)]",
             "bg-[color:var(--accent)] text-[color:var(--accent-foreground)]",
             "px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12",
             "relative overflow-hidden",
@@ -162,7 +162,7 @@ function MoreCell() {
         "group flex items-center justify-center text-[15px]",
         "min-h-[92px] lg:min-h-[112px]",
         "[box-shadow:inset_0_1px_var(--color-border),inset_1px_0_var(--color-border)]",
-        "bg-[color:var(--card)] text-[color:var(--foreground)]",
+        "bg-[color:var(--card)] text-[color:var(--card-foreground)]",
       )}
       style={{
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -415,6 +415,12 @@ html.dark {
 }
 
 @layer utilities {
+  /* Clients/Partners: override hero strip in Light-Alt to be pure white card with strong ink */
+  html.light-alt .clients-hero-strip {
+    background: var(--services-card-bg) !important;
+    color: var(--services-ink-strong) !important;
+  }
+
   .layout-container {
     width: 100%;
     max-width: calc(var(--container-max) + (var(--container-gutter) * 2));
