@@ -9,6 +9,13 @@ export default defineType({
     defineField({ name: "headline", title: "Headline", type: "string" }),
     defineField({ name: "subheading", title: "Subheading", type: "text", rows: 3 }),
     defineField({
+      name: "forceBlackLogos",
+      title: "Force monochrome black logos",
+      type: "boolean",
+      description: "Applies a filter so uploaded logos render as solid black regardless of original color.",
+      initialValue: true,
+    }),
+    defineField({
       name: "more",
       title: "More link (final cell)",
       type: "button",
@@ -25,9 +32,10 @@ export default defineType({
     defineField({ name: "version", type: "string", initialValue: "v1", hidden: true, readOnly: true }),
   ],
   preview: {
-    select: { headline: "headline", count: "logos.length" },
-    prepare({ headline, count }: { headline?: string; count?: number }) {
-      return { title: headline || "Clients / Partners", subtitle: `${count || 0} logos` };
+    select: { headline: "headline", count: "logos.length", force: "forceBlackLogos" },
+    prepare({ headline, count, force }: { headline?: string; count?: number; force?: boolean }) {
+      const tone = force ? "• black logos" : "• original colors";
+      return { title: headline || "Clients / Partners", subtitle: `${count || 0} logos ${tone}` };
     },
   },
 });

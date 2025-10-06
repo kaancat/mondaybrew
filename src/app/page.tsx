@@ -51,6 +51,7 @@ type ClientsSectionWithType = {
   headline?: string;
   subheading?: string;
   more?: { label?: string; href?: string; variant?: string } | null;
+  forceBlackLogos?: boolean;
   logos?: Array<{
     title?: string;
     url?: string;
@@ -162,6 +163,7 @@ export default async function Home() {
                 logos={section.logos}
                 more={section.more}
                 locale={locale}
+                forceBlackLogos={section.forceBlackLogos}
               />
             </div>
           );

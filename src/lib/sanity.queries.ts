@@ -413,6 +413,7 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
         eyebrow,
         headline,
         subheading,
+        forceBlackLogos,
         more{ label, href, variant, reference->{"slug": slug.current, locale} },
         logos[]{
           title,

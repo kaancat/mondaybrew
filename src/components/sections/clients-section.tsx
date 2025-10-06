@@ -16,9 +16,10 @@ export type ClientsSectionData = {
   logos?: ClientLogo[];
   more?: { label?: string; href?: string; reference?: { slug?: string; locale?: string } } | null;
   locale?: "da" | "en";
+  forceBlackLogos?: boolean;
 };
 
-export default function ClientsSection({ eyebrow, headline, subheading, logos, more, locale }: ClientsSectionData) {
+export default function ClientsSection({ eyebrow, headline, subheading, logos, more, locale, forceBlackLogos }: ClientsSectionData) {
   const items = (logos || []).filter((l) => (l?.title || l?.image?.image?.asset?.url)).slice(0, 60);
 
   return (
@@ -67,18 +68,24 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
 
       {/* Desktop/Tablet: lined grid */}
       <div className="layout-container hidden md:block">
-        <LinedGrid items={items} more={more} locale={locale} />
+        <LinedGrid items={items} more={more} locale={locale} forceBlackLogos={forceBlackLogos} />
       </div>
 
       {/* Mobile: marquee rows (prefers-reduced-motion handled inside) */}
-      <div className="layout-container md:hidden">
+      <div
+        className="layout-container md:hidden"
+        style={{
+          // @ts-expect-error CSS var
+          "--clients-logo-filter": forceBlackLogos ? "brightness(0) saturate(100%)" : "grayscale(100%)",
+        }}
+      >
         <ClientsMarquee items={items} />
       </div>
     </section>
   );
 }
 
-function LinedGrid({ items, more, locale }: { items: ClientLogo[]; more?: { label?: string; href?: string; reference?: { slug?: string; locale?: string } } | null; locale?: "da" | "en" }) {
+function LinedGrid({ items, more, locale, forceBlackLogos }: { items: ClientLogo[]; more?: { label?: string; href?: string; reference?: { slug?: string; locale?: string } } | null; locale?: "da" | "en"; forceBlackLogos?: boolean }) {
   // 5 columns on large, 4 on md, 3 on sm
   return (
     <div
@@ -92,6 +99,8 @@ function LinedGrid({ items, more, locale }: { items: ClientLogo[]; more?: { labe
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         "--color-border": "var(--border)",
+        // logo tone
+        "--clients-logo-filter": forceBlackLogos ? "brightness(0) saturate(100%)" : "grayscale(100%)",
       }}
     >
       <div className={cn("grid gap-0", "grid-cols-3 md:grid-cols-4 lg:grid-cols-5")}> 
@@ -139,8 +148,8 @@ function GridCell({ logo }: { logo: ClientLogo }) {
           height={Math.round(h)}
           placeholder={logo.image?.image?.asset?.metadata?.lqip ? "blur" : undefined}
           blurDataURL={logo.image?.image?.asset?.metadata?.lqip}
-          className="max-h-[56px] w-auto opacity-90 grayscale hover:grayscale-0 transition will-change-transform"
-          style={{ filter: "grayscale(100%)", mixBlendMode: "multiply" }}
+          className="max-h-[56px] w-auto opacity-90 transition will-change-transform"
+          style={{ filter: "var(--clients-logo-filter)", mixBlendMode: "multiply" }}
         />
       ) : (
         <span className="px-4 text-sm text-muted-foreground">{title}</span>

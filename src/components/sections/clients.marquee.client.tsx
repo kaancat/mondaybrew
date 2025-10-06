@@ -75,7 +75,7 @@ function Logo({ logo }: { logo: ClientLogo }) {
       placeholder={logo.image?.image?.asset?.metadata?.lqip ? "blur" : undefined}
       blurDataURL={logo.image?.image?.asset?.metadata?.lqip}
       className="max-h-[40px] w-auto opacity-90"
-      style={{ filter: "grayscale(100%)", mixBlendMode: "multiply" }}
+      style={{ filter: "var(--clients-logo-filter, grayscale(100%))", mixBlendMode: "multiply" }}
     />
   ) : (
     <span className="px-2 text-sm text-muted-foreground">{title}</span>
@@ -84,4 +84,3 @@ function Logo({ logo }: { logo: ClientLogo }) {
   if (href) return <a href={href} aria-label={`Visit ${title}`}>{inner}</a>;
   return inner;
 }
-
