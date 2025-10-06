@@ -1,4 +1,5 @@
 import siteSettings from "./types/documents/siteSettings";
+import aboutSection from "./types/documents/aboutSection";
 import page from "./types/documents/page";
 import post from "./types/documents/post";
 import caseStudy from "./types/documents/caseStudy";
@@ -29,6 +30,7 @@ import clientLogo from "./types/objects/clientLogo";
 const schemas = [
   // documents
   siteSettings,
+  aboutSection,
   page,
   post,
   caseStudy,

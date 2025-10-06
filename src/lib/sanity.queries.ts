@@ -62,6 +62,45 @@ export const siteSettingsQuery = `*[_type=="siteSettings"][0]{
   footer
 }`;
 
+export const aboutSectionQuery = `*[_type=="aboutSection"][0]{
+  eyebrow,
+  headline,
+  subheading,
+  mainImage {
+    alt,
+    asset->{
+      url,
+      metadata {
+        lqip,
+        dimensions
+      }
+    }
+  },
+  stats[]{
+    value,
+    label,
+    icon {
+      alt,
+      asset->{
+        url,
+        metadata {
+          lqip,
+          dimensions
+        }
+      }
+    }
+  },
+  cta {
+    label,
+    href,
+    variant,
+    reference->{
+      "slug": slug.current,
+      locale
+    }
+  }
+}`;
+
 export const homePageQuery = `*[_type=="page" && isHome == true && locale==$locale][0]{
   _id,
   title,

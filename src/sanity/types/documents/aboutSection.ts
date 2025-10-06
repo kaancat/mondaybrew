@@ -1,0 +1,93 @@
+import { defineType, defineField } from "sanity";
+
+const mockStats = [
+  { _key: "stat-experience", label: "Years crafting digital experiences", value: "15" },
+  { _key: "stat-shipped", label: "Products launched", value: "120+" },
+  { _key: "stat-nps", label: "Client NPS", value: "72" },
+];
+
+export default defineType({
+  name: "aboutSection",
+  title: "About Section",
+  type: "document",
+  fields: [
+    defineField({ name: "eyebrow", title: "Eyebrow", type: "string" }),
+    defineField({
+      name: "headline",
+      title: "Headline",
+      type: "string",
+      validation: (Rule) => Rule.required().min(6).warning("Consider a descriptive headline."),
+    }),
+    defineField({
+      name: "subheading",
+      title: "Subheading",
+      type: "text",
+      rows: 4,
+      validation: (Rule) => Rule.required().min(24).warning("Write at least a short paragraph."),
+    }),
+    defineField({
+      name: "mainImage",
+      title: "Main Image",
+      type: "image",
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: "alt", type: "string", title: "Alt text", validation: (Rule) => Rule.required() }),
+      ],
+    }),
+    defineField({
+      name: "stats",
+      title: "Stats",
+      type: "array",
+      validation: (Rule) => Rule.min(1).max(4),
+      of: [
+        defineField({
+          name: "stat",
+          type: "object",
+          fields: [
+            defineField({ name: "value", title: "Value", type: "string", validation: (Rule) => Rule.required() }),
+            defineField({ name: "label", title: "Label", type: "string", validation: (Rule) => Rule.required() }),
+            defineField({
+              name: "icon",
+              title: "Icon (optional)",
+              type: "image",
+              options: { hotspot: true },
+              fields: [defineField({ name: "alt", type: "string", title: "Alt text" })],
+            }),
+          ],
+          preview: {
+            select: { label: "label", value: "value" },
+            prepare({ label, value }) {
+              return {
+                title: value || "Stat",
+                subtitle: label,
+              };
+            },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: "cta",
+      title: "CTA (optional)",
+      type: "button",
+      description: "Optional call-to-action rendered below the image.",
+    }),
+  ],
+  initialValue: () => ({
+    eyebrow: "About mondaybrew",
+    headline: "We build brave digital products for teams who move fast",
+    subheading:
+      "Our team blends strategy, engineering, and growth to launch products that live up to big ambitions. From the first sketch to ongoing optimization, we stay close to your metrics and even closer to your users.",
+    stats: mockStats,
+  }),
+  preview: {
+    select: { headline: "headline", eyebrow: "eyebrow", stats: "stats" },
+    prepare({ headline, eyebrow, stats }) {
+      const count = Array.isArray(stats) ? stats.length : 0;
+      return {
+        title: headline || "About Section",
+        subtitle: [eyebrow, count ? `${count} stats` : null].filter(Boolean).join(" • "),
+      };
+    },
+  },
+});
