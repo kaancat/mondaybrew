@@ -64,12 +64,12 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos }:
       </div>
 
       {/* Desktop/Tablet: lined grid */}
-      <div className="layout-container vr-section-tight hidden md:block">
+      <div className="layout-container hidden md:block">
         <LinedGrid items={items} />
       </div>
 
       {/* Mobile: marquee rows (prefers-reduced-motion handled inside) */}
-      <div className="layout-container vr-section-tight md:hidden">
+      <div className="layout-container md:hidden">
         <ClientsMarquee items={items} />
       </div>
     </section>
@@ -177,4 +177,3 @@ function MoreCell() {
     </a>
   );
 }
-
