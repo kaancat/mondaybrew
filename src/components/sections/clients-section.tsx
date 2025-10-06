@@ -138,11 +138,6 @@ function GridCell({ logo }: { logo: ClientLogo }) {
         "[box-shadow:inset_0_1px_var(--color-border),inset_1px_0_var(--color-border)]",
         "bg-[color:var(--card)]",
       )}
-      style={{
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        "--color-border": "var(--border)",
-      }}
     >
       {url ? (
         <Image
@@ -181,11 +176,6 @@ function MoreCell({ label = "+ Many more →", href = "/cases" }: { label?: stri
         "[box-shadow:inset_0_1px_var(--color-border),inset_1px_0_var(--color-border)]",
         "bg-[color:var(--card)] text-[color:var(--card-foreground)]",
       )}
-      style={{
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        "--color-border": "var(--border)",
-      }}
       aria-label={`Browse more clients`}
     >
       <span className="inline-flex items-center gap-2 opacity-80 group-hover:opacity-100 transition">
