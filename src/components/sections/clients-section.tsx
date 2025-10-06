@@ -14,10 +14,11 @@ export type ClientsSectionData = {
   headline?: string;
   subheading?: string;
   logos?: ClientLogo[];
-  more?: { label?: string; href?: string } | null;
+  more?: { label?: string; href?: string; reference?: { slug?: string; locale?: string } } | null;
+  locale?: "da" | "en";
 };
 
-export default function ClientsSection({ eyebrow, headline, subheading, logos, more }: ClientsSectionData) {
+export default function ClientsSection({ eyebrow, headline, subheading, logos, more, locale }: ClientsSectionData) {
   const items = (logos || []).filter((l) => (l?.title || l?.image?.image?.asset?.url)).slice(0, 60);
 
   return (
@@ -66,7 +67,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
 
       {/* Desktop/Tablet: lined grid */}
       <div className="layout-container hidden md:block">
-        <LinedGrid items={items} more={more} />
+        <LinedGrid items={items} more={more} locale={locale} />
       </div>
 
       {/* Mobile: marquee rows (prefers-reduced-motion handled inside) */}
@@ -77,12 +78,12 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
   );
 }
 
-function LinedGrid({ items, more }: { items: ClientLogo[]; more?: { label?: string; href?: string } | null }) {
+function LinedGrid({ items, more, locale }: { items: ClientLogo[]; more?: { label?: string; href?: string; reference?: { slug?: string; locale?: string } } | null; locale?: "da" | "en" }) {
   // 5 columns on large, 4 on md, 3 on sm
   return (
     <div
       className={cn(
-        "relative",
+        "relative clients-grid",
         // outer bottom/right hairlines
         "[box-shadow:inset_0_-1px_var(--color-border),inset_-1px_0_var(--color-border)]",
       )}
@@ -98,7 +99,9 @@ function LinedGrid({ items, more }: { items: ClientLogo[]; more?: { label?: stri
           <GridCell key={i} logo={logo} />
         ))}
         {/* Optional tail cell from Sanity */}
-        {more?.label && more?.href ? <MoreCell label={more.label} href={more.href} /> : null}
+        {resolveMoreHref(more, locale) && more?.label ? (
+          <MoreCell label={more.label} href={resolveMoreHref(more, locale)!} />
+        ) : null}
       </div>
     </div>
   );
@@ -177,4 +180,16 @@ function MoreCell({ label = "+ Many more →", href = "/cases" }: { label?: stri
       </span>
     </a>
   );
+}
+
+function resolveMoreHref(
+  more: { href?: string; reference?: { slug?: string; locale?: string } } | null | undefined,
+  locale?: "da" | "en",
+): string | undefined {
+  if (!more) return undefined;
+  if (more.href) return more.href;
+  const slug = more.reference?.slug?.trim();
+  const loc = more.reference?.locale || locale;
+  if (!slug) return undefined;
+  return loc === "en" ? `/en/${slug}` : `/${slug}`;
 }

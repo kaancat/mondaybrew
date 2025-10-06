@@ -161,6 +161,7 @@ export default async function Home() {
                 subheading={section.subheading}
                 logos={section.logos}
                 more={section.more}
+                locale={locale}
               />
             </div>
           );
