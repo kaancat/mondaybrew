@@ -419,6 +419,7 @@ html.dark {
   html.light-alt .clients-hero-strip {
     background: var(--services-card-bg) !important;
     color: var(--services-ink-strong) !important;
+    border: 1px solid var(--nav-shell-border) !important;
   }
 
   .layout-container {
