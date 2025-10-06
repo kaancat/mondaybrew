@@ -196,7 +196,7 @@ function resolveHref(cta: AboutSectionData["cta"]) {
   if (manual) return manual;
   const slug = cta?.reference?.slug?.trim();
   if (slug) {
-    const locale = cta.reference?.locale || "da";
+    const locale = cta?.reference?.locale || "da";
     return locale === "en" ? `/en/${slug}` : `/${slug}`;
   }
   return null;
