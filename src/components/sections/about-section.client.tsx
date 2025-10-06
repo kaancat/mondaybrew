@@ -75,7 +75,8 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const overlayControls = useAnimation();
   const headlineControls = useAnimation();
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotionSetting = useReducedMotion();
+  const prefersReducedMotion = prefersReducedMotionSetting ?? false;
   const isInView = useInView(sectionRef, { once: true, amount: 0.55 });
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
@@ -207,7 +208,7 @@ type AnimatedStatProps = {
   stat: AboutSectionResolvedStat;
   index: number;
   isActive: boolean;
-  prefersReducedMotion: boolean | null;
+  prefersReducedMotion: boolean;
 };
 
 function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedStatProps) {
@@ -222,7 +223,7 @@ function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedS
     }
 
     const parsed = parseNumericValue(raw);
-    if (!parsed || prefersReducedMotion === true || !isActive) {
+    if (!parsed || prefersReducedMotion || !isActive) {
       setDisplayValue(raw);
       return;
     }
