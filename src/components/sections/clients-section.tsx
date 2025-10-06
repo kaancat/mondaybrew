@@ -101,6 +101,10 @@ function LinedGrid({ items, more, locale, forceBlackLogos }: { items: ClientLogo
         "--color-border": "var(--border)",
         // logo tone
         "--clients-logo-filter": forceBlackLogos ? "brightness(0) saturate(100%)" : "grayscale(100%)",
+        // Orange hover tuned for #ff914d
+        "--clients-logo-hover-filter": forceBlackLogos
+          ? "invert(60%) sepia(86%) saturate(1200%) hue-rotate(340deg) brightness(105%) contrast(101%)"
+          : "none",
       }}
     >
       <div className={cn("grid gap-0", "grid-cols-3 md:grid-cols-4 lg:grid-cols-5")}> 
@@ -128,7 +132,7 @@ function GridCell({ logo }: { logo: ClientLogo }) {
   const content = (
     <div
       className={cn(
-        "flex items-center justify-center",
+        "group/[cell] flex items-center justify-center",
         "min-h-[92px] lg:min-h-[112px]",
         // top/left hairlines only; container draws bottom/right
         "[box-shadow:inset_0_1px_var(--color-border),inset_1px_0_var(--color-border)]",
@@ -148,8 +152,8 @@ function GridCell({ logo }: { logo: ClientLogo }) {
           height={Math.round(h)}
           placeholder={logo.image?.image?.asset?.metadata?.lqip ? "blur" : undefined}
           blurDataURL={logo.image?.image?.asset?.metadata?.lqip}
-          className="max-h-[56px] w-auto opacity-90 transition will-change-transform"
-          style={{ filter: "var(--clients-logo-filter)", mixBlendMode: "multiply" }}
+          className="max-h-[56px] w-auto opacity-90 transition will-change-transform [filter:var(--clients-logo-filter)] group-hover/[cell]:[filter:var(--clients-logo-hover-filter)]"
+          style={{ mixBlendMode: "multiply" }}
         />
       ) : (
         <span className="px-4 text-sm text-muted-foreground">{title}</span>
@@ -159,7 +163,7 @@ function GridCell({ logo }: { logo: ClientLogo }) {
 
   if (href) {
     return (
-      <a href={href} aria-label={`Visit ${title}`} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]">
+      <a href={href} aria-label={`Visit ${title}`} className="group focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]">
         {content}
       </a>
     );

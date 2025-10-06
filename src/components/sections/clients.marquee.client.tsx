@@ -74,8 +74,8 @@ function Logo({ logo }: { logo: ClientLogo }) {
       height={Math.round(h)}
       placeholder={logo.image?.image?.asset?.metadata?.lqip ? "blur" : undefined}
       blurDataURL={logo.image?.image?.asset?.metadata?.lqip}
-      className="max-h-[40px] w-auto opacity-90"
-      style={{ filter: "var(--clients-logo-filter, grayscale(100%))", mixBlendMode: "multiply" }}
+      className="max-h-[40px] w-auto opacity-90 [filter:var(--clients-logo-filter,grayscale(100%))] group-hover:[filter:var(--clients-logo-hover-filter,none)]"
+      style={{ mixBlendMode: "multiply" }}
     />
   ) : (
     <span className="px-2 text-sm text-muted-foreground">{title}</span>
