@@ -57,15 +57,16 @@ const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "gho
 
 export function AboutSection({ eyebrow, headline, subheading, mainImage, stats, cta }: AboutSectionData) {
   const image = resolveImage(mainImage);
-  const sanitizedStats: AboutSectionResolvedStat[] = (stats ?? [])
-    .map((stat) => {
-      const value = stat?.value?.trim();
-      const label = stat?.label?.trim();
-      const icon = stat?.icon ? resolveImage(stat.icon) : null;
-      if (!value && !label && !icon?.url) return null;
-      return { value, label, icon } satisfies AboutSectionResolvedStat;
-    })
-    .filter((stat): stat is AboutSectionResolvedStat => stat !== null);
+  const sanitizedStats = (stats ?? []).reduce<AboutSectionResolvedStat[]>((acc, stat) => {
+    const value = stat?.value?.trim();
+    const label = stat?.label?.trim();
+    const icon = stat?.icon ? resolveImage(stat.icon) : null;
+    if (!value && !label && !icon?.url) {
+      return acc;
+    }
+    acc.push({ value, label, icon });
+    return acc;
+  }, []);
 
   return (
     <Section innerClassName="flex flex-col gap-[var(--flow-space)]">
