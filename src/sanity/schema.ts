@@ -1,5 +1,4 @@
 import siteSettings from "./types/documents/siteSettings";
-import aboutSection from "./types/documents/aboutSection";
 import page from "./types/documents/page";
 import post from "./types/documents/post";
 import caseStudy from "./types/documents/caseStudy";
@@ -7,6 +6,7 @@ import category from "./types/documents/category";
 import author from "./types/documents/author";
 
 import hero from "./types/sections/hero";
+import aboutSection from "./types/sections/aboutSection";
 import servicesSplit from "./types/sections/servicesSplit";
 import caseStudyCarousel from "./types/sections/caseStudyCarousel";
 import clientsSection from "./types/sections/clientsSection";
@@ -30,7 +30,6 @@ import clientLogo from "./types/objects/clientLogo";
 const schemas = [
   // documents
   siteSettings,
-  aboutSection,
   page,
   post,
   caseStudy,
@@ -38,6 +37,7 @@ const schemas = [
   author,
   // sections
   hero,
+  aboutSection,
   servicesSplit,
   caseStudyCarousel,
   clientsSection,

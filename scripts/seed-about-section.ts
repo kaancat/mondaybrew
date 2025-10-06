@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { createClient } from "next-sanity";
 
 const projectId = process.env.SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "4ot323fc";
@@ -31,13 +30,40 @@ async function uploadImage(url: string, filename: string) {
   return asset._id;
 }
 
-async function run() {
-  console.log("Seeding About Section document...");
+async function ensurePageDocument() {
+  const existing = await client.fetch<
+    | {
+        _id: string;
+        sections?: Array<{ _type?: string; _key?: string }>;
+      }
+    | null
+  >(
+    `*[_type=="page" && slug.current==$slug && locale==$locale][0]{ _id, sections }`,
+    { slug: "om-os", locale: "da" },
+  );
 
-  const existing = await client.fetch<{ _id: string } | null>(`*[_type == "aboutSection"][0]{ _id }`);
   if (existing?._id) {
-    console.log(`Existing aboutSection found with _id=${existing._id}, it will be replaced.`);
+    return existing._id;
   }
+
+  const _id = `page-om-os-da`;
+  await client.create({
+    _id,
+    _type: "page",
+    title: "Om os",
+    slug: { _type: "slug", current: "om-os" },
+    locale: "da",
+    isHome: false,
+    sections: [],
+  });
+
+  return _id;
+}
+
+async function run() {
+  console.log("Seeding About section inside page builder...");
+
+  const pageId = await ensurePageDocument();
 
   const mainImageId = await uploadImage(
     "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=2400&q=80",
@@ -57,9 +83,8 @@ async function run() {
     "stat-icon-impact.png",
   );
 
-  const doc = {
-    _id: "aboutSection",
-    _type: "aboutSection",
+  const aboutSection = {
+    _type: "aboutSection" as const,
     eyebrow: "About mondaybrew",
     headline: "We build digital experiences that move the metrics you care about",
     subheading:
@@ -107,11 +132,17 @@ async function run() {
       href: "/kontakt",
       variant: "default",
     },
-  } as const;
+  };
 
-  await client.createOrReplace(doc);
+  const patch = client.patch(pageId).setIfMissing({ sections: [] });
 
-  console.log("About Section document created and published.");
+  // Replace any existing aboutSection in sections
+  patch.unset(["sections[_type == 'aboutSection']"]);
+  patch.insert("after", "sections[-1]", [aboutSection]);
+
+  await patch.commit();
+
+  console.log(`About section seeded on page ${pageId}.`);
 }
 
 run().catch((err) => {

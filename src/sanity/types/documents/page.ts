@@ -25,6 +25,7 @@ export default defineType({
         { type: "servicesSplit" },
         { type: "caseStudyCarousel" },
         { type: "clientsSection" },
+        { type: "aboutSection" },
       ],
     }),
     defineField({ name: "seo", type: "seo" }),

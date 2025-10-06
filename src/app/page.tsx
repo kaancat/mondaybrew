@@ -10,6 +10,7 @@ import {
 } from "@/components/sections/services-split";
 import CaseStudyCarouselSection from "@/components/sections/case-study-carousel";
 import ClientsSection from "@/components/sections/clients-section";
+import { AboutSection, type AboutSectionData } from "@/components/sections/about-section";
 import { Section } from "@/components/layout/section";
 
 type SiteSettings = { seo?: Seo };
@@ -58,11 +59,13 @@ type ClientsSectionWithType = {
     image?: { alt?: string; image?: { asset?: { url?: string; metadata?: { lqip?: string; dimensions?: { width?: number; height?: number } } } } };
   }>;
 };
+type AboutSectionWithType = AboutSectionData & { _type: "aboutSection"; _key?: string };
 type HomePageSection =
   | HeroSectionWithType
   | ServicesSplitSectionWithType
   | CaseStudyCarouselSectionWithType
   | ClientsSectionWithType
+  | AboutSectionWithType
   | { _type?: string; _key?: string };
 
 type HomePagePayload = {
@@ -81,6 +84,10 @@ function isCaseStudyCarouselSection(
 
 function isClientsSection(section: HomePageSection | undefined): section is ClientsSectionWithType {
   return !!section && section._type === "clientsSection";
+}
+
+function isAboutSection(section: HomePageSection | undefined): section is AboutSectionWithType {
+  return !!section && section._type === "aboutSection";
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -164,6 +171,21 @@ export default async function Home() {
                 more={section.more}
                 locale={locale}
                 forceBlackLogos={section.forceBlackLogos}
+              />
+            </div>
+          );
+        }
+
+        if (isAboutSection(section)) {
+          return (
+            <div className="vr-section" key={key}>
+              <AboutSection
+                eyebrow={section.eyebrow}
+                headline={section.headline}
+                subheading={section.subheading}
+                mainImage={section.mainImage}
+                stats={section.stats}
+                cta={section.cta}
               />
             </div>
           );
