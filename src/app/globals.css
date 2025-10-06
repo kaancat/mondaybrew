@@ -423,6 +423,8 @@ html.dark {
   }
   /* Clients grid hairlines should match the hero border in Light-Alt */
   html.light-alt .clients-grid { --color-border: var(--nav-shell-border) !important; }
+  /* Clients marquee row dividers should also match in Light-Alt */
+  html.light-alt .clients-marquee { --color-border: var(--nav-shell-border) !important; }
 
   .layout-container {
     width: 100%;

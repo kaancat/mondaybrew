@@ -24,7 +24,13 @@ export default function ClientsMarquee({ items }: { items: ClientLogo[] }) {
   const rowB = [...cleaned.slice().reverse(), ...cleaned.slice().reverse()];
 
   return (
-    <div className="relative overflow-hidden rounded-[5px] bg-[color:var(--card)]">
+    <div
+      className="clients-marquee relative overflow-hidden rounded-[5px] bg-[color:var(--card)]"
+      style={{
+        // @ts-expect-error CSS var
+        "--color-border": "var(--border)",
+      }}
+    >
       <MarqueeRow items={rowA} duration={36} direction="left" paused={reduced} />
       <MarqueeRow items={rowB} duration={42} direction="right" paused={reduced} />
     </div>
@@ -38,7 +44,7 @@ function MarqueeRow({ items, duration, direction, paused }: { items: ClientLogo[
   const anim = paused || hover ? "none" : `marquee-${direction} ${duration}s linear infinite`;
 
   return (
-    <div className="relative border-t border-[color:var(--border)] first:border-t-0">
+    <div className="clients-marquee-row relative border-t border-[color:var(--color-border)] first:border-t-0">
       <div
         ref={trackRef}
         className="flex gap-8 py-6 will-change-transform"
