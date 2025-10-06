@@ -101,7 +101,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
         variants={headlineVariants}
         initial="hidden"
         animate={headlineControls}
-        className="flex flex-col gap-[calc(var(--flow-space)/1.6)] lg:max-w-[70ch]"
+        className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-none lg:w-[min(68rem,80%)]"
       >
         {eyebrow ? (
           <p className="text-[length:var(--font-tight)] uppercase tracking-[0.3em] text-[color:var(--accent)]">
@@ -109,12 +109,12 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
           </p>
         ) : null}
         {headline ? (
-          <h2 className="text-balance text-[clamp(2.75rem,5vw+1rem,4.75rem)] font-semibold leading-[1.02] text-[color:var(--foreground)]">
+          <h2 className="text-pretty text-[clamp(3rem,6vw+1rem,5.75rem)] font-semibold leading-[0.98] tracking-[-0.01em] text-[color:var(--foreground)]">
             {headline}
           </h2>
         ) : null}
         {subheading ? (
-          <p className="max-w-[72ch] text-[length:var(--font-body)] leading-[1.7] text-muted-foreground">
+          <p className="max-w-[78ch] text-[length:var(--font-body)] leading-[1.75] text-muted-foreground">
             {subheading}
           </p>
         ) : null}
