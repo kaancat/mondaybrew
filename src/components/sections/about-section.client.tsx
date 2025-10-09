@@ -173,26 +173,27 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             className={cn(
               "relative z-10 mt-[calc(var(--flow-space)*0.4)] w-full",
               "flex flex-col gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[10px]",
-              "border border-[color:var(--nav-shell-border)] bg-[color-mix(in_oklch,var(--nav-shell-bg)_85%,transparent)]",
-              "shadow-[var(--nav-shell-shadow)] backdrop-blur-[18px]",
+              "border border-[color:var(--nav-shell-border)]",
+              "shadow-[var(--nav-shell-shadow)] backdrop-blur-[20px]",
+              "bg-[color-mix(in_oklch,var(--nav-shell-bg)_60%,transparent)]",
               "px-[clamp(24px,4vw,48px)] py-[clamp(28px,5vh,44px)]",
               "md:-translate-y-[22%] lg:-translate-y-[26%]",
             )}
           >
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-[1px]"
+              className="pointer-events-none absolute inset-0 opacity-60"
               style={{
                 background:
-                  "linear-gradient(to right, color-mix(in oklch, var(--foreground) 35%, transparent) 0%, transparent 100%)",
+                  "linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.08) 26%, rgba(0,0,0,0.18) 100%)",
               }}
             />
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-70"
+              className="pointer-events-none absolute inset-x-0 top-0 h-[1px] opacity-70"
               style={{
                 background:
-                  "linear-gradient(135deg, color-mix(in oklch, var(--card) 18%, transparent) 0%, color-mix(in oklch, var(--nav-shell-bg) 55%, transparent) 40%, color-mix(in oklch, var(--surface-dark) 65%, transparent) 100%)",
+                  "linear-gradient(to right, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 100%)",
               }}
             />
             <dl
