@@ -29,7 +29,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           className={cn(
             "clients-hero-strip rounded-[5px] shadow-[var(--shadow-elevated-md)]",
             "bg-[color:var(--accent)] text-[color:var(--accent-foreground)]",
-            "dark:bg-[color:var(--services-card-bg)] dark:text-[color:var(--services-ink-strong)]",
+            "dark:!bg-[color:var(--services-card-bg)] dark:!text-[color:var(--services-ink-strong)]",
             "px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12",
             "relative overflow-hidden",
           )}
