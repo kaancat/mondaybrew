@@ -128,7 +128,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
         ) : null}
       </motion.div>
 
-      <div className="relative isolate pb-[clamp(140px,24vw,220px)]">
+      <div className="relative isolate">
         <motion.div
           style={imageMotionStyle}
           className={cn(
@@ -163,63 +163,41 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             />
           ) : null}
-        </motion.div>
 
-        {stats.length ? (
-          <motion.div
-            variants={overlayVariants}
-            initial="hidden"
-            animate={overlayControls}
-            className={cn(
-              "absolute left-1/2 z-10 flex w-[min(90%,76rem)] -translate-x-1/2 flex-col",
-              "gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[14px]",
-              "border border-white/[0.22] shadow-[0_36px_90px_rgba(8,6,20,0.28)]",
-              "px-[clamp(28px,4.5vw,56px)] py-[clamp(32px,5.4vh,52px)]",
-              "backdrop-blur-[40px] will-change-transform",
-            )}
-            style={{
-              background: "color-mix(in oklch, var(--card) 12%, transparent)",
-              borderColor: "color-mix(in oklch, var(--card) 40%, transparent)",
-              bottom: "clamp(-170px, -18vw, -110px)",
-            }}
-          >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-[1px] opacity-80"
-              style={{
-                background:
-                  "linear-gradient(to right, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0) 60%)",
-              }}
-            />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-45"
-              style={{
-                background:
-                  "radial-gradient(120% 100% at 0% 0%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 35%, rgba(0,0,0,0.15) 100%)",
-              }}
-            />
-            <dl
+          {stats.length ? (
+            <motion.div
+              variants={overlayVariants}
+              initial="hidden"
+              animate={overlayControls}
               className={cn(
-                "grid w-full gap-y-[clamp(18px,3.6vh,26px)] gap-x-[clamp(16px,3vw,36px)] relative z-10",
-                "place-items-center text-center",
-                gridCols,
-                "lg:[&>div]:px-[min(2vw,32px)]",
-                "lg:[&>div:not(:first-child)]:border-l lg:[&>div:not(:first-child)]:border-l-[color:color-mix(in_oklch,var(--border)_55%,transparent)]",
+                "absolute left-1/2 bottom-[clamp(24px,6vw,44px)] z-10 flex w-[min(92%,72rem)] -translate-x-1/2",
+                "flex-col gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[16px]",
+                "border border-white/20 bg-white/10 shadow-[0_28px_90px_rgba(8,6,20,0.32)]",
+                "px-[clamp(28px,5vw,60px)] py-[clamp(32px,5.5vh,56px)] backdrop-blur-[40px]",
               )}
             >
-              {stats.map((stat, index) => (
-                <AnimatedStat
-                  key={`${stat.label || stat.value || index}`}
-                  index={index}
-                  stat={stat}
-                  isActive={isInView}
-                  prefersReducedMotion={prefersReducedMotion}
-                />
-              ))}
-            </dl>
-          </motion.div>
-        ) : null}
+              <dl
+                className={cn(
+                  "grid w-full gap-y-[clamp(18px,3.2vh,26px)] gap-x-[clamp(16px,3vw,36px)]",
+                  "text-center place-items-center",
+                  gridCols,
+                  "lg:[&>div]:px-[min(2.2vw,36px)]",
+                  "lg:[&>div:not(:first-child)]:border-l lg:[&>div:not(:first-child)]:border-l-white/20",
+                )}
+              >
+                {stats.map((stat, index) => (
+                  <AnimatedStat
+                    key={`${stat.label || stat.value || index}`}
+                    index={index}
+                    stat={stat}
+                    isActive={isInView}
+                    prefersReducedMotion={prefersReducedMotion}
+                  />
+                ))}
+              </dl>
+            </motion.div>
+          ) : null}
+        </motion.div>
       </div>
 
       {cta?.label && cta?.href ? (
