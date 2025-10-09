@@ -128,7 +128,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
         ) : null}
       </motion.div>
 
-      <div className="relative isolate">
+      <div className="relative isolate pb-[clamp(140px,24vw,220px)]">
         <motion.div
           style={imageMotionStyle}
           className={cn(
@@ -171,16 +171,16 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             initial="hidden"
             animate={overlayControls}
             className={cn(
-              "relative z-10 mt-[calc(var(--flow-space)*0.4)] w-full",
-              "flex flex-col gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[12px]",
-              "border",
-              "shadow-[0_30px_80px_rgba(8,6,20,0.26)] backdrop-blur-[34px]",
-              "px-[clamp(24px,4vw,48px)] py-[clamp(28px,5vh,44px)]",
-              "md:-translate-y-[22%] lg:-translate-y-[26%]",
+              "absolute left-1/2 z-10 flex w-[min(90%,76rem)] -translate-x-1/2 flex-col",
+              "gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[14px]",
+              "border border-white/[0.22] shadow-[0_36px_90px_rgba(8,6,20,0.28)]",
+              "px-[clamp(28px,4.5vw,56px)] py-[clamp(32px,5.4vh,52px)]",
+              "backdrop-blur-[40px] will-change-transform",
             )}
             style={{
-              background: "color-mix(in oklch, var(--card) 18%, transparent)",
-              borderColor: "color-mix(in oklch, var(--card) 45%, transparent)",
+              background: "color-mix(in oklch, var(--card) 12%, transparent)",
+              borderColor: "color-mix(in oklch, var(--card) 40%, transparent)",
+              bottom: "clamp(-170px, -18vw, -110px)",
             }}
           >
             <span
