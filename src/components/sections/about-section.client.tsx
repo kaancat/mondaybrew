@@ -172,8 +172,8 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             animate={overlayControls}
             className={cn(
               "relative z-10 mt-[calc(var(--flow-space)*0.4)] w-full",
-              "flex flex-col gap-[clamp(16px,2.4vw,26px)] rounded-[10px]",
-              "border border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)]",
+              "flex flex-col gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[10px]",
+              "border border-[color:var(--nav-shell-border)] bg-[color-mix(in_oklch,var(--nav-shell-bg)_85%,transparent)]",
               "shadow-[var(--nav-shell-shadow)] backdrop-blur-[18px]",
               "px-[clamp(24px,4vw,48px)] py-[clamp(28px,5vh,44px)]",
               "md:-translate-y-[22%] lg:-translate-y-[26%]",
@@ -181,11 +181,23 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
           >
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-[linear-gradient(to_right,rgba(255,255,255,0.35),rgba(255,255,255,0))] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.2),rgba(255,255,255,0))]"
+              className="pointer-events-none absolute inset-x-0 top-0 h-[1px]"
+              style={{
+                background:
+                  "linear-gradient(to right, color-mix(in oklch, var(--foreground) 35%, transparent) 0%, transparent 100%)",
+              }}
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-70"
+              style={{
+                background:
+                  "linear-gradient(135deg, color-mix(in oklch, var(--card) 18%, transparent) 0%, color-mix(in oklch, var(--nav-shell-bg) 55%, transparent) 40%, color-mix(in oklch, var(--surface-dark) 65%, transparent) 100%)",
+              }}
             />
             <dl
               className={cn(
-                "grid w-full gap-y-[clamp(18px,3.6vh,26px)] gap-x-[clamp(16px,3vw,36px)]",
+                "grid w-full gap-y-[clamp(18px,3.6vh,26px)] gap-x-[clamp(16px,3vw,36px)] relative z-10",
                 "place-items-center text-center",
                 gridCols,
                 "lg:[&>div]:px-[min(2vw,32px)]",
