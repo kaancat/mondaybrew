@@ -172,33 +172,32 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             animate={overlayControls}
             className={cn(
               "relative z-10 mt-[calc(var(--flow-space)*0.4)] w-full",
-              "flex flex-col gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[10px]",
-              "border border-[rgba(255,255,255,0.18)]",
-              "shadow-[0_30px_80px_rgba(8,6,20,0.28)] backdrop-blur-[32px]",
-              "bg-[rgba(18,16,35,0.35)]",
+              "flex flex-col gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[12px]",
+              "border",
+              "shadow-[0_30px_80px_rgba(8,6,20,0.26)] backdrop-blur-[34px]",
               "px-[clamp(24px,4vw,48px)] py-[clamp(28px,5vh,44px)]",
               "md:-translate-y-[22%] lg:-translate-y-[26%]",
             )}
+            style={{
+              background: "color-mix(in oklch, var(--card) 18%, transparent)",
+              borderColor: "color-mix(in oklch, var(--card) 45%, transparent)",
+            }}
           >
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-65"
+              className="pointer-events-none absolute inset-x-0 top-0 h-[1px] opacity-80"
               style={{
                 background:
-                  "linear-gradient(145deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 38%, rgba(0,0,0,0.22) 100%)",
+                  "linear-gradient(to right, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0) 60%)",
               }}
             />
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-[1px] opacity-90"
+              className="pointer-events-none absolute inset-0 opacity-45"
               style={{
                 background:
-                  "linear-gradient(to right, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 100%)",
+                  "radial-gradient(120% 100% at 0% 0%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 35%, rgba(0,0,0,0.15) 100%)",
               }}
-            />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -left-1/3 top-1/2 h-[160%] w-[60%] -translate-y-1/2 rotate-[18deg] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.35),rgba(255,255,255,0))]"
             />
             <dl
               className={cn(
