@@ -171,24 +171,25 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             initial="hidden"
             animate={overlayControls}
             className={cn(
-              "relative z-10 mt-[calc(var(--flow-space)*0.6)] flex flex-col gap-[clamp(16px,2.6vw,28px)]",
-              "rounded-[5px] border border-[color:var(--border)] backdrop-blur-[14px]",
-              "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05),rgba(255,255,255,0.6))]",
-              "dark:bg-[linear-gradient(to_bottom,rgba(0,0,0,0.3),rgba(0,0,0,0.7))]",
-              "shadow-[0_8px_24px_rgba(10,8,20,0.15)]",
-              "px-[clamp(24px,4vw,48px)] py-[clamp(28px,5vh,48px)]",
-              "max-w-[min(72rem,100%)] mx-auto",
+              "relative z-10 mt-[calc(var(--flow-space)*0.4)] w-full",
+              "flex flex-col gap-[clamp(16px,2.4vw,26px)] rounded-[10px]",
+              "border border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)]",
+              "shadow-[var(--nav-shell-shadow)] backdrop-blur-[18px]",
+              "px-[clamp(24px,4vw,48px)] py-[clamp(28px,5vh,44px)]",
+              "md:-translate-y-[22%] lg:-translate-y-[26%]",
             )}
           >
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(to_right,rgba(255,255,255,0.75),rgba(255,255,255,0))] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.35),rgba(255,255,255,0))]"
+              className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-[linear-gradient(to_right,rgba(255,255,255,0.35),rgba(255,255,255,0))] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.2),rgba(255,255,255,0))]"
             />
             <dl
               className={cn(
-                "grid w-full gap-y-[clamp(18px,4vh,28px)] gap-x-[clamp(12px,3vw,32px)] place-items-center text-center",
+                "grid w-full gap-y-[clamp(18px,3.6vh,26px)] gap-x-[clamp(16px,3vw,36px)]",
+                "place-items-center text-center",
                 gridCols,
-                "lg:divide-x lg:divide-[color:color-mix(in_oklch,var(--border)_60%,transparent)]",
+                "lg:[&>div]:px-[min(2vw,32px)]",
+                "lg:[&>div:not(:first-child)]:border-l lg:[&>div:not(:first-child)]:border-l-[color:color-mix(in_oklch,var(--border)_55%,transparent)]",
               )}
             >
               {stats.map((stat, index) => (
@@ -266,9 +267,9 @@ function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedS
       initial="hidden"
       animate={controls}
       custom={index}
-      className="flex w-full flex-col items-center justify-center gap-3 px-4 py-2 text-center"
+      className="flex w-full flex-col items-center justify-center gap-[10px] px-2 py-1 text-center"
     >
-      <dd className="text-balance text-[clamp(3rem,6vw,5.5rem)] font-semibold leading-[1.05] text-[color:var(--foreground)]">
+      <dd className="text-balance text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[1.02] text-[color:var(--foreground)]">
         {displayValue || "—"}
       </dd>
       <dt className="mt-2 flex items-center justify-center gap-2 text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.05em] text-muted-foreground">
