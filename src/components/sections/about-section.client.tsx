@@ -173,28 +173,32 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             className={cn(
               "relative z-10 mt-[calc(var(--flow-space)*0.4)] w-full",
               "flex flex-col gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[10px]",
-              "border border-[color:var(--nav-shell-border)]",
-              "shadow-[var(--nav-shell-shadow)] backdrop-blur-[20px]",
-              "bg-[color-mix(in_oklch,var(--nav-shell-bg)_60%,transparent)]",
+              "border border-[rgba(255,255,255,0.18)]",
+              "shadow-[0_30px_80px_rgba(8,6,20,0.28)] backdrop-blur-[32px]",
+              "bg-[rgba(18,16,35,0.35)]",
               "px-[clamp(24px,4vw,48px)] py-[clamp(28px,5vh,44px)]",
               "md:-translate-y-[22%] lg:-translate-y-[26%]",
             )}
           >
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-60"
+              className="pointer-events-none absolute inset-0 opacity-65"
               style={{
                 background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.08) 26%, rgba(0,0,0,0.18) 100%)",
+                  "linear-gradient(145deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 38%, rgba(0,0,0,0.22) 100%)",
               }}
             />
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-[1px] opacity-70"
+              className="pointer-events-none absolute inset-x-0 top-0 h-[1px] opacity-90"
               style={{
                 background:
-                  "linear-gradient(to right, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 100%)",
+                  "linear-gradient(to right, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 100%)",
               }}
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -left-1/3 top-1/2 h-[160%] w-[60%] -translate-y-1/2 rotate-[18deg] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.35),rgba(255,255,255,0))]"
             />
             <dl
               className={cn(
