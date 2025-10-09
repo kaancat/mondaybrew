@@ -170,12 +170,12 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
               initial="hidden"
               animate={overlayControls}
               className={cn(
-                "absolute left-1/2 bottom-[clamp(24px,6vw,44px)] z-10 flex w-[min(92%,72rem)] -translate-x-1/2",
-                "flex-col gap-[clamp(16px,2.4vw,26px)] overflow-hidden rounded-[16px]",
-                "border border-white/20 bg-white/10 shadow-[0_28px_90px_rgba(8,6,20,0.32)]",
-                "px-[clamp(28px,5vw,60px)] py-[clamp(32px,5.5vh,56px)] backdrop-blur-[40px]",
+                "absolute inset-x-0 bottom-0 z-10 flex flex-col",
+                "overflow-hidden border-t border-white/20 bg-white/10 shadow-[0_-12px_60px_rgba(8,6,20,0.24)]",
+                "backdrop-blur-[36px] rounded-b-[5px]",
               )}
             >
+              <div className="px-[clamp(28px,5vw,60px)] py-[clamp(32px,5.5vh,52px)]">
               <dl
                 className={cn(
                   "grid w-full gap-y-[clamp(18px,3.2vh,26px)] gap-x-[clamp(16px,3vw,36px)]",
@@ -195,6 +195,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
                   />
                 ))}
               </dl>
+              </div>
             </motion.div>
           ) : null}
         </motion.div>
