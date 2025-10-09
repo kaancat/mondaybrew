@@ -169,6 +169,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           aria-label="Scroll left"
           className={cn(
             "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+            "dark:text-[color:var(--brand-ink-strong)]",
             "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
             "disabled:opacity-50 disabled:cursor-not-allowed",
           )}
@@ -182,6 +183,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           aria-label="Scroll right"
           className={cn(
             "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+            "dark:text-[color:var(--brand-ink-strong)]",
             "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
             "disabled:opacity-50 disabled:cursor-not-allowed",
           )}
