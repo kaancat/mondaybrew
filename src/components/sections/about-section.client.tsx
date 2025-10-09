@@ -170,32 +170,18 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             initial="hidden"
             animate={overlayControls}
             className={cn(
-              "relative z-10 mt-[var(--flow-space)] flex flex-col gap-[clamp(20px,3vw,36px)] md:mt-[calc(var(--flow-space)*-0.4)]",
+              "relative z-10 mt-[calc(var(--flow-space)*0.6)] flex flex-col gap-[clamp(16px,3vw,28px)]",
               "rounded-[5px] border border-[color:var(--border)] backdrop-blur-[14px]",
               "bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05),rgba(255,255,255,0.6))]",
               "dark:bg-[linear-gradient(to_bottom,rgba(0,0,0,0.3),rgba(0,0,0,0.7))]",
               "shadow-[0_8px_24px_rgba(10,8,20,0.15)]",
-              "px-[clamp(24px,5vw,64px)] py-[clamp(32px,6vh,64px)]",
-              "md:-translate-y-[38%] xl:-translate-y-[35%]",
+              "px-[clamp(24px,4vw,56px)] py-[clamp(28px,5vh,52px)]",
             )}
           >
             <span
               aria-hidden
               className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(to_right,rgba(255,255,255,0.75),rgba(255,255,255,0))] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.35),rgba(255,255,255,0))]"
             />
-            {!prefersReducedMotion ? (
-              <motion.span
-                aria-hidden
-                className="pointer-events-none absolute inset-0 rounded-[5px] opacity-0 md:opacity-100"
-                style={{
-                  background:
-                    "linear-gradient(120deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.12) 100%)",
-                  backgroundSize: "200% 200%",
-                }}
-                animate={{ backgroundPosition: ["-200% 0%", "200% 0%", "-200% 0%"] }}
-                transition={{ duration: 6, ease: EASE_OUT, repeat: Infinity }}
-              />
-            ) : null}
             <dl
               className={cn(
                 "grid w-full gap-y-[clamp(18px,4vh,32px)] gap-x-[clamp(20px,4vw,40px)]",
