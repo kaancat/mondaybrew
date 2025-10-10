@@ -51,17 +51,17 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
   return (
     <Section padding="none" innerClassName="layout-container-full">
       <div className="min-h-[100vh] flex flex-col">
-      <div className="layout-container pt-10 pb-2">
+      <div className="layout-container pt-8 pb-1">
         {eyebrow ? (
           <div className="eyebrow text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">{eyebrow}</div>
         ) : null}
         {headline ? (
-          <h2 className="mt-2 text-balance text-[clamp(32px,6vw,56px)] font-semibold leading-[1.05] tracking-tight">
+          <h2 className="mt-2 text-balance text-[clamp(32px,6vw,56px)] font-semibold leading-[1.05] tracking-tight w-full lg:max-w-[78ch] xl:max-w-[82ch]">
             {headline}
           </h2>
         ) : null}
         {subheading ? (
-          <p className="mt-2 max-w-[70ch] text-[length:var(--font-body)] text-muted-foreground">{subheading}</p>
+          <p className="mt-1 max-w-[70ch] text-[length:var(--font-body)] text-muted-foreground">{subheading}</p>
         ) : null}
       </div>
       <TestimonialsMarqueeClient

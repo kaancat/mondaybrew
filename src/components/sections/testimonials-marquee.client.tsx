@@ -61,19 +61,20 @@ function Card({ card }: { card: TCard }) {
   const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
   return (
-    <div
-      className={cn(
-        "group/card relative flex min-w-[320px] max-w-[520px] shrink-0 flex-col rounded-[10px] p-6",
-        "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
-        "transition-all duration-200 ease-out will-change-transform hover:scale-[1.03] hover:shadow-[var(--shadow-elevated-lg)]",
-      )}
-      style={{ background: bg ?? "var(--card)", color: ink }}
-    >
-      {card.logo?.url ? (
-        <div className="absolute right-4 top-4 h-6 w-24 opacity-90">
-          <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain" />
-        </div>
-      ) : null}
+    <div className="group/card relative min-w-[340px] max-w-[520px] shrink-0">
+      <div
+        className={cn(
+          "card-inner relative flex h-full flex-col rounded-[10px] p-6",
+          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
+        )}
+        style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
+      >
+        {card.logo?.url ? (
+          <div className="absolute right-4 top-4 h-6 w-24 opacity-90">
+            <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain" />
+          </div>
+        ) : null}
 
       {card.variant !== "quote" && card.image?.url ? (
         <div className="mb-4 overflow-hidden rounded-[6px]">
@@ -110,6 +111,7 @@ function Card({ card }: { card: TCard }) {
           <span aria-hidden>→</span>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }
@@ -120,17 +122,23 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   const x = useMotionValue(0);
   const doubled = useMemo(() => [...items, ...items], [items]);
 
+  const wrap = (value: number, width: number) => {
+    if (!width) return value;
+    let v = value;
+    while (v <= -width) v += width;
+    while (v > 0) v -= width;
+    return v;
+  };
+
   // Measure width of one full set and wrap seamlessly
   useAnimationFrame((_, delta) => {
     const el = setRef.current;
     if (!el) return;
     const width = el.offsetWidth;
     if (!width) return;
-    const step = (speed * direction * delta) / 1000;
-    let next = x.get() - step;
-    // wrap without visual jump
-    if (direction === 1 && next <= -width) next += width;
-    if (direction === -1 && next >= 0) next -= width;
+    const step = (speed * delta) / 1000;
+    let next = x.get() + (direction === 1 ? -step : step);
+    next = wrap(next, width);
     x.set(next);
   });
 
@@ -140,7 +148,9 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (!vp) return;
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        x.set(x.get() - e.deltaX);
+        const el = setRef.current;
+        const width = el?.offsetWidth || 0;
+        x.set(wrap(x.get() - e.deltaX, width));
       }
     };
     vp.addEventListener("wheel", onWheel, { passive: true });
@@ -149,15 +159,25 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
 
   return (
     <div ref={viewportRef} className="no-scrollbar relative overflow-hidden">
-      <motion.div style={{ x }} drag="x" dragMomentum onDrag={(e, info) => x.set(x.get() + info.delta.x)} className="flex gap-4 py-2">
+      <motion.div
+        style={{ x }}
+        drag="x"
+        dragMomentum
+        onDrag={(e, info) => {
+          const el = setRef.current;
+          const width = el?.offsetWidth || 0;
+          x.set(wrap(x.get() + info.delta.x, width));
+        }}
+        className="flex gap-6 py-2"
+      >
         {/* one set */}
-        <div ref={setRef} className="flex gap-4">
+        <div ref={setRef} className="flex gap-6">
           {items.map((card, i) => (
             <Card key={`a-${i}`} card={card} />
           ))}
         </div>
         {/* clone */}
-        <div className="flex gap-4" aria-hidden>
+        <div className="flex gap-6" aria-hidden>
           {items.map((card, i) => (
             <Card key={`b-${i}`} card={card} />
           ))}
