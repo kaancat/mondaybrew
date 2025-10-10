@@ -297,6 +297,10 @@ html.dark {
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
 
+  /* Services section card tokens (for consistent light cards on dark canvas) */
+  --services-card-bg: var(--brand-light);
+  --services-ink-strong: var(--brand-ink-strong);
+
   --sidebar: color-mix(in oklch, var(--mb-bg) 88%, black 12%);
   --sidebar-foreground: var(--brand-light);
   --sidebar-primary: color-mix(in oklch, var(--mb-accent) 60%, var(--mb-bg) 40%);
