@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
+import { motion, useAnimationFrame, useMotionValue, useTransform, wrap } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export type TImage = {
@@ -119,43 +119,55 @@ function Card({ card }: { card: TCard }) {
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const setRef = useRef<HTMLDivElement | null>(null);
-  const x = useMotionValue(0);
-  const doubled = useMemo(() => [...items, ...items], [items]);
+  const baseX = useMotionValue(0);
+  const widthRef = useRef(1);
+  const x = useTransform(baseX, (value) => wrap(-widthRef.current, 0, value));
+  const [repeatCount, setRepeatCount] = useState(3);
 
-  const wrap = (value: number, width: number) => {
-    if (!width) return value;
-    let v = value;
-    while (v <= -width) v += width;
-    while (v > 0) v -= width;
-    return v;
-  };
-
-  // Measure width of one full set and wrap seamlessly
   useAnimationFrame((_, delta) => {
     const el = setRef.current;
     if (!el) return;
     const width = el.offsetWidth;
     if (!width) return;
+    widthRef.current = width;
     const step = (speed * delta) / 1000;
-    let next = x.get() + (direction === 1 ? -step : step);
-    next = wrap(next, width);
-    x.set(next);
+    baseX.set(baseX.get() + (direction === 1 ? -step : step));
   });
 
-  // Wheel horizontal scroll to scrub
   useEffect(() => {
     const vp = viewportRef.current;
     if (!vp) return;
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        const el = setRef.current;
-        const width = el?.offsetWidth || 0;
-        x.set(wrap(x.get() - e.deltaX, width));
+        baseX.set(baseX.get() - e.deltaX);
       }
     };
     vp.addEventListener("wheel", onWheel, { passive: true });
     return () => vp.removeEventListener("wheel", onWheel);
-  }, [x]);
+  }, [baseX]);
+
+  useLayoutEffect(() => {
+    const setEl = setRef.current;
+    const vpEl = viewportRef.current;
+    if (!setEl || !vpEl) return;
+
+    const update = () => {
+      const width = setEl.offsetWidth;
+      const viewportWidth = vpEl.offsetWidth;
+      widthRef.current = width || 1;
+      if (!width) return;
+      const needed = Math.max(2, Math.ceil(viewportWidth / width) + 1);
+      setRepeatCount(needed);
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(setEl);
+    observer.observe(vpEl);
+    return () => observer.disconnect();
+  }, [items]);
+
+  const repeats = useMemo(() => Array.from({ length: repeatCount }), [repeatCount]);
 
   return (
     <div ref={viewportRef} className="no-scrollbar relative overflow-hidden">
@@ -163,25 +175,16 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
         style={{ x }}
         drag="x"
         dragMomentum
-        onDrag={(e, info) => {
-          const el = setRef.current;
-          const width = el?.offsetWidth || 0;
-          x.set(wrap(x.get() + info.delta.x, width));
-        }}
-        className="flex gap-6 py-2"
+        onDrag={(e, info) => baseX.set(baseX.get() + info.delta.x)}
+        className="flex py-2"
       >
-        {/* one set */}
-        <div ref={setRef} className="flex gap-6">
-          {items.map((card, i) => (
-            <Card key={`a-${i}`} card={card} />
-          ))}
-        </div>
-        {/* clone */}
-        <div className="flex gap-6" aria-hidden>
-          {items.map((card, i) => (
-            <Card key={`b-${i}`} card={card} />
-          ))}
-        </div>
+        {repeats.map((_, idx) => (
+          <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex gap-6 pr-6">
+            {items.map((card, i) => (
+              <Card key={`${idx}-${i}`} card={card} />
+            ))}
+          </div>
+        ))}
       </motion.div>
     </div>
   );

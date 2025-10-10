@@ -49,12 +49,17 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
     }));
 
   return (
-    <Section padding="none" innerClassName="layout-container-full">
-      <div className="min-h-[100vh] flex flex-col">
-      <div className="layout-container pt-8 pb-0">
+    <Section
+      padding="none"
+      width="full"
+      innerClassName="flex min-h-[100vh] flex-col gap-[calc(var(--flow-space)/1.6)]"
+    >
+      <div className="layout-container">
         <div className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]">
           {eyebrow ? (
-            <div className="eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">{eyebrow}</div>
+            <p className="eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">
+              {eyebrow}
+            </p>
           ) : null}
           {headline ? (
             <h2 className="text-balance text-[clamp(32px,6vw,58px)] font-semibold leading-[1.03] tracking-tight text-[color:var(--foreground)]">
@@ -66,12 +71,13 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
           ) : null}
         </div>
       </div>
-      <TestimonialsMarqueeClient
-        top={mapCards(top)}
-        bottom={mapCards(bottom)}
-        speedTop={speedTop ?? undefined}
-        speedBottom={speedBottom ?? undefined}
-      />
+      <div className="layout-container-full flex flex-1">
+        <TestimonialsMarqueeClient
+          top={mapCards(top)}
+          bottom={mapCards(bottom)}
+          speedTop={speedTop ?? undefined}
+          speedBottom={speedBottom ?? undefined}
+        />
       </div>
     </Section>
   );
