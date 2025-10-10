@@ -110,7 +110,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
         className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]"
       >
         {eyebrow ? (
-          <p className="about-eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.3em] text-[color:var(--about-eyebrow-color,var(--accent))]">
+          <p className="eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.3em] text-[color:var(--eyebrow-color,var(--accent))]">
             {eyebrow}
           </p>
         ) : null}

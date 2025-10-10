@@ -242,6 +242,9 @@ html.light-alt {
   --nav-locale-border: transparent;
   --nav-locale-ring: color-mix(in oklch, var(--mb-accent) 65%, transparent);
 
+  /* Global eyebrow color on Light-Alt (brand orange) */
+  --eyebrow-color: var(--mb-accent);
+
   /* Header CTA (Light Alt): text-only, no orange */
   --nav-cta-bg: transparent;
   --nav-cta-border: transparent;
@@ -449,10 +452,7 @@ html.dark {
     /* Labels should be strict black in Light-Alt */
     color: var(--brand-ink-strong) !important;
   }
-  /* About section eyebrow: force strong ink in Light-Alt */
-  html.light-alt .about-eyebrow {
-    --about-eyebrow-color: var(--brand-ink-strong);
-  }
+  /* About eyebrow override removed: now uses global --eyebrow-color */
 
   /* Clients/Partners: override hero strip in Light-Alt to be pure white card with strong ink */
   html.light-alt .clients-hero-strip {
@@ -462,6 +462,8 @@ html.dark {
     /* Avoid double rule with grid's top hairline */
     border-bottom: 0 !important;
     margin-bottom: -1px; /* visually fuse with grid top line */
+    /* Eyebrow uses brand orange for consistency */
+    --clients-hero-eyebrow: var(--mb-accent);
   }
   /* Clients grid hairlines should match the hero border in Light-Alt */
   html.light-alt .clients-grid {

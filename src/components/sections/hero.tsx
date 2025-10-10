@@ -283,7 +283,11 @@ export function HeroSection({
           style={{ justifyContent: contentJustify }}
         >
           <div className="max-w-2xl text-white">
-            {eyebrow ? <span className="mb-4 block text-sm font-medium text-white/80">{eyebrow}</span> : null}
+            {eyebrow ? (
+              <span className="eyebrow mb-4 block text-sm font-medium text-[color:var(--eyebrow-color,currentColor)]">
+                {eyebrow}
+              </span>
+            ) : null}
             {Array.isArray(headline) ? (
               <PortableText value={headline as PortableTextBlock[]} components={portableComponents} />
             ) : typeof headline === "string" && headline ? (
