@@ -40,7 +40,10 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
               <p className="mb-3 text-[12px] font-medium tracking-[0.25em] opacity-90">{eyebrow.toUpperCase()}</p>
             ) : null}
             {headline ? (
-              <h2 id="clients-heading" className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold">
+              <h2
+                id="clients-heading"
+                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-[color:var(--clients-hero-title,inherit)]"
+              >
                 {headline}
               </h2>
             ) : null}

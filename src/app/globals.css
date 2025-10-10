@@ -419,6 +419,8 @@ html.dark {
 }
 
 @layer utilities {
+  /* Clients/Partners: dark mode title should use house grey, not pure black */
+  html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--services-ink-strong) 72%, white 28%); }
   /* About section: improve readability in Light-Alt theme */
   html.light-alt .about-stats {
     /* Slightly more transparent for a glassier feel */
