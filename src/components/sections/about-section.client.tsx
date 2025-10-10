@@ -80,13 +80,11 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
   const isInView = useInView(sectionRef, { once: true, amount: 0.55 });
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
-  const imageMotionStyle = prefersReducedMotion
+  // Parallax should affect the image only – not the overlay/content.
+  // We therefore apply the mask + transform to an inner image layer instead of the container.
+  const imageLayerMotionStyle = prefersReducedMotion
     ? undefined
-    : {
-        y: parallaxY,
-        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
-        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
-      } as const;
+    : ({ y: parallaxY } as const);
 
   useEffect(() => {
     if (isInView) {
@@ -130,25 +128,32 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
 
       <div className="relative isolate">
         <motion.div
-          style={imageMotionStyle}
           className={cn(
             "relative overflow-hidden rounded-[5px] shadow-[var(--shadow-hero)]",
             "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,color-mix(in_oklch,var(--accent)_15%,transparent)_0%,transparent_60%)]",
           )}
         >
           <div className="aspect-[16/6]" />
+
+          {/* Image layer with its own mask and parallax (prevents the bottom fade from affecting overlay text) */}
           {image?.url ? (
-            <Image
-              src={image.url}
-              alt={image.alt || "About us hero"}
-              fill
-              loading="lazy"
-              placeholder={image.lqip ? "blur" : undefined}
-              blurDataURL={image.lqip || undefined}
-              sizes="(min-width: 1280px) 1100px, (min-width: 1024px) 960px, (min-width: 768px) 720px, 92vw"
-              className="object-cover"
-              priority={false}
-            />
+            <motion.div
+              aria-hidden
+              style={imageLayerMotionStyle}
+              className="absolute inset-0 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)] [-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)]"
+            >
+              <Image
+                src={image.url}
+                alt={image.alt || "About us hero"}
+                fill
+                loading="lazy"
+                placeholder={image.lqip ? "blur" : undefined}
+                blurDataURL={image.lqip || undefined}
+                sizes="(min-width: 1280px) 1100px, (min-width: 1024px) 960px, (min-width: 768px) 720px, 92vw"
+                className="object-cover"
+                priority={false}
+              />
+            </motion.div>
           ) : null}
           {!prefersReducedMotion ? (
             <motion.span
@@ -170,9 +175,10 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
               initial="hidden"
               animate={overlayControls}
               className={cn(
-                "absolute inset-x-0 bottom-0 z-10 flex flex-col",
-                "overflow-hidden border-t border-white/20 bg-white/10 shadow-[0_-12px_60px_rgba(8,6,20,0.24)]",
-                "backdrop-blur-[36px] rounded-b-[5px]",
+                "about-stats absolute inset-x-0 bottom-0 z-10 flex flex-col",
+                "overflow-hidden shadow-[0_-12px_60px_rgba(8,6,20,0.24)] backdrop-blur-[30px] rounded-b-[5px]",
+                // Use CSS variables for theme-appropriate background/border that we can override in globals
+                "border-t border-[color:var(--about-overlay-border,rgba(255,255,255,0.18))] bg-[color:var(--about-overlay-bg,rgba(255,255,255,0.14))]",
               )}
             >
               <div className="px-[clamp(28px,5vw,60px)] py-[clamp(32px,5.5vh,52px)]">
@@ -267,7 +273,7 @@ function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedS
       <dd className="text-balance text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[1.02] text-[color:var(--foreground)] dark:text-white">
         {displayValue || "—"}
       </dd>
-      <dt className="mt-2 flex items-center justify-center gap-2 text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.05em] text-muted-foreground dark:text-white/80">
+      <dt className="about-stats-label mt-2 flex items-center justify-center gap-2 text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.05em] text-muted-foreground dark:text-white/80">
         {icon?.url ? (
           <Image
             src={icon.url}

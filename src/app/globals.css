@@ -415,6 +415,17 @@ html.dark {
 }
 
 @layer utilities {
+  /* About section: improve readability in Light-Alt theme */
+  html.light-alt .about-stats {
+    /* Stronger white card + clearer divider on bright images */
+    --about-overlay-bg: color-mix(in oklch, white 65%, transparent);
+    --about-overlay-border: color-mix(in oklch, var(--foreground) 14%, transparent);
+  }
+  html.light-alt .about-stats-label {
+    /* Labels should be strict black in Light-Alt */
+    color: var(--brand-ink-strong) !important;
+  }
+
   /* Clients/Partners: override hero strip in Light-Alt to be pure white card with strong ink */
   html.light-alt .clients-hero-strip {
     background: var(--services-card-bg) !important;
