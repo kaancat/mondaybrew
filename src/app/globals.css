@@ -417,9 +417,9 @@ html.dark {
 @layer utilities {
   /* About section: improve readability in Light-Alt theme */
   html.light-alt .about-stats {
-    /* Stronger white card + clearer divider on bright images */
-    --about-overlay-bg: color-mix(in oklch, white 65%, transparent);
-    --about-overlay-border: color-mix(in oklch, var(--foreground) 14%, transparent);
+    /* Slightly more transparent for a glassier feel */
+    --about-overlay-bg: color-mix(in oklch, white 50%, transparent);
+    --about-overlay-border: color-mix(in oklch, var(--foreground) 10%, transparent);
   }
   html.light-alt .about-stats-label {
     /* Labels should be strict black in Light-Alt */
