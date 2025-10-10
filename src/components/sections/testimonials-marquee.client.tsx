@@ -63,7 +63,9 @@ function Card({ card }: { card: TCard }) {
   return (
     <div
       className={cn(
-        "group/card relative flex min-w-[320px] max-w-[520px] shrink-0 flex-col rounded-[10px] p-6 shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+        "group/card relative flex min-w-[320px] max-w-[520px] shrink-0 flex-col rounded-[10px] p-6",
+        "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+        "transition-all duration-200 ease-out will-change-transform hover:scale-[1.03] hover:shadow-[var(--shadow-elevated-lg)]",
       )}
       style={{ background: bg ?? "var(--card)", color: ink }}
     >
@@ -113,61 +115,67 @@ function Card({ card }: { card: TCard }) {
 }
 
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const baseX = useMotionValue(0);
-  const content = useMemo(() => [...items, ...items, ...items], [items]);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const setRef = useRef<HTMLDivElement | null>(null);
+  const x = useMotionValue(0);
+  const doubled = useMemo(() => [...items, ...items], [items]);
 
+  // Measure width of one full set and wrap seamlessly
   useAnimationFrame((_, delta) => {
-    const px = (speed * direction * delta) / 1000; // px per ms
-    baseX.set(baseX.get() - px);
-    const el = ref.current;
+    const el = setRef.current;
     if (!el) return;
-    const width = el.scrollWidth / 3; // width of a single set
-    if (Math.abs(baseX.get()) >= width) {
-      baseX.set(baseX.get() % width);
-    }
+    const width = el.offsetWidth;
+    if (!width) return;
+    const step = (speed * direction * delta) / 1000;
+    let next = x.get() - step;
+    // wrap without visual jump
+    if (direction === 1 && next <= -width) next += width;
+    if (direction === -1 && next >= 0) next -= width;
+    x.set(next);
   });
 
-  // Drag to offset
+  // Wheel horizontal scroll to scrub
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const vp = viewportRef.current;
+    if (!vp) return;
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        baseX.set(baseX.get() - e.deltaX);
+        x.set(x.get() - e.deltaX);
       }
     };
-    el.addEventListener("wheel", onWheel, { passive: true });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, [baseX]);
+    vp.addEventListener("wheel", onWheel, { passive: true });
+    return () => vp.removeEventListener("wheel", onWheel);
+  }, [x]);
 
   return (
-    <motion.div ref={ref} className="no-scrollbar relative overflow-hidden" initial={false}>
-      <motion.div
-        style={{ x: baseX }}
-        drag="x"
-        dragMomentum
-        onDrag={(e, info) => baseX.set(baseX.get() + info.delta.x)}
-        className="flex gap-4 py-2"
-      >
-        {content.map((card, i) => (
-          <Card key={i} card={card} />
-        ))}
+    <div ref={viewportRef} className="no-scrollbar relative overflow-hidden">
+      <motion.div style={{ x }} drag="x" dragMomentum onDrag={(e, info) => x.set(x.get() + info.delta.x)} className="flex gap-4 py-2">
+        {/* one set */}
+        <div ref={setRef} className="flex gap-4">
+          {items.map((card, i) => (
+            <Card key={`a-${i}`} card={card} />
+          ))}
+        </div>
+        {/* clone */}
+        <div className="flex gap-4" aria-hidden>
+          {items.map((card, i) => (
+            <Card key={`b-${i}`} card={card} />
+          ))}
+        </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
   return (
-    <div className="relative flex h-[100vh] flex-col justify-between">
-      {/* peek of bottom row when landing */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[15vh] bg-gradient-to-t from-background to-transparent" />
-      <div className="mt-auto flex flex-col gap-6 pb-6">
+    <div className="relative flex flex-1 flex-col justify-end">
+      {/* subtle peek of bottom row */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[12vh] bg-gradient-to-t from-background to-transparent" />
+      <div className="flex flex-col gap-4 pb-4">
         <Row items={top} speed={speedTop} direction={1} />
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
     </div>
   );
 }
-

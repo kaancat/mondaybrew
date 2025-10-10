@@ -50,7 +50,8 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
 
   return (
     <Section padding="none" innerClassName="layout-container-full">
-      <div className="layout-container pt-14 pb-6">
+      <div className="min-h-[100vh] flex flex-col">
+      <div className="layout-container pt-10 pb-2">
         {eyebrow ? (
           <div className="eyebrow text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">{eyebrow}</div>
         ) : null}
@@ -60,7 +61,7 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
           </h2>
         ) : null}
         {subheading ? (
-          <p className="mt-3 max-w-[70ch] text-[length:var(--font-body)] text-muted-foreground">{subheading}</p>
+          <p className="mt-2 max-w-[70ch] text-[length:var(--font-body)] text-muted-foreground">{subheading}</p>
         ) : null}
       </div>
       <TestimonialsMarqueeClient
@@ -69,7 +70,7 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
         speedTop={speedTop ?? undefined}
         speedBottom={speedBottom ?? undefined}
       />
+      </div>
     </Section>
   );
 }
-
