@@ -10,6 +10,7 @@ import aboutSection from "./types/sections/aboutSection";
 import servicesSplit from "./types/sections/servicesSplit";
 import caseStudyCarousel from "./types/sections/caseStudyCarousel";
 import clientsSection from "./types/sections/clientsSection";
+import testimonialsMarquee from "./types/sections/testimonialsMarquee";
 
 import seo from "./types/objects/seo";
 import cta from "./types/objects/cta";
@@ -26,6 +27,7 @@ import servicesSplitPillar from "./types/objects/servicesSplitPillar";
 import servicesSplitService from "./types/objects/servicesSplitService";
 import servicesSplitMedia from "./types/objects/servicesSplitMedia";
 import clientLogo from "./types/objects/clientLogo";
+import testimonialCard from "./types/objects/testimonialCard";
 
 const schemas = [
   // documents
@@ -41,6 +43,7 @@ const schemas = [
   servicesSplit,
   caseStudyCarousel,
   clientsSection,
+  testimonialsMarquee,
   // objects
   seo,
   cta,
@@ -57,6 +60,7 @@ const schemas = [
   servicesSplitService,
   servicesSplitMedia,
   clientLogo,
+  testimonialCard,
 ];
 
 export default schemas;

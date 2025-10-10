@@ -25,6 +25,7 @@ export default defineType({
         { type: "servicesSplit" },
         { type: "caseStudyCarousel" },
         { type: "clientsSection" },
+        { type: "testimonialsMarquee" },
         { type: "aboutSection" },
       ],
     }),

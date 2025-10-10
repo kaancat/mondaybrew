@@ -11,6 +11,7 @@ import {
 import CaseStudyCarouselSection from "@/components/sections/case-study-carousel";
 import ClientsSection from "@/components/sections/clients-section";
 import { AboutSection, type AboutSectionData } from "@/components/sections/about-section";
+import TestimonialsMarquee, { type TestimonialsMarqueeData } from "@/components/sections/testimonials-marquee";
 import { Section } from "@/components/layout/section";
 
 type SiteSettings = { seo?: Seo };
@@ -60,12 +61,14 @@ type ClientsSectionWithType = {
   }>;
 };
 type AboutSectionWithType = AboutSectionData & { _type: "aboutSection"; _key?: string };
+type TestimonialsWithType = TestimonialsMarqueeData & { _type: "testimonialsMarquee"; _key?: string };
 type HomePageSection =
   | HeroSectionWithType
   | ServicesSplitSectionWithType
   | CaseStudyCarouselSectionWithType
   | ClientsSectionWithType
   | AboutSectionWithType
+  | TestimonialsWithType
   | { _type?: string; _key?: string };
 
 type HomePagePayload = {
@@ -88,6 +91,9 @@ function isClientsSection(section: HomePageSection | undefined): section is Clie
 
 function isAboutSection(section: HomePageSection | undefined): section is AboutSectionWithType {
   return !!section && section._type === "aboutSection";
+}
+function isTestimonials(section: HomePageSection | undefined): section is TestimonialsWithType {
+  return !!section && section._type === "testimonialsMarquee";
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -186,6 +192,21 @@ export default async function Home() {
                 mainImage={section.mainImage}
                 stats={section.stats}
                 cta={section.cta}
+              />
+            </div>
+          );
+        }
+        if (isTestimonials(section)) {
+          return (
+            <div className="vr-section" key={key}>
+              <TestimonialsMarquee
+                eyebrow={section.eyebrow}
+                headline={section.headline}
+                subheading={section.subheading}
+                speedTop={section.speedTop}
+                speedBottom={section.speedBottom}
+                top={section.top}
+                bottom={section.bottom}
               />
             </div>
           );

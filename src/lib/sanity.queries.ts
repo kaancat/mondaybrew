@@ -454,6 +454,61 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
           reference->{"slug": slug.current, locale}
         }
       },
+      _type == "testimonialsMarquee" => {
+        eyebrow,
+        headline,
+        subheading,
+        speedTop,
+        speedBottom,
+        top[]{
+          variant,
+          background,
+          logo{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          quote,
+          author,
+          role,
+          cta{ label, href }
+        },
+        bottom[]{
+          variant,
+          background,
+          logo{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          quote,
+          author,
+          role,
+          cta{ label, href }
+        }
+      },
+      _type == "testimonialsMarquee" => {
+        _type,
+        eyebrow,
+        headline,
+        subheading,
+        speedTop,
+        speedBottom,
+        top[]{
+          variant,
+          background,
+          logo{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          quote,
+          author,
+          role,
+          cta{ label, href }
+        },
+        bottom[]{
+          variant,
+          background,
+          logo{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          quote,
+          author,
+          role,
+          cta{ label, href }
+        }
+      },
       true => {}
     )
   }
