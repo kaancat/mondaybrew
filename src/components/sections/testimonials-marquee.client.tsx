@@ -3,8 +3,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useReducedMotion } from "framer-motion";
 
 export type TImage = {
   url?: string | null;
@@ -119,41 +119,50 @@ function Card({ card }: { card: TCard }) {
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const setRef = useRef<HTMLDivElement | null>(null);
-  const baseX = useMotionValue(0);
   const setWidthRef = useRef(0);
+  const draggingRef = useRef(false);
+  const pointerIdRef = useRef<number | null>(null);
+  const startXRef = useRef(0);
+  const startScrollRef = useRef(0);
+  const lastTimeRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
   const [setWidth, setSetWidth] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
-  const wrapPosition = (value: number) => {
-    const width = setWidthRef.current;
-    if (!width) return value;
-    let v = value;
-    while (v <= -width) v += width;
-    while (v > 0) v -= width;
-    return v;
-  };
+  const repeatCount = useMemo(() => {
+    if (!setWidth || !viewportWidth) return 3;
+    return Math.max(2, Math.ceil(viewportWidth / setWidth) + 2);
+  }, [setWidth, viewportWidth]);
 
-  useAnimationFrame((_, delta) => {
-    const width = setWidthRef.current;
-    if (!width) return;
-    const step = (speed * delta) / 1000;
-    let next = baseX.get() + (direction === 1 ? -step : step);
-    if (next <= -width) next += width;
-    if (next > 0) next -= width;
-    baseX.set(next);
-  });
+  const clones = useMemo(() => Array.from({ length: repeatCount }), [repeatCount]);
 
   useEffect(() => {
-    const vp = viewportRef.current;
-    if (!vp) return;
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        baseX.set(wrapPosition(baseX.get() - e.deltaX));
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const animate = (time: number) => {
+      if (lastTimeRef.current == null) lastTimeRef.current = time;
+      const delta = time - lastTimeRef.current;
+      lastTimeRef.current = time;
+
+      const width = setWidthRef.current;
+      if (!draggingRef.current && !prefersReducedMotion && width > 0) {
+        let next = viewport.scrollLeft + (direction === 1 ? 1 : -1) * speed * (delta / 1000);
+        while (next >= width) next -= width;
+        while (next < 0) next += width;
+        viewport.scrollLeft = next;
       }
+
+      rafRef.current = requestAnimationFrame(animate);
     };
-    vp.addEventListener("wheel", onWheel, { passive: true });
-    return () => vp.removeEventListener("wheel", onWheel);
-  }, [baseX]);
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      lastTimeRef.current = null;
+    };
+  }, [speed, direction, prefersReducedMotion]);
 
   useLayoutEffect(() => {
     const setEl = setRef.current;
@@ -166,7 +175,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       setSetWidth(width);
       setViewportWidth(vw);
       setWidthRef.current = width;
-      baseX.set(wrapPosition(baseX.get()));
+      lastTimeRef.current = null;
     };
 
     measure();
@@ -174,32 +183,84 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     observer.observe(setEl);
     observer.observe(vpEl);
     return () => observer.disconnect();
-  }, [items, baseX]);
+  }, [items]);
 
-  const repeatCount = useMemo(() => {
-    if (!setWidth || !viewportWidth) return 3;
-    return Math.max(2, Math.ceil(viewportWidth / setWidth) + 2);
-  }, [setWidth, viewportWidth]);
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
 
-  const repeats = useMemo(() => Array.from({ length: repeatCount }), [repeatCount]);
+    const normalize = (value: number) => {
+      const width = setWidthRef.current;
+      if (!width) return value;
+      while (value >= width) value -= width;
+      while (value < 0) value += width;
+      return value;
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        event.preventDefault();
+        viewport.scrollLeft = normalize(viewport.scrollLeft + event.deltaX);
+        lastTimeRef.current = null;
+      }
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      draggingRef.current = true;
+      pointerIdRef.current = event.pointerId;
+      startXRef.current = event.clientX;
+      startScrollRef.current = viewport.scrollLeft;
+      viewport.setPointerCapture(event.pointerId);
+      viewport.dataset.dragging = "true";
+      lastTimeRef.current = null;
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!draggingRef.current || pointerIdRef.current !== event.pointerId) return;
+      const dx = startXRef.current - event.clientX;
+      viewport.scrollLeft = normalize(startScrollRef.current + dx);
+    };
+
+    const endDrag = (event: PointerEvent) => {
+      if (pointerIdRef.current !== event.pointerId) return;
+      draggingRef.current = false;
+      pointerIdRef.current = null;
+      viewport.releasePointerCapture(event.pointerId);
+      viewport.dataset.dragging = "false";
+      lastTimeRef.current = null;
+    };
+
+    viewport.addEventListener("wheel", onWheel, { passive: false });
+    viewport.addEventListener("pointerdown", onPointerDown);
+    viewport.addEventListener("pointermove", onPointerMove);
+    viewport.addEventListener("pointerup", endDrag);
+    viewport.addEventListener("pointercancel", endDrag);
+    viewport.addEventListener("pointerleave", endDrag);
+
+    return () => {
+      viewport.removeEventListener("wheel", onWheel);
+      viewport.removeEventListener("pointerdown", onPointerDown);
+      viewport.removeEventListener("pointermove", onPointerMove);
+      viewport.removeEventListener("pointerup", endDrag);
+      viewport.removeEventListener("pointercancel", endDrag);
+      viewport.removeEventListener("pointerleave", endDrag);
+    };
+  }, []);
 
   return (
-    <div ref={viewportRef} className="no-scrollbar relative overflow-hidden">
-      <motion.div
-        style={{ x: baseX }}
-        drag="x"
-        dragMomentum
-        onDrag={(e, info) => baseX.set(wrapPosition(baseX.get() + info.delta.x))}
-        className="flex py-2"
-      >
-        {repeats.map((_, idx) => (
+    <div
+      ref={viewportRef}
+      className="no-scrollbar relative overflow-hidden cursor-[grab] data-[dragging='true']:cursor-[grabbing]"
+    >
+      <div className="flex py-2">
+        {clones.map((_, idx) => (
           <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex gap-6 pr-6">
             {items.map((card, i) => (
               <Card key={`${idx}-${i}`} card={card} />
             ))}
           </div>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }
