@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useAnimationFrame, useMotionValue, useTransform, wrap } from "framer-motion";
+import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export type TImage = {
@@ -120,18 +120,27 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const setRef = useRef<HTMLDivElement | null>(null);
   const baseX = useMotionValue(0);
-  const widthRef = useRef(1);
-  const x = useTransform(baseX, (value) => wrap(-widthRef.current, 0, value));
-  const [repeatCount, setRepeatCount] = useState(3);
+  const setWidthRef = useRef(0);
+  const [setWidth, setSetWidth] = useState(0);
+  const [viewportWidth, setViewportWidth] = useState(0);
+
+  const wrapPosition = (value: number) => {
+    const width = setWidthRef.current;
+    if (!width) return value;
+    let v = value;
+    while (v <= -width) v += width;
+    while (v > 0) v -= width;
+    return v;
+  };
 
   useAnimationFrame((_, delta) => {
-    const el = setRef.current;
-    if (!el) return;
-    const width = el.offsetWidth;
+    const width = setWidthRef.current;
     if (!width) return;
-    widthRef.current = width;
     const step = (speed * delta) / 1000;
-    baseX.set(baseX.get() + (direction === 1 ? -step : step));
+    let next = baseX.get() + (direction === 1 ? -step : step);
+    if (next <= -width) next += width;
+    if (next > 0) next -= width;
+    baseX.set(next);
   });
 
   useEffect(() => {
@@ -139,7 +148,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (!vp) return;
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        baseX.set(baseX.get() - e.deltaX);
+        baseX.set(wrapPosition(baseX.get() - e.deltaX));
       }
     };
     vp.addEventListener("wheel", onWheel, { passive: true });
@@ -151,31 +160,36 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     const vpEl = viewportRef.current;
     if (!setEl || !vpEl) return;
 
-    const update = () => {
+    const measure = () => {
       const width = setEl.offsetWidth;
-      const viewportWidth = vpEl.offsetWidth;
-      widthRef.current = width || 1;
-      if (!width) return;
-      const needed = Math.max(2, Math.ceil(viewportWidth / width) + 1);
-      setRepeatCount(needed);
+      const vw = vpEl.offsetWidth;
+      setSetWidth(width);
+      setViewportWidth(vw);
+      setWidthRef.current = width;
+      baseX.set(wrapPosition(baseX.get()));
     };
 
-    update();
-    const observer = new ResizeObserver(update);
+    measure();
+    const observer = new ResizeObserver(measure);
     observer.observe(setEl);
     observer.observe(vpEl);
     return () => observer.disconnect();
-  }, [items]);
+  }, [items, baseX]);
+
+  const repeatCount = useMemo(() => {
+    if (!setWidth || !viewportWidth) return 3;
+    return Math.max(2, Math.ceil(viewportWidth / setWidth) + 2);
+  }, [setWidth, viewportWidth]);
 
   const repeats = useMemo(() => Array.from({ length: repeatCount }), [repeatCount]);
 
   return (
     <div ref={viewportRef} className="no-scrollbar relative overflow-hidden">
       <motion.div
-        style={{ x }}
+        style={{ x: baseX }}
         drag="x"
         dragMomentum
-        onDrag={(e, info) => baseX.set(baseX.get() + info.delta.x)}
+        onDrag={(e, info) => baseX.set(wrapPosition(baseX.get() + info.delta.x))}
         className="flex py-2"
       >
         {repeats.map((_, idx) => (
