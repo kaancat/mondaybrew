@@ -51,8 +51,8 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
               <p
                 className={cn(
                   "mt-3 text-[15px]/[1.6]",
-                  "text-[color:color-mix(in_oklch,var(--accent-foreground)_78%,white_22%)]",
-                  "dark:text-[color:color-mix(in_oklch,var(--services-ink-strong)_72%,white_28%)]",
+                  // Use theme-driven variable so we can tune per mode
+                  "text-[color:var(--clients-hero-sub,color-mix(in_oklch,var(--accent-foreground)_78%,white_22%))]",
                 )}
               >
                 {subheading}
