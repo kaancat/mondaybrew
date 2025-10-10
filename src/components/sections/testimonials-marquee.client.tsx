@@ -192,7 +192,7 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
     <div className="relative flex flex-1 flex-col justify-end">
       {/* subtle peek of bottom row */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[12vh] bg-gradient-to-t from-background to-transparent" />
-      <div className="flex flex-col gap-4 pb-4">
+      <div className="flex flex-col gap-3 pb-3">
         <Row items={top} speed={speedTop} direction={1} />
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>

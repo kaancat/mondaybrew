@@ -51,18 +51,20 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
   return (
     <Section padding="none" innerClassName="layout-container-full">
       <div className="min-h-[100vh] flex flex-col">
-      <div className="layout-container pt-8 pb-1">
-        {eyebrow ? (
-          <div className="eyebrow text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">{eyebrow}</div>
-        ) : null}
-        {headline ? (
-          <h2 className="mt-2 text-balance text-[clamp(32px,6vw,56px)] font-semibold leading-[1.05] tracking-tight w-full lg:max-w-[78ch] xl:max-w-[82ch]">
-            {headline}
-          </h2>
-        ) : null}
-        {subheading ? (
-          <p className="mt-1 max-w-[70ch] text-[length:var(--font-body)] text-muted-foreground">{subheading}</p>
-        ) : null}
+      <div className="layout-container pt-8 pb-0">
+        <div className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]">
+          {eyebrow ? (
+            <div className="eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">{eyebrow}</div>
+          ) : null}
+          {headline ? (
+            <h2 className="text-balance text-[clamp(32px,6vw,58px)] font-semibold leading-[1.03] tracking-tight text-[color:var(--foreground)]">
+              {headline}
+            </h2>
+          ) : null}
+          {subheading ? (
+            <p className="max-w-[78ch] text-[length:var(--font-body)] leading-[1.7] text-muted-foreground">{subheading}</p>
+          ) : null}
+        </div>
       </div>
       <TestimonialsMarqueeClient
         top={mapCards(top)}
