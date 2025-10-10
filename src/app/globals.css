@@ -425,6 +425,10 @@ html.dark {
     /* Labels should be strict black in Light-Alt */
     color: var(--brand-ink-strong) !important;
   }
+  /* About section eyebrow: force strong ink in Light-Alt */
+  html.light-alt .about-eyebrow {
+    --about-eyebrow-color: var(--brand-ink-strong);
+  }
 
   /* Clients/Partners: override hero strip in Light-Alt to be pure white card with strong ink */
   html.light-alt .clients-hero-strip {
