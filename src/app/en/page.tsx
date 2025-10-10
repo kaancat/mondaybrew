@@ -57,7 +57,7 @@ export default async function HomeEN() {
         </div>
       ) : (
         <Section innerClassName="flow">
-          <span className="text-sm uppercase tracking-[0.25em] text-muted-foreground">Homepage</span>
+          <span className="eyebrow text-sm uppercase tracking-[0.25em] text-[color:var(--eyebrow-color,currentColor)]">Homepage</span>
           <h1>Hero content missing</h1>
           <p className="max-w-2xl text-muted-foreground">
             Add a Hero section to the English homepage in Sanity to render content here.

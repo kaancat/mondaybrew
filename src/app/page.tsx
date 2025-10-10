@@ -195,7 +195,7 @@ export default async function Home() {
       })}
       {!hasHero ? (
         <Section innerClassName="flow">
-          <span className="text-sm uppercase tracking-[0.25em] text-muted-foreground">Homepage</span>
+          <span className="eyebrow text-sm uppercase tracking-[0.25em] text-[color:var(--eyebrow-color,currentColor)]">Homepage</span>
           <h1>Heroindhold mangler i Sanity</h1>
           <p className="max-w-2xl text-muted-foreground">
             Tilføj en Hero sektion til forsiden i Sanity (Forside → sektioner) for at se indholdet her.

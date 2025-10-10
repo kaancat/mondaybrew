@@ -167,6 +167,9 @@ html.light-primary {
   --cta-secondary-text: var(--brand-ink-strong);
   --cta-secondary-border: var(--brand-ink-strong);
   --cta-secondary-hover-border: color-mix(in oklch, var(--brand-ink-strong) 80%, white 20%);
+
+  /* Global eyebrow color on Primary */
+  --eyebrow-color: var(--mb-accent);
 }
 
 html.light-alt {
@@ -343,6 +346,9 @@ html.dark {
   --cta-secondary-text: var(--brand-ink-strong);
   --cta-secondary-border: var(--brand-ink-strong);
   --cta-secondary-hover-border: color-mix(in oklch, var(--brand-ink-strong) 80%, white 20%);
+
+  /* Global eyebrow color on Dark */
+  --eyebrow-color: var(--mb-accent);
 }
 
 @media (min-width: 1920px) {
@@ -426,8 +432,11 @@ html.dark {
     /* Title and subheading tones on dark grey */
     --clients-hero-title: color-mix(in oklch, var(--brand-light) 94%, black 6%);
     --clients-hero-sub: color-mix(in oklch, var(--brand-light) 76%, black 24%);
-    --clients-hero-eyebrow: color-mix(in oklch, var(--brand-light) 68%, black 32%);
+    /* Eyebrow follows brand orange in Primary */
+    --clients-hero-eyebrow: var(--mb-accent);
   }
+  /* Clients/Partners: dark theme eyebrow should be brand orange */
+  html.dark .clients-hero-strip { --clients-hero-eyebrow: var(--mb-accent); }
   /* Clients/Partners: dark mode title should use house grey, not pure black */
   html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--services-ink-strong) 72%, white 28%); }
   /* About section: improve readability in Light-Alt theme */

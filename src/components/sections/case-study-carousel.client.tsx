@@ -113,7 +113,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       <div className="mb-8 flex items-start justify-between gap-4">
         <div className="min-w-0">
           {eyebrow ? (
-            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">{eyebrow}</div>
+            <div className="eyebrow text-xs uppercase tracking-[0.25em] text-[color:var(--eyebrow-color,currentColor)] mb-2">{eyebrow}</div>
           ) : null}
           <h2 className="font-semibold text-foreground break-words">
             {headlineText || "Our work"}

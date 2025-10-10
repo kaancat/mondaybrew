@@ -270,7 +270,7 @@ export function ServicesSplit({
       <Container className="grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
         <div className="flex flex-col">
           {eyebrow ? (
-            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--mb-ink)_58%,var(--mb-bg)_42%)]">
+            <span className="eyebrow text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--eyebrow-color,currentColor)]">
               {eyebrow}
             </span>
           ) : null}
