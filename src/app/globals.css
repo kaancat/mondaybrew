@@ -424,8 +424,9 @@ html.dark {
     background: var(--surface-dark) !important;
     color: var(--brand-light) !important;
     /* Title and subheading tones on dark grey */
-    --clients-hero-title: color-mix(in oklch, var(--brand-light) 95%, black 5%);
-    --clients-hero-sub: color-mix(in oklch, var(--brand-light) 78%, black 22%);
+    --clients-hero-title: color-mix(in oklch, var(--brand-light) 94%, black 6%);
+    --clients-hero-sub: color-mix(in oklch, var(--brand-light) 76%, black 24%);
+    --clients-hero-eyebrow: color-mix(in oklch, var(--brand-light) 68%, black 32%);
   }
   /* Clients/Partners: dark mode title should use house grey, not pure black */
   html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--services-ink-strong) 72%, white 28%); }

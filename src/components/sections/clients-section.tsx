@@ -37,7 +37,9 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           {/* Left-aligned copy */}
           <div className="max-w-[56ch] pr-10">
             {eyebrow ? (
-              <p className="mb-3 text-[12px] font-medium tracking-[0.25em] opacity-90">{eyebrow.toUpperCase()}</p>
+              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-[color:var(--clients-hero-eyebrow,currentColor)]">
+                {eyebrow.toUpperCase()}
+              </p>
             ) : null}
             {headline ? (
               <h2
