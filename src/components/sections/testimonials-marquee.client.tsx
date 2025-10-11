@@ -1,6 +1,16 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  type WheelEvent as ReactWheelEvent,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -122,6 +132,14 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   const [setWidth, setSetWidth] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
   const prefersReducedMotion = useReducedMotion();
+  const offsetRef = useRef(0);
+  const startXRef = useRef(0);
+  const startOffsetRef = useRef(0);
+  const pointerIdRef = useRef<number | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const safeSpeed = Math.max(1, speed);
   const duration = useMemo(() => (setWidth > 0 ? setWidth / safeSpeed : 12), [setWidth, safeSpeed]);
@@ -133,6 +151,29 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   }, [setWidth, viewportWidth, prefersReducedMotion]);
 
   const clones = useMemo(() => Array.from({ length: repeatCount }), [repeatCount]);
+
+  const clearInteractionTimeout = useCallback(() => {
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current);
+      interactionTimeoutRef.current = null;
+    }
+  }, []);
+
+  const setOffsetSafe = useCallback(
+    (value: number) => {
+      if (!setWidth) {
+        offsetRef.current = value;
+        setOffset(value);
+        return;
+      }
+      const width = setWidth;
+      let next = value % width;
+      if (next < 0) next += width;
+      offsetRef.current = next;
+      setOffset(next);
+    },
+    [setWidth],
+  );
 
   useLayoutEffect(() => {
     const setEl = setRef.current;
@@ -151,34 +192,117 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     return () => observer.disconnect();
   }, [items]);
 
+  useEffect(() => {
+    setOffsetSafe(offsetRef.current);
+  }, [setOffsetSafe]);
+
+  useEffect(
+    () => () => {
+      clearInteractionTimeout();
+    },
+    [clearInteractionTimeout],
+  );
+
   const trackStyle = useMemo(() => {
-    if (prefersReducedMotion || !setWidth) return undefined;
+    if (!setWidth) return undefined;
     return {
       "--marquee-distance": `${-setWidth}px`,
       "--marquee-duration": `${duration}s`,
       animationDirection: direction === 1 ? "normal" : "reverse",
+      animationPlayState: isInteracting ? "paused" : "running",
       willChange: "transform",
-    } as CSSProperties;
-  }, [prefersReducedMotion, setWidth, duration, direction]);
+    } satisfies CSSProperties;
+  }, [setWidth, duration, direction, isInteracting]);
+
+  const wrapperStyle = useMemo(() => {
+    if (!setWidth && offset === 0) return undefined;
+    return {
+      transform: `translate3d(${-offset}px, 0, 0)`,
+      willChange: "transform",
+    } satisfies CSSProperties;
+  }, [offset, setWidth]);
+
+  const handleWheel = useCallback(
+    (event: ReactWheelEvent<HTMLDivElement>) => {
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+      event.preventDefault();
+      setOffsetSafe(offsetRef.current + event.deltaX);
+      setIsInteracting(true);
+      clearInteractionTimeout();
+      interactionTimeoutRef.current = setTimeout(() => {
+        interactionTimeoutRef.current = null;
+        setIsInteracting(false);
+      }, 200);
+    },
+    [clearInteractionTimeout, setOffsetSafe],
+  );
+
+  const handlePointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (!viewportRef.current) return;
+      pointerIdRef.current = event.pointerId;
+      viewportRef.current.setPointerCapture(event.pointerId);
+      startXRef.current = event.clientX;
+      startOffsetRef.current = offsetRef.current;
+      setIsDragging(true);
+      setIsInteracting(true);
+      clearInteractionTimeout();
+    },
+    [clearInteractionTimeout],
+  );
+
+  const handlePointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (!isDragging || pointerIdRef.current !== event.pointerId) return;
+      const dx = startXRef.current - event.clientX;
+      setOffsetSafe(startOffsetRef.current + dx);
+    },
+    [isDragging, setOffsetSafe],
+  );
+
+  const endDrag = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (pointerIdRef.current !== event.pointerId) return;
+      pointerIdRef.current = null;
+      setIsDragging(false);
+      setIsInteracting(false);
+      clearInteractionTimeout();
+      viewportRef.current?.releasePointerCapture(event.pointerId);
+    },
+    [clearInteractionTimeout],
+  );
 
   return (
-    <div ref={viewportRef} className="relative overflow-hidden">
-      <div
-        className={cn("flex py-2", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)}
-        style={trackStyle}
-      >
-        {clones.map((_, idx) => (
-          <div
-            key={idx}
-            ref={idx === 0 ? setRef : undefined}
-            className="flex gap-6 pr-6"
-            aria-hidden={idx > 0}
-          >
-            {items.map((card, i) => (
-              <Card key={`${idx}-${i}`} card={card} />
-            ))}
-          </div>
-        ))}
+    <div
+      ref={viewportRef}
+      className={cn(
+        "relative overflow-hidden",
+        !prefersReducedMotion ? "no-scrollbar" : undefined,
+        isDragging ? "cursor-[grabbing]" : "cursor-[grab]",
+      )}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onPointerLeave={endDrag}
+      onWheel={handleWheel}
+      data-dragging={isDragging ? "true" : "false"}
+    >
+      <div className="flex py-2" style={wrapperStyle}>
+        <div className={cn("flex", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)} style={trackStyle}>
+          {clones.map((_, idx) => (
+            <div
+              key={idx}
+              ref={idx === 0 ? setRef : undefined}
+              className="flex gap-6 pr-6"
+              aria-hidden={idx > 0}
+            >
+              {items.map((card, i) => (
+                <Card key={`${idx}-${i}`} card={card} />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
