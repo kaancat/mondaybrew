@@ -161,14 +161,13 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
 
   const setOffsetSafe = useCallback(
     (value: number) => {
-      if (!setWidth) {
-        offsetRef.current = value;
-        setOffset(value);
-        return;
-      }
+      let next = value;
       const width = setWidth;
-      let next = value % width;
-      if (next < 0) next += width;
+      if (width) {
+        const limit = width;
+        while (next > limit) next -= limit;
+        while (next < -limit) next += limit;
+      }
       offsetRef.current = next;
       setOffset(next);
     },
@@ -214,13 +213,13 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     } satisfies CSSProperties;
   }, [setWidth, duration, direction, isInteracting]);
 
-  const wrapperStyle = useMemo(() => {
-    if (!setWidth && offset === 0) return undefined;
-    return {
+  const wrapperStyle = useMemo(
+    () => ({
       transform: `translate3d(${-offset}px, 0, 0)`,
       willChange: "transform",
-    } satisfies CSSProperties;
-  }, [offset, setWidth]);
+    }),
+    [offset],
+  );
 
   const handleWheel = useCallback(
     (event: ReactWheelEvent<HTMLDivElement>) => {
@@ -242,6 +241,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       if (!viewportRef.current) return;
       pointerIdRef.current = event.pointerId;
       viewportRef.current.setPointerCapture(event.pointerId);
+      event.preventDefault();
       startXRef.current = event.clientX;
       startOffsetRef.current = offsetRef.current;
       setIsDragging(true);
@@ -254,6 +254,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (!isDragging || pointerIdRef.current !== event.pointerId) return;
+      event.preventDefault();
       const dx = startXRef.current - event.clientX;
       setOffsetSafe(startOffsetRef.current + dx);
     },
@@ -263,11 +264,14 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   const endDrag = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (pointerIdRef.current !== event.pointerId) return;
+      event.preventDefault();
       pointerIdRef.current = null;
       setIsDragging(false);
       setIsInteracting(false);
       clearInteractionTimeout();
-      viewportRef.current?.releasePointerCapture(event.pointerId);
+      if (viewportRef.current?.hasPointerCapture?.(event.pointerId)) {
+        viewportRef.current.releasePointerCapture(event.pointerId);
+      }
     },
     [clearInteractionTimeout],
   );
@@ -284,9 +288,9 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      onPointerLeave={endDrag}
       onWheel={handleWheel}
       data-dragging={isDragging ? "true" : "false"}
+      style={{ touchAction: "pan-y" }}
     >
       <div className="flex py-2" style={wrapperStyle}>
         <div className={cn("flex", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)} style={trackStyle}>
