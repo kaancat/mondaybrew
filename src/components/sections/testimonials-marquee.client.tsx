@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useReducedMotion } from "framer-motion";
+import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
 
 export type TImage = {
   url?: string | null;
@@ -119,50 +119,21 @@ function Card({ card }: { card: TCard }) {
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const setRef = useRef<HTMLDivElement | null>(null);
-  const setWidthRef = useRef(0);
-  const draggingRef = useRef(false);
-  const pointerIdRef = useRef<number | null>(null);
-  const startXRef = useRef(0);
-  const startScrollRef = useRef(0);
-  const lastTimeRef = useRef<number | null>(null);
-  const rafRef = useRef<number | null>(null);
   const [setWidth, setSetWidth] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
   const prefersReducedMotion = useReducedMotion();
+  const controls = useAnimationControls();
+
+  const safeSpeed = Math.max(1, speed);
+  const duration = useMemo(() => (setWidth > 0 ? setWidth / safeSpeed : 12), [setWidth, safeSpeed]);
 
   const repeatCount = useMemo(() => {
+    if (prefersReducedMotion) return 1;
     if (!setWidth || !viewportWidth) return 3;
     return Math.max(2, Math.ceil(viewportWidth / setWidth) + 2);
-  }, [setWidth, viewportWidth]);
+  }, [setWidth, viewportWidth, prefersReducedMotion]);
 
   const clones = useMemo(() => Array.from({ length: repeatCount }), [repeatCount]);
-
-  useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-
-    const animate = (time: number) => {
-      if (lastTimeRef.current == null) lastTimeRef.current = time;
-      const delta = time - lastTimeRef.current;
-      lastTimeRef.current = time;
-
-      const width = setWidthRef.current;
-      if (!draggingRef.current && !prefersReducedMotion && width > 0) {
-        let next = viewport.scrollLeft + (direction === 1 ? 1 : -1) * speed * (delta / 1000);
-        while (next >= width) next -= width;
-        while (next < 0) next += width;
-        viewport.scrollLeft = next;
-      }
-
-      rafRef.current = requestAnimationFrame(animate);
-    };
-
-    rafRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      lastTimeRef.current = null;
-    };
-  }, [speed, direction, prefersReducedMotion]);
 
   useLayoutEffect(() => {
     const setEl = setRef.current;
@@ -170,12 +141,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (!setEl || !vpEl) return;
 
     const measure = () => {
-      const width = setEl.offsetWidth;
-      const vw = vpEl.offsetWidth;
-      setSetWidth(width);
-      setViewportWidth(vw);
-      setWidthRef.current = width;
-      lastTimeRef.current = null;
+      setSetWidth(setEl.offsetWidth);
+      setViewportWidth(vpEl.offsetWidth);
     };
 
     measure();
@@ -186,81 +153,48 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   }, [items]);
 
   useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
+    if (!setWidth || prefersReducedMotion) {
+      controls.stop();
+      controls.set({ x: 0 });
+      return;
+    }
 
-    const normalize = (value: number) => {
-      const width = setWidthRef.current;
-      if (!width) return value;
-      while (value >= width) value -= width;
-      while (value < 0) value += width;
-      return value;
-    };
+    const from = direction === 1 ? 0 : -setWidth;
+    const to = direction === 1 ? -setWidth : 0;
 
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-        event.preventDefault();
-        viewport.scrollLeft = normalize(viewport.scrollLeft + event.deltaX);
-        lastTimeRef.current = null;
-      }
-    };
-
-    const onPointerDown = (event: PointerEvent) => {
-      draggingRef.current = true;
-      pointerIdRef.current = event.pointerId;
-      startXRef.current = event.clientX;
-      startScrollRef.current = viewport.scrollLeft;
-      viewport.setPointerCapture(event.pointerId);
-      viewport.dataset.dragging = "true";
-      lastTimeRef.current = null;
-    };
-
-    const onPointerMove = (event: PointerEvent) => {
-      if (!draggingRef.current || pointerIdRef.current !== event.pointerId) return;
-      const dx = startXRef.current - event.clientX;
-      viewport.scrollLeft = normalize(startScrollRef.current + dx);
-    };
-
-    const endDrag = (event: PointerEvent) => {
-      if (pointerIdRef.current !== event.pointerId) return;
-      draggingRef.current = false;
-      pointerIdRef.current = null;
-      viewport.releasePointerCapture(event.pointerId);
-      viewport.dataset.dragging = "false";
-      lastTimeRef.current = null;
-    };
-
-    viewport.addEventListener("wheel", onWheel, { passive: false });
-    viewport.addEventListener("pointerdown", onPointerDown);
-    viewport.addEventListener("pointermove", onPointerMove);
-    viewport.addEventListener("pointerup", endDrag);
-    viewport.addEventListener("pointercancel", endDrag);
-    viewport.addEventListener("pointerleave", endDrag);
+    controls.stop();
+    controls.set({ x: from });
+    controls.start({
+      x: to,
+      transition: {
+        duration,
+        ease: "linear",
+        repeat: Infinity,
+        repeatType: "loop",
+      },
+    });
 
     return () => {
-      viewport.removeEventListener("wheel", onWheel);
-      viewport.removeEventListener("pointerdown", onPointerDown);
-      viewport.removeEventListener("pointermove", onPointerMove);
-      viewport.removeEventListener("pointerup", endDrag);
-      viewport.removeEventListener("pointercancel", endDrag);
-      viewport.removeEventListener("pointerleave", endDrag);
+      controls.stop();
     };
-  }, []);
+  }, [controls, direction, duration, prefersReducedMotion, setWidth]);
 
   return (
-    <div
-      ref={viewportRef}
-      className="no-scrollbar relative overflow-hidden cursor-[grab] data-[dragging='true']:cursor-[grabbing]"
-    >
-      <div className="flex py-2">
+    <div ref={viewportRef} className="relative overflow-hidden">
+      <motion.div className="flex py-2" animate={prefersReducedMotion ? undefined : controls}>
         {clones.map((_, idx) => (
-          <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex gap-6 pr-6">
+          <div
+            key={idx}
+            ref={idx === 0 ? setRef : undefined}
+            className="flex gap-6 pr-6"
+            aria-hidden={idx > 0}
+          >
             {items.map((card, i) => (
               <Card key={`${idx}-${i}`} card={card} />
             ))}
           </div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
