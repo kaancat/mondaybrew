@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 
 export type TImage = {
   url?: string | null;
@@ -122,7 +122,6 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   const [setWidth, setSetWidth] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
   const prefersReducedMotion = useReducedMotion();
-  const controls = useAnimationControls();
 
   const safeSpeed = Math.max(1, speed);
   const duration = useMemo(() => (setWidth > 0 ? setWidth / safeSpeed : 12), [setWidth, safeSpeed]);
@@ -152,36 +151,22 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     return () => observer.disconnect();
   }, [items]);
 
-  useEffect(() => {
-    if (!setWidth || prefersReducedMotion) {
-      controls.stop();
-      controls.set({ x: 0 });
-      return;
-    }
-
-    const from = direction === 1 ? 0 : -setWidth;
-    const to = direction === 1 ? -setWidth : 0;
-
-    controls.stop();
-    controls.set({ x: from });
-    controls.start({
-      x: to,
-      transition: {
-        duration,
-        ease: "linear",
-        repeat: Infinity,
-        repeatType: "loop",
-      },
-    });
-
-    return () => {
-      controls.stop();
-    };
-  }, [controls, direction, duration, prefersReducedMotion, setWidth]);
+  const trackStyle = useMemo(() => {
+    if (prefersReducedMotion || !setWidth) return undefined;
+    return {
+      "--marquee-distance": `${-setWidth}px`,
+      "--marquee-duration": `${duration}s`,
+      animationDirection: direction === 1 ? "normal" : "reverse",
+      willChange: "transform",
+    } as CSSProperties;
+  }, [prefersReducedMotion, setWidth, duration, direction]);
 
   return (
     <div ref={viewportRef} className="relative overflow-hidden">
-      <motion.div className="flex py-2" animate={prefersReducedMotion ? undefined : controls}>
+      <div
+        className={cn("flex py-2", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)}
+        style={trackStyle}
+      >
         {clones.map((_, idx) => (
           <div
             key={idx}
@@ -194,7 +179,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
             ))}
           </div>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }

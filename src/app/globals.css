@@ -540,6 +540,23 @@ html.dark {
     display: none; /* Chrome/Safari */
   }
 
+  .marquee-track {
+    will-change: transform;
+    animation-name: marquee-slide;
+    animation-duration: var(--marquee-duration, 30s);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes marquee-slide {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(var(--marquee-distance, -50%), 0, 0);
+    }
+  }
+
   /* Vertical rhythm helpers (margin-based; avoid double stacking) */
   /* Hero uses medium gap on all breakpoints */
   .vr-hero { margin-bottom: var(--section-gap-md); }
