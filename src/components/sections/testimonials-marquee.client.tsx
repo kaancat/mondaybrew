@@ -74,9 +74,11 @@ function Card({ card }: { card: TCard }) {
     <div className="group/card relative min-w-[340px] max-w-[520px] shrink-0">
       <div
         className={cn(
-          "card-inner relative flex h-full flex-col rounded-[10px] p-6",
+          "card-inner relative flex h-full flex-col rounded-[5px] p-6",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
+          // Vertically center content for quote variant only
+          card.variant === "quote" ? "justify-center" : "",
         )}
         style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
       >
@@ -92,7 +94,7 @@ function Card({ card }: { card: TCard }) {
 
       {/* Image for non-quote variants */}
       {card.variant !== "quote" && card.image?.url ? (
-        <div className="mb-4 overflow-hidden rounded-[6px]">
+        <div className="mb-4 overflow-hidden rounded-[5px]">
           <Image
             src={card.image.url}
             alt={card.image.alt || ""}
@@ -105,22 +107,21 @@ function Card({ card }: { card: TCard }) {
         </div>
       ) : null}
 
-      {/* Quote text - with top margin for logo space when it's a quote variant */}
+      {/* Quote text - no top margin needed with justify-center */}
       {card.variant !== "image" && card.quote ? (
         <blockquote className={cn(
           "text-balance text-xl leading-[1.35]",
-          card.variant === "quote" && card.logo?.url ? "mt-12" : "",
           textClass
         )}>
           &ldquo;{card.quote}&rdquo;
         </blockquote>
       ) : null}
 
-      {/* SHORT separator line after quote */}
-      <div className="mt-4 h-px w-12 bg-current/30" />
+      {/* SHORT separator line after quote - tighter spacing like reference */}
+      <div className="mt-6 h-px w-12 bg-current/30" />
 
-      {/* Author info */}
-      <div className={cn("mt-3 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+      {/* Author info - tighter spacing */}
+      <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
         {card.author}
         {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
       </div>
