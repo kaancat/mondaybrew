@@ -111,24 +111,27 @@ function Card({ card }: { card: TCard }) {
         </div>
       ) : null}
 
-      {/* Wrapper for vertical centering of quote content only */}
+      {/* Content structure differs for quote vs other variants */}
       {card.variant === "quote" ? (
-        <div className="flex flex-1 flex-col justify-center">
-          {card.quote ? (
-            <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
-              &ldquo;{card.quote}&rdquo;
-            </blockquote>
-          ) : null}
-          
-          {/* SHORT separator line after quote - tighter spacing like reference */}
-          <div className="mt-6 h-px w-12 bg-current/30" />
+        <>
+          {/* Vertical centering wrapper for quote content - takes all space between logo and CTA */}
+          <div className="flex flex-1 flex-col justify-center">
+            {card.quote ? (
+              <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
+                &ldquo;{card.quote}&rdquo;
+              </blockquote>
+            ) : null}
+            
+            {/* SHORT separator line after quote - tighter spacing like reference */}
+            <div className="mt-6 h-px w-12 bg-current/30" />
 
-          {/* Author info - tighter spacing */}
-          <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
-            {card.author}
-            {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+            {/* Author info - tighter spacing */}
+            <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+              {card.author}
+              {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+            </div>
           </div>
-        </div>
+        </>
       ) : (
         <>
           {/* Quote text for non-quote variants */}
@@ -146,11 +149,11 @@ function Card({ card }: { card: TCard }) {
             {card.author}
             {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
           </div>
+
+          {/* Spacer to push CTA to bottom (only for non-quote variants) */}
+          <div className="flex-grow" />
         </>
       )}
-
-      {/* Spacer to push CTA to bottom */}
-      <div className="flex-grow" />
 
       {/* Full-width separator line before CTA */}
       {card.cta?.label && card.cta?.href ? (
