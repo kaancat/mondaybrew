@@ -77,16 +77,14 @@ function Card({ card }: { card: TCard }) {
           "card-inner relative flex h-full flex-col rounded-[5px] p-6",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
-          // Vertically center content for quote variant only
-          card.variant === "quote" ? "justify-center" : "",
         )}
         style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
       >
         {/* Logo - top LEFT for quote variant, top RIGHT for others */}
         {card.logo?.url ? (
           <div className={cn(
-            "absolute top-6 h-6 w-24 opacity-90",
-            card.variant === "quote" ? "left-6" : "right-6"
+            "mb-6 h-6 w-24 opacity-90",
+            card.variant === "quote" ? "" : "absolute top-6 right-6"
           )}>
             <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain object-left" />
           </div>
@@ -107,24 +105,43 @@ function Card({ card }: { card: TCard }) {
         </div>
       ) : null}
 
-      {/* Quote text - no top margin needed with justify-center */}
-      {card.variant !== "image" && card.quote ? (
-        <blockquote className={cn(
-          "text-balance text-xl leading-[1.35]",
-          textClass
-        )}>
-          &ldquo;{card.quote}&rdquo;
-        </blockquote>
-      ) : null}
+      {/* Wrapper for vertical centering of quote content only */}
+      {card.variant === "quote" ? (
+        <div className="flex flex-1 flex-col justify-center">
+          {card.quote ? (
+            <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
+              &ldquo;{card.quote}&rdquo;
+            </blockquote>
+          ) : null}
+          
+          {/* SHORT separator line after quote - tighter spacing like reference */}
+          <div className="mt-6 h-px w-12 bg-current/30" />
 
-      {/* SHORT separator line after quote - tighter spacing like reference */}
-      <div className="mt-6 h-px w-12 bg-current/30" />
+          {/* Author info - tighter spacing */}
+          <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+            {card.author}
+            {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Quote text for non-quote variants */}
+          {card.quote ? (
+            <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
+              &ldquo;{card.quote}&rdquo;
+            </blockquote>
+          ) : null}
+          
+          {/* SHORT separator line after quote */}
+          <div className="mt-6 h-px w-12 bg-current/30" />
 
-      {/* Author info - tighter spacing */}
-      <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
-        {card.author}
-        {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
-      </div>
+          {/* Author info */}
+          <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+            {card.author}
+            {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+          </div>
+        </>
+      )}
 
       {/* Spacer to push CTA to bottom */}
       <div className="flex-grow" />
