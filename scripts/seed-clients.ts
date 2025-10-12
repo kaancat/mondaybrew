@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { createClient } from "next-sanity";
 
 const projectId = process.env.SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "4ot323fc";
@@ -11,6 +10,16 @@ if (!token) {
 }
 
 const client = createClient({ projectId, dataset, apiVersion: "2024-09-01", token, useCdn: false });
+
+type ClientLogoDocument = {
+  _type: "clientLogo";
+  title: string;
+  image: {
+    _type: "imageWithAlt";
+    alt: string;
+    image: { _type: "image"; asset: { _type: "reference"; _ref: string } };
+  };
+};
 
 const NAMES = [
   "Lunar", "Intersport", "Rains", "Ecco", "Matas", "Velux", "Normann", "Bang & Olufsen",
@@ -35,7 +44,10 @@ async function uploadLogo(name: string) {
 }
 
 async function run() {
-  const home = await client.fetch<{ _id: string; sections?: Array<Record<string, unknown>> | null }>(
+  const home = await client.fetch<{
+    _id: string;
+    sections?: Array<{ _type?: string; _key?: string } & Record<string, unknown>> | null;
+  }>(
     `*[_type=="page" && isHome == true && locale == "da"][0]{ _id, sections }`,
   );
   if (!home?._id) {
@@ -45,7 +57,7 @@ async function run() {
 
   // Ensure clientsSection exists
   let inserted = false;
-  if (!home.sections || !home.sections.some((s) => s && (s as any)._type === "clientsSection")) {
+  if (!home.sections?.some((section) => section?._type === "clientsSection")) {
     await client
       .patch(home._id)
       .setIfMissing({ sections: [] })
@@ -67,7 +79,7 @@ async function run() {
   // Fetch the updated section with path info
   const doc = await client.fetch<{
     _id: string;
-    sections: Array<{ _type: string; _key: string; logos?: unknown[] }>;
+    sections: Array<{ _type: string; _key: string; logos?: ClientLogoDocument[] }>;
   }>(`*[_type=="page" && isHome == true && locale == "da"][0]{ _id, sections[]{ _type, _key, logos } }`);
 
   const idx = doc.sections.findIndex((s) => s._type === "clientsSection");
@@ -90,7 +102,7 @@ async function run() {
   }
 
   const uploads = await Promise.all(
-    NAMES.slice(0, 20).map(async (name) => {
+    NAMES.slice(0, 20).map(async (name): Promise<ClientLogoDocument | null> => {
       try {
         const asset = await uploadLogo(name);
         return {
@@ -101,15 +113,15 @@ async function run() {
             alt: `${name} logo`,
             image: { _type: "image", asset: { _type: "reference", _ref: asset._id } },
           },
-        } as const;
-      } catch (e) {
-        console.warn("Upload failed for", name, e);
+        };
+      } catch (error) {
+        console.warn("Upload failed for", name, error);
         return null;
       }
     }),
   );
 
-  const logos = uploads.filter(Boolean);
+  const logos = uploads.filter((logo): logo is ClientLogoDocument => Boolean(logo));
   await client
     .patch(doc._id)
     .setIfMissing({ sections: [] })

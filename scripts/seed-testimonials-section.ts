@@ -15,6 +15,33 @@ if (!token) {
 
 const client = createClient({ projectId, dataset, apiVersion: "2024-09-01", token, useCdn: false });
 
+type ImageField = {
+  _type: "imageWithAlt";
+  alt: string;
+  image: { _type: "image"; asset: { _type: "reference"; _ref: string } };
+};
+
+type ButtonField = { _type: "button"; label: string; href: string; variant?: string };
+
+type TestimonialSeed = {
+  variant: "quote" | "imageQuote" | "image";
+  background?: string;
+  logo?: ImageField;
+  image?: ImageField;
+  quote?: string;
+  author?: string;
+  role?: string;
+  cta?: ButtonField;
+};
+
+const imageRef = (id: string): ImageField => ({
+  _type: "imageWithAlt",
+  alt: "",
+  image: { _type: "image", asset: { _type: "reference", _ref: id } },
+});
+
+const card = (props: TestimonialSeed) => ({ _type: "testimonialCard", ...props });
+
 async function fetchBuffer(url: string) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Failed to download asset: ${url}`);
@@ -48,9 +75,6 @@ async function run() {
   const imgB = await uploadImage("https://images.unsplash.com/photo-1492724441997-5dc865305da7?q=80&w=1200&auto=format&fit=crop", "testimonial-b.jpg");
   const imgC = await uploadImage("https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1200&auto=format&fit=crop", "testimonial-c.jpg");
 
-  const card = (p: any) => ({ _type: "testimonialCard", ...p });
-  const imageRef = (id: string) => ({ _type: "imageWithAlt", alt: "", image: { _type: "image", asset: { _type: "reference", _ref: id } } });
-
   const section = {
     _type: "testimonialsMarquee" as const,
     eyebrow: "What our clients say",
@@ -61,12 +85,12 @@ async function run() {
     top: [
       card({ variant: "quote", background: "#F5F7FD", logo: imageRef(logoA), quote: "mondaybrew helped us cut time-to-ship by 40% across two quarters.", author: "Walter Gross", role: "Senior Marketing Manager", cta: { _type: "button", label: "View Sony case study", href: "/cases" } }),
       card({ variant: "imageQuote", background: "#CDE8DF", logo: imageRef(logoB), image: imageRef(imgA), quote: "Getting people out of email and into our flows increased ownership across teams.", author: "Jamie Chappell", role: "Creative Director", cta: { _type: "button", label: "View Fireclay Tile", href: "/cases" } }),
-      card({ variant: "image", background: "#FF914D", image: imageRef(imgB), logo: imageRef(logoC), cta: { _type: "button", label: "Explore project", href: "/cases" } }),
+      card({ variant: "image", image: imageRef(imgB), cta: { _type: "button", label: "Explore project", href: "/cases" } }),
     ],
     bottom: [
       card({ variant: "imageQuote", background: "#E9C6D0", logo: imageRef(logoA), image: imageRef(imgC), quote: "Built to serve the needs of a rapidly moving planning process.", author: "Dawn Jensen", role: "Senior Program Manager", cta: { _type: "button", label: "Read more", href: "/cases" } }),
       card({ variant: "quote", background: "#49444B", logo: imageRef(logoC), quote: "The partnership model gave us velocity without compromising quality.", author: "Michael Stenberg", role: "Head of Digital Marketing", cta: { _type: "button", label: "View Siemens", href: "/cases" } }),
-      card({ variant: "image", background: "#111111", image: imageRef(imgA), logo: imageRef(logoB), cta: { _type: "button", label: "See launch", href: "/cases" } }),
+      card({ variant: "image", image: imageRef(imgA), cta: { _type: "button", label: "See launch", href: "/cases" } }),
     ],
   };
 
@@ -79,4 +103,3 @@ async function run() {
 }
 
 run().catch((err) => { console.error(err); process.exit(1); });
-

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { createClient } from "next-sanity";
 
 const projectId = process.env.SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "4ot323fc";
@@ -26,7 +25,7 @@ async function run() {
   const draftId = `drafts.${pub._id}`;
   const draft = await client.fetch<{ _id?: string; sections?: unknown[] }>(`*[_id==$id][0]{ _id, sections }`, { id: draftId });
 
-  const clients = (pub.sections || []).find((s) => (s as any)?._type === "clientsSection");
+  const clients = (pub.sections || []).find((section) => section?._type === "clientsSection");
   if (!clients) {
     console.log("No clientsSection on published homepage; nothing to clone.");
     return;
@@ -49,4 +48,3 @@ run().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-

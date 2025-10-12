@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { createClient } from "next-sanity";
 
 const projectId = process.env.SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "4ot323fc";
@@ -89,4 +88,3 @@ run().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-

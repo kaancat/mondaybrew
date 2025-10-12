@@ -24,17 +24,18 @@ export default defineType({
       name: "background", 
       title: "Background color", 
       type: "string", 
-      description: "Hex or CSS color. Leave empty to auto-pick a brand/neutral.", 
-      options: { list: ["#FF914D", "#F5F7FD", "#49444B", "#111111", "white"] } 
+      description: "Applies behind quote content. Image-only cards ignore this.", 
+      options: { list: ["#FF914D", "#F5F7FD", "#49444B", "#111111", "white"] },
+      hidden: ({ parent }) => parent?.variant === "image",
     }),
     
     // Logo - Only for quote and imageQuote variants
     defineField({ 
       name: "logo", 
-      title: "Logo (top-left)", 
+      title: "Logo (quote cards)", 
       type: "imageWithAlt",
       hidden: ({ parent }) => parent?.variant === "image",
-      description: "Shows in top-left corner for quote-based cards",
+      description: "Optional mark displayed on quote-based cards",
     }),
     
     // Main image - Only for image and imageQuote variants
@@ -43,7 +44,7 @@ export default defineType({
       title: "Main image", 
       type: "imageWithAlt",
       hidden: ({ parent }) => parent?.variant === "quote",
-      description: "For 'Image only': fills entire card. For 'Image + Quote': shows on left side.",
+      description: "Required for image variants. Left column for Image + Quote, full-bleed for Image only.",
       validation: (Rule) => Rule.custom((value, context) => {
         const parent = context.parent as { variant?: string } | undefined;
         const variant = parent?.variant;
@@ -120,4 +121,3 @@ export default defineType({
     },
   },
 });
-
