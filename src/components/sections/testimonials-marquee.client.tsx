@@ -75,7 +75,7 @@ function Card({ card }: { card: TCard }) {
       <div
         className={cn(
           "card-inner relative flex h-full flex-col rounded-[5px] p-6",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          "ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
         style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
