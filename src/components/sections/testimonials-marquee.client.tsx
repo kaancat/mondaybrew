@@ -89,23 +89,23 @@ function QuoteCard({ card }: { card: TCard }) {
         )}
         style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
       >
-        <CardLogo card={card} className="absolute right-4 top-4" />
+        <CardLogo card={card} className="ml-auto" />
 
         {card.quote ? (
-          <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
+          <blockquote className={cn("mt-6 text-balance text-xl leading-[1.35]", textClass)}>
             “{card.quote}”
           </blockquote>
         ) : null}
 
-        <div className="mt-4 h-px w-full bg-current/20" />
+        <div className="mt-6 h-px w-12 bg-current/30" />
 
-        <div className={cn("mt-3 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+        <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
           {card.author}
           {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
         </div>
 
         {card.cta?.label && card.cta?.href ? (
-          <div className={cn("mt-4 flex items-center justify-between text-sm", subClass)}>
+          <div className={cn("mt-6 flex items-center justify-between text-sm", subClass)}>
             <Link href={card.cta.href} className="underline-offset-4 hover:underline">
               {card.cta.label}
             </Link>
@@ -119,36 +119,35 @@ function QuoteCard({ card }: { card: TCard }) {
 
 function ImageQuoteCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
-  const bg = card.background || undefined;
-  const ink = pickInk(bg);
+  const textBg = card.background || "var(--card)";
+  const ink = pickInk(textBg);
   const textClass = ink === "#ffffff" ? "text-white" : "text-[color:var(--brand-ink-strong)]";
-  const subClass = ink === "#ffffff" ? "text-white/75" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
+  const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
   return (
-    <div className="group/card relative min-w-[510px] max-w-[780px] shrink-0">
+    <div className="group/card relative min-w-[520px] max-w-[800px] shrink-0">
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
-        style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
       >
-        <div className="relative flex-[0_0_50%] min-w-[200px] overflow-hidden">
+        <div className="relative flex-[0_0_46%] min-w-[210px]">
           <Image
             src={card.image.url}
             alt={card.image.alt || ""}
             fill
+            sizes="(max-width: 768px) 70vw, 360px"
             placeholder={card.image.lqip ? "blur" : undefined}
             blurDataURL={card.image.lqip || undefined}
-            sizes="(max-width: 768px) 75vw, 320px"
             className="h-full w-full object-cover"
           />
         </div>
-        <div className="flex flex-1 flex-col p-6">
-          <CardLogo card={card} className="ml-auto mb-6" />
+        <div className="flex flex-1 flex-col p-6" style={{ background: textBg, color: ink }}>
+          <CardLogo card={card} className="ml-auto" />
           {card.quote ? (
-            <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
+            <blockquote className={cn("mt-6 text-balance text-xl leading-[1.35]", textClass)}>
               “{card.quote}”
             </blockquote>
           ) : null}
@@ -160,16 +159,14 @@ function ImageQuoteCard({ card }: { card: TCard }) {
             {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
           </div>
 
-          <div className="flex flex-1 items-end">
-            {card.cta?.label && card.cta?.href ? (
-              <div className={cn("mt-6 flex w-full items-center justify-between text-sm", subClass)}>
-                <Link href={card.cta.href} className="underline-offset-4 hover:underline">
-                  {card.cta.label}
-                </Link>
-                <span aria-hidden>→</span>
-              </div>
-            ) : null}
-          </div>
+          {card.cta?.label && card.cta?.href ? (
+            <div className="mt-auto flex items-center justify-between text-sm text-inherit">
+              <Link href={card.cta.href} className="underline-offset-4 hover:underline">
+                {card.cta.label}
+              </Link>
+              <span aria-hidden>→</span>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -179,10 +176,10 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 function ImageOnlyCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
   return (
-    <div className="group/card relative min-w-[510px] max-w-[780px] shrink-0">
+    <div className="group/card relative min-w-[520px] max-w-[800px] shrink-0">
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[340px] flex-col overflow-hidden rounded-[10px]",
+          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
@@ -191,14 +188,18 @@ function ImageOnlyCard({ card }: { card: TCard }) {
           src={card.image.url}
           alt={card.image.alt || ""}
           fill
+          sizes="(max-width: 768px) 80vw, 480px"
           placeholder={card.image.lqip ? "blur" : undefined}
           blurDataURL={card.image.lqip || undefined}
-          sizes="(max-width: 768px) 80vw, 480px"
           className="h-full w-full object-cover"
         />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 to-transparent" />
         {card.cta?.label && card.cta?.href ? (
-          <div className="relative mt-auto flex items-center justify-between bg-black/60 px-6 py-4 text-sm text-white backdrop-blur">
-            <Link href={card.cta.href} className="font-medium uppercase tracking-[0.18em] underline-offset-4 hover:underline">
+          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-6 pb-5 pt-4 text-sm text-white">
+            <Link
+              href={card.cta.href}
+              className="pointer-events-auto font-medium uppercase tracking-[0.18em] underline-offset-4 hover:underline"
+            >
               {card.cta.label}
             </Link>
             <span aria-hidden>→</span>
