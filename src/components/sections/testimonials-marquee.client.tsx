@@ -112,7 +112,7 @@ function Card({ card }: { card: TCard }) {
           card.variant === "quote" && card.logo?.url ? "mt-12" : "",
           textClass
         )}>
-          "{card.quote}"
+          &ldquo;{card.quote}&rdquo;
         </blockquote>
       ) : null}
 
