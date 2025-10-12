@@ -83,10 +83,16 @@ function Card({ card }: { card: TCard }) {
         {/* Logo - top LEFT for quote variant, top RIGHT for others */}
         {card.logo?.url ? (
           <div className={cn(
-            "mb-6 h-6 w-24 opacity-90",
-            card.variant === "quote" ? "" : "absolute top-6 right-6"
+            "relative h-6 w-24 shrink-0 opacity-90",
+            card.variant === "quote" ? "mb-6" : "absolute top-6 right-6"
           )}>
-            <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain object-left" />
+            <Image 
+              src={card.logo.url} 
+              alt={card.logo.alt || ""} 
+              fill 
+              className="object-contain object-left" 
+              sizes="96px"
+            />
           </div>
         ) : null}
 
