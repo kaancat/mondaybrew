@@ -546,7 +546,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
             <div
               key={idx}
               ref={idx === 0 ? setRef : undefined}
-              className="flex gap-6 pr-6"
+              className="flex gap-8"
               aria-hidden={idx > 0}
             >
               {items.map((card, i) => (
