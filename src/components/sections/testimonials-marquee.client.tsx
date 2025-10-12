@@ -174,6 +174,22 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     velocityRef.current = 0;
   }, []);
 
+  // Define setOffsetSafe first (used by applyMomentum)
+  const setOffsetSafe = useCallback(
+    (value: number) => {
+      let next = value;
+      const width = setWidth;
+      if (width) {
+        const limit = width;
+        while (next > limit) next -= limit;
+        while (next < -limit) next += limit;
+      }
+      offsetRef.current = next;
+      setOffset(next);
+    },
+    [setWidth],
+  );
+
   // Apply momentum/inertia scrolling after drag release
   const applyMomentum = useCallback(() => {
     cancelMomentum();
@@ -202,21 +218,6 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       setIsInteracting(false);
     }
   }, [cancelMomentum, setOffsetSafe]);
-
-  const setOffsetSafe = useCallback(
-    (value: number) => {
-      let next = value;
-      const width = setWidth;
-      if (width) {
-        const limit = width;
-        while (next > limit) next -= limit;
-        while (next < -limit) next += limit;
-      }
-      offsetRef.current = next;
-      setOffset(next);
-    },
-    [setWidth],
-  );
 
   useLayoutEffect(() => {
     const setEl = setRef.current;
@@ -255,7 +256,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       animationDirection: direction === 1 ? "normal" : "reverse",
       animationPlayState: isInteracting ? "paused" : "running",
       willChange: "transform",
-    } satisfies CSSProperties;
+    } as CSSProperties;
   }, [setWidth, duration, direction, isInteracting]);
 
   const wrapperStyle = useMemo(
