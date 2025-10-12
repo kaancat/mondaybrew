@@ -45,7 +45,8 @@ export default defineType({
       hidden: ({ parent }) => parent?.variant === "quote",
       description: "For 'Image only': fills entire card. For 'Image + Quote': shows on left side.",
       validation: (Rule) => Rule.custom((value, context) => {
-        const variant = (context.parent as any)?.variant;
+        const parent = context.parent as { variant?: string } | undefined;
+        const variant = parent?.variant;
         if ((variant === "image" || variant === "imageQuote") && !value) {
           return "Image is required for this variant";
         }
@@ -61,7 +62,8 @@ export default defineType({
       rows: 3,
       hidden: ({ parent }) => parent?.variant === "image",
       validation: (Rule) => Rule.custom((value, context) => {
-        const variant = (context.parent as any)?.variant;
+        const parent = context.parent as { variant?: string } | undefined;
+        const variant = parent?.variant;
         if ((variant === "quote" || variant === "imageQuote") && !value) {
           return "Quote is required for this variant";
         }
@@ -76,7 +78,8 @@ export default defineType({
       type: "string",
       hidden: ({ parent }) => parent?.variant === "image",
       validation: (Rule) => Rule.custom((value, context) => {
-        const variant = (context.parent as any)?.variant;
+        const parent = context.parent as { variant?: string } | undefined;
+        const variant = parent?.variant;
         if ((variant === "quote" || variant === "imageQuote") && !value) {
           return "Author name is required for this variant";
         }
