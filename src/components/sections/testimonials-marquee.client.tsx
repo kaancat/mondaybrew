@@ -140,6 +140,12 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   const [isDragging, setIsDragging] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
   const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Momentum scrolling state
+  const velocityRef = useRef(0);
+  const lastPosRef = useRef(0);
+  const lastTimeRef = useRef(0);
+  const momentumRafRef = useRef<number | null>(null);
 
   const safeSpeed = Math.max(1, speed);
   const duration = useMemo(() => (setWidth > 0 ? setWidth / safeSpeed : 12), [setWidth, safeSpeed]);
@@ -158,6 +164,44 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       interactionTimeoutRef.current = null;
     }
   }, []);
+
+  // Cancel momentum animation
+  const cancelMomentum = useCallback(() => {
+    if (momentumRafRef.current !== null) {
+      cancelAnimationFrame(momentumRafRef.current);
+      momentumRafRef.current = null;
+    }
+    velocityRef.current = 0;
+  }, []);
+
+  // Apply momentum/inertia scrolling after drag release
+  const applyMomentum = useCallback(() => {
+    cancelMomentum();
+    
+    const friction = 0.92; // Controls how quickly momentum decays
+    const minVelocity = 0.1; // Minimum velocity before stopping
+    
+    const animate = () => {
+      const vel = velocityRef.current;
+      
+      if (Math.abs(vel) < minVelocity) {
+        velocityRef.current = 0;
+        momentumRafRef.current = null;
+        setIsInteracting(false);
+        return;
+      }
+      
+      velocityRef.current *= friction;
+      setOffsetSafe(offsetRef.current + vel);
+      momentumRafRef.current = requestAnimationFrame(animate);
+    };
+    
+    if (Math.abs(velocityRef.current) >= minVelocity) {
+      momentumRafRef.current = requestAnimationFrame(animate);
+    } else {
+      setIsInteracting(false);
+    }
+  }, [cancelMomentum, setOffsetSafe]);
 
   const setOffsetSafe = useCallback(
     (value: number) => {
@@ -198,8 +242,9 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   useEffect(
     () => () => {
       clearInteractionTimeout();
+      cancelMomentum();
     },
-    [clearInteractionTimeout],
+    [clearInteractionTimeout, cancelMomentum],
   );
 
   const trackStyle = useMemo(() => {
@@ -225,6 +270,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     (event: ReactWheelEvent<HTMLDivElement>) => {
       if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
       event.preventDefault();
+      cancelMomentum();
       setOffsetSafe(offsetRef.current + event.deltaX);
       setIsInteracting(true);
       clearInteractionTimeout();
@@ -233,30 +279,53 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
         setIsInteracting(false);
       }, 200);
     },
-    [clearInteractionTimeout, setOffsetSafe],
+    [cancelMomentum, clearInteractionTimeout, setOffsetSafe],
   );
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (!viewportRef.current) return;
+      
+      // Cancel any ongoing momentum
+      cancelMomentum();
+      
       pointerIdRef.current = event.pointerId;
       viewportRef.current.setPointerCapture(event.pointerId);
       event.preventDefault();
+      
       startXRef.current = event.clientX;
       startOffsetRef.current = offsetRef.current;
+      lastPosRef.current = event.clientX;
+      lastTimeRef.current = Date.now();
+      velocityRef.current = 0;
+      
       setIsDragging(true);
       setIsInteracting(true);
       clearInteractionTimeout();
     },
-    [clearInteractionTimeout],
+    [cancelMomentum, clearInteractionTimeout],
   );
 
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (!isDragging || pointerIdRef.current !== event.pointerId) return;
       event.preventDefault();
-      const dx = startXRef.current - event.clientX;
-      setOffsetSafe(startOffsetRef.current + dx);
+      
+      // Calculate velocity for momentum
+      const now = Date.now();
+      const dt = now - lastTimeRef.current;
+      const dx = event.clientX - lastPosRef.current;
+      
+      if (dt > 0) {
+        // Smooth velocity calculation (pixels per frame, roughly 16ms target)
+        velocityRef.current = -(dx / dt) * 16;
+      }
+      
+      lastPosRef.current = event.clientX;
+      lastTimeRef.current = now;
+      
+      const totalDx = startXRef.current - event.clientX;
+      setOffsetSafe(startOffsetRef.current + totalDx);
     },
     [isDragging, setOffsetSafe],
   );
@@ -265,15 +334,25 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (pointerIdRef.current !== event.pointerId) return;
       event.preventDefault();
+      
       pointerIdRef.current = null;
       setIsDragging(false);
-      setIsInteracting(false);
-      clearInteractionTimeout();
+      
       if (viewportRef.current?.hasPointerCapture?.(event.pointerId)) {
         viewportRef.current.releasePointerCapture(event.pointerId);
       }
+      
+      clearInteractionTimeout();
+      
+      // Apply momentum based on final velocity
+      if (!prefersReducedMotion && Math.abs(velocityRef.current) > 0.5) {
+        applyMomentum();
+      } else {
+        setIsInteracting(false);
+        velocityRef.current = 0;
+      }
     },
-    [clearInteractionTimeout],
+    [applyMomentum, clearInteractionTimeout, prefersReducedMotion],
   );
 
   return (
