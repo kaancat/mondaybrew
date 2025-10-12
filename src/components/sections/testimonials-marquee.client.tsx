@@ -123,7 +123,7 @@ function Card({ card }: { card: TCard }) {
       <div className={cn("group/card relative shrink-0", cardWidthClass)}>
         <div
           className={cn(
-            "card-inner relative flex h-full rounded-[5px] overflow-hidden",
+            "card-inner relative flex h-full min-h-[400px] rounded-[5px] overflow-hidden",
             "ring-1 ring-black/10 dark:ring-white/10",
             "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
           )}
@@ -131,7 +131,7 @@ function Card({ card }: { card: TCard }) {
         >
           {/* Left side: Image (takes ~40% width) */}
           {card.image?.url ? (
-            <div className="relative w-[40%] shrink-0">
+            <div className="relative w-[40%] shrink-0 h-full">
               <Image
                 src={card.image.url}
                 alt={card.image.alt || ""}
@@ -143,7 +143,7 @@ function Card({ card }: { card: TCard }) {
           ) : null}
 
           {/* Right side: Quote content (takes ~60% width) */}
-          <div className="flex flex-1 flex-col p-6">
+          <div className="flex flex-1 flex-col p-6" style={{ background: bg ?? "var(--card)" }}>
             {/* Logo top-left */}
             {card.logo?.url ? (
               <div className="relative h-6 w-24 shrink-0 opacity-90 mb-6">
