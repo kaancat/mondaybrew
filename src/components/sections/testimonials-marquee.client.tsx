@@ -70,8 +70,130 @@ function Card({ card }: { card: TCard }) {
   const textClass = ink === "#ffffff" ? "text-white" : "text-[color:var(--brand-ink-strong)]";
   const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
+  // Adjust card width based on variant
+  const cardWidthClass = card.variant === "quote" 
+    ? "min-w-[340px] max-w-[520px]" 
+    : "min-w-[510px] max-w-[780px]"; // ~1.5x wider for image variants
+
+  // IMAGE ONLY variant - full image with CTA overlay
+  if (card.variant === "image") {
+    return (
+      <div className={cn("group/card relative shrink-0", cardWidthClass)}>
+        <div
+          className={cn(
+            "card-inner relative flex h-full flex-col rounded-[5px] overflow-hidden",
+            "ring-1 ring-black/10 dark:ring-white/10",
+            "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
+          )}
+          style={{ background: bg ?? "var(--card)", transformOrigin: "center" }}
+        >
+          {/* Full-size image */}
+          {card.image?.url ? (
+            <div className="relative flex-1 min-h-[400px]">
+              <Image
+                src={card.image.url}
+                alt={card.image.alt || ""}
+                fill
+                className="object-cover"
+                sizes="780px"
+              />
+            </div>
+          ) : null}
+
+          {/* CTA overlay at bottom */}
+          {card.cta?.label && card.cta?.href ? (
+            <div className="relative z-10 bg-black/80 backdrop-blur-sm px-6 py-4">
+              <Link 
+                href={card.cta.href} 
+                className="flex items-center justify-between text-sm text-white hover:text-white/80 transition-colors"
+              >
+                <span>{card.cta.label}</span>
+                <span aria-hidden>→</span>
+              </Link>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
+  // IMAGE + QUOTE variant - side by side layout
+  if (card.variant === "imageQuote") {
+    return (
+      <div className={cn("group/card relative shrink-0", cardWidthClass)}>
+        <div
+          className={cn(
+            "card-inner relative flex h-full rounded-[5px] overflow-hidden",
+            "ring-1 ring-black/10 dark:ring-white/10",
+            "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
+          )}
+          style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
+        >
+          {/* Left side: Image (takes ~40% width) */}
+          {card.image?.url ? (
+            <div className="relative w-[40%] shrink-0">
+              <Image
+                src={card.image.url}
+                alt={card.image.alt || ""}
+                fill
+                className="object-cover"
+                sizes="312px"
+              />
+            </div>
+          ) : null}
+
+          {/* Right side: Quote content (takes ~60% width) */}
+          <div className="flex flex-1 flex-col p-6">
+            {/* Logo top-left */}
+            {card.logo?.url ? (
+              <div className="relative h-6 w-24 shrink-0 opacity-90 mb-6">
+                <Image 
+                  src={card.logo.url} 
+                  alt={card.logo.alt || ""} 
+                  fill 
+                  className="object-contain object-left" 
+                  sizes="96px"
+                />
+              </div>
+            ) : null}
+
+            {/* Centered quote content */}
+            <div className="flex flex-1 flex-col justify-center">
+              {card.quote ? (
+                <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
+                  &ldquo;{card.quote}&rdquo;
+                </blockquote>
+              ) : null}
+              
+              <div className="mt-6 h-px w-12 bg-current/30" />
+
+              <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+                {card.author}
+                {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+              </div>
+            </div>
+
+            {/* CTA at bottom */}
+            {card.cta?.label && card.cta?.href ? (
+              <>
+                <div className="mt-6 h-px w-full bg-current/20" />
+                <div className={cn("mt-4 flex items-center justify-between text-sm", subClass)}>
+                  <Link href={card.cta.href} className="underline-offset-4 hover:underline">
+                    {card.cta.label}
+                  </Link>
+                  <span aria-hidden>→</span>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // QUOTE ONLY variant - existing implementation
   return (
-    <div className="group/card relative min-w-[340px] max-w-[520px] shrink-0">
+    <div className={cn("group/card relative shrink-0", cardWidthClass)}>
       <div
         className={cn(
           "card-inner relative flex h-full flex-col rounded-[5px] p-6",
