@@ -80,12 +80,17 @@ function Card({ card }: { card: TCard }) {
         )}
         style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
       >
+        {/* Logo - top LEFT for quote variant, top RIGHT for others */}
         {card.logo?.url ? (
-          <div className="absolute right-4 top-4 h-6 w-24 opacity-90">
-            <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain" />
+          <div className={cn(
+            "absolute top-6 h-6 w-24 opacity-90",
+            card.variant === "quote" ? "left-6" : "right-6"
+          )}>
+            <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain object-left" />
           </div>
         ) : null}
 
+      {/* Image for non-quote variants */}
       {card.variant !== "quote" && card.image?.url ? (
         <div className="mb-4 overflow-hidden rounded-[6px]">
           <Image
@@ -100,26 +105,40 @@ function Card({ card }: { card: TCard }) {
         </div>
       ) : null}
 
+      {/* Quote text - with top margin for logo space when it's a quote variant */}
       {card.variant !== "image" && card.quote ? (
-        <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
-          “{card.quote}”
+        <blockquote className={cn(
+          "text-balance text-xl leading-[1.35]",
+          card.variant === "quote" && card.logo?.url ? "mt-12" : "",
+          textClass
+        )}>
+          "{card.quote}"
         </blockquote>
       ) : null}
 
-      <div className="mt-4 h-px w-full bg-current/20" />
+      {/* SHORT separator line after quote */}
+      <div className="mt-4 h-px w-12 bg-current/30" />
 
+      {/* Author info */}
       <div className={cn("mt-3 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
         {card.author}
         {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
       </div>
 
+      {/* Spacer to push CTA to bottom */}
+      <div className="flex-grow" />
+
+      {/* Full-width separator line before CTA */}
       {card.cta?.label && card.cta?.href ? (
-        <div className={cn("mt-4 flex items-center justify-between text-sm", subClass)}>
-          <Link href={card.cta.href} className="underline-offset-4 hover:underline">
-            {card.cta.label}
-          </Link>
-          <span aria-hidden>→</span>
-        </div>
+        <>
+          <div className="mt-6 h-px w-full bg-current/20" />
+          <div className={cn("mt-4 flex items-center justify-between text-sm", subClass)}>
+            <Link href={card.cta.href} className="underline-offset-4 hover:underline">
+              {card.cta.label}
+            </Link>
+            <span aria-hidden>→</span>
+          </div>
+        </>
       ) : null}
       </div>
     </div>
