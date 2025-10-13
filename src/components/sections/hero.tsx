@@ -234,17 +234,15 @@ export function HeroSection({
     })
     .filter(Boolean) as HeroFeatureDisplayItem[];
 
-  const offsetVar = "var(--hero-offset, 140px)";
-  const bottomGapVar = "var(--hero-bottom-gap, 96px)";
   // Fill the viewport regardless of header height
   const heroHeight = `100dvh`;
 
-  const contentJustify = alignment === "start" ? "flex-start" : alignment === "end" ? "flex-end" : "center";
   const contentGap = alignment === "center" ? "gap-12" : "gap-10";
+  const justifyMd = alignment === "start" ? "md:justify-start" : alignment === "end" ? "md:justify-end" : "md:justify-center";
 
   const hasFeature = featureItems.length > 0;
-  // With a smaller mobile feature card, we can reduce the safe padding
-  const mobileFeaturePad = hasFeature ? "pb-[180px] sm:pb-[240px] md:pb-10" : "";
+  // With a smaller mobile feature card, reduce safe padding so text sits higher
+  const mobileFeaturePad = hasFeature ? "pb-[140px] sm:pb-[220px] md:pb-10" : "";
 
   return (
     <Section
@@ -285,8 +283,7 @@ export function HeroSection({
         </div>
 
         <div
-          className={`relative z-10 flex h-full flex-col ${contentGap} px-6 py-10 sm:px-10 lg:px-16 ${mobileFeaturePad}`}
-          style={{ justifyContent: contentJustify }}
+          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-16 pb-10 sm:px-10 sm:pt-16 lg:px-16 ${mobileFeaturePad}`}
         >
           <div className="max-w-2xl text-white">
             {eyebrow ? (
