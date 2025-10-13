@@ -80,7 +80,10 @@ function QuoteCard({ card }: { card: TCard }) {
   const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
   return (
-    <div className="group/card relative min-w-[340px] max-w-[520px] shrink-0">
+    <div
+      className="group/card relative shrink-0"
+      style={{ width: 420, minWidth: 420 }}
+    >
       <div
         className={cn(
           "card-inner relative flex h-full flex-col rounded-[10px] p-6",
@@ -125,7 +128,10 @@ function ImageQuoteCard({ card }: { card: TCard }) {
   const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
   return (
-    <div className="group/card relative min-w-[520px] max-w-[800px] shrink-0">
+    <div
+      className="group/card relative shrink-0"
+      style={{ width: 720, minWidth: 720 }}
+    >
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
@@ -176,7 +182,10 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 function ImageOnlyCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
   return (
-    <div className="group/card relative min-w-[520px] max-w-[800px] shrink-0">
+    <div
+      className="group/card relative shrink-0"
+      style={{ width: 720, minWidth: 720 }}
+    >
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
