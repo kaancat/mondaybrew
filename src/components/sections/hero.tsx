@@ -236,8 +236,8 @@ export function HeroSection({
 
   const offsetVar = "var(--hero-offset, 140px)";
   const bottomGapVar = "var(--hero-bottom-gap, 96px)";
-  // Use dynamic viewport height to avoid mobile browser UI shrinking issues
-  const heroHeight = `min(820px, max(500px, calc(100dvh - ${offsetVar} - ${bottomGapVar})))`;
+  // Fill the viewport regardless of header height
+  const heroHeight = `100dvh`;
 
   const contentJustify = alignment === "start" ? "flex-start" : alignment === "end" ? "flex-end" : "center";
   const contentGap = alignment === "center" ? "gap-12" : "gap-10";
@@ -249,8 +249,9 @@ export function HeroSection({
   return (
     <Section
       padding="none"
-      className="mt-0 md:mt-[var(--hero-offset,140px)] mb-[var(--hero-bottom-gap,96px)]"
+      className="mt-0 mb-0"
       innerClassName="pb-16"
+      data-hero-full="true"
     >
       <div
         className="full-bleed md:relative md:isolate flex w-full flex-col overflow-hidden md:rounded-[5px] md:border md:border-white/10 md:bg-black/60 shadow-[var(--shadow-hero)]"

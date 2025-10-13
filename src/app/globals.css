@@ -567,6 +567,8 @@ html.dark {
   /* Vertical rhythm helpers (margin-based; avoid double stacking) */
   /* Hero uses medium gap on all breakpoints */
   .vr-hero { margin-bottom: var(--section-gap-md); }
+  /* If the hero declares 100vh, remove external rhythm spacing */
+  .vr-hero:has([data-hero-full="true"]) { margin-bottom: 0 !important; }
 
   .vr-section { margin-top: var(--section-gap-sm); }
   @media (min-width: 768px) { .vr-section { margin-top: var(--section-gap-md); } }
