@@ -258,10 +258,15 @@ function Card({ card }: { card: TCard }) {
 }
 
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
-  const normalizedItems = useMemo(() => items.map((card, i) => ({
-    ...card,
-    background: card.background ?? DEFAULT_BACKGROUNDS[i % DEFAULT_BACKGROUNDS.length],
-  })), [items]);
+  const normalizedItems = useMemo(() => {
+    const palette = DEFAULT_BACKGROUNDS;
+    return items.map((card, i) => {
+      const raw = card.background?.trim();
+      const usesToken = raw ? raw.startsWith("var(") || raw.includes("var(--") : false;
+      const background = usesToken && raw ? raw : palette[i % palette.length];
+      return { ...card, background };
+    });
+  }, [items]);
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const setRef = useRef<HTMLDivElement | null>(null);
