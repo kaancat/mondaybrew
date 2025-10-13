@@ -337,7 +337,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             </nav>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 px-0 py-0 sm:gap-3 md:flex-nowrap md:justify-end md:pl-4">
+          <div className="hidden md:flex flex-wrap items-center gap-2 px-0 py-0 sm:gap-3 md:flex-nowrap md:justify-end md:pl-4">
             {(() => {
               return (
                 <button
