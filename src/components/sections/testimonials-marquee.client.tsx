@@ -251,6 +251,11 @@ function Card({ card }: { card: TCard }) {
 }
 
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
+  const normalizedItems = useMemo(() => items.map((card, i) => ({
+    ...card,
+    background: card.background ?? DEFAULT_BACKGROUNDS[i % DEFAULT_BACKGROUNDS.length],
+  })), [items]);
+
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const setRef = useRef<HTMLDivElement | null>(null);
   const [setWidth, setSetWidth] = useState(0);
@@ -358,7 +363,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     observer.observe(setEl);
     observer.observe(vpEl);
     return () => observer.disconnect();
-  }, [items]);
+  }, [normalizedItems]);
 
   useEffect(() => {
     setOffsetSafe(offsetRef.current);
@@ -505,7 +510,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
               className="flex"
               aria-hidden={idx > 0}
             >
-              {items.map((card, i) => (
+              {normalizedItems.map((card, i) => (
                 <Card key={`${idx}-${i}`} card={card} />
               ))}
             </div>
