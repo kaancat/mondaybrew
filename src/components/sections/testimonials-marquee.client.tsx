@@ -33,7 +33,6 @@ type ToneStyle = {
   sub: string;
   divider: string;
   border: string;
-  ctaBg?: string;
   ctaInk?: string;
 };
 
@@ -72,7 +71,6 @@ const TONE_PRESETS: Record<ToneKey, ToneStyle> = {
     sub: "color-mix(in oklch, var(--brand-ink-strong) 70%, transparent 30%)",
     divider: "color-mix(in oklch, var(--brand-ink-strong) 14%, transparent 86%)",
     border: "color-mix(in oklch, var(--brand-ink-strong) 18%, transparent 82%)",
-    ctaBg: "color-mix(in oklch, var(--brand-ink-strong) 10%, var(--surface-elevated) 90%)",
     ctaInk: "var(--brand-ink-strong)",
   },
   charcoal: {
@@ -81,7 +79,6 @@ const TONE_PRESETS: Record<ToneKey, ToneStyle> = {
     sub: "color-mix(in oklch, var(--brand-light) 80%, transparent 20%)",
     divider: "color-mix(in oklch, var(--brand-light) 28%, transparent 72%)",
     border: "color-mix(in oklch, var(--brand-light) 24%, transparent 76%)",
-    ctaBg: "color-mix(in oklch, var(--surface-dark) 72%, transparent 28%)",
     ctaInk: "var(--brand-light)",
   },
   accent: {
@@ -90,7 +87,6 @@ const TONE_PRESETS: Record<ToneKey, ToneStyle> = {
     sub: "color-mix(in oklch, var(--brand-light) 82%, transparent 18%)",
     divider: "color-mix(in oklch, var(--brand-light) 32%, transparent 68%)",
     border: "color-mix(in oklch, var(--brand-light) 28%, transparent 72%)",
-    ctaBg: "color-mix(in oklch, var(--accent) 78%, transparent 22%)",
     ctaInk: "var(--brand-light)",
   },
 };
@@ -138,7 +134,6 @@ function deriveColorsFromBackground(background: string): ToneStyle {
       sub: LIGHT_SUB,
       divider: LIGHT_DIVIDER,
       border: LIGHT_BORDER,
-      ctaBg: "color-mix(in oklch, var(--brand-light) 14%, transparent 86%)",
       ctaInk: LIGHT_INK,
     };
   }
@@ -148,7 +143,6 @@ function deriveColorsFromBackground(background: string): ToneStyle {
     sub: DARK_SUB,
     divider: DARK_DIVIDER,
     border: DARK_BORDER,
-    ctaBg: "color-mix(in oklch, var(--brand-ink-strong) 16%, transparent 84%)",
     ctaInk: DARK_INK,
   };
 }
@@ -176,12 +170,13 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
 
 function CardCta({ card, colors, className }: { card: TCard; colors: ToneStyle; className?: string }) {
   if (!card.cta?.label || !card.cta.href) return null;
+  const ink = colors.ctaInk ?? colors.ink;
   return (
     <div
       className={cn("border-t pt-4", className)}
-      style={{ borderColor: colors.border, background: colors.ctaBg }}
+      style={{ borderColor: colors.border }}
     >
-      <div className="flex items-center justify-between text-sm" style={{ color: colors.ctaInk ?? colors.sub }}>
+      <div className="flex items-center justify-between text-sm" style={{ color: ink }}>
         <Link href={card.cta.href} className="underline-offset-4 hover:underline">
           {card.cta.label}
         </Link>
@@ -279,7 +274,6 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 function ImageOnlyCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
   const colors = card.colors ?? TONE_PRESETS.charcoal;
-  const overlay = colors.ctaBg ?? "color-mix(in oklch, var(--surface-dark) 72%, transparent 28%)";
   const captionColor = colors.ctaInk ?? colors.ink;
 
   return (
@@ -301,11 +295,14 @@ function ImageOnlyCard({ card }: { card: TCard }) {
           className="h-full w-full object-cover"
         />
         <CardLogo card={card} className="absolute left-6 top-6 z-10" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t" style={{ backgroundImage: "linear-gradient(to top," + overlay + " 0%, transparent 100%)" }} />
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
+          style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%)" }}
+        />
         {card.cta?.label && card.cta?.href ? (
           <div
-            className="absolute inset-x-0 bottom-0 flex items-center justify-between px-6 py-4 text-sm"
-            style={{ borderTop: `1px solid ${colors.border}`, background: overlay, color: captionColor }}
+            className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t px-6 py-4 text-sm"
+            style={{ borderColor: colors.border, background: "rgba(0,0,0,0.68)", color: captionColor }}
           >
             <Link
               href={card.cta.href}
