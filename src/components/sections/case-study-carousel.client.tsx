@@ -16,12 +16,12 @@ export interface CaseStudyCarouselProps {
 }
 
 export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, exploreLabel = "Explore all cases", eyebrow, headlineText, intro }: CaseStudyCarouselProps) {
+  const clampedInitial = Math.min(Math.max(initialIndex, 0), Math.max(items.length - 1, 0));
   const frameRef = useRef<HTMLDivElement>(null); // non-scrolling frame
   const scrollerRef = useRef<HTMLDivElement>(null); // scrollable track
-  const [index, setIndex] = useState(initialIndex);
+  const [index, setIndex] = useState(clampedInitial);
   const [perView, setPerView] = useState(1);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [announce, setAnnounce] = useState("");
   const rafRef = useRef<number | null>(null);
 
   // Responsive items per view
@@ -68,7 +68,6 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     return Math.max(0, Math.floor(w));
   }, [containerWidth, perView, gapPx, peekPx]);
 
-  const stepX = useMemo(() => perView * (cardWidth + gapPx), [perView, cardWidth, gapPx]);
   const totalWidth = useMemo(() => (items.length * cardWidth) + Math.max(0, items.length - 1) * gapPx, [items.length, cardWidth, gapPx]);
   const maxOffset = useMemo(() => Math.max(0, totalWidth - containerWidth), [totalWidth, containerWidth]);
 
@@ -97,7 +96,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     const eps = 1;
     setCanPrev(sl > eps);
     setCanNext(max - sl > eps);
-  }, []);
+    const approx = Math.round(sl / Math.max(cardWidth + gapPx, 1));
+    setIndex((prev) => (approx === prev ? prev : approx));
+  }, [cardWidth, gapPx]);
 
   const scrollByChunk = useCallback((dir: -1 | 1) => {
     const el = scrollerRef.current;
@@ -107,6 +108,13 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     const next = Math.min(Math.max(0, Math.round(el.scrollLeft + dir * chunk)), Math.round(maxOffset));
     el.scrollTo({ left: next, behavior: prefersReduced ? "auto" : "smooth" });
   }, [cardWidth, gapPx, containerWidth, maxOffset, prefersReduced]);
+
+  const announcement = useMemo(() => {
+    const clamped = Math.min(Math.max(index, 0), Math.max(items.length - 1, 0));
+    const current = items[clamped];
+    if (!current) return "";
+    return `Showing ${current.title}`;
+  }, [index, items]);
 
   return (
     <div className="group/section">
@@ -192,7 +200,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         </button>
       </div>
       {/* polite announcement for screen readers */}
-      <div aria-live="polite" className="sr-only" role="status">{announce}</div>
+      <div aria-live="polite" className="sr-only" role="status">{announcement}</div>
     </div>
   );
 }

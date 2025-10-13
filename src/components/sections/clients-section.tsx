@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Container } from "@/components/layout/container";
 import { cn } from "@/lib/utils";
 import ClientsMarquee from "./clients.marquee.client";
 
@@ -115,7 +114,7 @@ function LinedGrid({ items, more, locale, forceBlackLogos }: { items: ClientLogo
         "--color-border": "var(--border)",
         // logo tone
         "--clients-logo-filter": forceBlackLogos ? "brightness(0) saturate(100%)" : "grayscale(100%)",
-        // Orange hover tuned for #ff914d
+        // Orange hover tuned for brand accent tone
         "--clients-logo-hover-filter": forceBlackLogos
           ? "invert(60%) sepia(86%) saturate(1200%) hue-rotate(340deg) brightness(105%) contrast(101%)"
           : "none",

@@ -385,7 +385,7 @@ export function ServicesSplit({
                 className={cn(
                   "rounded-[5px] p-6",
                   isLightAlt
-                    ? "border border-black/10 bg-white text-[#151418] shadow-[var(--shadow-elevated-md)]"
+                    ? "border border-black/10 bg-white text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
                     : "border border-[color:color-mix(in oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
                 )}
               >
@@ -418,7 +418,6 @@ export function ServicesSplit({
                         key={cta.id || `${activeService.id}-cta-${index}`}
                         cta={cta}
                         index={index}
-                        isLightAlt={isLightAlt}
                       />
                     ))}
                   </div>
@@ -485,7 +484,7 @@ function renderMedia(media: ServicesSplitMedia | null | undefined, isLightAlt: b
   );
 }
 
-function CtaButton({ cta, index, isLightAlt }: { cta: ServicesSplitCta; index: number; isLightAlt: boolean }) {
+function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
   if (!cta.href) return null;
   const resolvedVariant: "primary" | "secondary" = (() => {
     if (cta.style === "secondary") return "secondary";

@@ -50,6 +50,8 @@ const CARD_WIDTHS: Record<TCard["variant"], number> = {
 };
 
 const CARD_GAP = 24; // px spacing applied symmetrically around each card
+const LIGHT_INK = "var(--brand-light)";
+const DARK_INK = "var(--brand-ink-strong)";
 
 // simple luminance check to pick ink
 function hexToRgb(hex?: string | null) {
@@ -63,14 +65,14 @@ function hexToRgb(hex?: string | null) {
 }
 function pickInk(bg?: string | null) {
   const rgb = hexToRgb(bg || "");
-  if (!rgb) return "var(--brand-ink-strong)";
+  if (!rgb) return DARK_INK;
   // relative luminance
   const a = [rgb.r, rgb.g, rgb.b].map(v=>{
     const s = v/255;
     return s <= 0.03928 ? s/12.92 : Math.pow((s+0.055)/1.055,2.4);
   });
   const L = 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
-  return L > 0.5 ? "#0a0a0a" : "#ffffff";
+  return L > 0.5 ? DARK_INK : LIGHT_INK;
 }
 
 function CardLogo({ card, className }: { card: TCard; className?: string }) {
@@ -87,7 +89,7 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
   return (
     <div
       className="group/card relative shrink-0"
-      style={{ width: width + CARD_GAP, minWidth: width + CARD_GAP, flex: "0 0 auto", paddingInline: CARD_GAP / 2 }}
+      style={{ width, minWidth: width, flex: "0 0 auto", marginInline: CARD_GAP / 2 }}
     >
       {children}
     </div>
@@ -97,8 +99,9 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
 function QuoteCard({ card }: { card: TCard }) {
   const bg = card.background || undefined;
   const ink = pickInk(bg);
-  const textClass = ink === "#ffffff" ? "text-white" : "text-[color:var(--brand-ink-strong)]";
-  const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
+  const useLightInk = ink === LIGHT_INK;
+  const textClass = useLightInk ? "text-white" : "text-[color:var(--brand-ink-strong)]";
+  const subClass = useLightInk ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
   return (
     <CardFrame card={card}>
@@ -142,8 +145,9 @@ function ImageQuoteCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
   const textBg = card.background || "var(--card)";
   const ink = pickInk(textBg);
-  const textClass = ink === "#ffffff" ? "text-white" : "text-[color:var(--brand-ink-strong)]";
-  const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
+  const useLightInk = ink === LIGHT_INK;
+  const textClass = useLightInk ? "text-white" : "text-[color:var(--brand-ink-strong)]";
+  const subClass = useLightInk ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
   return (
     <CardFrame card={card}>
@@ -494,7 +498,6 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
               key={idx}
               ref={idx === 0 ? setRef : undefined}
               className="flex"
-              style={{ paddingRight: CARD_GAP }}
               aria-hidden={idx > 0}
             >
               {items.map((card, i) => (
