@@ -223,16 +223,17 @@ function QuoteCard({ card }: { card: TCard }) {
 }
 
 function ImageQuoteCard({ card }: { card: TCard }) {
-  // Simplified: treat image+text as a pure image card with CTA bar and logo
+  // Unified image-only style (same as Siemens CTA look):
+  // - Strong scrim
+  // - White CTA text + arrow
+  // - Subtle white border on top of CTA bar
   if (!card.image?.url) return null;
-  const colors = card.colors ?? TONE_PRESETS.charcoal;
-  const captionColor = colors.ctaInk ?? colors.ink;
 
   return (
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
+          "card-inner relative flex h-full min-h=[340px] overflow-hidden rounded-[10px]",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
@@ -246,15 +247,20 @@ function ImageQuoteCard({ card }: { card: TCard }) {
           blurDataURL={card.image.lqip || undefined}
           className="h-full w-full object-cover"
         />
-        <CardLogo card={card} className="absolute right-6 top-6 z-10" />
+        <CardLogo card={card} className="absolute right-6 top-6 z-20" />
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
-          style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%)" }}
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40"
+          style={{ backgroundImage: "linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.56) 60%, transparent 100%)" }}
         />
         {card.cta?.label && card.cta?.href ? (
           <div
-            className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t px-6 py-4 text-sm"
-            style={{ borderColor: colors.border, background: "rgba(0,0,0,0.68)", color: captionColor }}
+            className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between border-t px-6 py-4 text-sm"
+            style={{
+              borderColor: "rgba(255,255,255,0.22)",
+              background: "rgba(0,0,0,0.78)",
+              color: "#fff",
+              textShadow: "0 1px 1px rgba(0,0,0,0.35)",
+            }}
           >
             <Link
               href={card.cta.href}
@@ -262,7 +268,7 @@ function ImageQuoteCard({ card }: { card: TCard }) {
             >
               {card.cta.label}
             </Link>
-            <span aria-hidden>→</span>
+            <span aria-hidden style={{ opacity: 0.95 }}>→</span>
           </div>
         ) : null}
       </div>
@@ -272,9 +278,6 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 
 function ImageOnlyCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
-  const colors = card.colors ?? TONE_PRESETS.charcoal;
-  const captionColor = colors.ctaInk ?? colors.ink;
-
   return (
     <CardFrame card={card}>
       <div
@@ -293,15 +296,20 @@ function ImageOnlyCard({ card }: { card: TCard }) {
           blurDataURL={card.image.lqip || undefined}
           className="h-full w-full object-cover"
         />
-        <CardLogo card={card} className="absolute right-6 top-6 z-10" />
+        <CardLogo card={card} className="absolute right-6 top-6 z-20" />
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
-          style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%)" }}
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40"
+          style={{ backgroundImage: "linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.56) 60%, transparent 100%)" }}
         />
         {card.cta?.label && card.cta?.href ? (
           <div
-            className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t px-6 py-4 text-sm"
-            style={{ borderColor: colors.border, background: "rgba(0,0,0,0.68)", color: captionColor }}
+            className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between border-t px-6 py-4 text-sm"
+            style={{
+              borderColor: "rgba(255,255,255,0.22)",
+              background: "rgba(0,0,0,0.78)",
+              color: "#fff",
+              textShadow: "0 1px 1px rgba(0,0,0,0.35)",
+            }}
           >
             <Link
               href={card.cta.href}
@@ -309,7 +317,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
             >
               {card.cta.label}
             </Link>
-            <span aria-hidden>→</span>
+            <span aria-hidden style={{ opacity: 0.95 }}>→</span>
           </div>
         ) : null}
       </div>
