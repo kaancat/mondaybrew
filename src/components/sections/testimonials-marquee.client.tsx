@@ -42,6 +42,12 @@ export type TestimonialsClientProps = {
   speedBottom?: number;
 };
 
+const CARD_WIDTHS: Record<TCard["variant"], number> = {
+  quote: 420,
+  imageQuote: 720,
+  image: 720,
+};
+
 // simple luminance check to pick ink
 function hexToRgb(hex?: string | null) {
   if (!hex) return null;
@@ -79,10 +85,12 @@ function QuoteCard({ card }: { card: TCard }) {
   const textClass = ink === "#ffffff" ? "text-white" : "text-[color:var(--brand-ink-strong)]";
   const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
+  const width = CARD_WIDTHS.quote;
+
   return (
     <div
       className="group/card relative shrink-0"
-      style={{ width: 420, minWidth: 420 }}
+      style={{ width, minWidth: width, flex: "0 0 auto" }}
     >
       <div
         className={cn(
@@ -127,10 +135,12 @@ function ImageQuoteCard({ card }: { card: TCard }) {
   const textClass = ink === "#ffffff" ? "text-white" : "text-[color:var(--brand-ink-strong)]";
   const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
+  const width = CARD_WIDTHS.imageQuote;
+
   return (
     <div
       className="group/card relative shrink-0"
-      style={{ width: 720, minWidth: 720 }}
+      style={{ width, minWidth: width, flex: "0 0 auto" }}
     >
       <div
         className={cn(
@@ -181,10 +191,11 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 
 function ImageOnlyCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
+  const width = CARD_WIDTHS.image;
   return (
     <div
       className="group/card relative shrink-0"
-      style={{ width: 720, minWidth: 720 }}
+      style={{ width, minWidth: width, flex: "0 0 auto" }}
     >
       <div
         className={cn(
