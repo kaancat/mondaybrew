@@ -96,6 +96,20 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
   );
 }
 
+function CardCta({ card, textClass, className }: { card: TCard; textClass: string; className?: string }) {
+  if (!card.cta?.label || !card.cta.href) return null;
+  return (
+    <div className={cn("mt-8 border-t border-current/15 pt-4", className)}>
+      <div className={cn("flex items-center justify-between text-sm", textClass)}>
+        <Link href={card.cta.href} className="underline-offset-4 hover:underline">
+          {card.cta.label}
+        </Link>
+        <span aria-hidden>→</span>
+      </div>
+    </div>
+  );
+}
+
 function QuoteCard({ card }: { card: TCard }) {
   const bg = card.background || undefined;
   const ink = pickInk(bg);
@@ -113,29 +127,22 @@ function QuoteCard({ card }: { card: TCard }) {
         )}
         style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
       >
-        <CardLogo card={card} className="ml-auto" />
+        <CardLogo card={card} className="mb-6" />
 
         {card.quote ? (
-          <blockquote className={cn("mt-6 text-balance text-xl leading-[1.35]", textClass)}>
+          <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
             “{card.quote}”
           </blockquote>
         ) : null}
 
-        <div className="mt-6 h-px w-12 bg-current/30" />
+        <div className={cn("mt-6 h-px w-12 bg-current/30", textClass)} />
 
         <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
           {card.author}
           {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
         </div>
 
-        {card.cta?.label && card.cta?.href ? (
-          <div className={cn("mt-6 flex items-center justify-between text-sm", subClass)}>
-            <Link href={card.cta.href} className="underline-offset-4 hover:underline">
-              {card.cta.label}
-            </Link>
-            <span aria-hidden>→</span>
-          </div>
-        ) : null}
+        <CardCta card={card} textClass={subClass} />
       </div>
     </CardFrame>
   );
@@ -170,9 +177,9 @@ function ImageQuoteCard({ card }: { card: TCard }) {
           />
         </div>
         <div className="flex flex-1 flex-col p-6" style={{ background: textBg, color: ink }}>
-          <CardLogo card={card} className="ml-auto" />
+          <CardLogo card={card} className="mb-6" />
           {card.quote ? (
-            <blockquote className={cn("mt-6 text-balance text-xl leading-[1.35]", textClass)}>
+            <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
               “{card.quote}”
             </blockquote>
           ) : null}
@@ -184,14 +191,8 @@ function ImageQuoteCard({ card }: { card: TCard }) {
             {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
           </div>
 
-          {card.cta?.label && card.cta?.href ? (
-            <div className="mt-auto flex items-center justify-between text-sm text-inherit">
-              <Link href={card.cta.href} className="underline-offset-4 hover:underline">
-                {card.cta.label}
-              </Link>
-              <span aria-hidden>→</span>
-            </div>
-          ) : null}
+          <div className="mt-auto" />
+          <CardCta card={card} textClass={subClass} />
         </div>
       </div>
     </CardFrame>
@@ -218,9 +219,10 @@ function ImageOnlyCard({ card }: { card: TCard }) {
           blurDataURL={card.image.lqip || undefined}
           className="h-full w-full object-cover"
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 to-transparent" />
+        <CardLogo card={card} className="absolute left-6 top-6 z-10" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[color:color-mix(in_oklch,black_70%,transparent)] to-transparent" />
         {card.cta?.label && card.cta?.href ? (
-          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-6 pb-5 pt-4 text-sm text-white">
+          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-white/25 bg-[color:color-mix(in_oklch,black_78%,transparent_22%)] px-6 py-4 text-sm text-white">
             <Link
               href={card.cta.href}
               className="pointer-events-auto font-medium uppercase tracking-[0.18em] underline-offset-4 hover:underline"
