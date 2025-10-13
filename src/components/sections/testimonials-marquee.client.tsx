@@ -25,6 +25,18 @@ export type TImage = {
   height?: number;
 } | null;
 
+type ToneKey = "surface" | "charcoal" | "accent";
+
+type ToneStyle = {
+  background: string;
+  ink: string;
+  sub: string;
+  divider: string;
+  border: string;
+  ctaBg?: string;
+  ctaInk?: string;
+};
+
 export type TCard = {
   variant: "image" | "quote" | "imageQuote";
   background?: string | null;
@@ -34,7 +46,8 @@ export type TCard = {
   author?: string | null;
   role?: string | null;
   cta?: { label?: string | null; href?: string | null } | null;
-  tone?: "surface" | "charcoal" | "accent" | "auto" | null;
+  tone?: ToneKey | "auto" | null;
+  colors?: ToneStyle;
 };
 
 export type TestimonialsClientProps = {
@@ -51,20 +64,48 @@ const CARD_WIDTHS: Record<TCard["variant"], number> = {
 };
 
 const CARD_GAP = 32; // px spacing applied symmetrically around each card
-const TONE_PRESETS: Record<Exclude<TCard['tone'], null | undefined | 'auto'>, string> = {
-  surface: "var(--surface-elevated)",
-  charcoal: "color-mix(in oklch, var(--surface-dark) 92%, transparent 8%)",
-  accent: "color-mix(in oklch, var(--accent) 60%, var(--surface-base) 40%)",
+
+const TONE_PRESETS: Record<ToneKey, ToneStyle> = {
+  surface: {
+    background: "var(--surface-elevated)",
+    ink: "var(--brand-ink-strong)",
+    sub: "color-mix(in oklch, var(--brand-ink-strong) 70%, transparent 30%)",
+    divider: "color-mix(in oklch, var(--brand-ink-strong) 14%, transparent 86%)",
+    border: "color-mix(in oklch, var(--brand-ink-strong) 18%, transparent 82%)",
+    ctaBg: "color-mix(in oklch, var(--brand-ink-strong) 10%, var(--surface-elevated) 90%)",
+    ctaInk: "var(--brand-ink-strong)",
+  },
+  charcoal: {
+    background: "color-mix(in oklch, var(--surface-dark) 92%, transparent 8%)",
+    ink: "var(--brand-light)",
+    sub: "color-mix(in oklch, var(--brand-light) 80%, transparent 20%)",
+    divider: "color-mix(in oklch, var(--brand-light) 28%, transparent 72%)",
+    border: "color-mix(in oklch, var(--brand-light) 24%, transparent 76%)",
+    ctaBg: "color-mix(in oklch, var(--surface-dark) 72%, transparent 28%)",
+    ctaInk: "var(--brand-light)",
+  },
+  accent: {
+    background: "color-mix(in oklch, var(--accent) 88%, var(--surface-base) 12%)",
+    ink: "var(--brand-light)",
+    sub: "color-mix(in oklch, var(--brand-light) 82%, transparent 18%)",
+    divider: "color-mix(in oklch, var(--brand-light) 32%, transparent 68%)",
+    border: "color-mix(in oklch, var(--brand-light) 28%, transparent 72%)",
+    ctaBg: "color-mix(in oklch, var(--accent) 78%, transparent 22%)",
+    ctaInk: "var(--brand-light)",
+  },
 };
-const DEFAULT_BACKGROUNDS = [
-  TONE_PRESETS.surface,
-  TONE_PRESETS.charcoal,
-  TONE_PRESETS.accent,
-  "color-mix(in oklch, var(--accent) 28%, var(--surface-elevated) 72%)",
-];
+
+const TONE_SEQUENCE: ToneKey[] = ["surface", "charcoal", "accent"];
 
 const LIGHT_INK = "var(--brand-light)";
 const DARK_INK = "var(--brand-ink-strong)";
+
+const LIGHT_SUB = "color-mix(in oklch, var(--brand-light) 80%, transparent 20%)";
+const LIGHT_DIVIDER = "color-mix(in oklch, var(--brand-light) 32%, transparent 68%)";
+const LIGHT_BORDER = "color-mix(in oklch, var(--brand-light) 26%, transparent 74%)";
+const DARK_SUB = "color-mix(in oklch, var(--brand-ink-strong) 70%, transparent 30%)";
+const DARK_DIVIDER = "color-mix(in oklch, var(--brand-ink-strong) 18%, transparent 82%)";
+const DARK_BORDER = "color-mix(in oklch, var(--brand-ink-strong) 14%, transparent 86%)";
 
 // simple luminance check to pick ink
 function hexToRgb(hex?: string | null) {
@@ -88,6 +129,30 @@ function pickInk(bg?: string | null) {
   return L > 0.5 ? DARK_INK : LIGHT_INK;
 }
 
+function deriveColorsFromBackground(background: string): ToneStyle {
+  const ink = pickInk(background);
+  if (ink === LIGHT_INK) {
+    return {
+      background,
+      ink,
+      sub: LIGHT_SUB,
+      divider: LIGHT_DIVIDER,
+      border: LIGHT_BORDER,
+      ctaBg: "color-mix(in oklch, var(--brand-light) 14%, transparent 86%)",
+      ctaInk: LIGHT_INK,
+    };
+  }
+  return {
+    background,
+    ink,
+    sub: DARK_SUB,
+    divider: DARK_DIVIDER,
+    border: DARK_BORDER,
+    ctaBg: "color-mix(in oklch, var(--brand-ink-strong) 16%, transparent 84%)",
+    ctaInk: DARK_INK,
+  };
+}
+
 function CardLogo({ card, className }: { card: TCard; className?: string }) {
   if (!card.logo?.url) return null;
   return (
@@ -109,11 +174,14 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
   );
 }
 
-function CardCta({ card, textClass, className }: { card: TCard; textClass: string; className?: string }) {
+function CardCta({ card, colors, className }: { card: TCard; colors: ToneStyle; className?: string }) {
   if (!card.cta?.label || !card.cta.href) return null;
   return (
-    <div className={cn("border-t border-current/15 pt-4", className)}>
-      <div className={cn("flex items-center justify-between text-sm", textClass)}>
+    <div
+      className={cn("border-t pt-4", className)}
+      style={{ borderColor: colors.border, background: colors.ctaBg }}
+    >
+      <div className="flex items-center justify-between text-sm" style={{ color: colors.ctaInk ?? colors.sub }}>
         <Link href={card.cta.href} className="underline-offset-4 hover:underline">
           {card.cta.label}
         </Link>
@@ -124,40 +192,36 @@ function CardCta({ card, textClass, className }: { card: TCard; textClass: strin
 }
 
 function QuoteCard({ card }: { card: TCard }) {
-  const bg = card.background || undefined;
-  const ink = pickInk(bg);
-  const useLightInk = ink === LIGHT_INK;
-  const textClass = useLightInk ? "text-white" : "text-[color:var(--brand-ink-strong)]";
-  const subClass = useLightInk ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
+  const colors = card.colors ?? deriveColorsFromBackground(card.background ?? TONE_PRESETS.surface.background);
 
   return (
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full flex-col rounded-[10px] p-6",
+          "card-inner relative flex h-full flex-col rounded-[10px] p-8",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
-        style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
+        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
         <CardLogo card={card} className="mb-8 self-start" />
 
         <div className="flex flex-1 flex-col gap-6">
           {card.quote ? (
-            <blockquote className={cn("text-balance text-[1.65rem] leading-snug", textClass)}>
+            <blockquote className="text-balance text-[1.65rem] leading-snug" style={{ color: colors.ink }}>
               “{card.quote}”
             </blockquote>
           ) : null}
 
-          <div className="h-px w-12 bg-current/25" />
+          <div className="h-px w-12" style={{ background: colors.divider }} />
 
-          <div className={cn("text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+          <div className="text-sm font-medium uppercase tracking-[0.18em]" style={{ color: colors.sub }}>
             {card.author}
             {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
           </div>
         </div>
 
-        <CardCta card={card} textClass={subClass} className="mt-8" />
+        <CardCta card={card} colors={colors} className="mt-8" />
       </div>
     </CardFrame>
   );
@@ -165,11 +229,7 @@ function QuoteCard({ card }: { card: TCard }) {
 
 function ImageQuoteCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
-  const textBg = card.background || "var(--card)";
-  const ink = pickInk(textBg);
-  const useLightInk = ink === LIGHT_INK;
-  const textClass = useLightInk ? "text-white" : "text-[color:var(--brand-ink-strong)]";
-  const subClass = useLightInk ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
+  const colors = card.colors ?? deriveColorsFromBackground(card.background ?? TONE_PRESETS.surface.background);
 
   return (
     <CardFrame card={card}>
@@ -179,6 +239,7 @@ function ImageQuoteCard({ card }: { card: TCard }) {
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
+        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
         <div className="relative flex-[0_0_46%] min-w-[210px]">
           <Image
@@ -191,24 +252,24 @@ function ImageQuoteCard({ card }: { card: TCard }) {
             className="h-full w-full object-cover"
           />
         </div>
-        <div className="flex flex-1 flex-col p-6" style={{ background: textBg, color: ink }}>
+        <div className="flex flex-1 flex-col p-6" style={{ background: colors.background, color: colors.ink }}>
           <CardLogo card={card} className="mb-8 self-start" />
           <div className="flex flex-col gap-6">
             {card.quote ? (
-              <blockquote className={cn("text-balance text-[1.65rem] leading-snug", textClass)}>
+              <blockquote className="text-balance text-[1.65rem] leading-snug" style={{ color: colors.ink }}>
                 “{card.quote}”
               </blockquote>
             ) : null}
 
-            <div className="h-px w-12 bg-current/25" />
+            <div className="h-px w-12" style={{ background: colors.divider }} />
 
-            <div className={cn("text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+            <div className="text-sm font-medium uppercase tracking-[0.18em]" style={{ color: colors.sub }}>
               {card.author}
               {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
             </div>
           </div>
 
-          <CardCta card={card} textClass={subClass} className="mt-auto" />
+          <CardCta card={card} colors={colors} className="mt-auto" />
         </div>
       </div>
     </CardFrame>
@@ -217,6 +278,10 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 
 function ImageOnlyCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
+  const colors = card.colors ?? TONE_PRESETS.charcoal;
+  const overlay = colors.ctaBg ?? "color-mix(in oklch, var(--surface-dark) 72%, transparent 28%)";
+  const captionColor = colors.ctaInk ?? colors.ink;
+
   return (
     <CardFrame card={card}>
       <div
@@ -236,9 +301,12 @@ function ImageOnlyCard({ card }: { card: TCard }) {
           className="h-full w-full object-cover"
         />
         <CardLogo card={card} className="absolute left-6 top-6 z-10" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[color:color-mix(in_oklch,black_72%,transparent_28%)] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t" style={{ backgroundImage: "linear-gradient(to top," + overlay + " 0%, transparent 100%)" }} />
         {card.cta?.label && card.cta?.href ? (
-          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-white/20 bg-[color:color-mix(in_oklch,black_78%,transparent_22%)] px-6 py-4 text-sm text-white">
+          <div
+            className="absolute inset-x-0 bottom-0 flex items-center justify-between px-6 py-4 text-sm"
+            style={{ borderTop: `1px solid ${colors.border}`, background: overlay, color: captionColor }}
+          >
             <Link
               href={card.cta.href}
               className="pointer-events-auto font-medium uppercase tracking-[0.18em] underline-offset-4 hover:underline"
@@ -265,14 +333,20 @@ function Card({ card }: { card: TCard }) {
 
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
   const normalizedItems = useMemo(() => {
-    const palette = DEFAULT_BACKGROUNDS;
     return items.map((card, i) => {
       const raw = card.background?.trim();
-      const tone = card.tone && card.tone !== "auto" ? card.tone : null;
-      const preset = tone ? TONE_PRESETS[tone as Exclude<TCard["tone"], null | undefined | "auto">] : undefined;
+      const toneKey: ToneKey = (card.tone && card.tone !== "auto" ? card.tone : TONE_SEQUENCE[i % TONE_SEQUENCE.length]) as ToneKey;
+      const preset = TONE_PRESETS[toneKey];
       const usesToken = raw ? raw.startsWith("var(") || raw.includes("var(--") : false;
-      const background = preset ?? (usesToken && raw ? raw : palette[i % palette.length]);
-      return { ...card, background };
+
+      if (raw && !usesToken) {
+        const derived = deriveColorsFromBackground(raw);
+        return { ...card, tone: toneKey, background: raw, colors: derived };
+      }
+
+      const background = raw && usesToken ? raw : preset.background;
+      const colors: ToneStyle = raw && usesToken ? { ...preset, background: raw } : preset;
+      return { ...card, tone: toneKey, background, colors };
     });
   }, [items]);
 
