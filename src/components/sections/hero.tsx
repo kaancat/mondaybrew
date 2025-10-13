@@ -243,7 +243,8 @@ export function HeroSection({
   const contentGap = alignment === "center" ? "gap-12" : "gap-10";
 
   const hasFeature = featureItems.length > 0;
-  const mobileFeaturePad = hasFeature ? "pb-[260px] sm:pb-[300px] md:pb-10" : "";
+  // With a smaller mobile feature card, we can reduce the safe padding
+  const mobileFeaturePad = hasFeature ? "pb-[180px] sm:pb-[240px] md:pb-10" : "";
 
   return (
     <Section
@@ -252,7 +253,7 @@ export function HeroSection({
       style={{ marginTop: offsetVar, marginBottom: bottomGapVar }}
     >
       <div
-        className="relative isolate flex w-full flex-col overflow-hidden rounded-[5px] border border-white/10 bg-black/60 shadow-[var(--shadow-hero)]"
+        className="full-bleed md:relative md:isolate flex w-full flex-col overflow-hidden md:rounded-[5px] md:border md:border-white/10 md:bg-black/60 shadow-[var(--shadow-hero)]"
         style={{ minHeight: "560px", height: heroHeight }}
       >
         <div className="absolute inset-0">

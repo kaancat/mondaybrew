@@ -44,8 +44,7 @@ export function HeroFeatureCarousel({ items }: Props) {
 
   return (
     <div
-      className="group absolute bottom-6 right-6 w-full max-w-[26rem] text-white sm:bottom-8 sm:right-8 sm:max-w-[27.5rem] md:bottom-10 md:right-10"
-      // Keep pointer interactions and ensure stacking above gradients
+      className="group absolute bottom-4 right-4 w-[68vw] max-w-[18rem] text-white sm:bottom-6 sm:right-6 sm:w-[56vw] sm:max-w-[22rem] md:bottom-10 md:right-10 md:w-full md:max-w-[27.5rem]"
       style={{ zIndex: 10 }}
     >
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-85 transition-opacity duration-500 group-hover:opacity-100">
@@ -53,7 +52,7 @@ export function HeroFeatureCarousel({ items }: Props) {
       </div>
 
       <div className="relative rounded-[5px] bg-gradient-to-br from-white/36 via-white/14 to-white/4 p-[1px]">
-                        <div className="relative flex h-full flex-col overflow-hidden rounded-[5px] border border-white/16 bg-[rgba(14,12,26,0.42)] shadow-[var(--shadow-glass-lg)] backdrop-blur-[26px]">
+        <div className="relative flex h-full flex-col overflow-hidden rounded-[5px] border border-white/16 bg-[rgba(14,12,26,0.42)] shadow-[var(--shadow-glass-lg)] backdrop-blur-[22px]">
           <div className="overflow-hidden">
             <div
               className="flex transition-transform duration-300 ease-out"
@@ -96,12 +95,12 @@ export function HeroFeatureCarousel({ items }: Props) {
 
                       <div className="flex flex-1 flex-col gap-3 px-6 pb-6 pt-4">
                         {item.title ? (
-                          <h3 className="text-[1.5rem] font-semibold leading-tight tracking-tight text-white">
+                          <h3 className="text-[1.1rem] sm:text-[1.3rem] md:text-[1.5rem] font-semibold leading-tight tracking-tight text-white">
                             {item.title}
                           </h3>
                         ) : null}
                         {item.excerpt ? (
-                          <p className="text-[1.02rem] text-white/78 sm:text-[1.08rem] line-clamp-3">{item.excerpt}</p>
+                          <p className="text-[0.95rem] text-white/78 sm:text-[1.02rem] md:text-[1.08rem] line-clamp-3">{item.excerpt}</p>
                         ) : null}
                       </div>
                     </CardWrapper>
