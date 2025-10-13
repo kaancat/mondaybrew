@@ -338,6 +338,18 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     } as CSSProperties;
   }, [setWidth, duration, direction, prefersReducedMotion]);
 
+  const wrapOffset = useCallback(
+    (value: number) => {
+      if (!setWidth) return value;
+      const limit = setWidth;
+      let next = value;
+      while (next > limit) next -= limit;
+      while (next < -limit) next += limit;
+      return next;
+    },
+    [setWidth],
+  );
+
   // Lightweight drag/scroll: we translate a wrapper layer while pausing the CSS animation.
   const [dragOffset, setDragOffset] = useState(0);
   const [isInteracting, setIsInteracting] = useState(false);
@@ -388,19 +400,6 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     clearInteractionTimeout();
     interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
   }, [prefersReducedMotion, clearInteractionTimeout]);
-
-  const wrapOffset = useCallback(
-    (value: number) => {
-      if (!setWidth) return value;
-      const limit = setWidth;
-      if (!limit) return value;
-      let next = value;
-      while (next > limit) next -= limit;
-      while (next < -limit) next += limit;
-      return next;
-    },
-    [setWidth],
-  );
 
   const wrapperStyle = useMemo(
     () => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: isInteracting ? "transform" : undefined }),
