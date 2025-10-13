@@ -43,7 +43,11 @@ export function HeroFeatureCarousel({ items }: Props) {
   const goPrev = () => setIndex((prev) => (prev - 1 + normalized.length) % normalized.length);
 
   return (
-    <div className="group relative w-full max-w-[26rem] text-white sm:max-w-[27.5rem] md:absolute md:bottom-10 md:right-10">
+    <div
+      className="group absolute bottom-6 right-6 w-full max-w-[26rem] text-white sm:bottom-8 sm:right-8 sm:max-w-[27.5rem] md:bottom-10 md:right-10"
+      // Keep pointer interactions and ensure stacking above gradients
+      style={{ zIndex: 10 }}
+    >
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-85 transition-opacity duration-500 group-hover:opacity-100">
         <div className="absolute inset-0 translate-y-4 scale-[1.05] rounded-[5px] bg-[radial-gradient(circle_at_18%_20%,rgba(134,118,255,0.32),transparent_74%)] blur-[36px]" />
       </div>

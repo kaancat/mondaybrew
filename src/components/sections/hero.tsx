@@ -236,10 +236,14 @@ export function HeroSection({
 
   const offsetVar = "var(--hero-offset, 140px)";
   const bottomGapVar = "var(--hero-bottom-gap, 96px)";
-  const heroHeight = `min(820px, max(500px, calc(100vh - ${offsetVar} - ${bottomGapVar})))`;
+  // Use dynamic viewport height to avoid mobile browser UI shrinking issues
+  const heroHeight = `min(820px, max(500px, calc(100dvh - ${offsetVar} - ${bottomGapVar})))`;
 
   const contentJustify = alignment === "start" ? "flex-start" : alignment === "end" ? "flex-end" : "center";
   const contentGap = alignment === "center" ? "gap-12" : "gap-10";
+
+  const hasFeature = featureItems.length > 0;
+  const mobileFeaturePad = hasFeature ? "pb-[260px] sm:pb-[300px] md:pb-10" : "";
 
   return (
     <Section
@@ -279,7 +283,7 @@ export function HeroSection({
         </div>
 
         <div
-          className={`relative z-10 flex h-full flex-col ${contentGap} px-6 py-10 sm:px-10 lg:px-16`}
+          className={`relative z-10 flex h-full flex-col ${contentGap} px-6 py-10 sm:px-10 lg:px-16 ${mobileFeaturePad}`}
           style={{ justifyContent: contentJustify }}
         >
           <div className="max-w-2xl text-white">

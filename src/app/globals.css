@@ -84,6 +84,13 @@
   --shadow-glass-lg: 0 36px 110px rgba(6,5,16,0.32);
 }
 
+/* Mobile: let the Hero fill the viewport without extra bottom gap */
+@media (max-width: 767px) {
+  :root {
+    --hero-bottom-gap: 0px;
+  }
+}
+
 :root,
 html.light-primary {
   color-scheme: light;
