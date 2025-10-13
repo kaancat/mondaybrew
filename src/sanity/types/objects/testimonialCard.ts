@@ -13,7 +13,7 @@ export default defineType({
         list: [
           { title: "Image only", value: "image" },
           { title: "Quote only", value: "quote" },
-          { title: "Image Card", value: "imageQuote" }, // simplified image+text card
+          { title: "Image + Text", value: "imageQuote" },
         ],
         layout: "radio",
       },
@@ -41,8 +41,6 @@ export default defineType({
         layout: "radio",
       },
       initialValue: "surface",
-      // Hide tone for the simplified image card — we don't want background colors there
-      hidden: ({ parent }) => parent?.variant === "imageQuote",
     }),
     
     // Logo - Only for quote and imageQuote variants
@@ -60,7 +58,7 @@ export default defineType({
       title: "Main image", 
       type: "imageWithAlt",
       hidden: ({ parent }) => parent?.variant === "quote",
-      description: "Required for image variants. Full-bleed image for Image-only and Image Card.",
+      description: "Required for image variants. Left column for Image + Text, full-bleed for Image only.",
       validation: (Rule) => Rule.custom((value, context) => {
         const parent = context.parent as { variant?: string } | undefined;
         const variant = parent?.variant;
@@ -77,11 +75,11 @@ export default defineType({
       title: "Quote", 
       type: "text", 
       rows: 3,
-      hidden: ({ parent }) => parent?.variant !== "quote",
+      hidden: ({ parent }) => parent?.variant === "image",
       validation: (Rule) => Rule.custom((value, context) => {
         const parent = context.parent as { variant?: string } | undefined;
         const variant = parent?.variant;
-        if (variant === "quote" && !value) {
+        if ((variant === "quote" || variant === "imageQuote") && !value) {
           return "Quote is required for this variant";
         }
         return true;
@@ -93,11 +91,11 @@ export default defineType({
       name: "author", 
       title: "Name", 
       type: "string",
-      hidden: ({ parent }) => parent?.variant !== "quote",
+      hidden: ({ parent }) => parent?.variant === "image",
       validation: (Rule) => Rule.custom((value, context) => {
         const parent = context.parent as { variant?: string } | undefined;
         const variant = parent?.variant;
-        if (variant === "quote" && !value) {
+        if ((variant === "quote" || variant === "imageQuote") && !value) {
           return "Author name is required for this variant";
         }
         return true;
@@ -109,7 +107,7 @@ export default defineType({
       name: "role", 
       title: "Title / Role", 
       type: "string",
-      hidden: ({ parent }) => parent?.variant !== "quote",
+      hidden: ({ parent }) => parent?.variant === "image",
     }),
     
     // CTA - Available for all variants
@@ -129,7 +127,7 @@ export default defineType({
       image: "image.image",
     },
     prepare({ title, subtitle, variant, media, image }) {
-      const fallbackTitle = variant === "image" ? "Image Only Card" : variant === "imageQuote" ? "Image Card" : "Testimonial";
+      const fallbackTitle = variant === "image" ? "Image Only Card" : variant === "imageQuote" ? "Image + Text" : "Testimonial";
       return {
         title: title || fallbackTitle,
         subtitle: subtitle || variant,

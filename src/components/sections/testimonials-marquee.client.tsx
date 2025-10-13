@@ -223,54 +223,50 @@ function QuoteCard({ card }: { card: TCard }) {
 }
 
 function ImageQuoteCard({ card }: { card: TCard }) {
-  // Unified image-only style (same as Siemens CTA look):
-  // - Strong scrim
-  // - White CTA text + arrow
-  // - Subtle white border on top of CTA bar
+  // Restored two-column layout: image left, text right (same width as image-only)
   if (!card.image?.url) return null;
+  const colors = card.colors ?? deriveColorsFromBackground(card.background ?? TONE_PRESETS.surface.background);
 
   return (
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h=[340px] overflow-hidden rounded-[10px]",
+          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
+        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
-        <Image
-          src={card.image.url}
-          alt={card.image.alt || ""}
-          fill
-          sizes="(max-width: 768px) 80vw, 480px"
-          placeholder={card.image.lqip ? "blur" : undefined}
-          blurDataURL={card.image.lqip || undefined}
-          className="h-full w-full object-cover"
-        />
-        <CardLogo card={card} className="absolute right-6 top-6 z-20" />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40"
-          style={{ backgroundImage: "linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.56) 60%, transparent 100%)" }}
-        />
-        {card.cta?.label && card.cta?.href ? (
-          <div
-            className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between border-t px-6 py-4 text-sm"
-            style={{
-              borderColor: "rgba(255,255,255,0.22)",
-              background: "rgba(0,0,0,0.78)",
-              color: "#fff",
-              textShadow: "0 1px 1px rgba(0,0,0,0.35)",
-            }}
-          >
-            <Link
-              href={card.cta.href}
-              className="pointer-events-auto font-medium uppercase tracking-[0.18em] underline-offset-4 hover:underline"
-            >
-              {card.cta.label}
-            </Link>
-            <span aria-hidden style={{ opacity: 0.95 }}>→</span>
+        <div className="relative flex-[0_0_46%] min-w-[210px]">
+          <Image
+            src={card.image.url}
+            alt={card.image.alt || ""}
+            fill
+            sizes="(max-width: 768px) 70vw, 360px"
+            placeholder={card.image.lqip ? "blur" : undefined}
+            blurDataURL={card.image.lqip || undefined}
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <div className="flex flex-1 flex-col p-6" style={{ background: colors.background, color: colors.ink }}>
+          <CardLogo card={card} className="mb-8 self-start" />
+          <div className="flex flex-col gap-6">
+            {card.quote ? (
+              <blockquote className="text-balance text-[1.65rem] leading-snug" style={{ color: colors.ink }}>
+                “{card.quote}”
+              </blockquote>
+            ) : null}
+
+            <div className="h-px w-12" style={{ background: colors.divider }} />
+
+            <div className="text-sm font-medium uppercase tracking-[0.18em]" style={{ color: colors.sub }}>
+              {card.author}
+              {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+            </div>
           </div>
-        ) : null}
+
+          <CardCta card={card} colors={colors} className="mt-auto" />
+        </div>
       </div>
     </CardFrame>
   );
@@ -296,7 +292,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
           blurDataURL={card.image.lqip || undefined}
           className="h-full w-full object-cover"
         />
-        <CardLogo card={card} className="absolute right-6 top-6 z-20" />
+        <CardLogo card={card} className="absolute left-6 top-6 z-20" />
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40"
           style={{ backgroundImage: "linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.56) 60%, transparent 100%)" }}
