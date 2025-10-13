@@ -393,10 +393,75 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     } as CSSProperties;
   }, [setWidth, duration, direction, prefersReducedMotion]);
 
+  // Lightweight drag/scroll: we translate a wrapper layer while pausing the CSS animation.
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const pointerIdRef = useRef<number | null>(null);
+  const startXRef = useRef(0);
+  const startOffsetRef = useRef(0);
+  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearInteractionTimeout = useCallback(() => {
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current);
+      interactionTimeoutRef.current = null;
+    }
+  }, []);
+
+  const onWheel = useCallback((e: ReactWheelEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return; // native scroll
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    setIsInteracting(true);
+    setDragOffset((v) => v - e.deltaX);
+    clearInteractionTimeout();
+    interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 200);
+  }, [prefersReducedMotion, clearInteractionTimeout]);
+
+  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return;
+    pointerIdRef.current = e.pointerId;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    startXRef.current = e.clientX;
+    startOffsetRef.current = dragOffset;
+    setIsInteracting(true);
+  }, [prefersReducedMotion, dragOffset]);
+
+  const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return;
+    if (pointerIdRef.current !== e.pointerId) return;
+    e.preventDefault();
+    const dx = e.clientX - startXRef.current;
+    setDragOffset(startOffsetRef.current + dx);
+  }, [prefersReducedMotion]);
+
+  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return;
+    if (pointerIdRef.current !== e.pointerId) return;
+    pointerIdRef.current = null;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    clearInteractionTimeout();
+    interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
+  }, [prefersReducedMotion, clearInteractionTimeout]);
+
+  const wrapperStyle = useMemo(() => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: isInteracting ? "transform" : undefined }), [dragOffset, isInteracting]);
+
+  const animatedTrackStyle = useMemo(() => ({
+    ...(trackStyle || {}),
+    animationPlayState: isInteracting ? "paused" : (trackStyle as any)?.animationPlayState || "running",
+  }), [trackStyle, isInteracting]);
+
   return (
-    <div ref={viewportRef} className={cn("relative overflow-hidden", prefersReducedMotion && "no-scrollbar overflow-x-auto")}> 
-      <div className="flex py-2">
-        <div className={cn("flex w-max", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)} style={trackStyle}>
+    <div ref={viewportRef} className={cn("relative overflow-hidden", prefersReducedMotion && "no-scrollbar overflow-x-auto")}
+      onWheel={onWheel}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      style={{ touchAction: "pan-y" }}
+    >
+      <div className="flex py-2" style={wrapperStyle}>
+        <div className={cn("flex w-max", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)} style={animatedTrackStyle}>
           {clones.map((_, idx) => (
             <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex" aria-hidden={idx > 0}>
               {normalizedItems.map((card, i) => (
