@@ -252,6 +252,7 @@ function ImageQuoteCard({ card }: { card: TCard }) {
           <Image
             src={card.image.url}
             alt={card.image.alt || ""}
+            draggable={false}
             fill
             sizes="(max-width: 768px) 70vw, 360px"
             placeholder={card.image.lqip ? "blur" : undefined}
@@ -297,6 +298,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
         <Image
           src={card.image.url}
           alt={card.image.alt || ""}
+          draggable={false}
           fill
           sizes="(max-width: 768px) 80vw, 480px"
           placeholder={card.image.lqip ? "blur" : undefined}
