@@ -172,7 +172,14 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
   return (
     <div
       className="group/card relative shrink-0"
-      style={{ width, minWidth: width, flex: "0 0 auto", marginInline: CARD_GAP / 2 }}
+      style={{
+        width,
+        minWidth: width,
+        flex: "0 0 auto",
+        marginInline: CARD_GAP / 2,
+        contain: "layout paint",
+        contentVisibility: "auto",
+      }}
     >
       {children}
     </div>
