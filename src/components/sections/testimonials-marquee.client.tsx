@@ -202,7 +202,7 @@ function QuoteCard({ card }: { card: TCard }) {
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full flex-col rounded-[5px] p-8",
+          "card-inner relative flex h-full min-h-[400px] flex-col rounded-[5px] p-8",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
@@ -241,7 +241,7 @@ function ImageQuoteCard({ card }: { card: TCard }) {
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[5px]",
+          "card-inner relative flex h-full min-h-[400px] overflow-hidden rounded-[5px]",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
@@ -289,7 +289,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[5px]",
+          "card-inner relative flex h-full min-h-[400px] overflow-hidden rounded-[5px]",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
