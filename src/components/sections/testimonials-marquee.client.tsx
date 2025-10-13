@@ -10,6 +10,7 @@ import {
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
+  type ReactNode,
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,6 +49,8 @@ const CARD_WIDTHS: Record<TCard["variant"], number> = {
   image: 720,
 };
 
+const CARD_GAP = 24; // px spacing applied symmetrically around each card
+
 // simple luminance check to pick ink
 function hexToRgb(hex?: string | null) {
   if (!hex) return null;
@@ -79,19 +82,26 @@ function CardLogo({ card, className }: { card: TCard; className?: string }) {
   );
 }
 
+function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
+  const width = CARD_WIDTHS[card.variant];
+  return (
+    <div
+      className="group/card relative shrink-0"
+      style={{ width: width + CARD_GAP, minWidth: width + CARD_GAP, flex: "0 0 auto", paddingInline: CARD_GAP / 2 }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function QuoteCard({ card }: { card: TCard }) {
   const bg = card.background || undefined;
   const ink = pickInk(bg);
   const textClass = ink === "#ffffff" ? "text-white" : "text-[color:var(--brand-ink-strong)]";
   const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
-  const width = CARD_WIDTHS.quote;
-
   return (
-    <div
-      className="group/card relative shrink-0"
-      style={{ width, minWidth: width, flex: "0 0 auto" }}
-    >
+    <CardFrame card={card}>
       <div
         className={cn(
           "card-inner relative flex h-full flex-col rounded-[10px] p-6",
@@ -124,7 +134,7 @@ function QuoteCard({ card }: { card: TCard }) {
           </div>
         ) : null}
       </div>
-    </div>
+    </CardFrame>
   );
 }
 
@@ -135,13 +145,8 @@ function ImageQuoteCard({ card }: { card: TCard }) {
   const textClass = ink === "#ffffff" ? "text-white" : "text-[color:var(--brand-ink-strong)]";
   const subClass = ink === "#ffffff" ? "text-white/80" : "text-[color:color-mix(in_oklch,var(--brand-ink-strong)_70%,white_30%)]";
 
-  const width = CARD_WIDTHS.imageQuote;
-
   return (
-    <div
-      className="group/card relative shrink-0"
-      style={{ width, minWidth: width, flex: "0 0 auto" }}
-    >
+    <CardFrame card={card}>
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
@@ -185,18 +190,14 @@ function ImageQuoteCard({ card }: { card: TCard }) {
           ) : null}
         </div>
       </div>
-    </div>
+    </CardFrame>
   );
 }
 
 function ImageOnlyCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
-  const width = CARD_WIDTHS.image;
   return (
-    <div
-      className="group/card relative shrink-0"
-      style={{ width, minWidth: width, flex: "0 0 auto" }}
-    >
+    <CardFrame card={card}>
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
@@ -226,7 +227,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
           </div>
         ) : null}
       </div>
-    </div>
+    </CardFrame>
   );
 }
 
@@ -492,7 +493,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
             <div
               key={idx}
               ref={idx === 0 ? setRef : undefined}
-              className="flex gap-8"
+              className="flex"
+              style={{ paddingRight: CARD_GAP }}
               aria-hidden={idx > 0}
             >
               {items.map((card, i) => (
