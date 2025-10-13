@@ -343,6 +343,7 @@ function Card({ card }: { card: TCard }) {
 }
 
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
+  // Normalize tones to preset styles
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
@@ -354,257 +355,41 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const setRef = useRef<HTMLDivElement | null>(null);
   const [setWidth, setSetWidth] = useState(0);
-  const [viewportWidth, setViewportWidth] = useState(0);
   const prefersReducedMotion = useReducedMotion();
-  const offsetRef = useRef(0);
-  const startXRef = useRef(0);
-  const startOffsetRef = useRef(0);
-  const pointerIdRef = useRef<number | null>(null);
-  const [offset, setOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isInteracting, setIsInteracting] = useState(false);
-  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
-  // Momentum scrolling state
-  const velocityRef = useRef(0);
-  const lastPosRef = useRef(0);
-  const lastTimeRef = useRef(0);
-  const momentumRafRef = useRef<number | null>(null);
 
   const safeSpeed = Math.max(1, speed);
   const duration = useMemo(() => (setWidth > 0 ? setWidth / safeSpeed : 12), [setWidth, safeSpeed]);
 
-  const repeatCount = useMemo(() => {
-    if (prefersReducedMotion) return 1;
-    if (!setWidth || !viewportWidth) return 3;
-    return Math.max(2, Math.ceil(viewportWidth / setWidth) + 2);
-  }, [setWidth, viewportWidth, prefersReducedMotion]);
-
-  const clones = useMemo(() => Array.from({ length: repeatCount }), [repeatCount]);
-
-  const clearInteractionTimeout = useCallback(() => {
-    if (interactionTimeoutRef.current) {
-      clearTimeout(interactionTimeoutRef.current);
-      interactionTimeoutRef.current = null;
-    }
-  }, []);
-
-  // Cancel momentum animation
-  const cancelMomentum = useCallback(() => {
-    if (momentumRafRef.current !== null) {
-      cancelAnimationFrame(momentumRafRef.current);
-      momentumRafRef.current = null;
-    }
-    velocityRef.current = 0;
-  }, []);
-
-  // Define setOffsetSafe first (used by applyMomentum)
-  const setOffsetSafe = useCallback(
-    (value: number) => {
-      let next = value;
-      const width = setWidth;
-      if (width) {
-        const limit = width;
-        while (next > limit) next -= limit;
-        while (next < -limit) next += limit;
-      }
-      offsetRef.current = next;
-      setOffset(next);
-    },
-    [setWidth],
-  );
-
-  // Apply momentum/inertia scrolling after drag release
-  const applyMomentum = useCallback(() => {
-    cancelMomentum();
-    
-    const friction = 0.92; // Controls how quickly momentum decays
-    const minVelocity = 0.1; // Minimum velocity before stopping
-    
-    const animate = () => {
-      const vel = velocityRef.current;
-      
-      if (Math.abs(vel) < minVelocity) {
-        velocityRef.current = 0;
-        momentumRafRef.current = null;
-        setIsInteracting(false);
-        return;
-      }
-      
-      velocityRef.current *= friction;
-      setOffsetSafe(offsetRef.current + vel);
-      momentumRafRef.current = requestAnimationFrame(animate);
-    };
-    
-    if (Math.abs(velocityRef.current) >= minVelocity) {
-      momentumRafRef.current = requestAnimationFrame(animate);
-    } else {
-      setIsInteracting(false);
-    }
-  }, [cancelMomentum, setOffsetSafe]);
+  // Only two clones required for seamless loop; no JS drag/momentum.
+  const clones = useMemo(() => Array.from({ length: prefersReducedMotion ? 1 : 2 }), [prefersReducedMotion]);
 
   useLayoutEffect(() => {
     const setEl = setRef.current;
-    const vpEl = viewportRef.current;
-    if (!setEl || !vpEl) return;
-
-    const measure = () => {
-      setSetWidth(setEl.offsetWidth);
-      setViewportWidth(vpEl.offsetWidth);
-    };
-
+    if (!setEl) return;
+    const measure = () => setSetWidth(setEl.offsetWidth);
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(setEl);
-    observer.observe(vpEl);
     return () => observer.disconnect();
   }, [normalizedItems]);
 
-  useEffect(() => {
-    setOffsetSafe(offsetRef.current);
-  }, [setOffsetSafe]);
-
-  useEffect(
-    () => () => {
-      clearInteractionTimeout();
-      cancelMomentum();
-    },
-    [clearInteractionTimeout, cancelMomentum],
-  );
-
   const trackStyle = useMemo(() => {
-    if (!setWidth) return undefined;
+    if (!setWidth || prefersReducedMotion) return undefined;
     return {
       "--marquee-distance": `${-setWidth}px`,
       "--marquee-duration": `${duration}s`,
       animationDirection: direction === 1 ? "normal" : "reverse",
-      animationPlayState: isInteracting ? "paused" : "running",
+      animationPlayState: "running",
       willChange: "transform",
     } as CSSProperties;
-  }, [setWidth, duration, direction, isInteracting]);
-
-  const wrapperStyle = useMemo(
-    () => ({
-      transform: `translate3d(${-offset}px, 0, 0)`,
-      willChange: "transform",
-    }),
-    [offset],
-  );
-
-  const handleWheel = useCallback(
-    (event: ReactWheelEvent<HTMLDivElement>) => {
-      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
-      event.preventDefault();
-      cancelMomentum();
-      setOffsetSafe(offsetRef.current + event.deltaX);
-      setIsInteracting(true);
-      clearInteractionTimeout();
-      interactionTimeoutRef.current = setTimeout(() => {
-        interactionTimeoutRef.current = null;
-        setIsInteracting(false);
-      }, 200);
-    },
-    [cancelMomentum, clearInteractionTimeout, setOffsetSafe],
-  );
-
-  const handlePointerDown = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (!viewportRef.current) return;
-      
-      // Cancel any ongoing momentum
-      cancelMomentum();
-      
-      pointerIdRef.current = event.pointerId;
-      viewportRef.current.setPointerCapture(event.pointerId);
-      event.preventDefault();
-      
-      startXRef.current = event.clientX;
-      startOffsetRef.current = offsetRef.current;
-      lastPosRef.current = event.clientX;
-      lastTimeRef.current = Date.now();
-      velocityRef.current = 0;
-      
-      setIsDragging(true);
-      setIsInteracting(true);
-      clearInteractionTimeout();
-    },
-    [cancelMomentum, clearInteractionTimeout],
-  );
-
-  const handlePointerMove = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (!isDragging || pointerIdRef.current !== event.pointerId) return;
-      event.preventDefault();
-      
-      // Calculate velocity for momentum
-      const now = Date.now();
-      const dt = now - lastTimeRef.current;
-      const dx = event.clientX - lastPosRef.current;
-      
-      if (dt > 0) {
-        // Smooth velocity calculation (pixels per frame, roughly 16ms target)
-        velocityRef.current = -(dx / dt) * 16;
-      }
-      
-      lastPosRef.current = event.clientX;
-      lastTimeRef.current = now;
-      
-      const totalDx = startXRef.current - event.clientX;
-      setOffsetSafe(startOffsetRef.current + totalDx);
-    },
-    [isDragging, setOffsetSafe],
-  );
-
-  const endDrag = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (pointerIdRef.current !== event.pointerId) return;
-      event.preventDefault();
-      
-      pointerIdRef.current = null;
-      setIsDragging(false);
-      
-      if (viewportRef.current?.hasPointerCapture?.(event.pointerId)) {
-        viewportRef.current.releasePointerCapture(event.pointerId);
-      }
-      
-      clearInteractionTimeout();
-      
-      // Apply momentum based on final velocity
-      if (!prefersReducedMotion && Math.abs(velocityRef.current) > 0.5) {
-        applyMomentum();
-      } else {
-        setIsInteracting(false);
-        velocityRef.current = 0;
-      }
-    },
-    [applyMomentum, clearInteractionTimeout, prefersReducedMotion],
-  );
+  }, [setWidth, duration, direction, prefersReducedMotion]);
 
   return (
-    <div
-      ref={viewportRef}
-      className={cn(
-        "relative overflow-hidden",
-        !prefersReducedMotion ? "no-scrollbar" : undefined,
-        isDragging ? "cursor-[grabbing]" : "cursor-[grab]",
-      )}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
-      onWheel={handleWheel}
-      data-dragging={isDragging ? "true" : "false"}
-      style={{ touchAction: "pan-y" }}
-    >
-      <div className="flex py-2" style={wrapperStyle}>
-        <div className={cn("flex", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)} style={trackStyle}>
+    <div ref={viewportRef} className={cn("relative overflow-hidden", prefersReducedMotion && "no-scrollbar overflow-x-auto")}> 
+      <div className="flex py-2">
+        <div className={cn("flex w-max", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)} style={trackStyle}>
           {clones.map((_, idx) => (
-            <div
-              key={idx}
-              ref={idx === 0 ? setRef : undefined}
-              className="flex"
-              aria-hidden={idx > 0}
-            >
+            <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex" aria-hidden={idx > 0}>
               {normalizedItems.map((card, i) => (
                 <Card key={`${idx}-${i}`} card={card} />
               ))}
