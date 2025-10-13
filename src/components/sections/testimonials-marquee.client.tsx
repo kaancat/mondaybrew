@@ -34,6 +34,7 @@ export type TCard = {
   author?: string | null;
   role?: string | null;
   cta?: { label?: string | null; href?: string | null } | null;
+  tone?: "surface" | "charcoal" | "accent" | "auto" | null;
 };
 
 export type TestimonialsClientProps = {
@@ -50,11 +51,16 @@ const CARD_WIDTHS: Record<TCard["variant"], number> = {
 };
 
 const CARD_GAP = 32; // px spacing applied symmetrically around each card
+const TONE_PRESETS: Record<Exclude<TCard['tone'], null | undefined | 'auto'>, string> = {
+  surface: "var(--surface-elevated)",
+  charcoal: "color-mix(in oklch, var(--surface-dark) 92%, transparent 8%)",
+  accent: "color-mix(in oklch, var(--accent) 60%, var(--surface-base) 40%)",
+};
 const DEFAULT_BACKGROUNDS = [
-  "var(--surface-elevated)",
-  "var(--surface-dark)",
-  "var(--accent)",
-  "color-mix(in oklch, var(--accent) 28%, var(--surface-base) 72%)",
+  TONE_PRESETS.surface,
+  TONE_PRESETS.charcoal,
+  TONE_PRESETS.accent,
+  "color-mix(in oklch, var(--accent) 28%, var(--surface-elevated) 72%)",
 ];
 
 const LIGHT_INK = "var(--brand-light)";
@@ -262,8 +268,10 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     const palette = DEFAULT_BACKGROUNDS;
     return items.map((card, i) => {
       const raw = card.background?.trim();
+      const tone = card.tone && card.tone !== "auto" ? card.tone : null;
+      const preset = tone ? TONE_PRESETS[tone as Exclude<TCard["tone"], null | undefined | "auto">] : undefined;
       const usesToken = raw ? raw.startsWith("var(") || raw.includes("var(--") : false;
-      const background = usesToken && raw ? raw : palette[i % palette.length];
+      const background = preset ?? (usesToken && raw ? raw : palette[i % palette.length]);
       return { ...card, background };
     });
   }, [items]);

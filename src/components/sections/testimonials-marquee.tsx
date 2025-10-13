@@ -25,6 +25,7 @@ export type TestimonialsMarqueeData = {
   top?: Array<{
     variant?: "image" | "quote" | "imageQuote";
     background?: string | null;
+    tone?: "surface" | "charcoal" | "accent" | "auto" | null;
     logo?: SanityImage;
     image?: SanityImage;
     quote?: string | null;
@@ -40,6 +41,7 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
     (set || []).map((c) => ({
       variant: (c?.variant as TCard["variant"]) || "quote",
       background: c?.background || null,
+      tone: (c?.tone as TCard["tone"]) ?? null,
       logo: resolveImage(c?.logo),
       image: resolveImage(c?.image),
       quote: c?.quote || null,

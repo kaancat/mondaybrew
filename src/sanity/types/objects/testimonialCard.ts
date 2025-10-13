@@ -24,9 +24,23 @@ export default defineType({
       name: "background", 
       title: "Background color", 
       type: "string", 
-      description: "Applies behind quote content. Image-only cards ignore this.", 
-      options: { list: ["#FF914D", "#F5F7FD", "#49444B", "#111111", "white"] },
-      hidden: ({ parent }) => parent?.variant === "image",
+      description: "Legacy manual color. Prefer the tone selector below.", 
+      hidden: true,
+    }),
+    defineField({
+      name: "tone",
+      title: "Color tone",
+      type: "string",
+      description: "Select a preset background that matches the site themes.",
+      options: {
+        list: [
+          { title: "Surface", value: "surface" },
+          { title: "Charcoal", value: "charcoal" },
+          { title: "Accent", value: "accent" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "surface",
     }),
     
     // Logo - Only for quote and imageQuote variants
