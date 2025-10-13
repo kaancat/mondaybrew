@@ -241,8 +241,8 @@ export function HeroSection({
   const justifyMd = alignment === "start" ? "md:justify-start" : alignment === "end" ? "md:justify-end" : "md:justify-center";
 
   const hasFeature = featureItems.length > 0;
-  // With a smaller mobile feature card, reduce safe padding so text sits higher
-  const mobileFeaturePad = hasFeature ? "pb-[140px] sm:pb-[220px] md:pb-10" : "";
+  // Adjust safe padding for the featured card footprint on mobile
+  const mobileFeaturePad = hasFeature ? "pb-[160px] sm:pb-[220px] md:pb-10" : "";
 
   return (
     <Section
@@ -283,7 +283,7 @@ export function HeroSection({
         </div>
 
         <div
-          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-16 pb-10 sm:px-10 sm:pt-16 lg:px-16 ${mobileFeaturePad}`}
+          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-24 pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
         >
           <div className="max-w-2xl text-white">
             {eyebrow ? (

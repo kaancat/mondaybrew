@@ -44,7 +44,7 @@ export function HeroFeatureCarousel({ items }: Props) {
 
   return (
     <div
-      className="group absolute bottom-4 right-4 w-[48vw] max-w-[14rem] text-white sm:bottom-6 sm:right-6 sm:w-[52vw] sm:max-w-[18rem] md:bottom-10 md:right-10 md:w-full md:max-w-[27.5rem]"
+      className="group absolute bottom-4 right-4 w-[60vw] max-w-[19rem] text-white sm:bottom-6 sm:right-6 sm:w-[56vw] sm:max-w-[20rem] md:bottom-10 md:right-10 md:w-full md:max-w-[27.5rem]"
       style={{ zIndex: 10 }}
     >
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-85 transition-opacity duration-500 group-hover:opacity-100">
@@ -93,14 +93,14 @@ export function HeroFeatureCarousel({ items }: Props) {
                         </div>
                       ) : null}
 
-                      <div className="flex flex-1 flex-col gap-3 px-6 pb-6 pt-4">
+                      <div className="flex flex-1 flex-col gap-2 px-5 pb-5 pt-3 sm:gap-3 sm:px-6 sm:pb-6 sm:pt-4">
                         {item.title ? (
-                          <h3 className="text-[1rem] sm:text-[1.2rem] md:text-[1.5rem] font-semibold leading-tight tracking-tight text-white">
+                          <h3 className="text-[1.05rem] sm:text-[1.2rem] md:text-[1.5rem] font-semibold leading-tight tracking-tight text-white">
                             {item.title}
                           </h3>
                         ) : null}
                         {item.excerpt ? (
-                          <p className="text-[0.9rem] text-white/78 sm:text-[1rem] md:text-[1.08rem] line-clamp-3">{item.excerpt}</p>
+                          <p className="text-[0.95rem] text-white/78 sm:text-[1rem] md:text-[1.08rem] line-clamp-2 sm:line-clamp-3">{item.excerpt}</p>
                         ) : null}
                       </div>
                     </CardWrapper>
