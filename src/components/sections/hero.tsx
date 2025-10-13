@@ -249,8 +249,8 @@ export function HeroSection({
   return (
     <Section
       padding="none"
+      className="mt-0 md:mt-[var(--hero-offset,140px)] mb-[var(--hero-bottom-gap,96px)]"
       innerClassName="pb-16"
-      style={{ marginTop: offsetVar, marginBottom: bottomGapVar }}
     >
       <div
         className="full-bleed md:relative md:isolate flex w-full flex-col overflow-hidden md:rounded-[5px] md:border md:border-white/10 md:bg-black/60 shadow-[var(--shadow-hero)]"
