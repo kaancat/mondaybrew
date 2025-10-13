@@ -74,7 +74,7 @@ export function HeroFeatureCarousel({ items }: Props) {
                       )}
                     >
                       {item.image?.url ? (
-                        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[5px]">
+                        <div className="relative aspect-[16/9] sm:aspect-[4/3] w-full overflow-hidden rounded-[5px]">
                           <Image
                             src={item.image.url}
                             alt={item.image.alt || item.title || "Hero feature"}
@@ -93,7 +93,7 @@ export function HeroFeatureCarousel({ items }: Props) {
                         </div>
                       ) : null}
 
-                      <div className="flex flex-1 flex-col gap-2 px-5 pb-5 pt-3 sm:gap-3 sm:px-6 sm:pb-6 sm:pt-4">
+                      <div className="flex flex-1 flex-col gap-2 px-4 pb-4 pt-3 sm:gap-3 sm:px-6 sm:pb-6 sm:pt-4">
                         {item.title ? (
                           <h3 className="text-[1.05rem] sm:text-[1.2rem] md:text-[1.5rem] font-semibold leading-tight tracking-tight text-white">
                             {item.title}

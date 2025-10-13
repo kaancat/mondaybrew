@@ -241,8 +241,8 @@ export function HeroSection({
   const justifyMd = alignment === "start" ? "md:justify-start" : alignment === "end" ? "md:justify-end" : "md:justify-center";
 
   const hasFeature = featureItems.length > 0;
-  // Adjust safe padding for the featured card footprint on mobile
-  const mobileFeaturePad = hasFeature ? "pb-[160px] sm:pb-[220px] md:pb-10" : "";
+  // Adjust safe padding for the featured card footprint on mobile (shorter card)
+  const mobileFeaturePad = hasFeature ? "pb-[140px] sm:pb-[220px] md:pb-10" : "";
 
   return (
     <Section
