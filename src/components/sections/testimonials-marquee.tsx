@@ -1,6 +1,5 @@
 import TestimonialsMarqueeClient, { type TCard, type TImage } from "./testimonials-marquee.client";
 import { Section } from "@/components/layout/section";
-import { Container } from "@/components/layout/container";
 
 type SanityImage = {
   alt?: string | null;
@@ -57,8 +56,8 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
       width="full"
       innerClassName="flex min-h-[100vh] flex-col gap-[calc(var(--flow-space)/1.6)]"
     >
-      <Container>
-        <div className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]">
+      {/* Note: Section provides the padded Container already (width=full). Avoid nested Containers to prevent double gutters. */}
+      <div className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]">
           {eyebrow ? (
             <p className="eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">
               {eyebrow}
@@ -72,16 +71,15 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
           {subheading ? (
             <p className="max-w-[78ch] text-[length:var(--font-body)] leading-[1.7] text-muted-foreground">{subheading}</p>
           ) : null}
-        </div>
-      </Container>
-      <Container width="full" className="flex flex-1">
+      </div>
+      <div className="flex flex-1">
         <TestimonialsMarqueeClient
           top={mapCards(top)}
           bottom={mapCards(bottom)}
           speedTop={speedTop ?? undefined}
           speedBottom={speedBottom ?? undefined}
         />
-      </Container>
+      </div>
     </Section>
   );
 }
