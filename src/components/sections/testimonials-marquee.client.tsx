@@ -57,8 +57,9 @@ export type TestimonialsClientProps = {
 };
 
 const CARD_WIDTHS: Record<TCard["variant"], number> = {
-  quote: 460,
-  imageQuote: 780,
+  // Make text-only cards a bit wider, and match Image+Text width to it
+  quote: 600,
+  imageQuote: 600,
   image: 780,
 };
 
@@ -240,7 +241,8 @@ function ImageQuoteCard({ card }: { card: TCard }) {
         )}
         style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
-        <div className="relative flex-[0_0_46%] min-w-[210px]">
+        {/* Slightly narrower image column to give copy more room */}
+        <div className="relative flex-[0_0_40%] min-w-[210px]">
           <Image
             src={card.image.url}
             alt={card.image.alt || ""}
