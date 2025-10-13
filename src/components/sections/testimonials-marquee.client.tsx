@@ -50,6 +50,13 @@ const CARD_WIDTHS: Record<TCard["variant"], number> = {
 };
 
 const CARD_GAP = 32; // px spacing applied symmetrically around each card
+const DEFAULT_BACKGROUNDS = [
+  "var(--surface-elevated)",
+  "var(--surface-dark)",
+  "var(--accent)",
+  "color-mix(in oklch, var(--accent) 28%, var(--surface-base) 72%)",
+];
+
 const LIGHT_INK = "var(--brand-light)";
 const DARK_INK = "var(--brand-ink-strong)";
 
