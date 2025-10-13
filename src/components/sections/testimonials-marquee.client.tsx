@@ -44,12 +44,12 @@ export type TestimonialsClientProps = {
 };
 
 const CARD_WIDTHS: Record<TCard["variant"], number> = {
-  quote: 420,
-  imageQuote: 720,
-  image: 720,
+  quote: 460,
+  imageQuote: 780,
+  image: 780,
 };
 
-const CARD_GAP = 24; // px spacing applied symmetrically around each card
+const CARD_GAP = 32; // px spacing applied symmetrically around each card
 const LIGHT_INK = "var(--brand-light)";
 const DARK_INK = "var(--brand-ink-strong)";
 
@@ -99,7 +99,7 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
 function CardCta({ card, textClass, className }: { card: TCard; textClass: string; className?: string }) {
   if (!card.cta?.label || !card.cta.href) return null;
   return (
-    <div className={cn("mt-8 border-t border-current/15 pt-4", className)}>
+    <div className={cn("border-t border-current/15 pt-4", className)}>
       <div className={cn("flex items-center justify-between text-sm", textClass)}>
         <Link href={card.cta.href} className="underline-offset-4 hover:underline">
           {card.cta.label}
@@ -127,22 +127,24 @@ function QuoteCard({ card }: { card: TCard }) {
         )}
         style={{ background: bg ?? "var(--card)", color: ink, transformOrigin: "center" }}
       >
-        <CardLogo card={card} className="mb-6" />
+        <CardLogo card={card} className="mb-8 self-start" />
 
-        {card.quote ? (
-          <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
-            “{card.quote}”
-          </blockquote>
-        ) : null}
+        <div className="flex flex-1 flex-col gap-6">
+          {card.quote ? (
+            <blockquote className={cn("text-balance text-[1.65rem] leading-snug", textClass)}>
+              “{card.quote}”
+            </blockquote>
+          ) : null}
 
-        <div className={cn("mt-6 h-px w-12 bg-current/30", textClass)} />
+          <div className="h-px w-12 bg-current/25" />
 
-        <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
-          {card.author}
-          {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+          <div className={cn("text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+            {card.author}
+            {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+          </div>
         </div>
 
-        <CardCta card={card} textClass={subClass} />
+        <CardCta card={card} textClass={subClass} className="mt-8" />
       </div>
     </CardFrame>
   );
@@ -177,22 +179,23 @@ function ImageQuoteCard({ card }: { card: TCard }) {
           />
         </div>
         <div className="flex flex-1 flex-col p-6" style={{ background: textBg, color: ink }}>
-          <CardLogo card={card} className="mb-6" />
-          {card.quote ? (
-            <blockquote className={cn("text-balance text-xl leading-[1.35]", textClass)}>
-              “{card.quote}”
-            </blockquote>
-          ) : null}
+          <CardLogo card={card} className="mb-8 self-start" />
+          <div className="flex flex-col gap-6">
+            {card.quote ? (
+              <blockquote className={cn("text-balance text-[1.65rem] leading-snug", textClass)}>
+                “{card.quote}”
+              </blockquote>
+            ) : null}
 
-          <div className="mt-6 h-px w-12 bg-current/30" />
+            <div className="h-px w-12 bg-current/25" />
 
-          <div className={cn("mt-4 text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
-            {card.author}
-            {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+            <div className={cn("text-sm font-medium uppercase tracking-[0.18em]", subClass)}>
+              {card.author}
+              {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+            </div>
           </div>
 
-          <div className="mt-auto" />
-          <CardCta card={card} textClass={subClass} />
+          <CardCta card={card} textClass={subClass} className="mt-auto" />
         </div>
       </div>
     </CardFrame>
@@ -220,9 +223,9 @@ function ImageOnlyCard({ card }: { card: TCard }) {
           className="h-full w-full object-cover"
         />
         <CardLogo card={card} className="absolute left-6 top-6 z-10" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[color:color-mix(in_oklch,black_70%,transparent)] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[color:color-mix(in_oklch,black_72%,transparent_28%)] to-transparent" />
         {card.cta?.label && card.cta?.href ? (
-          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-white/25 bg-[color:color-mix(in_oklch,black_78%,transparent_22%)] px-6 py-4 text-sm text-white">
+          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-white/20 bg-[color:color-mix(in_oklch,black_78%,transparent_22%)] px-6 py-4 text-sm text-white">
             <Link
               href={card.cta.href}
               className="pointer-events-auto font-medium uppercase tracking-[0.18em] underline-offset-4 hover:underline"
