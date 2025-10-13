@@ -200,7 +200,10 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       <Menu className="size-[18px]" aria-hidden="true" />
                     </button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-[88vw] max-w-sm border-l border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)] text-[color:var(--nav-shell-text)] backdrop-blur-[14px]">
+                  <SheetContent
+                    side="right"
+                    className="w-[88vw] max-w-sm overflow-hidden border-l border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)] text-[color:var(--nav-shell-text)] backdrop-blur-[14px] transition-[transform,width] duration-500 ease-out data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
+                  >
                     <div className="flex flex-col gap-6 p-4">
                       <nav className="flex flex-col gap-2 text-base font-medium">
                         {sections.map((section) => {
