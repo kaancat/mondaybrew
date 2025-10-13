@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe, Moon, Palette, Sun } from "lucide-react";
+import { ArrowRight, Globe, Moon, Palette, Sun, Menu } from "lucide-react";
+import { Sheet, SheetTrigger, SheetContent, SheetClose } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -119,6 +120,25 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const ctaHref = cta?.href ?? "/kontakt";
   const ctaLabel = cta?.label || DEFAULT_CTA_LABEL;
 
+  // Next theme for toggle (shared by desktop and mobile)
+  const cycle = themeOrder;
+  const currentIndex = cycle.indexOf(currentThemeId);
+  const nextThemeId = cycle[(currentIndex + 1) % cycle.length] ?? cycle[0];
+  const nextTheme = getThemeDefinition(nextThemeId);
+  const themeIcon = (() => {
+    if (!mounted) {
+      return <Sun className="size-[16px]" aria-hidden="true" />;
+    }
+    switch (nextThemeId) {
+      case "light-alt":
+        return <Palette className="size-[16px]" aria-hidden="true" />;
+      case "dark":
+        return <Moon className="size-[16px]" aria-hidden="true" />;
+      default:
+        return <Sun className="size-[16px]" aria-hidden="true" />;
+    }
+  })();
+
   const menuShell =
     "rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)] text-[color:var(--nav-shell-text)] shadow-[var(--nav-shell-shadow)] backdrop-blur-[12px] transition-all duration-300";
 
@@ -144,7 +164,114 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     <header ref={headerRef} className="fixed inset-x-0 top-4 z-50">
       <div className="layout-container">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className={cn(menuShell, "flex items-center gap-4 px-5 py-2.5 md:flex-row")}
+          {/* Mobile header: brand + hamburger inside glass shell */}
+          <div className={cn(menuShell, "flex items-center justify-between px-4 py-2.5 md:hidden")}
+            aria-label="Mobile header"
+          >
+            <Link href="/" className="inline-flex items-center">
+              {(() => {
+                const chosen = isLightAlt
+                  ? brand.logoLight ?? brand.logo ?? brand.logoDark
+                  : brand.logoDark ?? brand.logo ?? brand.logoLight;
+                if (chosen?.url) {
+                  return (
+                    <Image
+                      src={chosen.url}
+                      alt={chosen.alt || brand.title}
+                      width={chosen.width ?? 150}
+                      height={chosen.height ?? 32}
+                      className="h-6 w-auto"
+                      priority
+                    />
+                  );
+                }
+                return <span className="text-sm font-semibold">{brand.title}</span>;
+              })()}
+            </Link>
+
+            {(
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Open menu"
+                      className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                    >
+                      <Menu className="size-[18px]" aria-hidden="true" />
+                    </button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[88vw] max-w-sm border-l border-[color:var(--nav-shell-border)] bg-[color:var(--nav-shell-bg)] text-[color:var(--nav-shell-text)] backdrop-blur-[14px]">
+                    <div className="flex flex-col gap-6 p-4">
+                      <nav className="flex flex-col gap-2 text-base font-medium">
+                        {sections.map((section) => {
+                          if (section.kind === "link") {
+                            const href = section.href ?? "#";
+                            return (
+                              <Link key={section.label} href={href} className="rounded-[5px] px-2 py-2 hover:bg-[color:var(--nav-link-hover-bg)]">
+                                {section.label}
+                              </Link>
+                            );
+                          }
+                          // Flatten mega groups
+                          return (
+                            <div key={section.label} className="flex flex-col gap-1">
+                              <span className="px-2 py-1 text-xs uppercase tracking-wider opacity-80">{section.label}</span>
+                              {section.groups.flatMap((g, gi) =>
+                                g.items.map((item, ii) => (
+                                  <Link key={`${gi}-${ii}-${item.label}`} href={item.href ?? "#"} className="rounded-[5px] px-2 py-2 hover:bg-[color:var(--nav-link-hover-bg)]">
+                                    {item.label}
+                                  </Link>
+                                )),
+                              )}
+                            </div>
+                          );
+                        })}
+                      </nav>
+
+                      <div className="h-px bg-[color:var(--nav-shell-border)]" />
+
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href={ctaHref}
+                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                        >
+                          <span>{ctaLabel}</span>
+                          <ArrowRight className="size-[16px]" aria-hidden="true" />
+                        </Link>
+
+                        <Link
+                          href={localeConfig.href}
+                          className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-locale-border)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-locale-text)] hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          aria-label="Change language"
+                        >
+                          <Globe className="size-[16px]" aria-hidden="true" />
+                          <span className="sr-only">{localeConfig.active}</span>
+                        </Link>
+                      </div>
+
+                      <div className="flex items-center justify-center pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setTheme(nextThemeId)}
+                          className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] px-3 py-2 text-sm text-[color:var(--nav-toggle-text)] hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                          aria-label={`Switch to ${nextTheme.label}`}
+                        >
+                          {themeIcon}
+                          <span className="ml-2">Theme</span>
+                        </button>
+                      </div>
+
+                      <SheetClose asChild>
+                        <button className="sr-only" aria-label="Close" />
+                      </SheetClose>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+            )}
+          </div>
+
+          {/* Desktop header */}
+          <div className={cn(menuShell, "hidden md:flex items-center gap-4 px-5 py-2.5 md:flex-row")}
             style={{ justifyContent: "space-between" }}
           >
             <Link href="/" className="inline-flex items-center">
@@ -167,7 +294,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 return <span className="text-sm font-semibold">{brand.title}</span>;
               })()}
             </Link>
-            <nav className={cn("flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium md:flex-nowrap", "text-[color:var(--nav-link-text)]")}>
+            <nav className={cn("flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium md:flex-nowrap", "text-[color:var(--nav-link-text)]")}> 
               {sections.map((section) => {
                 if (section.kind === "link") {
                   const href = section.href ?? "#";
@@ -212,25 +339,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
           <div className="flex flex-wrap items-center gap-2 px-0 py-0 sm:gap-3 md:flex-nowrap md:justify-end md:pl-4">
             {(() => {
-              const cycle = themeOrder;
-              const currentIndex = cycle.indexOf(currentThemeId);
-              const nextThemeId = cycle[(currentIndex + 1) % cycle.length] ?? cycle[0];
-              const nextTheme = getThemeDefinition(nextThemeId);
-
-              const icon = (() => {
-                if (!mounted) {
-                  return <Sun className="size-[16px]" aria-hidden="true" />;
-                }
-                switch (nextThemeId) {
-                  case "light-alt":
-                    return <Palette className="size-[16px]" aria-hidden="true" />;
-                  case "dark":
-                    return <Moon className="size-[16px]" aria-hidden="true" />;
-                  default:
-                    return <Sun className="size-[16px]" aria-hidden="true" />;
-                }
-              })();
-
               return (
                 <button
                   type="button"
@@ -238,7 +346,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent px-2 py-1.5 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                   aria-label={`Switch to ${nextTheme.label}`}
                 >
-                  {icon}
+                  {themeIcon}
                 </button>
               );
             })()}
