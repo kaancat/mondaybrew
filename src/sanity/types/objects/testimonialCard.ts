@@ -29,18 +29,20 @@ export default defineType({
     }),
     defineField({
       name: "tone",
-      title: "Color tone",
+      title: "Card color",
       type: "string",
-      description: "Select a preset background that matches the site themes.",
+      description:
+        "Choose one of the three presets used by Service cards. No custom colors.",
       options: {
         list: [
-          { title: "Surface", value: "surface" },
-          { title: "Charcoal", value: "charcoal" },
-          { title: "Accent", value: "accent" },
+          { title: "Primary", value: "primary" },
+          { title: "Light Alt", value: "lightAlt" },
+          { title: "Dark", value: "dark" },
         ],
         layout: "radio",
       },
-      initialValue: "surface",
+      initialValue: "primary",
+      hidden: ({ parent }) => parent?.variant === "image", // Image-only has no card background
     }),
     
     // Logo - Only for quote and imageQuote variants

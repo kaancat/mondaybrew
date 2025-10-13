@@ -25,7 +25,7 @@ export type TImage = {
   height?: number;
 } | null;
 
-type ToneKey = "surface" | "charcoal" | "accent";
+type ModeKey = "primary" | "lightAlt" | "dark";
 
 type ToneStyle = {
   background: string;
@@ -45,7 +45,7 @@ export type TCard = {
   author?: string | null;
   role?: string | null;
   cta?: { label?: string | null; href?: string | null } | null;
-  tone?: ToneKey | "auto" | null;
+  tone?: ModeKey | "auto" | null;
   colors?: ToneStyle;
 };
 
@@ -64,34 +64,38 @@ const CARD_WIDTHS: Record<TCard["variant"], number> = {
 
 const CARD_GAP = 32; // px spacing applied symmetrically around each card
 
-const TONE_PRESETS: Record<ToneKey, ToneStyle> = {
-  surface: {
-    background: "var(--surface-elevated)",
-    ink: "var(--brand-ink-strong)",
-    sub: "color-mix(in oklch, var(--brand-ink-strong) 70%, transparent 30%)",
-    divider: "color-mix(in oklch, var(--brand-ink-strong) 14%, transparent 86%)",
-    border: "color-mix(in oklch, var(--brand-ink-strong) 18%, transparent 82%)",
-    ctaInk: "var(--brand-ink-strong)",
-  },
-  charcoal: {
-    background: "color-mix(in oklch, var(--surface-dark) 92%, transparent 8%)",
-    ink: "var(--brand-light)",
-    sub: "color-mix(in oklch, var(--brand-light) 80%, transparent 20%)",
-    divider: "color-mix(in oklch, var(--brand-light) 28%, transparent 72%)",
-    border: "color-mix(in oklch, var(--brand-light) 24%, transparent 76%)",
-    ctaInk: "var(--brand-light)",
-  },
-  accent: {
-    background: "color-mix(in oklch, var(--accent) 88%, var(--surface-base) 12%)",
+// Map Service card presets (Primary, Light Alt, Dark) to concrete tones
+const MODE_PRESETS: Record<ModeKey, ToneStyle> = {
+  primary: {
+    // Services card on Primary uses dark grey surface with light ink
+    background: "var(--surface-dark)",
     ink: "var(--brand-light)",
     sub: "color-mix(in oklch, var(--brand-light) 82%, transparent 18%)",
     divider: "color-mix(in oklch, var(--brand-light) 32%, transparent 68%)",
-    border: "color-mix(in oklch, var(--brand-light) 28%, transparent 72%)",
+    border: "color-mix(in oklch, var(--brand-light) 26%, transparent 74%)",
     ctaInk: "var(--brand-light)",
+  },
+  lightAlt: {
+    // Light-Alt service cards are strict white with black ink
+    background: "var(--services-card-bg, oklch(1 0 0))",
+    ink: "var(--services-ink-strong, #0a0a0a)",
+    sub: "color-mix(in oklch, var(--services-ink-strong, #0a0a0a) 65%, transparent 35%)",
+    divider: "color-mix(in oklch, var(--services-ink-strong, #0a0a0a) 18%, transparent 82%)",
+    border: "var(--nav-shell-border, oklch(0.922 0 0))",
+    ctaInk: "var(--services-ink-strong, #0a0a0a)",
+  },
+  dark: {
+    // Dark mode service cards present light card with house grey ink
+    background: "var(--services-card-bg, var(--brand-light))",
+    ink: "var(--brand-ink-strong)",
+    sub: "color-mix(in oklch, var(--brand-ink-strong) 72%, transparent 28%)",
+    divider: "color-mix(in oklch, var(--brand-ink-strong) 22%, transparent 78%)",
+    border: "color-mix(in oklch, var(--brand-ink-strong) 18%, transparent 82%)",
+    ctaInk: "var(--brand-ink-strong)",
   },
 };
 
-const TONE_SEQUENCE: ToneKey[] = ["surface", "charcoal", "accent"];
+const MODE_SEQUENCE: ModeKey[] = ["primary", "lightAlt", "dark"];
 
 const LIGHT_INK = "var(--brand-light)";
 const DARK_INK = "var(--brand-ink-strong)";
@@ -187,7 +191,8 @@ function CardCta({ card, colors, className }: { card: TCard; colors: ToneStyle; 
 }
 
 function QuoteCard({ card }: { card: TCard }) {
-  const colors = card.colors ?? deriveColorsFromBackground(card.background ?? TONE_PRESETS.surface.background);
+  const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
+  const colors = card.colors ?? MODE_PRESETS[tone];
 
   return (
     <CardFrame card={card}>
@@ -225,7 +230,8 @@ function QuoteCard({ card }: { card: TCard }) {
 function ImageQuoteCard({ card }: { card: TCard }) {
   // Restored two-column layout: image left, text right (same width as image-only)
   if (!card.image?.url) return null;
-  const colors = card.colors ?? deriveColorsFromBackground(card.background ?? TONE_PRESETS.surface.background);
+  const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
+  const colors = card.colors ?? MODE_PRESETS[tone];
 
   return (
     <CardFrame card={card}>
@@ -334,19 +340,9 @@ function Card({ card }: { card: TCard }) {
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
-      const raw = card.background?.trim();
-      const toneKey: ToneKey = (card.tone && card.tone !== "auto" ? card.tone : TONE_SEQUENCE[i % TONE_SEQUENCE.length]) as ToneKey;
-      const preset = TONE_PRESETS[toneKey];
-      const usesToken = raw ? raw.startsWith("var(") || raw.includes("var(--") : false;
-
-      if (raw && !usesToken) {
-        const derived = deriveColorsFromBackground(raw);
-        return { ...card, tone: toneKey, background: raw, colors: derived };
-      }
-
-      const background = raw && usesToken ? raw : preset.background;
-      const colors: ToneStyle = raw && usesToken ? { ...preset, background: raw } : preset;
-      return { ...card, tone: toneKey, background, colors };
+      const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
+      const preset = MODE_PRESETS[toneKey];
+      return { ...card, tone: toneKey, background: preset.background, colors: preset };
     });
   }, [items]);
 
