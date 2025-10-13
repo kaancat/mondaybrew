@@ -174,17 +174,14 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
 
 function CardCta({ card, colors, className }: { card: TCard; colors: ToneStyle; className?: string }) {
   if (!card.cta?.label || !card.cta.href) return null;
-  const ink = colors.ctaInk ?? colors.ink;
+  const ctaColor = "var(--mb-accent)"; // brand orange
   return (
-    <div
-      className={cn("border-t pt-4", className)}
-      style={{ borderColor: colors.border }}
-    >
-      <div className="flex items-center justify-between text-sm" style={{ color: ink }}>
+    <div className={cn("border-t pt-4", className)} style={{ borderColor: colors.border }}>
+      <div className="flex items-center justify-between text-sm" style={{ color: ctaColor }}>
         <Link href={card.cta.href} className="underline-offset-4 hover:underline">
           {card.cta.label}
         </Link>
-        <span aria-hidden>→</span>
+        <span aria-hidden style={{ color: ctaColor }}>→</span>
       </div>
     </div>
   );
@@ -198,7 +195,7 @@ function QuoteCard({ card }: { card: TCard }) {
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full flex-col rounded-[10px] p-8",
+          "card-inner relative flex h-full flex-col rounded-[5px] p-8",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
@@ -237,7 +234,7 @@ function ImageQuoteCard({ card }: { card: TCard }) {
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
+          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[5px]",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
@@ -284,7 +281,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[10px]",
+          "card-inner relative flex h-full min-h-[340px] overflow-hidden rounded-[5px]",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
@@ -309,7 +306,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
             style={{
               borderColor: "rgba(255,255,255,0.22)",
               background: "rgba(0,0,0,0.78)",
-              color: "#fff",
+              color: "var(--mb-accent)",
               textShadow: "0 1px 1px rgba(0,0,0,0.35)",
             }}
           >
@@ -319,7 +316,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
             >
               {card.cta.label}
             </Link>
-            <span aria-hidden style={{ opacity: 0.95 }}>→</span>
+            <span aria-hidden style={{ opacity: 0.95, color: "var(--mb-accent)" }}>→</span>
           </div>
         ) : null}
       </div>
