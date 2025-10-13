@@ -2,7 +2,6 @@
 
 import {
   useCallback,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -103,60 +102,6 @@ const MODE_PRESETS: Record<ModeKey, ToneStyle> = {
 };
 
 const MODE_SEQUENCE: ModeKey[] = ["primary", "lightAlt", "dark"];
-
-const LIGHT_INK = "var(--brand-light)";
-const DARK_INK = "var(--brand-ink-strong)";
-
-const LIGHT_SUB = "color-mix(in oklch, var(--brand-light) 80%, transparent 20%)";
-const LIGHT_DIVIDER = "color-mix(in oklch, var(--brand-light) 32%, transparent 68%)";
-const LIGHT_BORDER = "color-mix(in oklch, var(--brand-light) 26%, transparent 74%)";
-const DARK_SUB = "color-mix(in oklch, var(--brand-ink-strong) 70%, transparent 30%)";
-const DARK_DIVIDER = "color-mix(in oklch, var(--brand-ink-strong) 18%, transparent 82%)";
-const DARK_BORDER = "color-mix(in oklch, var(--brand-ink-strong) 14%, transparent 86%)";
-
-// simple luminance check to pick ink
-function hexToRgb(hex?: string | null) {
-  if (!hex) return null;
-  const h = hex.replace("#","");
-  if (h.length !== 6) return null;
-  const r = parseInt(h.substring(0,2),16);
-  const g = parseInt(h.substring(2,4),16);
-  const b = parseInt(h.substring(4,6),16);
-  return { r,g,b };
-}
-function pickInk(bg?: string | null) {
-  const rgb = hexToRgb(bg || "");
-  if (!rgb) return DARK_INK;
-  // relative luminance
-  const a = [rgb.r, rgb.g, rgb.b].map(v=>{
-    const s = v/255;
-    return s <= 0.03928 ? s/12.92 : Math.pow((s+0.055)/1.055,2.4);
-  });
-  const L = 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
-  return L > 0.5 ? DARK_INK : LIGHT_INK;
-}
-
-function deriveColorsFromBackground(background: string): ToneStyle {
-  const ink = pickInk(background);
-  if (ink === LIGHT_INK) {
-    return {
-      background,
-      ink,
-      sub: LIGHT_SUB,
-      divider: LIGHT_DIVIDER,
-      border: LIGHT_BORDER,
-      ctaInk: LIGHT_INK,
-    };
-  }
-  return {
-    background,
-    ink,
-    sub: DARK_SUB,
-    divider: DARK_DIVIDER,
-    border: DARK_BORDER,
-    ctaInk: DARK_INK,
-  };
-}
 
 function CardLogo({ card, className }: { card: TCard; className?: string }) {
   if (!card.logo?.url) return null;
@@ -413,10 +358,10 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
     e.preventDefault();
     setIsInteracting(true);
-    setDragOffset((v) => v - e.deltaX);
+    setDragOffset((v) => wrapOffset(v - e.deltaX));
     clearInteractionTimeout();
     interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 200);
-  }, [prefersReducedMotion, clearInteractionTimeout]);
+  }, [prefersReducedMotion, wrapOffset, clearInteractionTimeout]);
 
   const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     if (prefersReducedMotion) return;
@@ -432,8 +377,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (pointerIdRef.current !== e.pointerId) return;
     e.preventDefault();
     const dx = e.clientX - startXRef.current;
-    setDragOffset(startOffsetRef.current + dx);
-  }, [prefersReducedMotion]);
+    setDragOffset(wrapOffset(startOffsetRef.current + dx));
+  }, [prefersReducedMotion, wrapOffset]);
 
   const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     if (prefersReducedMotion) return;
@@ -444,12 +389,31 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
   }, [prefersReducedMotion, clearInteractionTimeout]);
 
-  const wrapperStyle = useMemo(() => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: isInteracting ? "transform" : undefined }), [dragOffset, isInteracting]);
+  const wrapOffset = useCallback(
+    (value: number) => {
+      if (!setWidth) return value;
+      const limit = setWidth;
+      if (!limit) return value;
+      let next = value;
+      while (next > limit) next -= limit;
+      while (next < -limit) next += limit;
+      return next;
+    },
+    [setWidth],
+  );
 
-  const animatedTrackStyle = useMemo(() => ({
-    ...(trackStyle || {}),
-    animationPlayState: isInteracting ? "paused" : (trackStyle as any)?.animationPlayState || "running",
-  }), [trackStyle, isInteracting]);
+  const wrapperStyle = useMemo(
+    () => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: isInteracting ? "transform" : undefined }),
+    [dragOffset, isInteracting],
+  );
+
+  const animatedTrackStyle = useMemo<CSSProperties | undefined>(() => {
+    if (!trackStyle) return undefined;
+    return {
+      ...trackStyle,
+      animationPlayState: isInteracting ? "paused" : "running",
+    } satisfies CSSProperties;
+  }, [trackStyle, isInteracting]);
 
   return (
     <div ref={viewportRef} className={cn("relative overflow-hidden", prefersReducedMotion && "no-scrollbar overflow-x-auto")}
