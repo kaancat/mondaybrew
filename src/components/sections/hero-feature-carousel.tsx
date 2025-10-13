@@ -45,11 +45,11 @@ export function HeroFeatureCarousel({ items }: Props) {
   return (
     <div className="group relative w-full max-w-[26rem] text-white sm:max-w-[27.5rem] md:absolute md:bottom-10 md:right-10">
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-85 transition-opacity duration-500 group-hover:opacity-100">
-        <div className="absolute inset-0 translate-y-4 scale-[1.05] rounded-[10px] bg-[radial-gradient(circle_at_18%_20%,rgba(134,118,255,0.32),transparent_74%)] blur-[36px]" />
+        <div className="absolute inset-0 translate-y-4 scale-[1.05] rounded-[5px] bg-[radial-gradient(circle_at_18%_20%,rgba(134,118,255,0.32),transparent_74%)] blur-[36px]" />
       </div>
 
-      <div className="relative rounded-[10px] bg-gradient-to-br from-white/36 via-white/14 to-white/4 p-[1px]">
-                        <div className="relative flex h-full flex-col overflow-hidden rounded-[10px] border border-white/16 bg-[rgba(14,12,26,0.42)] shadow-[var(--shadow-glass-lg)] backdrop-blur-[26px]">
+      <div className="relative rounded-[5px] bg-gradient-to-br from-white/36 via-white/14 to-white/4 p-[1px]">
+                        <div className="relative flex h-full flex-col overflow-hidden rounded-[5px] border border-white/16 bg-[rgba(14,12,26,0.42)] shadow-[var(--shadow-glass-lg)] backdrop-blur-[26px]">
           <div className="overflow-hidden">
             <div
               className="flex transition-transform duration-300 ease-out"
@@ -65,13 +65,13 @@ export function HeroFeatureCarousel({ items }: Props) {
                     <CardWrapper
                       {...(isLink ? { href: cardHref } : {})}
                       className={cn(
-                        "flex h-full flex-col overflow-hidden rounded-[12px] text-left outline-none",
+                        "flex h-full flex-col overflow-hidden rounded-[5px] text-left outline-none",
                         isLink &&
                           "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
                       )}
                     >
                       {item.image?.url ? (
-                        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[12px]">
+                        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[5px]">
                           <Image
                             src={item.image.url}
                             alt={item.image.alt || item.title || "Hero feature"}
@@ -81,7 +81,7 @@ export function HeroFeatureCarousel({ items }: Props) {
                             blurDataURL={item.image.lqip}
                             className="object-cover"
                           />
-                          <div className="pointer-events-none absolute inset-0 rounded-[12px] bg-gradient-to-b from-white/12 via-transparent to-black/42" />
+                          <div className="pointer-events-none absolute inset-0 rounded-[5px] bg-gradient-to-b from-white/12 via-transparent to-black/42" />
                           {itemIndex === index ? (
                             <div className="absolute right-3 top-3 flex h-7 min-w-[3.2rem] items-center justify-center rounded-full bg-black/35 px-3 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/85 leading-none">
                               {String(index + 1).padStart(2, "0")} / {String(normalized.length).padStart(2, "0")}
