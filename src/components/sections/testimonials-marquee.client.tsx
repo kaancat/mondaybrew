@@ -241,8 +241,8 @@ function ImageQuoteCard({ card }: { card: TCard }) {
         )}
         style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
-        {/* Slightly narrower image column to give copy more room */}
-        <div className="relative flex-[0_0_40%] min-w-[210px]">
+        {/* Nudge image a bit wider for balance */}
+        <div className="relative flex-[0_0_44%] min-w-[210px]">
           <Image
             src={card.image.url}
             alt={card.image.alt || ""}
