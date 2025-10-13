@@ -56,11 +56,17 @@ export type TestimonialsClientProps = {
   speedBottom?: number;
 };
 
+// Card width rules
+const QUOTE_WIDTH = 600; // desired copy column width
+const IMAGE_ONLY_WIDTH = 780;
+const IMAGE_QUOTE_IMAGE_BASIS = 0.44; // 44% image, 56% text
+
 const CARD_WIDTHS: Record<TCard["variant"], number> = {
-  // Make text-only cards a bit wider, and match Image+Text width to it
-  quote: 600,
-  imageQuote: 600,
-  image: 780,
+  quote: QUOTE_WIDTH,
+  // Ensure the text column on Image+Text matches the Quote card width
+  // total = textWidth / (1 - imageBasis)
+  imageQuote: Math.round(QUOTE_WIDTH / (1 - IMAGE_QUOTE_IMAGE_BASIS)),
+  image: IMAGE_ONLY_WIDTH,
 };
 
 const CARD_GAP = 32; // px spacing applied symmetrically around each card
