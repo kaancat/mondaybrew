@@ -470,6 +470,11 @@ html.dark {
     padding: 0;
   }
 
+  [data-slot="sheet-overlay"] {
+    background: transparent !important;
+    pointer-events: none;
+  }
+
   h1,
   h2,
   h3,
