@@ -52,9 +52,11 @@ export default function RootLayout({
           />
           <GA />
           <ConsentBanner />
-          <Navbar />
-          {children}
-          <Footer />
+          <div className="site-shell">
+            <Navbar />
+            {children}
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>
