@@ -162,10 +162,10 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
   return (
     <header ref={headerRef} className="fixed inset-x-0 top-2 sm:top-3 md:top-4 z-50">
-      <div className="layout-container px-3 sm:px-4 md:px-[var(--container-gutter)]">
+      <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           {/* Mobile header: brand + hamburger inside glass shell */}
-          <div className={cn(menuShell, "flex items-center justify-between px-5 py-2 md:py-2.5 md:hidden")}
+          <div className={cn(menuShell, "flex items-center justify-between px-5 py-1.5 md:py-2.5 md:hidden")}
             aria-label="Mobile header"
           >
             <Link href="/" className="inline-flex items-center">
