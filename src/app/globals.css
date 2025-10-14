@@ -486,6 +486,37 @@ html.dark {
     transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1) !important;
   }
 
+  /* Prevent third-party scripts from interfering with mobile menu transforms */
+  body[data-mobile-nav-open="true"] iframe,
+  body[data-mobile-nav-open="true"] [data-tf-live],
+  body[data-mobile-nav-open="true"] [id*="google-analytics"],
+  body[data-mobile-nav-open="true"] [id*="facebook"],
+  body[data-mobile-nav-open="true"] [id*="hotjar"],
+  body[data-mobile-nav-open="true"] [id*="intercom"],
+  body[data-mobile-nav-open="true"] [id*="zendesk"],
+  body[data-mobile-nav-open="true"] [class*="third-party"],
+  body[data-mobile-nav-open="true"] [class*="embed"],
+  body[data-mobile-nav-open="true"] [class*="widget"] {
+    transform: none !important;
+    will-change: auto !important;
+    isolation: auto !important;
+  }
+
+  /* Prevent homepage component animations from interfering with mobile menu transforms */
+  body[data-mobile-nav-open="true"] [style*="transform: translateX"],
+  body[data-mobile-nav-open="true"] [style*="transform: translateY"],
+  body[data-mobile-nav-open="true"] [style*="transform: translate3d"],
+  body[data-mobile-nav-open="true"] [style*="transform: scale"],
+  body[data-mobile-nav-open="true"] video,
+  body[data-mobile-nav-open="true"] img[style*="transform"],
+  body[data-mobile-nav-open="true"] .hero-feature-carousel,
+  body[data-mobile-nav-open="true"] .case-study-carousel,
+  body[data-mobile-nav-open="true"] .about-section {
+    transform: none !important;
+    will-change: auto !important;
+    isolation: auto !important;
+  }
+
   [data-slot="sheet-content"].mobile-nav-panel {
     width: 100vw;
     max-width: none;
