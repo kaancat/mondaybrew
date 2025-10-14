@@ -260,25 +260,26 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="mobile-nav-panel flex max-w-[360px] flex-col border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
+                className="mobile-nav-panel flex max-w-[360px] flex-col overflow-hidden rounded-r-[32px] border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_48px_160px_rgba(8,6,20,0.55)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
               >
-                <div className="flex items-center justify-between px-5 pt-6 pb-4">
+                <div className="flex items-center justify-between px-6 pt-7 pb-5">
                   <div className="flex flex-col">
                     <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
                   </div>
                   <SheetClose asChild>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[13px] font-medium text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                      aria-label="Luk menu"
+                      className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                     >
-                      <X className="size-[16px]" aria-hidden="true" />
-                      <span>Luk</span>
+                      <X className="size-[18px]" aria-hidden="true" />
+                      <span className="sr-only">Luk</span>
                     </button>
                   </SheetClose>
                 </div>
                 <motion.div
                   key={Number(mobileOpen)}
-                  className="flex-1 space-y-7 overflow-y-auto px-5 pb-10"
+                  className="flex-1 space-y-7 overflow-y-auto px-6 pb-12"
                   initial="hidden"
                   animate="show"
                   variants={mobileMenuVariants}
@@ -347,7 +348,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                     </motion.section>
                   ) : null}
                 </motion.div>
-                <div className="mt-auto space-y-3 border-t border-[color:var(--mobile-nav-border)] px-5 pb-6 pt-5">
+                <div className="mt-auto space-y-3 border-t border-[color:var(--mobile-nav-border)] px-6 pb-7 pt-6">
                   <SheetClose asChild>
                     <Link
                       href={ctaHref}
