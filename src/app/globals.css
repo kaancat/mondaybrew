@@ -452,14 +452,17 @@ html.dark {
     min-height: 100vh;
     background: var(--background);
     transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1), border-radius 420ms cubic-bezier(0.25, 0.62, 0.32, 1), box-shadow 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
-    transform-origin: left top;
+    transform-origin: left center;
     will-change: transform;
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
-    transform: translate3d(calc(var(--mobile-nav-width) - clamp(20px, 5vw, 44px)), clamp(28px, 7vh, 48px), 0) scale(0.9);
+    margin-block: clamp(28px, 7vh, 48px);
+    transform: translate3d(calc(var(--mobile-nav-width) - clamp(20px, 5vw, 44px)), 0, 0) scale(0.9);
     border-radius: clamp(22px, 7vw, 34px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
+    height: calc(100vh - (clamp(28px, 7vh, 48px) * 2));
+    max-height: calc(100vh - (clamp(28px, 7vh, 48px) * 2));
     overflow: hidden;
   }
 

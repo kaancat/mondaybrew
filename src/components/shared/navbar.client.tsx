@@ -260,7 +260,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="mobile-nav-panel flex max-w-[360px] flex-col overflow-hidden rounded-r-[32px] border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_48px_160px_rgba(8,6,20,0.55)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
+                className="mobile-nav-panel flex max-w-[360px] flex-col overflow-hidden border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_48px_160px_rgba(8,6,20,0.55)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
               >
                 <div className="flex items-center justify-between px-6 pt-7 pb-5">
                   <div className="flex flex-col">
