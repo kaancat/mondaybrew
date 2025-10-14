@@ -260,7 +260,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="mobile-nav-panel relative flex max-w-[360px] flex-col overflow-hidden rounded-r-[32px] border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_40px_120px_rgba(12,8,24,0.36)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] !z-40 data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
+                className="mobile-nav-panel relative flex max-w-[360px] flex-col overflow-hidden rounded-r-[32px] border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_40px_120px_rgba(12,8,24,0.36)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] !z-[60] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
                 style={{ width: "var(--mobile-nav-width)" }}
               >
                 <div className="relative z-10 flex items-center justify-between px-5 pt-6 pb-4">
