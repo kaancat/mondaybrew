@@ -18,6 +18,12 @@ export function TypeformEmbed({ id }: Props) {
       ref={ref}
       data-tf-live={id}
       className="w-full min-h-[600px]"
+      style={{
+        // Prevent transform interference with mobile menu
+        transform: 'none',
+        willChange: 'auto',
+        isolation: 'auto'
+      }}
     />
   );
 }
