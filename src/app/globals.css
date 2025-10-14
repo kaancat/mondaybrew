@@ -86,6 +86,7 @@
 
   --site-shell-offset-x: 0px;
   --site-shell-scale: 1;
+  --site-shell-inset: 0px;
   --full-bleed-inline-start: calc(50% - 50vw);
   --full-bleed-inline-end: calc(50% - 50vw);
   --full-bleed-width: 100vw;
@@ -436,9 +437,10 @@ html.dark {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 0.9;
-    --full-bleed-width: 100%;
-    --full-bleed-inline-start: 0px;
-    --full-bleed-inline-end: 0px;
+    --site-shell-inset: clamp(14px, 4vw, 24px);
+    --full-bleed-width: calc(100% - (var(--site-shell-inset) * 2));
+    --full-bleed-inline-start: var(--site-shell-inset);
+    --full-bleed-inline-end: var(--site-shell-inset);
   }
 
   body::before {
@@ -636,6 +638,12 @@ html.dark {
     margin-left: var(--full-bleed-inline-start) !important;
     margin-right: var(--full-bleed-inline-end) !important;
     transition: margin 420ms cubic-bezier(0.25, 0.62, 0.32, 1), width 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
+  }
+
+  body[data-mobile-nav-open="true"] .full-bleed {
+    border-radius: clamp(20px, 6vw, 32px);
+    box-shadow: 0 56px 160px rgba(8, 6, 20, 0.45);
+    overflow: hidden;
   }
 
   /* When mobile menu is open, prevent full-bleed from escaping the transformed container */
