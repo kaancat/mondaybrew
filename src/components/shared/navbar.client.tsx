@@ -299,20 +299,19 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                                 const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
                                 return (
                                   <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
-                                    <SheetClose asChild>
-                                      <Link
-                                        href={href}
-                                        className={cn(
-                                          "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
-                                          active
-                                            ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                            : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                        )}
-                                      >
-                                        <span>{item.label}</span>
-                                        <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
-                                      </Link>
-                                    </SheetClose>
+                                    <Link
+                                      href={href}
+                                      onClick={() => setMobileOpen(false)}
+                                      className={cn(
+                                        "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                        active
+                                          ? "text-[color:var(--mobile-nav-text)] font-semibold"
+                                          : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                      )}
+                                    >
+                                      <span>{item.label}</span>
+                                      <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                                    </Link>
                                   </motion.li>
                                 );
                               }),
@@ -331,19 +330,18 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                               const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
                               return (
                                 <motion.li key={link.label} variants={mobileItemVariants}>
-                                  <SheetClose asChild>
-                                    <Link
-                                      href={href}
-                                      className={cn(
-                                        "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
-                                        active
-                                          ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                          : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                      )}
-                                    >
-                                      {link.label}
-                                    </Link>
-                                  </SheetClose>
+                                  <Link
+                                    href={href}
+                                    onClick={() => setMobileOpen(false)}
+                                    className={cn(
+                                      "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
+                                      active
+                                        ? "text-[color:var(--mobile-nav-text)] font-semibold"
+                                        : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                    )}
+                                  >
+                                    {link.label}
+                                  </Link>
                                 </motion.li>
                               );
                             })}
@@ -352,15 +350,14 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       ) : null}
                     </motion.div>
                     <div className="mt-auto space-y-3 pb-6 pt-6">
-                      <SheetClose asChild>
-                        <Link
-                          href={ctaHref}
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                        >
-                          <span>{ctaLabel}</span>
-                          <ArrowRight className="size-[16px]" aria-hidden="true" />
-                        </Link>
-                      </SheetClose>
+                      <Link
+                        href={ctaHref}
+                        onClick={() => setMobileOpen(false)}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                      >
+                        <span>{ctaLabel}</span>
+                        <ArrowRight className="size-[16px]" aria-hidden="true" />
+                      </Link>
                       <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
                         <button
                           type="button"
@@ -370,15 +367,14 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                           {themeIcon}
                           <span>Skift tema</span>
                         </button>
-                        <SheetClose asChild>
-                          <Link
-                            href={localeConfig.href}
-                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                          >
-                            <Globe className="size-[16px]" aria-hidden="true" />
-                            <span>{localeConfig.target}</span>
-                          </Link>
-                        </SheetClose>
+                        <Link
+                          href={localeConfig.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                        >
+                          <Globe className="size-[16px]" aria-hidden="true" />
+                          <span>{localeConfig.target}</span>
+                        </Link>
                       </div>
                     </div>
                   </div>
