@@ -82,7 +82,7 @@
   --shadow-elevated-lg: 0 36px 110px rgba(18,15,33,0.28);
   --shadow-hero: 0 50px 120px rgba(8,6,20,0.35);
   --shadow-glass-lg: 0 36px 110px rgba(6,5,16,0.32);
-  --mobile-nav-width: min(82vw, 360px);
+  --mobile-nav-width: min(80vw, 360px);
 
   --mobile-nav-surface: rgba(16, 14, 26, 0.94);
   --mobile-nav-text: rgba(245, 247, 253, 0.95);
@@ -90,9 +90,8 @@
   --mobile-nav-heading: rgba(245, 247, 253, 0.75);
   --mobile-nav-border: rgba(255, 255, 255, 0.14);
   --mobile-nav-hover: rgba(255, 255, 255, 0.08);
-  --mobile-nav-link: rgba(245, 247, 253, 0.8);
-  --mobile-nav-overlay: transparent;
-  --mobile-nav-frame: rgba(255, 255, 255, 0.1);
+  --mobile-nav-link: rgba(245, 247, 253, 0.82);
+  --mobile-nav-overlay: rgba(8, 5, 16, 0.35);
 }
 
 /* Mobile: let the Hero fill the viewport without extra bottom gap */
@@ -288,9 +287,8 @@ html.light-alt {
   --mobile-nav-heading: color-mix(in oklch, var(--services-ink-strong) 80%, var(--mb-accent) 20%);
   --mobile-nav-border: rgba(0, 0, 0, 0.1);
   --mobile-nav-hover: rgba(0, 0, 0, 0.04);
-  --mobile-nav-link: color-mix(in oklch, var(--services-ink-strong) 78%, black 22%);
-  --mobile-nav-overlay: transparent;
-  --mobile-nav-frame: rgba(0, 0, 0, 0.08);
+  --mobile-nav-link: color-mix(in oklch, var(--services-ink-strong) 80%, black 20%);
+  --mobile-nav-overlay: rgba(20, 20, 24, 0.25);
 }
 
 html.dark {
@@ -387,9 +385,8 @@ html.dark {
   --mobile-nav-heading: color-mix(in oklch, var(--mb-accent) 55%, white 45%);
   --mobile-nav-border: color-mix(in oklch, white 14%, transparent);
   --mobile-nav-hover: color-mix(in oklch, white 12%, transparent);
-  --mobile-nav-link: color-mix(in oklch, white 80%, var(--surface-base) 20%);
-  --mobile-nav-overlay: transparent;
-  --mobile-nav-frame: rgba(255, 255, 255, 0.14);
+  --mobile-nav-link: color-mix(in oklch, white 82%, var(--surface-base) 18%);
+  --mobile-nav-overlay: rgba(6, 5, 14, 0.35);
 }
 
 @media (min-width: 1920px) {
@@ -430,62 +427,29 @@ html.dark {
 
   body[data-mobile-nav-open="true"] {
     overflow: hidden;
-    background: var(--mobile-nav-surface);
   }
 
   .site-shell {
     position: relative;
     min-height: 100vh;
-    background: #0b0e2b; /* debug contrast */
-    overflow: hidden;
-    transition: none; /* debug */
+    transition: transform 420ms cubic-bezier(0.24, 0.6, 0.32, 1), border-radius 420ms cubic-bezier(0.24, 0.6, 0.32, 1), box-shadow 420ms cubic-bezier(0.24, 0.6, 0.32, 1);
     transform-origin: left top;
     will-change: transform;
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
-    transform: translate3d(320px, 32px, 0) scale(0.9);
-    border-radius: 32px;
-    box-shadow: 0 60px 150px rgba(255, 0, 0, 0.35);
-    border: 6px solid rgba(255, 0, 0, 0.6);
+    transform: translate3d(calc(var(--mobile-nav-width) - clamp(16px, 4vw, 36px)), clamp(16px, 5vh, 32px), 0) scale(0.92);
+    border-radius: clamp(18px, 6vw, 28px);
+    box-shadow: 0 44px 140px rgba(12, 8, 24, 0.42);
     overflow: hidden;
   }
 
   body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"] {
     background: var(--mobile-nav-overlay);
-    opacity: 1;
   }
 
-  /* DEBUG: vivid drawer color */
-  body[data-debug-nav="true"] .mobile-nav-panel {
-    background: #ff3b3b !important;
-    color: #000 !important;
-  }
-
-  body[data-debug-nav="true"] .site-shell {
-    border: 8px solid #00ffcc !important;
-    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.4);
-  }
-
-  .mobile-nav-panel::before,
-  .mobile-nav-panel::after {
-    content: "";
-    position: absolute;
-    inset-inline: 0;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .mobile-nav-panel::before {
-    top: 0;
-    height: clamp(36px, 9vh, 60px);
-    background: linear-gradient(to bottom, color-mix(in oklch, var(--mobile-nav-text) 14%, transparent) 0%, transparent 100%);
-  }
-
-  .mobile-nav-panel::after {
-    bottom: 0;
-    height: clamp(44px, 10vh, 72px);
-    background: linear-gradient(to top, color-mix(in oklch, var(--mobile-nav-text) 16%, transparent) 0%, transparent 100%);
+  [data-slot="sheet-content"].mobile-nav-panel {
+    width: var(--mobile-nav-width);
   }
 
   h1,
