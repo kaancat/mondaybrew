@@ -462,6 +462,7 @@ html.dark {
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
     overflow: hidden;
     z-index: 60;
+    pointer-events: none;
   }
 
   [data-slot="sheet-content"].mobile-nav-panel {
