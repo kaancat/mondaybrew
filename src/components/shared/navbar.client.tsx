@@ -122,16 +122,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
       body.style.setProperty("--site-shell-offset-x", `${offset}px`);
       body.style.setProperty("--site-shell-scale", `${scale}`);
-
-      if (mobileOpen) {
-        body.style.setProperty("--full-bleed-width", "100%");
-        body.style.setProperty("--full-bleed-inline-start", "0px");
-        body.style.setProperty("--full-bleed-inline-end", "0px");
-      } else {
-        body.style.setProperty("--full-bleed-width", "100vw");
-        body.style.setProperty("--full-bleed-inline-start", "calc(50% - 50vw)");
-        body.style.setProperty("--full-bleed-inline-end", "calc(50% - 50vw)");
-      }
+      
+      // full-bleed variables are now handled purely by CSS via data-mobile-nav-open attribute
+      // This prevents JS/CSS conflicts and ensures consistent behavior across all pages
     };
 
     updateShellMetrics();
@@ -140,9 +133,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
       window.removeEventListener("resize", updateShellMetrics);
       body.style.removeProperty("--site-shell-offset-x");
       body.style.removeProperty("--site-shell-scale");
-      body.style.removeProperty("--full-bleed-width");
-      body.style.removeProperty("--full-bleed-inline-start");
-      body.style.removeProperty("--full-bleed-inline-end");
     };
   }, [mobileOpen]);
 
