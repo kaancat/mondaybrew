@@ -84,12 +84,6 @@
   --shadow-glass-lg: 0 36px 110px rgba(6,5,16,0.32);
   --mobile-nav-width: min(80vw, 360px);
 
-  --site-shell-offset-x: 0px;
-  --site-shell-scale: 1;
-  --full-bleed-inline-start: calc(50% - 50vw);
-  --full-bleed-inline-end: calc(50% - 50vw);
-  --full-bleed-width: 100vw;
-
   --mobile-nav-surface: rgba(16, 14, 26, 0.94);
   --mobile-nav-text: rgba(245, 247, 253, 0.9);
   --mobile-nav-muted: rgba(245, 247, 253, 0.62);
@@ -434,11 +428,6 @@ html.dark {
 
   body[data-mobile-nav-open="true"] {
     overflow: hidden;
-    --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
-    --site-shell-scale: 0.9;
-    --full-bleed-inline-start: 0px;
-    --full-bleed-inline-end: 0px;
-    --full-bleed-width: 100%;
   }
 
   body::before {
@@ -465,15 +454,17 @@ html.dark {
     transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1), border-radius 420ms cubic-bezier(0.25, 0.62, 0.32, 1), box-shadow 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
     transform-origin: left center;
     will-change: transform;
-    transform: translate3d(var(--site-shell-offset-x), 0, 0) scale(var(--site-shell-scale));
+    --site-shell-offset-x: 0px;
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
+    transform: translate3d(calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px)), 0, 0) scale(0.9);
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
     overflow: hidden;
     z-index: 60;
     pointer-events: none;
+    --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
   }
 
   [data-slot="sheet-content"].mobile-nav-panel {
@@ -624,9 +615,9 @@ html.dark {
   }
 
   .full-bleed {
-    width: var(--full-bleed-width);
-    margin-left: var(--full-bleed-inline-start);
-    margin-right: var(--full-bleed-inline-end);
+    width: 100vw;
+    margin-left: calc((50% - 50vw) + var(--site-shell-offset-x, 0px));
+    margin-right: calc((50% - 50vw) - var(--site-shell-offset-x, 0px));
   }
 
   /* Hide native scrollbars but keep scrolling accessible */
