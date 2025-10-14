@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
-import { Sheet, SheetTrigger, SheetContent, SheetClose } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -251,139 +250,144 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               })()}
             </Link>
 
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger asChild>
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={() => setMobileOpen(true)}
+              className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+            >
+              <Menu className="size-[18px]" aria-hidden="true" />
+            </button>
+            <div
+              role="presentation"
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                "fixed inset-0 z-[120] bg-black/60 transition-opacity",
+                mobileOpen ? "opacity-100" : "pointer-events-none opacity-0",
+              )}
+            />
+            <aside
+              className={cn(
+                "mobile-nav-panel fixed inset-y-0 left-0 z-[140] flex max-w-[360px] flex-col overflow-hidden rounded-r-[32px] border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_40px_120px_rgba(12,8,24,0.36)] transition-transform duration-500 ease-[cubic-bezier(.22,.61,.36,1)]",
+              )}
+              style={{
+                width: "var(--mobile-nav-width)",
+                transform: mobileOpen ? "translate3d(0,0,0)" : "translate3d(calc(-1 * var(--mobile-nav-width)),0,0)",
+              }}
+            >
+              <div className="relative z-10 flex items-center justify-between px-5 pt-6 pb-4 bg-red-500 text-black">
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
+                  <span className="text-xs uppercase">DEBUG PANEL</span>
+                </div>
                 <button
                   type="button"
-                  aria-label="Open menu"
-                  className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[13px] font-medium text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                 >
-                  <Menu className="size-[18px]" aria-hidden="true" />
+                  <X className="size-[16px]" aria-hidden="true" />
+                  <span>Luk</span>
                 </button>
-              </SheetTrigger>
-              <SheetContent
-                side="left"
-                className="mobile-nav-panel relative flex max-w-[360px] flex-col overflow-hidden rounded-r-[32px] border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_40px_120px_rgba(12,8,24,0.36)] !z-[200] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
-                style={{ width: "var(--mobile-nav-width)" }}
+              </div>
+              <motion.div
+                key={Number(mobileOpen)}
+                className="relative z-10 flex-1 space-y-7 overflow-y-auto bg-yellow-200 px-5 pb-10"
+                initial="hidden"
+                animate={mobileOpen ? "show" : "hidden"}
+                variants={mobileMenuVariants}
               >
-                <div className="relative z-10 flex items-center justify-between px-5 pt-6 pb-4 bg-lime-500 text-black">
-                  <div className="flex flex-col">
-                    <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
-                    <span className="text-xs uppercase">DEBUG PANEL</span>
-                  </div>
-                  <SheetClose asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[13px] font-medium text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                    >
-                      <X className="size-[16px]" aria-hidden="true" />
-                      <span>Luk</span>
-                    </button>
-                  </SheetClose>
-                </div>
-                <motion.div
-                  key={Number(mobileOpen)}
-                  className="relative z-10 flex-1 space-y-7 overflow-y-auto bg-yellow-200 px-5 pb-10"
-                  initial="hidden"
-                  animate="show"
-                  variants={mobileMenuVariants}
-                >
-                  {megaSections.map((section) => (
-                    <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
-                      <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                        {section.label}
-                      </motion.h2>
-                      <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5 bg-purple-200">
-                        {section.groups.flatMap((group) =>
-                          group.items.map((item) => {
-                            const href = item.href ?? "#";
-                            const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                            return (
-                              <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
-                                <SheetClose asChild>
-                                  <Link
-                                    href={href}
-                                    className={cn(
-                                      "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
-                                      active
-                                        ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                        : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                    )}
-                                  >
-                                    <span>{item.label}</span>
-                                    <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
-                                  </Link>
-                                </SheetClose>
-                              </motion.li>
-                            );
-                          }),
-                        )}
-                      </motion.ul>
-                    </motion.section>
-                  ))}
-                  {simpleLinks.length ? (
-                    <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
-                      <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                        Mere
-                      </motion.h2>
-                      <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                        {simpleLinks.map((link) => {
-                          const href = link.href ?? "#";
+                <div className="rounded-lg border border-dashed border-black bg-white/80 p-4 text-black">DEBUG: Drawer content mounted</div>
+                {megaSections.map((section) => (
+                  <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
+                    <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                      {section.label}
+                    </motion.h2>
+                    <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5 bg-purple-200">
+                      {section.groups.flatMap((group) =>
+                        group.items.map((item) => {
+                          const href = item.href ?? "#";
                           const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
                           return (
-                            <motion.li key={link.label} variants={mobileItemVariants}>
-                              <SheetClose asChild>
-                                <Link
-                                  href={href}
-                                  className={cn(
-                                    "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
-                                    active
-                                      ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                      : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                  )}
-                                >
-                                  {link.label}
-                                </Link>
-                              </SheetClose>
+                            <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
+                              <Link
+                                href={href}
+                                onClick={() => setMobileOpen(false)}
+                                className={cn(
+                                  "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                  active
+                                    ? "text-[color:var(--mobile-nav-text)] font-semibold"
+                                    : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                )}
+                              >
+                                <span>{item.label}</span>
+                                <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                              </Link>
                             </motion.li>
                           );
-                        })}
-                      </motion.ul>
-                    </motion.section>
-                  ) : null}
-                </motion.div>
-                <div className="relative z-10 mt-auto space-y-3 border-t border-[color:var(--mobile-nav-border)] bg-blue-200 px-5 pb-6 pt-5">
-                  <SheetClose asChild>
-                    <Link
-                      href={ctaHref}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                    >
-                      <span>{ctaLabel}</span>
-                      <ArrowRight className="size-[16px]" aria-hidden="true" />
-                    </Link>
-                  </SheetClose>
-                  <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
-                    <button
-                      type="button"
-                      onClick={() => setTheme(nextThemeId)}
-                      className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                    >
-                      {themeIcon}
-                      <span>Skift tema</span>
-                    </button>
-                    <SheetClose asChild>
-                      <Link
-                        href={localeConfig.href}
-                        className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                      >
-                        <Globe className="size-[16px]" aria-hidden="true" />
-                        <span>{localeConfig.target}</span>
-                      </Link>
-                    </SheetClose>
-                  </div>
+                        }),
+                      )}
+                    </motion.ul>
+                  </motion.section>
+                ))}
+                {simpleLinks.length ? (
+                  <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
+                    <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                      Mere
+                    </motion.h2>
+                    <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                      {simpleLinks.map((link) => {
+                        const href = link.href ?? "#";
+                        const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                        return (
+                          <motion.li key={link.label} variants={mobileItemVariants}>
+                            <Link
+                              href={href}
+                              onClick={() => setMobileOpen(false)}
+                              className={cn(
+                                "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
+                                active
+                                  ? "text-[color:var(--mobile-nav-text)] font-semibold"
+                                  : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                              )}
+                            >
+                              {link.label}
+                            </Link>
+                          </motion.li>
+                        );
+                      })}
+                    </motion.ul>
+                  </motion.section>
+                ) : null}
+              </motion.div>
+              <div className="relative z-10 mt-auto space-y-3 border-t border-[color:var(--mobile-nav-border)] bg-blue-200 px-5 pb-6 pt-5">
+                <Link
+                  href={ctaHref}
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                >
+                  <span>{ctaLabel}</span>
+                  <ArrowRight className="size-[16px]" aria-hidden="true" />
+                </Link>
+                <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
+                  <button
+                    type="button"
+                    onClick={() => setTheme(nextThemeId)}
+                    className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                  >
+                    {themeIcon}
+                    <span>Skift tema</span>
+                  </button>
+                  <Link
+                    href={localeConfig.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                  >
+                    <Globe className="size-[16px]" aria-hidden="true" />
+                    <span>{localeConfig.target}</span>
+                  </Link>
                 </div>
-              </SheetContent>
-            </Sheet>
+              </div>
+            </aside>
           </div>
 
           {/* Desktop header */}
