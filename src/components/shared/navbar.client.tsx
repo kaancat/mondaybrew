@@ -260,123 +260,130 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="mobile-nav-panel flex max-w-[360px] flex-col overflow-hidden border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_48px_160px_rgba(8,6,20,0.55)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
+                className="mobile-nav-panel flex h-screen w-screen flex-col overflow-hidden border-none bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-[0_48px_160px_rgba(8,6,20,0.55)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent data-[state=closed]:shadow-none"
               >
-                <div className="flex items-center justify-between px-6 pt-7 pb-5">
-                  <div className="flex flex-col">
-                    <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
+                <div className="flex h-full w-full">
+                  <div className="mobile-nav-inner flex h-full w-[var(--mobile-nav-width)] flex-col border-r border-[color:var(--mobile-nav-border)]">
+                    <div className="flex items-center justify-between px-6 pt-7 pb-5">
+                      <div className="flex flex-col">
+                        <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
+                      </div>
+                      <SheetClose asChild>
+                        <button
+                          type="button"
+                          aria-label="Luk menu"
+                          className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                        >
+                          <X className="size-[18px]" aria-hidden="true" />
+                          <span className="sr-only">Luk</span>
+                        </button>
+                      </SheetClose>
+                    </div>
+                    <motion.div
+                      key={Number(mobileOpen)}
+                      className="flex-1 space-y-7 overflow-y-auto px-6 pb-12"
+                      initial="hidden"
+                      animate="show"
+                      variants={mobileMenuVariants}
+                    >
+                      {megaSections.map((section) => (
+                        <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
+                          <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                            {section.label}
+                          </motion.h2>
+                          <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                            {section.groups.flatMap((group) =>
+                              group.items.map((item) => {
+                                const href = item.href ?? "#";
+                                const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                                return (
+                                  <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
+                                    <SheetClose asChild>
+                                      <Link
+                                        href={href}
+                                        className={cn(
+                                          "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                          active
+                                            ? "text-[color:var(--mobile-nav-text)] font-semibold"
+                                            : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                        )}
+                                      >
+                                        <span>{item.label}</span>
+                                        <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                                      </Link>
+                                    </SheetClose>
+                                  </motion.li>
+                                );
+                              }),
+                            )}
+                          </motion.ul>
+                        </motion.section>
+                      ))}
+                      {simpleLinks.length ? (
+                        <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
+                          <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                            Mere
+                          </motion.h2>
+                          <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                            {simpleLinks.map((link) => {
+                              const href = link.href ?? "#";
+                              const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                              return (
+                                <motion.li key={link.label} variants={mobileItemVariants}>
+                                  <SheetClose asChild>
+                                    <Link
+                                      href={href}
+                                      className={cn(
+                                        "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
+                                        active
+                                          ? "text-[color:var(--mobile-nav-text)] font-semibold"
+                                          : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                      )}
+                                    >
+                                      {link.label}
+                                    </Link>
+                                  </SheetClose>
+                                </motion.li>
+                              );
+                            })}
+                          </motion.ul>
+                        </motion.section>
+                      ) : null}
+                    </motion.div>
+                    <div className="mt-auto space-y-3 border-t border-[color:var(--mobile-nav-border)] px-6 pb-7 pt-6">
+                      <SheetClose asChild>
+                        <Link
+                          href={ctaHref}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                        >
+                          <span>{ctaLabel}</span>
+                          <ArrowRight className="size-[16px]" aria-hidden="true" />
+                        </Link>
+                      </SheetClose>
+                      <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
+                        <button
+                          type="button"
+                          onClick={() => setTheme(nextThemeId)}
+                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                        >
+                          {themeIcon}
+                          <span>Skift tema</span>
+                        </button>
+                        <SheetClose asChild>
+                          <Link
+                            href={localeConfig.href}
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          >
+                            <Globe className="size-[16px]" aria-hidden="true" />
+                            <span>{localeConfig.target}</span>
+                          </Link>
+                        </SheetClose>
+                      </div>
+                    </div>
                   </div>
                   <SheetClose asChild>
-                    <button
-                      type="button"
-                      aria-label="Luk menu"
-                      className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                    >
-                      <X className="size-[18px]" aria-hidden="true" />
-                      <span className="sr-only">Luk</span>
-                    </button>
+                    <button type="button" tabIndex={-1} aria-hidden="true" className="flex-1" />
                   </SheetClose>
-                </div>
-                <motion.div
-                  key={Number(mobileOpen)}
-                  className="flex-1 space-y-7 overflow-y-auto px-6 pb-12"
-                  initial="hidden"
-                  animate="show"
-                  variants={mobileMenuVariants}
-                >
-                  {megaSections.map((section) => (
-                    <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
-                      <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                        {section.label}
-                      </motion.h2>
-                      <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                        {section.groups.flatMap((group) =>
-                          group.items.map((item) => {
-                            const href = item.href ?? "#";
-                            const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                            return (
-                              <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
-                                <SheetClose asChild>
-                                  <Link
-                                    href={href}
-                                    className={cn(
-                                      "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
-                                      active
-                                        ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                        : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                    )}
-                                  >
-                                    <span>{item.label}</span>
-                                    <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
-                                  </Link>
-                                </SheetClose>
-                              </motion.li>
-                            );
-                          }),
-                        )}
-                      </motion.ul>
-                    </motion.section>
-                  ))}
-                  {simpleLinks.length ? (
-                    <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
-                      <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                        Mere
-                      </motion.h2>
-                      <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                        {simpleLinks.map((link) => {
-                          const href = link.href ?? "#";
-                          const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                          return (
-                            <motion.li key={link.label} variants={mobileItemVariants}>
-                              <SheetClose asChild>
-                                <Link
-                                  href={href}
-                                  className={cn(
-                                    "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
-                                    active
-                                      ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                      : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                  )}
-                                >
-                                  {link.label}
-                                </Link>
-                              </SheetClose>
-                            </motion.li>
-                          );
-                        })}
-                      </motion.ul>
-                    </motion.section>
-                  ) : null}
-                </motion.div>
-                <div className="mt-auto space-y-3 border-t border-[color:var(--mobile-nav-border)] px-6 pb-7 pt-6">
-                  <SheetClose asChild>
-                    <Link
-                      href={ctaHref}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                    >
-                      <span>{ctaLabel}</span>
-                      <ArrowRight className="size-[16px]" aria-hidden="true" />
-                    </Link>
-                  </SheetClose>
-                  <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
-                    <button
-                      type="button"
-                      onClick={() => setTheme(nextThemeId)}
-                      className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                    >
-                      {themeIcon}
-                      <span>Skift tema</span>
-                    </button>
-                    <SheetClose asChild>
-                      <Link
-                        href={localeConfig.href}
-                        className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                      >
-                        <Globe className="size-[16px]" aria-hidden="true" />
-                        <span>{localeConfig.target}</span>
-                      </Link>
-                    </SheetClose>
-                  </div>
                 </div>
               </SheetContent>
             </Sheet>
