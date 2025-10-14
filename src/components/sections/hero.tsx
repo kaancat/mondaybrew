@@ -252,7 +252,7 @@ export function HeroSection({
       data-hero-full="true"
     >
       <div
-        className="full-bleed md:relative md:isolate flex w-full flex-col overflow-hidden md:rounded-[5px] md:border md:border-white/10 md:bg-black/60 shadow-[var(--shadow-hero)]"
+        className="full-bleed relative md:isolate flex w-full flex-col overflow-hidden md:rounded-[5px] md:border md:border-white/10 md:bg-black/60 shadow-[var(--shadow-hero)]"
         style={{ minHeight: "560px", height: heroHeight }}
       >
         <div className="absolute inset-0">
