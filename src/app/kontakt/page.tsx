@@ -9,9 +9,10 @@ export default function ContactPage() {
       <p className="text-muted-foreground max-w-2xl">
         Placeholder for kontakt-siden. Her kommer kontaktinfo, adresse og et Typeform-embed.
       </p>
-      <div className="max-w-3xl">
+      {/* Temporarily commented out for mobile menu testing */}
+      {/* <div className="max-w-3xl">
         <TypeformEmbed id="placeholder" />
-      </div>
+      </div> */}
     </Section>
   );
 }
