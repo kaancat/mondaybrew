@@ -675,6 +675,25 @@ html.dark {
   .vr-section-tight { margin-top: var(--section-gap-sm); }
   .vr-section-none { margin-top: 0; }
 
+  /* When mobile menu is open, disable margins that interfere with transform */
+  body[data-mobile-nav-open="true"] .vr-hero,
+  body[data-mobile-nav-open="true"] .vr-section,
+  body[data-mobile-nav-open="true"] .vr-section-tight {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Ensure main element doesn't interfere with transform context */
+  main {
+    position: relative;
+    display: block;
+    width: 100%;
+    /* Prevent main from creating new stacking context that breaks transforms */
+    isolation: auto;
+    transform: none;
+    will-change: auto;
+  }
+
   /* Last content section to footer spacing */
   main > .vr-hero:last-child,
   main > .vr-section:last-child,
