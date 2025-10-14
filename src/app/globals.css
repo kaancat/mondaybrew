@@ -476,6 +476,13 @@ html.dark {
     pointer-events: none;
   }
 
+  /* Include navbar in the transform to maintain visual consistency */
+  body[data-mobile-nav-open="true"] header {
+    transform: translate3d(var(--site-shell-offset-x), 0, 0) scale(var(--site-shell-scale));
+    transform-origin: left center;
+    transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
+  }
+
   [data-slot="sheet-content"].mobile-nav-panel {
     width: 100vw;
     max-width: none;
