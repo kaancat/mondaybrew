@@ -260,11 +260,11 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="mobile-nav-panel flex h-screen w-screen flex-col overflow-hidden border-none bg-transparent text-[color:var(--mobile-nav-text)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent"
+                className="mobile-nav-panel fixed inset-0 z-[40] flex h-screen w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent"
               >
-                <div className="flex h-full w-full">
-                  <div className="mobile-nav-inner flex h-full w-[var(--mobile-nav-width)] flex-col border-r border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] shadow-[0_48px_160px_rgba(8,6,20,0.55)]">
-                    <div className="flex items-center justify-between px-6 pt-7 pb-5">
+                <div className="flex h-full w-full items-stretch">
+                  <div className="mobile-nav-inner flex h-full w-[var(--mobile-nav-width)] flex-col border-r border-[color:var(--mobile-nav-border)] px-6 py-8">
+                    <div className="flex items-center justify-between pt-4 pb-4">
                       <div className="flex flex-col">
                         <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
                       </div>
@@ -281,7 +281,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                     </div>
                     <motion.div
                       key={Number(mobileOpen)}
-                      className="flex-1 space-y-7 overflow-y-auto px-6 pb-12"
+                      className="flex-1 space-y-7 overflow-y-auto pb-10"
                       initial="hidden"
                       animate="show"
                       variants={mobileMenuVariants}
@@ -350,7 +350,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         </motion.section>
                       ) : null}
                     </motion.div>
-                    <div className="mt-auto space-y-3 border-t border-[color:var(--mobile-nav-border)] px-6 pb-7 pt-6">
+                    <div className="mt-auto space-y-3 border-t border-[color:var(--mobile-nav-border)] pb-6 pt-6">
                       <SheetClose asChild>
                         <Link
                           href={ctaHref}
