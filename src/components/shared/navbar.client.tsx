@@ -108,6 +108,44 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     };
   }, [mobileOpen]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const body = document.body;
+    if (!body) return;
+
+    const updateShellMetrics = () => {
+      const viewportWidth = window.innerWidth || 0;
+      const drawerWidth = Math.min(viewportWidth * 0.8, 360);
+      const drawerGap = Math.min(Math.max(viewportWidth * 0.03, 6), 18);
+      const offset = mobileOpen ? drawerWidth + drawerGap : 0;
+      const scale = mobileOpen ? 0.9 : 1;
+
+      body.style.setProperty("--site-shell-offset-x", `${offset}px`);
+      body.style.setProperty("--site-shell-scale", `${scale}`);
+
+      if (mobileOpen) {
+        body.style.setProperty("--full-bleed-width", "100%");
+        body.style.setProperty("--full-bleed-inline-start", "0px");
+        body.style.setProperty("--full-bleed-inline-end", "0px");
+      } else {
+        body.style.setProperty("--full-bleed-width", "100vw");
+        body.style.setProperty("--full-bleed-inline-start", "calc(50% - 50vw)");
+        body.style.setProperty("--full-bleed-inline-end", "calc(50% - 50vw)");
+      }
+    };
+
+    updateShellMetrics();
+    window.addEventListener("resize", updateShellMetrics);
+    return () => {
+      window.removeEventListener("resize", updateShellMetrics);
+      body.style.removeProperty("--site-shell-offset-x");
+      body.style.removeProperty("--site-shell-scale");
+      body.style.removeProperty("--full-bleed-width");
+      body.style.removeProperty("--full-bleed-inline-start");
+      body.style.removeProperty("--full-bleed-inline-end");
+    };
+  }, [mobileOpen]);
+
   const effectiveTheme = (mounted ? resolvedTheme : undefined) as ThemeId | undefined;
   const currentThemeId = effectiveTheme ?? defaultThemeId;
   const isLightAlt = currentThemeId === "light-alt";
