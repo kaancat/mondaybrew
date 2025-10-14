@@ -454,7 +454,6 @@ html.dark {
     transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1), border-radius 420ms cubic-bezier(0.25, 0.62, 0.32, 1), box-shadow 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
     transform-origin: left center;
     will-change: transform;
-    --site-shell-offset-x: 0px;
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
@@ -464,7 +463,6 @@ html.dark {
     overflow: hidden;
     z-index: 60;
     pointer-events: none;
-    --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
   }
 
   [data-slot="sheet-content"].mobile-nav-panel {
@@ -616,8 +614,8 @@ html.dark {
 
   .full-bleed {
     width: 100vw;
-    margin-left: calc((50% - 50vw) + var(--site-shell-offset-x, 0px));
-    margin-right: calc((50% - 50vw) - var(--site-shell-offset-x, 0px));
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
   }
 
   /* Hide native scrollbars but keep scrolling accessible */
