@@ -441,6 +441,9 @@ html.dark {
     --full-bleed-width: calc(100% - (var(--site-shell-inset) * 2));
     --full-bleed-inline-start: var(--site-shell-inset);
     --full-bleed-inline-end: var(--site-shell-inset);
+    
+    /* Create isolated stacking context */
+    isolation: isolate;
   }
 
   body::before {
@@ -476,6 +479,10 @@ html.dark {
     overflow: hidden;
     z-index: 60;
     pointer-events: none;
+    
+    /* Isolate from page content */
+    isolation: isolate;
+    contain: layout style paint;
   }
 
   /* Include navbar in the transform to maintain visual consistency */
