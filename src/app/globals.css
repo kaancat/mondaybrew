@@ -463,10 +463,6 @@ html.dark {
     overflow: hidden;
   }
 
-  body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"] {
-    background: var(--mobile-nav-overlay);
-  }
-
   [data-slot="sheet-content"].mobile-nav-panel {
     width: 100vw;
     max-width: none;
