@@ -458,7 +458,7 @@ html.dark {
 
   body[data-mobile-nav-open="true"] .site-shell {
     transform: translate3d(calc(var(--mobile-nav-width) - clamp(20px, 5vw, 44px)), 0, 0) scale(0.9);
-    border-radius: clamp(22px, 7vw, 34px);
+    border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
     overflow: hidden;
   }
