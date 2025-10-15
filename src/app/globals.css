@@ -694,6 +694,13 @@ html.dark {
     margin-left: 0 !important;
     margin-right: 0 !important;
     max-width: 100%;
+    /* Ensure full-bleed elements don't create visual artifacts */
+    position: relative;
+    left: 0 !important;
+    right: 0 !important;
+    /* Neutralize stacking context that can cause artifacts */
+    isolation: auto !important;
+    contain: none !important;
   }
 
   /* Hide native scrollbars but keep scrolling accessible */
@@ -739,6 +746,24 @@ html.dark {
   body[data-mobile-nav-open="true"] .vr-section-tight {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+  }
+
+  /* Prevent hero section from creating visual artifacts when mobile nav is open */
+  body[data-mobile-nav-open="true"] .vr-hero {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  body[data-mobile-nav-open="true"] .vr-hero > * {
+    max-width: 100%;
+  }
+
+  /* Remove container padding in hero section when mobile nav is open to prevent gaps */
+  body[data-mobile-nav-open="true"] .vr-hero .layout-container {
+    padding-inline: 0 !important;
+    max-width: none !important;
   }
 
   /* Ensure main element doesn't interfere with transform context */
