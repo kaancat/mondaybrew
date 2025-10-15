@@ -474,12 +474,16 @@ html.dark {
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
+    transform-origin: left center !important;
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
     overflow: hidden;
+    height: 100vh;
+    margin-block: auto;
     z-index: 60;
     pointer-events: none;
-    
+    background: transparent;
+
     /* Isolate from page content */
     isolation: isolate;
     contain: layout style paint;
