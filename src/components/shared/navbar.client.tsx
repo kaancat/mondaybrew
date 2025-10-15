@@ -289,10 +289,10 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               <SheetContent
                 side="left"
                 hideCloseButton
-                className="mobile-nav-panel fixed inset-0 z-[40] flex h-screen w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0 transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent"
+                className="mobile-nav-panel fixed inset-0 z-[120] flex h-screen w-screen overflow-hidden text-[color:var(--mobile-nav-text)] shadow-none border-r-0 transition-[transform,width] duration-500 ease-[cubic-bezier(.22,.61,.36,1)] data-[state=closed]:pointer-events-none data-[state=closed]:w-0 data-[state=closed]:max-w-0 data-[state=closed]:border-transparent"
               >
                 <div className="flex h-full w-full items-stretch">
-                  <div className="mobile-nav-inner flex h-full w-[var(--mobile-nav-width)] flex-col px-6 py-8">
+                  <div className="mobile-nav-inner relative z-[1] flex h-full w-[var(--mobile-nav-width)] flex-col bg-[color:var(--mobile-nav-surface)]/96 px-6 py-8 backdrop-blur-[22px]">
                     <div className="flex items-center justify-between pb-5">
                       <div className="flex flex-col">
                         <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
