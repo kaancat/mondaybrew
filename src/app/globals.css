@@ -528,37 +528,11 @@ html.dark {
     width: 100vw;
     max-width: none;
     padding: 0;
-    pointer-events: auto;
   }
 
   [data-slot="sheet-overlay"] {
     background: transparent !important;
     pointer-events: none;
-  }
-
-  .mobile-nav-panel::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 380ms cubic-bezier(0.25, 0.62, 0.32, 1);
-    background: linear-gradient(
-      90deg,
-      color-mix(in oklch, var(--mobile-nav-surface) 96%, transparent) 0%,
-      color-mix(in oklch, var(--mobile-nav-surface) 86%, transparent) 38%,
-      color-mix(in oklch, var(--mobile-nav-surface) 58%, transparent) 65%,
-      transparent 100%
-    );
-  }
-
-  body[data-mobile-nav-open="true"] .mobile-nav-panel::before {
-    opacity: 1;
-  }
-
-  .mobile-nav-inner {
-    box-shadow: 0 48px 120px rgba(10, 8, 22, 0.45);
-    border-right: 1px solid color-mix(in oklch, var(--mobile-nav-border) 72%, transparent);
   }
 
   h1,
