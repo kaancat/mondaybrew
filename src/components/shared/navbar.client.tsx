@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Sheet, SheetTrigger, SheetContent, SheetClose } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -202,6 +202,17 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
         delayChildren: 0.06,
       },
     },
+    exit: {
+      opacity: 0,
+      y: 16,
+      transition: {
+        duration: 0.4,
+        ease: [0.22, 0.61, 0.36, 1],
+        when: "afterChildren",
+        staggerChildren: 0.05,
+        staggerDirection: -1,
+      },
+    },
   } as const;
 
   const mobileGroupVariants = {
@@ -215,6 +226,16 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
         staggerChildren: 0.06,
       },
     },
+    exit: {
+      opacity: 0,
+      y: 20,
+      transition: {
+        duration: 0.3,
+        ease: [0.22, 0.61, 0.36, 1],
+        staggerChildren: 0.04,
+        staggerDirection: -1,
+      },
+    },
   } as const;
 
   const mobileItemVariants = {
@@ -223,6 +244,11 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
       opacity: 1,
       y: 0,
       transition: { duration: 0.32, ease: [0.22, 0.61, 0.36, 1] },
+    },
+    exit: {
+      opacity: 0,
+      y: 12,
+      transition: { duration: 0.25, ease: [0.22, 0.61, 0.36, 1] },
     },
   } as const;
 
@@ -308,13 +334,16 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         </button>
                       </SheetClose>
                     </div>
-                    <motion.div
-                      key={Number(mobileOpen)}
-                      className="no-scrollbar flex-1 space-y-7 overflow-y-auto pb-10"
-                      initial="hidden"
-                      animate="show"
-                      variants={mobileMenuVariants}
-                    >
+                    <AnimatePresence mode="wait">
+                      {mobileOpen && (
+                        <motion.div
+                          key="mobile-menu"
+                          className="no-scrollbar flex-1 space-y-7 overflow-y-auto pb-10"
+                          initial="hidden"
+                          animate="show"
+                          exit="exit"
+                          variants={mobileMenuVariants}
+                        >
                       {megaSections.map((section) => (
                         <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
                           <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
@@ -376,7 +405,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                           </motion.ul>
                         </motion.section>
                       ) : null}
-                    </motion.div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     <div className="mt-auto space-y-3 pb-6 pt-6">
                       <Link
                         href={ctaHref}
