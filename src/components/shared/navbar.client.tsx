@@ -228,14 +228,33 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     const html = document.documentElement;
 
     if (open) {
+      body.removeAttribute("data-mobile-nav-closing");
+      html.removeAttribute("data-mobile-nav-closing");
       body.setAttribute("data-mobile-nav-open", "true");
       html.setAttribute("data-mobile-nav-open", "true");
       return;
     }
 
-    // Closing: remove open attribute and let CSS animate shell back
+    // Closing: snap shell to rest and prevent any exit animation
+    body.setAttribute("data-mobile-nav-closing", "true");
+    html.setAttribute("data-mobile-nav-closing", "true");
     body.removeAttribute("data-mobile-nav-open");
     html.removeAttribute("data-mobile-nav-open");
+    // Force-safe end state in case of stray rules on specific pages
+    body.style.setProperty("--site-shell-offset-x", "0px");
+    body.style.setProperty("--site-shell-scale", "1");
+    html.style.setProperty("--site-shell-offset-x", "0px");
+    html.style.setProperty("--site-shell-scale", "1");
+
+    // Clean up guard shortly after
+    window.setTimeout(() => {
+      body.removeAttribute("data-mobile-nav-closing");
+      html.removeAttribute("data-mobile-nav-closing");
+      body.style.removeProperty("--site-shell-offset-x");
+      body.style.removeProperty("--site-shell-scale");
+      html.style.removeProperty("--site-shell-offset-x");
+      html.style.removeProperty("--site-shell-scale");
+    }, 120);
   };
 
   return (
