@@ -228,10 +228,17 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     const html = document.documentElement;
 
     if (open) {
+      // Opening: snap to open state, no animation
       body.removeAttribute("data-mobile-nav-closing");
       html.removeAttribute("data-mobile-nav-closing");
+      body.setAttribute("data-mobile-nav-opening", "true");
+      html.setAttribute("data-mobile-nav-opening", "true");
       body.setAttribute("data-mobile-nav-open", "true");
       html.setAttribute("data-mobile-nav-open", "true");
+      window.setTimeout(() => {
+        body.removeAttribute("data-mobile-nav-opening");
+        html.removeAttribute("data-mobile-nav-opening");
+      }, 80);
       return;
     }
 
@@ -321,22 +328,19 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                     {mobileOpen && (
                       <motion.div
                         className="no-scrollbar flex-1 space-y-7 overflow-y-auto pb-10"
-                        initial="hidden"
-                        animate="show"
-                        variants={mobileMenuVariants}
                       >
                       {megaSections.map((section) => (
-                        <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
-                          <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                        <motion.section key={section.label} className="space-y-3">
+                          <motion.h2 className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
                             {section.label}
                           </motion.h2>
-                          <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                          <motion.ul className="flex flex-col gap-1.5">
                             {section.groups.flatMap((group) =>
                               group.items.map((item) => {
                                 const href = item.href ?? "#";
                                 const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
                                 return (
-                                  <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
+                                  <motion.li key={`${section.label}-${item.label}`}>
                                     <Link
                                       href={href}
                                       onClick={() => setMobileOpen(false)}
@@ -358,16 +362,16 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         </motion.section>
                       ))}
                       {simpleLinks.length ? (
-                        <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
-                          <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                        <motion.section key="primary-links" className="space-y-3 pt-2">
+                          <motion.h2 className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
                             Mere
                           </motion.h2>
-                          <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                          <motion.ul className="flex flex-col gap-1.5">
                             {simpleLinks.map((link) => {
                               const href = link.href ?? "#";
                               const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
                               return (
-                                <motion.li key={link.label} variants={mobileItemVariants}>
+                                  <motion.li key={link.label}>
                                   <Link
                                     href={href}
                                     onClick={() => setMobileOpen(false)}
