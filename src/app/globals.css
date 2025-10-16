@@ -593,20 +593,7 @@ html.dark {
   }
 
   /* Disable site-shell exit animation: snap to rest while closing */
-  body[data-mobile-nav-closing="true"] .site-shell,
-  html[data-mobile-nav-closing="true"] .site-shell {
-    transition: none !important;
-    transform: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    pointer-events: auto !important;
-  }
-
-  body[data-mobile-nav-closing="true"] header[class*="fixed"],
-  html[data-mobile-nav-closing="true"] header[class*="fixed"] {
-    transition: none !important;
-    transform: none !important;
-  }
+  /* removed closing guard; allow CSS transitions to animate exit */
 
   h1,
   h2,
