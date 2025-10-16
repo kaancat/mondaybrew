@@ -464,6 +464,17 @@ html.dark {
     opacity: 1;
   }
 
+  /* Exiting: keep open flag but drive vars back to rest so transition mirrors enter */
+  body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"],
+  html[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"] {
+    --site-shell-offset-x: 0px;
+    --site-shell-scale: 1;
+  }
+  body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"]::before,
+  html[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"]::before {
+    opacity: 0;
+  }
+
   .site-shell {
     position: relative;
     z-index: 50;
@@ -589,6 +600,13 @@ html.dark {
   body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"],
   html[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
     opacity: 1;
+    transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  /* Exiting: fade overlay out while shell animates back (open still true) */
+  body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"] [data-slot="sheet-overlay"],
+  html[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"] [data-slot="sheet-overlay"] {
+    opacity: 0;
     transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
