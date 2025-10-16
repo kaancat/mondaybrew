@@ -96,45 +96,19 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   }, []);
 
   useEffect(() => {
-    const body = typeof document !== "undefined" ? document.body : null;
-    if (!body) return;
-    if (mobileOpen) {
-      body.setAttribute("data-mobile-nav-open", "true");
-    } else {
-      body.removeAttribute("data-mobile-nav-open");
-    }
+    // Cleanup on unmount to avoid stale attributes
     return () => {
+      if (typeof document === "undefined") return;
+      const body = document.body;
+      const html = document.documentElement;
       body.removeAttribute("data-mobile-nav-open");
+      html.removeAttribute("data-mobile-nav-open");
+      body.removeAttribute("data-mobile-nav-closing");
+      html.removeAttribute("data-mobile-nav-closing");
     };
-  }, [mobileOpen]);
+  }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const body = document.body;
-    if (!body) return;
-
-    const updateShellMetrics = () => {
-      const viewportWidth = window.innerWidth || 0;
-      const drawerWidth = Math.min(viewportWidth * 0.8, 360);
-      const drawerGap = Math.min(Math.max(viewportWidth * 0.03, 6), 18);
-      const offset = mobileOpen ? drawerWidth + drawerGap : 0;
-      const scale = mobileOpen ? 0.9 : 1;
-
-      body.style.setProperty("--site-shell-offset-x", `${offset}px`);
-      body.style.setProperty("--site-shell-scale", `${scale}`);
-      
-      // full-bleed variables are now handled purely by CSS via data-mobile-nav-open attribute
-      // This prevents JS/CSS conflicts and ensures consistent behavior across all pages
-    };
-
-    updateShellMetrics();
-    window.addEventListener("resize", updateShellMetrics);
-    return () => {
-      window.removeEventListener("resize", updateShellMetrics);
-      body.style.removeProperty("--site-shell-offset-x");
-      body.style.removeProperty("--site-shell-scale");
-    };
-  }, [mobileOpen]);
+  // CSS controls site-shell transforms purely via data attribute and CSS vars.
 
   const effectiveTheme = (mounted ? resolvedTheme : undefined) as ThemeId | undefined;
   const currentThemeId = effectiveTheme ?? defaultThemeId;
@@ -202,17 +176,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
         delayChildren: 0.06,
       },
     },
-    exit: {
-      opacity: 0,
-      y: 16,
-      transition: {
-        duration: 0.4,
-        ease: [0.22, 0.61, 0.36, 1],
-        when: "afterChildren",
-        staggerChildren: 0.05,
-        staggerDirection: -1,
-      },
-    },
   } as const;
 
   const mobileGroupVariants = {
@@ -226,16 +189,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
         staggerChildren: 0.06,
       },
     },
-    exit: {
-      opacity: 0,
-      y: 20,
-      transition: {
-        duration: 0.3,
-        ease: [0.22, 0.61, 0.36, 1],
-        staggerChildren: 0.04,
-        staggerDirection: -1,
-      },
-    },
   } as const;
 
   const mobileItemVariants = {
@@ -244,11 +197,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
       opacity: 1,
       y: 0,
       transition: { duration: 0.32, ease: [0.22, 0.61, 0.36, 1] },
-    },
-    exit: {
-      opacity: 0,
-      y: 12,
-      transition: { duration: 0.25, ease: [0.22, 0.61, 0.36, 1] },
     },
   } as const;
 
@@ -272,6 +220,42 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     window.addEventListener("resize", updateOffset);
     return () => window.removeEventListener("resize", updateOffset);
   }, []);
+
+  const handleOpenChange = (open: boolean) => {
+    setMobileOpen(open);
+    if (typeof document === "undefined") return;
+    const body = document.body;
+    const html = document.documentElement;
+
+    if (open) {
+      body.removeAttribute("data-mobile-nav-closing");
+      html.removeAttribute("data-mobile-nav-closing");
+      body.setAttribute("data-mobile-nav-open", "true");
+      html.setAttribute("data-mobile-nav-open", "true");
+      return;
+    }
+
+    // Closing: snap shell to rest and prevent any exit animation
+    body.setAttribute("data-mobile-nav-closing", "true");
+    html.setAttribute("data-mobile-nav-closing", "true");
+    body.removeAttribute("data-mobile-nav-open");
+    html.removeAttribute("data-mobile-nav-open");
+    // Force-safe end state in case of stray rules on specific pages
+    body.style.setProperty("--site-shell-offset-x", "0px");
+    body.style.setProperty("--site-shell-scale", "1");
+    html.style.setProperty("--site-shell-offset-x", "0px");
+    html.style.setProperty("--site-shell-scale", "1");
+
+    // Clean up guard shortly after
+    window.setTimeout(() => {
+      body.removeAttribute("data-mobile-nav-closing");
+      html.removeAttribute("data-mobile-nav-closing");
+      body.style.removeProperty("--site-shell-offset-x");
+      body.style.removeProperty("--site-shell-scale");
+      html.style.removeProperty("--site-shell-offset-x");
+      html.style.removeProperty("--site-shell-scale");
+    }, 120);
+  };
 
   return (
     <header ref={headerRef} className="fixed inset-x-0 top-2 sm:top-3 md:top-4 z-50">
@@ -302,7 +286,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               })()}
             </Link>
 
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
               <SheetTrigger asChild>
                 <button
                   type="button"
@@ -334,16 +318,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         </button>
                       </SheetClose>
                     </div>
-                    <AnimatePresence mode="wait">
-                      {mobileOpen && (
-                        <motion.div
-                          key="mobile-menu"
-                          className="no-scrollbar flex-1 space-y-7 overflow-y-auto pb-10"
-                          initial="hidden"
-                          animate="show"
-                          exit="exit"
-                          variants={mobileMenuVariants}
-                        >
+                    {mobileOpen && (
+                      <motion.div
+                        className="no-scrollbar flex-1 space-y-7 overflow-y-auto pb-10"
+                        initial="hidden"
+                        animate="show"
+                        variants={mobileMenuVariants}
+                      >
                       {megaSections.map((section) => (
                         <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
                           <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
@@ -405,9 +386,8 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                           </motion.ul>
                         </motion.section>
                       ) : null}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                      </motion.div>
+                    )}
                     <div className="mt-auto space-y-3 pb-6 pt-6">
                       <Link
                         href={ctaHref}

@@ -433,7 +433,8 @@ html.dark {
     position: relative;
   }
 
-  body[data-mobile-nav-open="true"] {
+  body[data-mobile-nav-open="true"],
+  html[data-mobile-nav-open="true"] {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 0.9;
@@ -457,7 +458,8 @@ html.dark {
     z-index: 0;
   }
 
-  body[data-mobile-nav-open="true"]::before {
+  body[data-mobile-nav-open="true"]::before,
+  html[data-mobile-nav-open="true"]::before {
     background: var(--mobile-nav-surface);
     opacity: 1;
   }
@@ -470,10 +472,12 @@ html.dark {
     transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1), border-radius 420ms cubic-bezier(0.25, 0.62, 0.32, 1), box-shadow 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
     transform-origin: left center;
     will-change: transform;
-    transform: translate3d(var(--site-shell-offset-x), 0, 0) scale(var(--site-shell-scale));
+    /* Clamp offset to avoid accidental negative translateX pushing shell off-screen */
+    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
   }
 
-  body[data-mobile-nav-open="true"] .site-shell {
+  body[data-mobile-nav-open="true"] .site-shell,
+  html[data-mobile-nav-open="true"] .site-shell {
     transform-origin: left center !important;
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
@@ -491,23 +495,34 @@ html.dark {
 
   /* Include navbar in the transform to maintain visual consistency */
   /* Use higher specificity and !important to override Tailwind's fixed positioning */
-  body[data-mobile-nav-open="true"] header[class*="fixed"] {
-    transform: translate3d(var(--site-shell-offset-x), 0, 0) scale(var(--site-shell-scale)) !important;
+  body[data-mobile-nav-open="true"] header[class*="fixed"],
+  html[data-mobile-nav-open="true"] header[class*="fixed"] {
+    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale)) !important;
     transform-origin: left center !important;
     transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1) !important;
   }
 
   /* Prevent third-party scripts from interfering with mobile menu transforms */
   body[data-mobile-nav-open="true"] iframe,
+  html[data-mobile-nav-open="true"] iframe,
   body[data-mobile-nav-open="true"] [data-tf-live],
+  html[data-mobile-nav-open="true"] [data-tf-live],
   body[data-mobile-nav-open="true"] [id*="google-analytics"],
+  html[data-mobile-nav-open="true"] [id*="google-analytics"],
   body[data-mobile-nav-open="true"] [id*="facebook"],
+  html[data-mobile-nav-open="true"] [id*="facebook"],
   body[data-mobile-nav-open="true"] [id*="hotjar"],
+  html[data-mobile-nav-open="true"] [id*="hotjar"],
   body[data-mobile-nav-open="true"] [id*="intercom"],
+  html[data-mobile-nav-open="true"] [id*="intercom"],
   body[data-mobile-nav-open="true"] [id*="zendesk"],
+  html[data-mobile-nav-open="true"] [id*="zendesk"],
   body[data-mobile-nav-open="true"] [class*="third-party"],
+  html[data-mobile-nav-open="true"] [class*="third-party"],
   body[data-mobile-nav-open="true"] [class*="embed"],
-  body[data-mobile-nav-open="true"] [class*="widget"] {
+  html[data-mobile-nav-open="true"] [class*="embed"],
+  body[data-mobile-nav-open="true"] [class*="widget"],
+  html[data-mobile-nav-open="true"] [class*="widget"] {
     transform: none !important;
     will-change: auto !important;
     isolation: auto !important;
@@ -515,14 +530,23 @@ html.dark {
 
   /* Prevent homepage component animations from interfering with mobile menu transforms */
   body[data-mobile-nav-open="true"] [style*="transform: translateX"],
+  html[data-mobile-nav-open="true"] [style*="transform: translateX"],
   body[data-mobile-nav-open="true"] [style*="transform: translateY"],
+  html[data-mobile-nav-open="true"] [style*="transform: translateY"],
   body[data-mobile-nav-open="true"] [style*="transform: translate3d"],
+  html[data-mobile-nav-open="true"] [style*="transform: translate3d"],
   body[data-mobile-nav-open="true"] [style*="transform: scale"],
+  html[data-mobile-nav-open="true"] [style*="transform: scale"],
   body[data-mobile-nav-open="true"] video,
+  html[data-mobile-nav-open="true"] video,
   body[data-mobile-nav-open="true"] img[style*="transform"],
+  html[data-mobile-nav-open="true"] img[style*="transform"],
   body[data-mobile-nav-open="true"] .hero-feature-carousel,
+  html[data-mobile-nav-open="true"] .hero-feature-carousel,
   body[data-mobile-nav-open="true"] .case-study-carousel,
-  body[data-mobile-nav-open="true"] .about-section {
+  html[data-mobile-nav-open="true"] .case-study-carousel,
+  body[data-mobile-nav-open="true"] .about-section,
+  html[data-mobile-nav-open="true"] .about-section {
     transform: none !important;
     will-change: auto !important;
     isolation: auto !important;
@@ -532,31 +556,56 @@ html.dark {
     width: 100vw;
     max-width: none;
     padding: 0;
-    transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Disable exit animation by default; we add transitions only while open */
+    transition: none;
   }
 
   [data-slot="sheet-content"].mobile-nav-panel[data-state="closed"] {
     transform: translateX(-100%);
     opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
   }
 
-  [data-slot="sheet-content"].mobile-nav-panel[data-state="open"] {
+  body[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"],
+  html[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"] {
     transform: translateX(0);
     opacity: 1;
+    visibility: visible;
+    transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
   [data-slot="sheet-overlay"] {
     background: transparent !important;
     pointer-events: none;
-    transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Disable exit animation by default */
+    transition: none;
   }
 
   [data-slot="sheet-overlay"][data-state="closed"] {
     opacity: 0;
   }
 
-  [data-slot="sheet-overlay"][data-state="open"] {
+  body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"],
+  html[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
     opacity: 1;
+    transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  /* Disable site-shell exit animation: snap to rest while closing */
+  body[data-mobile-nav-closing="true"] .site-shell,
+  html[data-mobile-nav-closing="true"] .site-shell {
+    transition: none !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    pointer-events: auto !important;
+  }
+
+  body[data-mobile-nav-closing="true"] header[class*="fixed"],
+  html[data-mobile-nav-closing="true"] header[class*="fixed"] {
+    transition: none !important;
+    transform: none !important;
   }
 
   h1,
@@ -702,14 +751,16 @@ html.dark {
     transition: margin 420ms cubic-bezier(0.25, 0.62, 0.32, 1), width 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
   }
 
-  body[data-mobile-nav-open="true"] .full-bleed {
+  body[data-mobile-nav-open="true"] .full-bleed,
+  html[data-mobile-nav-open="true"] .full-bleed {
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.45);
     overflow: hidden;
   }
 
   /* When mobile menu is open, prevent full-bleed from escaping the transformed container */
-  body[data-mobile-nav-open="true"] .full-bleed {
+  body[data-mobile-nav-open="true"] .full-bleed,
+  html[data-mobile-nav-open="true"] .full-bleed {
     width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -762,26 +813,32 @@ html.dark {
 
   /* When mobile menu is open, disable margins that interfere with transform */
   body[data-mobile-nav-open="true"] .vr-hero,
+  html[data-mobile-nav-open="true"] .vr-hero,
   body[data-mobile-nav-open="true"] .vr-section,
-  body[data-mobile-nav-open="true"] .vr-section-tight {
+  html[data-mobile-nav-open="true"] .vr-section,
+  body[data-mobile-nav-open="true"] .vr-section-tight,
+  html[data-mobile-nav-open="true"] .vr-section-tight {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
 
   /* Prevent hero section from creating visual artifacts when mobile nav is open */
-  body[data-mobile-nav-open="true"] .vr-hero {
+  body[data-mobile-nav-open="true"] .vr-hero,
+  html[data-mobile-nav-open="true"] .vr-hero {
     overflow: hidden;
     position: relative;
     width: 100%;
     max-width: 100%;
   }
 
-  body[data-mobile-nav-open="true"] .vr-hero > * {
+  body[data-mobile-nav-open="true"] .vr-hero > *,
+  html[data-mobile-nav-open="true"] .vr-hero > * {
     max-width: 100%;
   }
 
   /* Remove container padding in hero section when mobile nav is open to prevent gaps */
-  body[data-mobile-nav-open="true"] .vr-hero .layout-container {
+  body[data-mobile-nav-open="true"] .vr-hero .layout-container,
+  html[data-mobile-nav-open="true"] .vr-hero .layout-container {
     padding-inline: 0 !important;
     max-width: none !important;
   }
