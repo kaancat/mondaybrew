@@ -35,7 +35,7 @@ Overlay uses:
 
 - Do: change timing by editing the tokens above.
 - Do: keep header sticky inside `.site-shell` so it inherits the transform.
-- Do: use locally scoped wrappers (e.g. `.nav-isolate`) for embeds that should not move while opened.
+- Do: use locally scoped wrappers (e.g. `.nav-isolate`) for embeds that should not move while opened (utility is defined in CSS).
 - Don’t: add global selectors like `body[data-mobile-nav-open] [style*="transform"] { … }`.
 - Don’t: write CSS vars from JS; only phase attributes are set from JS.
 
@@ -54,4 +54,3 @@ Playwright checks live under `web/tmp/`. They open/close on `/` and `/kontakt`, 
 - page is clickable after close
 
 > If a regression is found, first confirm phases are correct, then check for any new open‑only rules that still apply during `exiting`.
-

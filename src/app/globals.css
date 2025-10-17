@@ -555,6 +555,9 @@ html.dark {
     isolation: auto !important;
   }
 
+  /* Opt-in helper: wrap any custom embed/component you want to keep stable while opened */
+  body[data-mobile-nav-open="true"] .nav-isolate { transform: none !important; will-change: auto !important; isolation: auto !important; }
+
   /* Prevent homepage component animations while open; allow during exiting */
   body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateX"],
   html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateX"],
