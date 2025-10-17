@@ -464,6 +464,24 @@ html.dark {
     opacity: 1;
   }
 
+  /* Exiting: keep 'open' while reversing geometry and restoring presentation */
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"],
+  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
+    --site-shell-offset-x: 0px;
+    --site-shell-scale: 1;
+  }
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell,
+  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
+    background: var(--background);
+    pointer-events: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"]::before,
+  html[data-mobile-nav-open="true"][data-nav-phase="exiting"]::before {
+    opacity: 0;
+  }
+
   .site-shell {
     position: relative;
     z-index: 50;
@@ -502,51 +520,51 @@ html.dark {
     transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1) !important;
   }
 
-  /* Prevent third-party scripts from interfering with mobile menu transforms */
-  body[data-mobile-nav-open="true"] iframe,
-  html[data-mobile-nav-open="true"] iframe,
-  body[data-mobile-nav-open="true"] [data-tf-live],
-  html[data-mobile-nav-open="true"] [data-tf-live],
-  body[data-mobile-nav-open="true"] [id*="google-analytics"],
-  html[data-mobile-nav-open="true"] [id*="google-analytics"],
-  body[data-mobile-nav-open="true"] [id*="facebook"],
-  html[data-mobile-nav-open="true"] [id*="facebook"],
-  body[data-mobile-nav-open="true"] [id*="hotjar"],
-  html[data-mobile-nav-open="true"] [id*="hotjar"],
-  body[data-mobile-nav-open="true"] [id*="intercom"],
-  html[data-mobile-nav-open="true"] [id*="intercom"],
-  body[data-mobile-nav-open="true"] [id*="zendesk"],
-  html[data-mobile-nav-open="true"] [id*="zendesk"],
-  body[data-mobile-nav-open="true"] [class*="third-party"],
-  html[data-mobile-nav-open="true"] [class*="third-party"],
-  body[data-mobile-nav-open="true"] [class*="embed"],
-  html[data-mobile-nav-open="true"] [class*="embed"],
-  body[data-mobile-nav-open="true"] [class*="widget"],
-  html[data-mobile-nav-open="true"] [class*="widget"] {
+  /* Prevent third-party scripts while open; allow transforms during exiting */
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) iframe,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) iframe,
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [data-tf-live],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [data-tf-live],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="google-analytics"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="google-analytics"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="facebook"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="facebook"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="hotjar"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="hotjar"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="intercom"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="intercom"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="zendesk"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="zendesk"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="third-party"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="third-party"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="embed"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="embed"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="widget"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="widget"] {
     transform: none !important;
     will-change: auto !important;
     isolation: auto !important;
   }
 
-  /* Prevent homepage component animations from interfering with mobile menu transforms */
-  body[data-mobile-nav-open="true"] [style*="transform: translateX"],
-  html[data-mobile-nav-open="true"] [style*="transform: translateX"],
-  body[data-mobile-nav-open="true"] [style*="transform: translateY"],
-  html[data-mobile-nav-open="true"] [style*="transform: translateY"],
-  body[data-mobile-nav-open="true"] [style*="transform: translate3d"],
-  html[data-mobile-nav-open="true"] [style*="transform: translate3d"],
-  body[data-mobile-nav-open="true"] [style*="transform: scale"],
-  html[data-mobile-nav-open="true"] [style*="transform: scale"],
-  body[data-mobile-nav-open="true"] video,
-  html[data-mobile-nav-open="true"] video,
-  body[data-mobile-nav-open="true"] img[style*="transform"],
-  html[data-mobile-nav-open="true"] img[style*="transform"],
-  body[data-mobile-nav-open="true"] .hero-feature-carousel,
-  html[data-mobile-nav-open="true"] .hero-feature-carousel,
-  body[data-mobile-nav-open="true"] .case-study-carousel,
-  html[data-mobile-nav-open="true"] .case-study-carousel,
-  body[data-mobile-nav-open="true"] .about-section,
-  html[data-mobile-nav-open="true"] .about-section {
+  /* Prevent homepage component animations while open; allow during exiting */
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateX"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateX"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateY"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateY"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translate3d"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translate3d"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: scale"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: scale"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) video,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) video,
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) img[style*="transform"],
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) img[style*="transform"],
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .hero-feature-carousel,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .hero-feature-carousel,
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .case-study-carousel,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .case-study-carousel,
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .about-section,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .about-section {
     transform: none !important;
     will-change: auto !important;
     isolation: auto !important;
@@ -591,22 +609,13 @@ html.dark {
     opacity: 1;
     transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
-
-  /* Disable site-shell exit animation: snap to rest while closing */
-  body[data-mobile-nav-closing="true"] .site-shell,
-  html[data-mobile-nav-closing="true"] .site-shell {
-    transition: none !important;
-    transform: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    pointer-events: auto !important;
+  /* Fade overlay during exiting while still open */
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"],
+  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"] {
+    opacity: 0;
   }
 
-  body[data-mobile-nav-closing="true"] header[class*="fixed"],
-  html[data-mobile-nav-closing="true"] header[class*="fixed"] {
-    transition: none !important;
-    transform: none !important;
-  }
+  /* Remove old snapping guard (no longer used) */
 
   h1,
   h2,

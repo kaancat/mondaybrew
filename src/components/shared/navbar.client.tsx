@@ -222,39 +222,45 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   }, []);
 
   const handleOpenChange = (open: boolean) => {
-    setMobileOpen(open);
     if (typeof document === "undefined") return;
     const body = document.body;
     const html = document.documentElement;
 
     if (open) {
-      body.removeAttribute("data-mobile-nav-closing");
-      html.removeAttribute("data-mobile-nav-closing");
+      // Open: set attribute and let existing CSS handle enter animation
+      setMobileOpen(true);
       body.setAttribute("data-mobile-nav-open", "true");
       html.setAttribute("data-mobile-nav-open", "true");
+      body.removeAttribute("data-nav-phase");
       return;
     }
 
-    // Closing: snap shell to rest and prevent any exit animation
-    body.setAttribute("data-mobile-nav-closing", "true");
-    html.setAttribute("data-mobile-nav-closing", "true");
-    body.removeAttribute("data-mobile-nav-open");
-    html.removeAttribute("data-mobile-nav-open");
-    // Force-safe end state in case of stray rules on specific pages
-    body.style.setProperty("--site-shell-offset-x", "0px");
-    body.style.setProperty("--site-shell-scale", "1");
-    html.style.setProperty("--site-shell-offset-x", "0px");
-    html.style.setProperty("--site-shell-scale", "1");
+    // Start controlled exit: keep 'open' while reversing geometry via CSS
+    body.setAttribute("data-nav-phase", "exiting");
+    // Keep Sheet open until animation completes
+    setMobileOpen(true);
 
-    // Clean up guard shortly after
-    window.setTimeout(() => {
-      body.removeAttribute("data-mobile-nav-closing");
-      html.removeAttribute("data-mobile-nav-closing");
-      body.style.removeProperty("--site-shell-offset-x");
-      body.style.removeProperty("--site-shell-scale");
-      html.style.removeProperty("--site-shell-offset-x");
-      html.style.removeProperty("--site-shell-scale");
-    }, 120);
+    const shell = document.querySelector<HTMLElement>(".site-shell");
+    const finalize = () => {
+      body.removeAttribute("data-nav-phase");
+      body.removeAttribute("data-mobile-nav-open");
+      html.removeAttribute("data-mobile-nav-open");
+      setMobileOpen(false);
+    };
+
+    if (shell) {
+      const onEnd = (e: TransitionEvent) => {
+        if (e.propertyName === "transform") {
+          shell.removeEventListener("transitionend", onEnd as any);
+          finalize();
+        }
+      };
+      shell.addEventListener("transitionend", onEnd as any, { once: true });
+      // Fallback in case transitionend is missed
+      window.setTimeout(finalize, 700);
+    } else {
+      finalize();
+    }
   };
 
   return (
