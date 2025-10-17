@@ -913,3 +913,10 @@ html.dark {
   body[data-nav-phase="cleanup"] .vr-hero .layout-container {
     transition: none !important;
   }
+  /* Include navbar in the transform to maintain visual consistency (fixed header) */
+  body[data-mobile-nav-open="true"] header[class*="fixed"],
+  html[data-mobile-nav-open="true"] header[class*="fixed"] {
+    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale)) !important;
+    transform-origin: left center !important;
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease) !important;
+  }
