@@ -268,11 +268,15 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     const shell = document.querySelector<HTMLElement>(".site-shell");
     const finalize = () => {
       log("exit:finalize-before-clear");
-      body.removeAttribute("data-nav-phase");
+      // Freeze transitions for a tick while removing attributes
+      body.setAttribute("data-nav-phase", "cleanup");
       body.removeAttribute("data-mobile-nav-open");
       html.removeAttribute("data-mobile-nav-open");
       setMobileOpen(false);
-      log("exit:finalize-after-clear");
+      setTimeout(() => {
+        body.removeAttribute("data-nav-phase");
+        log("exit:finalize-after-clear");
+      }, 40);
     };
 
     if (shell) {
