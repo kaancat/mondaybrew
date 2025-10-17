@@ -464,6 +464,29 @@ html.dark {
     opacity: 1;
   }
 
+  /* Exiting phase: keep 'open' but return tokens to closed-state so removing
+     the attribute does not trigger another width/margin transition */
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"],
+  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
+    --site-shell-offset-x: 0px;
+    --site-shell-scale: 1;
+    --site-shell-inset: 0px;
+    --full-bleed-width: 100vw;
+    --full-bleed-inline-start: calc(50% - 50vw);
+    --full-bleed-inline-end: calc(50% - 50vw);
+  }
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell,
+  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
+    background: var(--background);
+    pointer-events: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"]::before,
+  html[data-mobile-nav-open="true"][data-nav-phase="exiting"]::before {
+    opacity: 0;
+  }
+
   /* Exiting: keep 'open' while reversing geometry and restoring presentation */
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"],
   html[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
@@ -767,9 +790,10 @@ html.dark {
     overflow: hidden;
   }
 
-  /* When mobile menu is open, prevent full-bleed from escaping the transformed container */
-  body[data-mobile-nav-open="true"] .full-bleed,
-  html[data-mobile-nav-open="true"] .full-bleed {
+  /* When mobile menu is open, prevent full-bleed from escaping the transformed container
+     Do NOT apply during exiting to avoid post-close snap */
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {
     width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;

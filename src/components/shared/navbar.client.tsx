@@ -90,6 +90,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const NAV_DEBUG = process.env.NEXT_PUBLIC_NAV_DEBUG === "1";
 
   useEffect(() => {
     setMounted(true);
@@ -221,6 +222,28 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     return () => window.removeEventListener("resize", updateOffset);
   }, []);
 
+  const readShellMetrics = () => {
+    if (typeof window === "undefined") return {} as any;
+    const body = document.body;
+    const shell = document.querySelector<HTMLElement>(".site-shell");
+    const csBody = getComputedStyle(body);
+    const csShell = shell ? getComputedStyle(shell) : ({} as any);
+    return {
+      offsetVar: csBody.getPropertyValue("--site-shell-offset-x").trim(),
+      scaleVar: csBody.getPropertyValue("--site-shell-scale").trim(),
+      shellTransform: csShell.transform,
+      sheetState: document.querySelector<HTMLElement>('[data-slot="sheet-content"]')?.getAttribute("data-state"),
+      phaseAttr: document.body.getAttribute("data-nav-phase"),
+      openAttr: document.body.getAttribute("data-mobile-nav-open"),
+    };
+  };
+
+  const log = (label: string) => {
+    if (!NAV_DEBUG) return;
+    // eslint-disable-next-line no-console
+    console.log(`[nav-debug] ${label}`, readShellMetrics());
+  };
+
   const handleOpenChange = (open: boolean) => {
     if (typeof document === "undefined") return;
     const body = document.body;
@@ -232,6 +255,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
       body.setAttribute("data-mobile-nav-open", "true");
       html.setAttribute("data-mobile-nav-open", "true");
       body.removeAttribute("data-nav-phase");
+      log("open:start");
       return;
     }
 
@@ -239,25 +263,32 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     body.setAttribute("data-nav-phase", "exiting");
     // Keep Sheet open until animation completes
     setMobileOpen(true);
+    log("exit:start");
 
     const shell = document.querySelector<HTMLElement>(".site-shell");
     const finalize = () => {
+      log("exit:finalize-before-clear");
       body.removeAttribute("data-nav-phase");
       body.removeAttribute("data-mobile-nav-open");
       html.removeAttribute("data-mobile-nav-open");
       setMobileOpen(false);
+      log("exit:finalize-after-clear");
     };
 
     if (shell) {
       const onEnd = (e: TransitionEvent) => {
         if (e.propertyName === "transform") {
           shell.removeEventListener("transitionend", onEnd as any);
+          log("exit:transitionend(transform)");
           finalize();
         }
       };
       shell.addEventListener("transitionend", onEnd as any, { once: true });
       // Fallback in case transitionend is missed
-      window.setTimeout(finalize, 700);
+      window.setTimeout(() => {
+        log("exit:timeout-fallback");
+        finalize();
+      }, 700);
     } else {
       finalize();
     }
