@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sheet, SheetTrigger, SheetContent, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -299,7 +299,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   };
 
   return (
-    <header ref={headerRef} className="fixed inset-x-0 top-2 sm:top-3 md:top-4 z-50">
+    <header ref={headerRef} className="sticky top-2 sm:top-3 md:top-4 z-50">
       <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           {/* Mobile header: brand + hamburger inside glass shell */}
@@ -342,6 +342,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 hideCloseButton
                 className="mobile-nav-panel fixed inset-0 z-[40] flex h-screen w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
               >
+                {/* Accessibility: satisfy Radix requirements without changing visuals */}
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetDescription className="sr-only">Site navigation</SheetDescription>
                 <div className="flex h-full w-full items-stretch">
                   <div className="mobile-nav-inner flex h-full w-[var(--mobile-nav-width)] flex-col px-6 py-8">
                     <div className="flex items-center justify-between pb-5">

@@ -534,36 +534,16 @@ html.dark {
     contain: layout style paint;
   }
 
-  /* Include navbar in the transform to maintain visual consistency */
-  /* Use higher specificity and !important to override Tailwind's fixed positioning */
-  body[data-mobile-nav-open="true"] header[class*="fixed"],
-  html[data-mobile-nav-open="true"] header[class*="fixed"] {
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale)) !important;
-    transform-origin: left center !important;
-    transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1) !important;
-  }
+  /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */
 
-  /* Prevent third-party scripts while open; allow transforms during exiting */
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) iframe,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) iframe,
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [data-tf-live],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [data-tf-live],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="google-analytics"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="google-analytics"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="facebook"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="facebook"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="hotjar"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="hotjar"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="intercom"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="intercom"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="zendesk"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [id*="zendesk"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="third-party"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="third-party"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="embed"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="embed"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="widget"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [class*="widget"] {
+  /* Scoped isolation: keep only known components in view neutral while opened */
+  body[data-mobile-nav-open="true"] .hero-feature-carousel,
+  html[data-mobile-nav-open="true"] .hero-feature-carousel,
+  body[data-mobile-nav-open="true"] .case-study-carousel,
+  html[data-mobile-nav-open="true"] .case-study-carousel,
+  body[data-mobile-nav-open="true"] .about-section,
+  html[data-mobile-nav-open="true"] .about-section,
+  body[data-mobile-nav-open="true"] [data-tf-live] {
     transform: none !important;
     will-change: auto !important;
     isolation: auto !important;
