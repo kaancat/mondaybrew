@@ -46,6 +46,12 @@
 :root {
   --radius: 0.625rem;
 
+  /* Nav animation tokens (single source of truth) */
+  --nav-anim-duration: 420ms;
+  --nav-anim-ease: cubic-bezier(0.25, 0.62, 0.32, 1);
+  --nav-overlay-duration: 500ms;
+  --nav-overlay-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
   --layout-max: 86.5rem; /* ~1384px */
   --layout-tight: 60rem; /* ~960px */
   --layout-gutter: clamp(1.5rem, 5vw, 4rem);
@@ -510,7 +516,7 @@ html.dark {
     z-index: 50;
     min-height: 100vh;
     background: var(--background);
-    transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1), border-radius 420ms cubic-bezier(0.25, 0.62, 0.32, 1), box-shadow 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
     will-change: transform;
     /* Clamp offset to avoid accidental negative translateX pushing shell off-screen */
@@ -593,7 +599,7 @@ html.dark {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
-    transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
   }
 
   [data-slot="sheet-overlay"] {
@@ -610,7 +616,7 @@ html.dark {
   body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"],
   html[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
     opacity: 1;
-    transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
   }
   /* Fade overlay during exiting while still open */
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"],
@@ -760,7 +766,7 @@ html.dark {
     width: var(--full-bleed-width) !important;
     margin-left: var(--full-bleed-inline-start) !important;
     margin-right: var(--full-bleed-inline-end) !important;
-    transition: margin 420ms cubic-bezier(0.25, 0.62, 0.32, 1), width 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
+    transition: margin var(--nav-anim-duration) var(--nav-anim-ease), width var(--nav-anim-duration) var(--nav-anim-ease);
   }
 
   body[data-mobile-nav-open="true"] .full-bleed,
