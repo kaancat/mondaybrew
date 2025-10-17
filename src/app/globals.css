@@ -844,34 +844,37 @@ html.dark {
   .vr-section-tight { margin-top: var(--section-gap-sm); }
   .vr-section-none { margin-top: 0; }
 
-  /* When mobile menu is open, disable margins that interfere with transform */
-  body[data-mobile-nav-open="true"] .vr-hero,
-  html[data-mobile-nav-open="true"] .vr-hero,
-  body[data-mobile-nav-open="true"] .vr-section,
-  html[data-mobile-nav-open="true"] .vr-section,
-  body[data-mobile-nav-open="true"] .vr-section-tight,
-  html[data-mobile-nav-open="true"] .vr-section-tight {
+  /* When mobile menu is open, disable margins that interfere with transform
+     Do NOT apply during exiting to avoid post-close snap */
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero,
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-section,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-section,
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-section-tight,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-section-tight {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
 
-  /* Prevent hero section from creating visual artifacts when mobile nav is open */
-  body[data-mobile-nav-open="true"] .vr-hero,
-  html[data-mobile-nav-open="true"] .vr-hero {
+  /* Prevent hero section from creating visual artifacts when mobile nav is open
+     Do NOT apply during exiting to avoid post-close snap */
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero {
     overflow: hidden;
     position: relative;
     width: 100%;
     max-width: 100%;
   }
 
-  body[data-mobile-nav-open="true"] .vr-hero > *,
-  html[data-mobile-nav-open="true"] .vr-hero > * {
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero > *,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero > * {
     max-width: 100%;
   }
 
-  /* Remove container padding in hero section when mobile nav is open to prevent gaps */
-  body[data-mobile-nav-open="true"] .vr-hero .layout-container,
-  html[data-mobile-nav-open="true"] .vr-hero .layout-container {
+  /* Remove container padding in hero section when mobile nav is open to prevent gaps
+     Do NOT apply during exiting to avoid post-close snap */
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero .layout-container,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero .layout-container {
     padding-inline: 0 !important;
     max-width: none !important;
   }
