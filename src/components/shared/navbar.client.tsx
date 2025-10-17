@@ -10,6 +10,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { defaultThemeId, getThemeDefinition, themeOrder, ThemeId } from "@/theme/registry";
+import { useNavPhase } from "@/components/shared/use-nav-phase";
 
 export type NavbarLink = {
   label: string;
@@ -89,25 +90,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const headerRef = useRef<HTMLElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const NAV_DEBUG = process.env.NEXT_PUBLIC_NAV_DEBUG === "1";
+  const { mobileOpen, onOpenChange } = useNavPhase();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    // Cleanup on unmount to avoid stale attributes
-    return () => {
-      if (typeof document === "undefined") return;
-      const body = document.body;
-      const html = document.documentElement;
-      body.removeAttribute("data-mobile-nav-open");
-      html.removeAttribute("data-mobile-nav-open");
-      body.removeAttribute("data-mobile-nav-closing");
-      html.removeAttribute("data-mobile-nav-closing");
-    };
-  }, []);
+  // Cleanup handled by useNavPhase
 
   // CSS controls site-shell transforms purely via data attribute and CSS vars.
 
@@ -136,7 +125,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   }, [locales?.available, locales?.defaultLocale, pathname]);
 
   useEffect(() => {
-    setMobileOpen(false);
+    // Close on route change via phase controller
+    onOpenChange(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   const ctaHref = cta?.href ?? "/kontakt";
@@ -222,81 +213,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     return () => window.removeEventListener("resize", updateOffset);
   }, []);
 
-  const readShellMetrics = () => {
-    if (typeof window === "undefined") return {} as any;
-    const body = document.body;
-    const shell = document.querySelector<HTMLElement>(".site-shell");
-    const csBody = getComputedStyle(body);
-    const csShell = shell ? getComputedStyle(shell) : ({} as any);
-    return {
-      offsetVar: csBody.getPropertyValue("--site-shell-offset-x").trim(),
-      scaleVar: csBody.getPropertyValue("--site-shell-scale").trim(),
-      shellTransform: csShell.transform,
-      sheetState: document.querySelector<HTMLElement>('[data-slot="sheet-content"]')?.getAttribute("data-state"),
-      phaseAttr: document.body.getAttribute("data-nav-phase"),
-      openAttr: document.body.getAttribute("data-mobile-nav-open"),
-    };
-  };
-
-  const log = (label: string) => {
-    if (!NAV_DEBUG) return;
-    // eslint-disable-next-line no-console
-    console.log(`[nav-debug] ${label}`, readShellMetrics());
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    if (typeof document === "undefined") return;
-    const body = document.body;
-    const html = document.documentElement;
-
-    if (open) {
-      // Open: set attribute and let existing CSS handle enter animation
-      setMobileOpen(true);
-      body.setAttribute("data-mobile-nav-open", "true");
-      html.setAttribute("data-mobile-nav-open", "true");
-      body.removeAttribute("data-nav-phase");
-      log("open:start");
-      return;
-    }
-
-    // Start controlled exit: keep 'open' while reversing geometry via CSS
-    body.setAttribute("data-nav-phase", "exiting");
-    // Keep Sheet open until animation completes
-    setMobileOpen(true);
-    log("exit:start");
-
-    const shell = document.querySelector<HTMLElement>(".site-shell");
-    const finalize = () => {
-      log("exit:finalize-before-clear");
-      // Freeze transitions for a tick while removing attributes
-      body.setAttribute("data-nav-phase", "cleanup");
-      body.removeAttribute("data-mobile-nav-open");
-      html.removeAttribute("data-mobile-nav-open");
-      setMobileOpen(false);
-      setTimeout(() => {
-        body.removeAttribute("data-nav-phase");
-        log("exit:finalize-after-clear");
-      }, 40);
-    };
-
-    if (shell) {
-      const onEnd = (e: TransitionEvent) => {
-        if (e.propertyName === "transform") {
-          shell.removeEventListener("transitionend", onEnd as any);
-          log("exit:transitionend(transform)");
-          finalize();
-        }
-      };
-      shell.addEventListener("transitionend", onEnd as any, { once: true });
-      // Fallback in case transitionend is missed
-      window.setTimeout(() => {
-        log("exit:timeout-fallback");
-        finalize();
-      }, 700);
-    } else {
-      finalize();
-    }
-  };
+  const handleOpenChange = onOpenChange;
 
   return (
     <header ref={headerRef} className="sticky top-2 sm:top-3 md:top-4 z-50">
