@@ -52,6 +52,9 @@
   --nav-overlay-duration: 500ms;
   --nav-overlay-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --nav-viewport-height: 100vh;
+  --nav-card-inset: clamp(14px, 4vw, 24px);
+  --nav-card-radius: clamp(20px, 6vw, 32px);
+  --nav-card-offset-y: 0px;
 
   --layout-max: 86.5rem; /* ~1384px */
   --layout-tight: 60rem; /* ~960px */
@@ -450,7 +453,10 @@ html.dark {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 0.9;
-    --site-shell-inset: clamp(14px, 4vw, 24px);
+    --nav-card-inset: clamp(14px, 4vw, 24px);
+    --nav-card-radius: clamp(20px, 6vw, 32px);
+    --nav-card-offset-y: clamp(14px, 4vw, 24px);
+    --site-shell-inset: var(--nav-card-inset);
     
     /* Create isolated stacking context */
     isolation: isolate;
@@ -463,6 +469,7 @@ html.dark {
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
     --site-shell-offset-x: 0px;
     --site-shell-scale: 1;
+    --nav-card-offset-y: 0px;
   }
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
     /* Ensure mirrored geometry: keep origin consistent while reversing */
@@ -479,16 +486,16 @@ html.dark {
     transform-origin: left center;
     will-change: transform;
     /* Clamp offset to avoid accidental negative translateX pushing shell off-screen */
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
+    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
     transform-origin: left center !important;
-    border-radius: clamp(20px, 6vw, 32px);
+    border-radius: var(--nav-card-radius);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
     overflow: hidden;
-    height: calc(var(--nav-viewport-height) - (var(--site-shell-inset) * 2));
-    margin-block: var(--site-shell-inset);
+    height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
+    margin-block: 0;
     z-index: 60;
     pointer-events: none;
     background: transparent;
