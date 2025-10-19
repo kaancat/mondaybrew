@@ -42,13 +42,12 @@ export function useNavPhase() {
 
     const shell = document.querySelector<HTMLElement>(".site-shell");
     if (shell) {
-      const onEnd = (e: TransitionEvent) => {
-        if (e.propertyName === "transform") {
-          shell.removeEventListener("transitionend", onEnd as any);
+      const onEnd = (event: TransitionEvent) => {
+        if (event.propertyName === "transform") {
           finalizeClose();
         }
       };
-      shell.addEventListener("transitionend", onEnd as any, { once: true });
+      shell.addEventListener("transitionend", onEnd, { once: true });
       // Fallback if transitionend is missed
       setTimeout(finalizeClose, 700);
     } else {

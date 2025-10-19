@@ -1,5 +1,4 @@
 import { Section } from "@/components/layout/section";
-import { TypeformEmbed } from "@/components/shared/typeform";
 
 export default function ContactPage() {
   return (
