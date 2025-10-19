@@ -481,10 +481,7 @@ html.dark {
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
     overflow: hidden;
     /* Float the card with equal top/bottom spacing while open */
-    /* Fallback for older browsers */
     height: calc(100vh - (var(--site-shell-inset) * 2));
-    /* Prefer dynamic viewport units (iOS Safari, Android Chrome) */
-    height: calc(100dvh - (var(--site-shell-inset) * 2));
     margin-block: var(--site-shell-inset);
     z-index: 60;
     pointer-events: none;
@@ -502,8 +499,6 @@ html.dark {
 
   [data-slot="sheet-content"].mobile-nav-panel {
     width: 100vw;
-    /* Ensure the panel itself matches dynamic viewport height on mobile */
-    height: 100dvh !important;
     max-width: none;
     padding: 0;
     /* Disable exit animation by default; we add transitions only while open */
@@ -803,17 +798,4 @@ html.dark {
   body[data-nav-phase="cleanup"] .vr-hero,
   body[data-nav-phase="cleanup"] .vr-hero .layout-container {
     transition: none !important;
-  }
-
-  /* During cleanup, force the shell to its closed geometry immediately to avoid top-gap flash */
-  body[data-nav-phase="cleanup"] .site-shell {
-    margin-block: 0 !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    min-height: 100dvh !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    background: var(--background) !important;
-    transform: none !important;
-    pointer-events: auto !important;
   }
