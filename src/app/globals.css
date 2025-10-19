@@ -589,10 +589,9 @@ html.dark {
 
   /* During exiting, keep the panel in DOM for Radix state but hide it immediately
      to prevent menu items shining through the semi-transparent shell */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-content"].mobile-nav-panel {
+body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-content"].mobile-nav-panel {
     opacity: 0 !important;
     visibility: hidden !important;
-    pointer-events: none !important;
     transition: none !important;
   }
 

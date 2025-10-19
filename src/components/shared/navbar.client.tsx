@@ -7,7 +7,7 @@ import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { defaultThemeId, getThemeDefinition, themeOrder, ThemeId } from "@/theme/registry";
 import { useNavPhase } from "@/components/shared/use-nav-phase";
@@ -91,6 +91,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { mobileOpen, onOpenChange } = useNavPhase();
+  const scheduleClose = useCallback(() => {
+    requestAnimationFrame(() => onOpenChange(false));
+  }, [onOpenChange]);
 
   useEffect(() => {
     setMounted(true);
@@ -301,7 +304,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                                     <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
                                       <Link
                                         href={href}
-                                        onClick={() => onOpenChange(false)}
+                                        onClick={scheduleClose}
                                         className={cn(
                                           "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
                                           active
@@ -332,7 +335,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                                   <motion.li key={link.label} variants={mobileItemVariants}>
                                     <Link
                                       href={href}
-                                      onClick={() => onOpenChange(false)}
+                                      onClick={scheduleClose}
                                       className={cn(
                                         "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
                                         active
@@ -353,7 +356,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       <div className="mt-8 space-y-3">
                         <Link
                           href={ctaHref}
-                          onClick={() => onOpenChange(false)}
+                          onClick={scheduleClose}
                           className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
                         >
                           <span>{ctaLabel}</span>
@@ -370,7 +373,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                           </button>
                           <Link
                             href={localeConfig.href}
-                            onClick={() => onOpenChange(false)}
+                            onClick={scheduleClose}
                             className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
                           >
                             <Globe className="size-[16px]" aria-hidden="true" />
