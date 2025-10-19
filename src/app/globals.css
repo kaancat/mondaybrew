@@ -484,12 +484,12 @@ html.dark {
     --site-shell-offset-x: 0px;
     --site-shell-scale: 1;
     --nav-card-offset-y: 0px;
-    --nav-card-border-radius: var(--nav-card-radius);
-    --nav-card-box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
-    --nav-card-overflow: hidden;
-    --nav-card-pointer: none;
-    --nav-card-background: transparent;
-    --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
+    --nav-card-border-radius: 0px;
+    --nav-card-box-shadow: none;
+    --nav-card-overflow: visible;
+    --nav-card-pointer: auto;
+    --nav-card-background: var(--background);
+    --nav-card-height: var(--nav-viewport-height);
     --nav-card-margin-block: 0;
   }
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
@@ -514,7 +514,7 @@ html.dark {
     z-index: 50;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
     will-change: transform;
     /* Clamp offset to avoid accidental negative translateX pushing shell off-screen */

@@ -46,10 +46,12 @@ export function useNavPhase() {
       const settle = () => {
         if (settled) return;
         settled = true;
+        shell.removeEventListener("transitionend", settle);
+        shell.removeEventListener("transitioncancel", settle);
         finalizeClose();
       };
-      shell.addEventListener("transitionend", settle, { once: true });
-      shell.addEventListener("transitioncancel", settle, { once: true });
+      shell.addEventListener("transitionend", settle);
+      shell.addEventListener("transitioncancel", settle);
       setTimeout(settle, EXIT_FALLBACK_MS);
     } else {
       finalizeClose();
