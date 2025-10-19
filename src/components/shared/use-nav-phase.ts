@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export function useNavPhase() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const EXIT_FALLBACK_MS = 480;
 
   // Cleanup on unmount (defensive)
   useEffect(() => {
@@ -15,14 +16,13 @@ export function useNavPhase() {
   }, []);
 
   const finalizeClose = useCallback(() => {
-    // Freeze transitions for a tick while removing attributes to prevent last-frame snap
     const body = document.body;
+    setMobileOpen(false);
     body.setAttribute("data-nav-phase", "cleanup");
     body.removeAttribute("data-mobile-nav-open");
-    setMobileOpen(false);
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       body.removeAttribute("data-nav-phase");
-    }, 40);
+    });
   }, []);
 
   const onOpenChange = useCallback((open: boolean) => {
@@ -42,18 +42,19 @@ export function useNavPhase() {
 
     const shell = document.querySelector<HTMLElement>(".site-shell");
     if (shell) {
-      const onEnd = (event: TransitionEvent) => {
-        if (event.propertyName === "transform") {
-          finalizeClose();
-        }
+      let settled = false;
+      const settle = () => {
+        if (settled) return;
+        settled = true;
+        finalizeClose();
       };
-      shell.addEventListener("transitionend", onEnd, { once: true });
-      // Fallback if transitionend is missed
-      setTimeout(finalizeClose, 700);
+      shell.addEventListener("transitionend", settle, { once: true });
+      shell.addEventListener("transitioncancel", settle, { once: true });
+      setTimeout(settle, EXIT_FALLBACK_MS);
     } else {
       finalizeClose();
     }
-  }, [finalizeClose]);
+  }, [EXIT_FALLBACK_MS, finalizeClose]);
 
   return { mobileOpen, onOpenChange } as const;
 }
