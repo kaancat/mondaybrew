@@ -458,10 +458,6 @@ html.dark {
     --site-shell-scale: 1;
   }
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
-    background: var(--background);
-    pointer-events: auto;
-    border-radius: 0;
-    box-shadow: none;
     /* Ensure mirrored geometry: keep origin consistent while reversing */
     transform-origin: left center !important;
   }
@@ -479,7 +475,7 @@ html.dark {
     transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
   }
 
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .site-shell {
+  body[data-mobile-nav-open="true"] .site-shell {
     transform-origin: left center !important;
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
