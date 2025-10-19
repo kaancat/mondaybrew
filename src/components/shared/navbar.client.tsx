@@ -257,7 +257,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               <SheetContent
                 side="left"
                 hideCloseButton
-                className="mobile-nav-panel fixed inset-0 z-[40] flex h-screen w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
+                className="mobile-nav-panel fixed z-[40] flex bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
               >
                 {/* Accessibility: satisfy Radix requirements without changing visuals */}
                 <SheetTitle className="sr-only">Menu</SheetTitle>
