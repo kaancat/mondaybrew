@@ -497,19 +497,9 @@ html.dark {
   body[data-mobile-nav-open="true"] .nav-isolate { transform: none !important; will-change: auto !important; isolation: auto !important; }
 
   [data-slot="sheet-content"].mobile-nav-panel {
-    /* Drawer panel: left-attached sheet with rounded top-right/bottom-right */
-    box-sizing: border-box;
-    left: 0 !important;
-    right: auto !important;
-    top: var(--site-shell-inset) !important;
-    bottom: var(--site-shell-inset) !important;
-    width: var(--mobile-nav-width) !important;
-    height: calc(100vh - (var(--site-shell-inset) * 2)) !important; /* override utilities */
+    width: 100vw;
     max-width: none;
     padding: 0;
-    border-top-right-radius: clamp(20px, 6vw, 32px) !important;
-    border-bottom-right-radius: clamp(20px, 6vw, 32px) !important;
-    overflow: hidden;
     /* Disable exit animation by default; we add transitions only while open */
     transition: none;
   }
