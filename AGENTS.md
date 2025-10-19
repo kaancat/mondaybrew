@@ -24,8 +24,11 @@ References:
   - `--nav-anim-duration`, `--nav-anim-ease` (shell)
   - `--nav-overlay-duration`, `--nav-overlay-ease` (overlay)
 - Maintain mirrored exit:
-  - Keep the shell’s “open layout” (height: 100vh, margin auto, overflow hidden, radius/shadow) for the entire exit.
+  - Keep the shell’s “open layout” (height driven by `--nav-viewport-height`, translate-Y offset from `--nav-card-offset-y`) for the entire exit.
   - Finalize on `transitionend` in `use-nav-phase`, then apply a ~40ms `cleanup` micro‑phase.
+- Use the exposed tokens instead of ad-hoc values:
+  - `--nav-card-inset`, `--nav-card-radius`, `--nav-card-offset-y`
+  - `--nav-viewport-height` (fallbacks to `100vh`, upgrades to `100dvh` when supported)
 - If an embed must not move while the menu is open, wrap it with `.nav-isolate` (utility exists in globals.css).
 
 ## DON’T
@@ -38,6 +41,7 @@ References:
 ## Safe Change Points
 
 - Adjust mobile drawer width via `--mobile-nav-width` in `:root`.
+- Tweak the floating card spacing/shape via `--nav-card-inset` / `--nav-card-radius` (these automatically feed the shell geometry and transforms).
 - Tune animation timing by editing the tokens only; JS should not set CSS vars.
 - Overlay behavior: customize `[data-slot="sheet-overlay"]` rules in globals.css.
 
@@ -79,4 +83,3 @@ rg -n "data-mobile-nav-open" web/src | rg -v "web/src/app/globals.css" && echo "
 - Shell/header geometry: CSS in `globals.css` only.
 - Phase control: `use-nav-phase.ts` (don’t duplicate attribute writes elsewhere).
 - Drawer content animation: Framer inside the panel (never the shell).
-
