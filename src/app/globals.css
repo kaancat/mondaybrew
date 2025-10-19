@@ -480,9 +480,8 @@ html.dark {
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
     overflow: hidden;
-    /* Float the card with equal top/bottom spacing while open */
-    height: calc(100vh - (var(--site-shell-inset) * 2));
-    margin-block: var(--site-shell-inset);
+    height: 100vh;
+    margin-block: auto;
     z-index: 60;
     pointer-events: none;
     background: transparent;
