@@ -279,102 +279,104 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         </button>
                       </SheetClose>
                     </div>
-                    {mobileOpen && (
-                      <motion.div
-                        className="no-scrollbar flex-1 space-y-7 overflow-y-auto pb-10"
-                        initial="hidden"
-                        animate="show"
-                        variants={mobileMenuVariants}
-                      >
-                      {megaSections.map((section) => (
-                        <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
-                          <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                            {section.label}
-                          </motion.h2>
-                          <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                            {section.groups.flatMap((group) =>
-                              group.items.map((item) => {
-                                const href = item.href ?? "#";
+                    <div className="no-scrollbar flex-1 overflow-y-auto">
+                      {mobileOpen && (
+                        <motion.div
+                          className="space-y-7 pb-8"
+                          initial="hidden"
+                          animate="show"
+                          variants={mobileMenuVariants}
+                        >
+                        {megaSections.map((section) => (
+                          <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
+                            <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                              {section.label}
+                            </motion.h2>
+                            <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                              {section.groups.flatMap((group) =>
+                                group.items.map((item) => {
+                                  const href = item.href ?? "#";
+                                  const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                                  return (
+                                    <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
+                                      <Link
+                                        href={href}
+                                        onClick={() => onOpenChange(false)}
+                                        className={cn(
+                                          "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                          active
+                                            ? "text-[color:var(--mobile-nav-text)] font-semibold"
+                                            : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                        )}
+                                      >
+                                        <span>{item.label}</span>
+                                        <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                                      </Link>
+                                    </motion.li>
+                                  );
+                                }),
+                              )}
+                            </motion.ul>
+                          </motion.section>
+                        ))}
+                        {simpleLinks.length ? (
+                          <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
+                            <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                              Mere
+                            </motion.h2>
+                            <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                              {simpleLinks.map((link) => {
+                                const href = link.href ?? "#";
                                 const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
                                 return (
-                                  <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
+                                  <motion.li key={link.label} variants={mobileItemVariants}>
                                     <Link
                                       href={href}
                                       onClick={() => onOpenChange(false)}
                                       className={cn(
-                                        "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                        "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
                                         active
                                           ? "text-[color:var(--mobile-nav-text)] font-semibold"
                                           : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
                                       )}
                                     >
-                                      <span>{item.label}</span>
-                                      <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                                      {link.label}
                                     </Link>
                                   </motion.li>
                                 );
-                              }),
-                            )}
-                          </motion.ul>
-                        </motion.section>
-                      ))}
-                      {simpleLinks.length ? (
-                        <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
-                          <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                            Mere
-                          </motion.h2>
-                          <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                            {simpleLinks.map((link) => {
-                              const href = link.href ?? "#";
-                              const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                              return (
-                                <motion.li key={link.label} variants={mobileItemVariants}>
-                                  <Link
-                                    href={href}
-                                    onClick={() => onOpenChange(false)}
-                                    className={cn(
-                                      "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
-                                      active
-                                        ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                        : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                    )}
-                                  >
-                                    {link.label}
-                                  </Link>
-                                </motion.li>
-                              );
-                            })}
-                          </motion.ul>
-                        </motion.section>
-                      ) : null}
-                      </motion.div>
-                    )}
-                    <div className="mt-auto space-y-3 pb-6 pt-6">
-                      <Link
-                        href={ctaHref}
-                        onClick={() => onOpenChange(false)}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                      >
-                        <span>{ctaLabel}</span>
-                        <ArrowRight className="size-[16px]" aria-hidden="true" />
-                      </Link>
-                      <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
-                        <button
-                          type="button"
-                          onClick={() => setTheme(nextThemeId)}
-                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                        >
-                          {themeIcon}
-                          <span>Skift tema</span>
-                        </button>
+                              })}
+                            </motion.ul>
+                          </motion.section>
+                        ) : null}
+                        </motion.div>
+                      )}
+                      <div className="space-y-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] pt-6">
                         <Link
-                          href={localeConfig.href}
+                          href={ctaHref}
                           onClick={() => onOpenChange(false)}
-                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
                         >
-                          <Globe className="size-[16px]" aria-hidden="true" />
-                          <span>{localeConfig.target}</span>
+                          <span>{ctaLabel}</span>
+                          <ArrowRight className="size-[16px]" aria-hidden="true" />
                         </Link>
+                        <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
+                          <button
+                            type="button"
+                            onClick={() => setTheme(nextThemeId)}
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                          >
+                            {themeIcon}
+                            <span>Skift tema</span>
+                          </button>
+                          <Link
+                            href={localeConfig.href}
+                            onClick={() => onOpenChange(false)}
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          >
+                            <Globe className="size-[16px]" aria-hidden="true" />
+                            <span>{localeConfig.target}</span>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
