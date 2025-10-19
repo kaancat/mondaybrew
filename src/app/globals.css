@@ -916,3 +916,19 @@ html.dark {
     transform-origin: left center !important;
     transition: transform var(--nav-anim-duration) var(--nav-anim-ease) !important;
   }
+  /* Cleanup micro-phase: disable transitions for 1 frame during attribute removal */
+  body[data-nav-phase="cleanup"] .site-shell,
+  body[data-nav-phase="cleanup"] header[class*="fixed"],
+  body[data-nav-phase="cleanup"] .full-bleed,
+  body[data-nav-phase="cleanup"] .vr-hero,
+  body[data-nav-phase="cleanup"] .vr-hero .layout-container {
+    transition: none !important;
+  }
+  /* Cleanup micro-phase: disable transitions for 1 frame during attribute removal */
+  body[data-nav-phase="cleanup"] .site-shell,
+  body[data-nav-phase="cleanup"] header[class*="fixed"],
+  body[data-nav-phase="cleanup"] .full-bleed,
+  body[data-nav-phase="cleanup"] .vr-hero,
+  body[data-nav-phase="cleanup"] .vr-hero .layout-container {
+    transition: none !important;
+  }

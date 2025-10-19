@@ -16,12 +16,15 @@ export function useNavPhase() {
   }, []);
 
   const finalizeClose = useCallback(() => {
-    // Remove attributes directly; selectors have been audited to prevent post-close transitions
+    // Freeze transitions for a tick while removing attributes to prevent last-frame snap
     const body = document.body;
-    body.removeAttribute("data-nav-phase");
+    body.setAttribute("data-nav-phase", "cleanup");
     body.removeAttribute("data-mobile-nav-open");
     document.documentElement.removeAttribute("data-mobile-nav-open");
     setMobileOpen(false);
+    setTimeout(() => {
+      body.removeAttribute("data-nav-phase");
+    }, 40);
   }, []);
 
   const onOpenChange = useCallback((open: boolean) => {
