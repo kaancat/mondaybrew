@@ -546,6 +546,10 @@ html.dark {
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"] {
     opacity: 0;
   }
+  /* Add a slight delay so overlay masks color changes while shell begins to close */
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"][data-state="open"] {
+    transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease) 120ms !important;
+  }
 
   /* Remove old snapping guard (no longer used) */
 
