@@ -804,3 +804,16 @@ html.dark {
   body[data-nav-phase="cleanup"] .vr-hero .layout-container {
     transition: none !important;
   }
+
+  /* During cleanup, force the shell to its closed geometry immediately to avoid top-gap flash */
+  body[data-nav-phase="cleanup"] .site-shell {
+    margin-block: 0 !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--background) !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
