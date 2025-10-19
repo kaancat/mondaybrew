@@ -514,7 +514,7 @@ html.dark {
     z-index: 50;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
     will-change: transform;
     /* Clamp offset to avoid accidental negative translateX pushing shell off-screen */
