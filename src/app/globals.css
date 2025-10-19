@@ -462,6 +462,8 @@ html.dark {
     pointer-events: auto;
     border-radius: 0;
     box-shadow: none;
+    /* Ensure mirrored geometry: keep origin consistent while reversing */
+    transform-origin: left center !important;
   }
   /* Exiting: keep 'open' while reversing geometry and restoring presentation */
 
@@ -779,6 +781,10 @@ html.dark {
     transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale)) !important;
     transform-origin: left center !important;
     transition: transform var(--nav-anim-duration) var(--nav-anim-ease) !important;
+  }
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] header[class*="fixed"] {
+    /* Mirror exit from same anchor to avoid diagonal feel */
+    transform-origin: left center !important;
   }
   /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
   body[data-nav-phase="cleanup"] .site-shell,
