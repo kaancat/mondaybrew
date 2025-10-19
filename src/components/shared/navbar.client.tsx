@@ -263,7 +263,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <SheetTitle className="sr-only">Menu</SheetTitle>
                 <SheetDescription className="sr-only">Site navigation</SheetDescription>
                 <div className="flex h-full w-full items-stretch">
-                  <div className="mobile-nav-inner flex h-full w-[var(--mobile-nav-width)] flex-col px-6 py-8">
+                  <div className="mobile-nav-inner flex h-full min-h-0 w-[var(--mobile-nav-width)] flex-col px-6 py-8">
                     <div className="flex items-center justify-between pb-5">
                       <div className="flex flex-col">
                         <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
