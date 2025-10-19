@@ -457,7 +457,14 @@ html.dark {
     --nav-card-radius: clamp(20px, 6vw, 32px);
     --nav-card-offset-y: 0px;
     --site-shell-inset: var(--nav-card-inset);
-    
+    --nav-card-border-radius: var(--nav-card-radius);
+    --nav-card-box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
+    --nav-card-overflow: hidden;
+    --nav-card-pointer: none;
+    --nav-card-background: transparent;
+    --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
+    --nav-card-margin-block: 0;
+
     /* Create isolated stacking context */
     isolation: isolate;
   }
@@ -470,6 +477,13 @@ html.dark {
     --site-shell-offset-x: 0px;
     --site-shell-scale: 1;
     --nav-card-offset-y: 0px;
+    --nav-card-border-radius: var(--nav-card-radius);
+    --nav-card-box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
+    --nav-card-overflow: hidden;
+    --nav-card-pointer: none;
+    --nav-card-background: transparent;
+    --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
+    --nav-card-margin-block: 0;
   }
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
     /* Ensure mirrored geometry: keep origin consistent while reversing */
@@ -493,27 +507,47 @@ html.dark {
     z-index: 50;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
     will-change: transform;
     /* Clamp offset to avoid accidental negative translateX pushing shell off-screen */
     transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
+    border-radius: clamp(0px, var(--nav-card-radius), 0px);
+    box-shadow: none;
+    overflow: visible;
+    pointer-events: auto;
+    background: var(--background);
+    height: var(--nav-viewport-height);
+    margin-block: 0;
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
     transform-origin: left center !important;
-    border-radius: var(--nav-card-radius);
-    box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
-    overflow: hidden;
-    height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
-    margin-block: 0;
+    border-radius: var(--nav-card-border-radius);
+    box-shadow: var(--nav-card-box-shadow);
+    overflow: var(--nav-card-overflow);
+    height: var(--nav-card-height);
+    margin-block: var(--nav-card-margin-block);
     z-index: 60;
-    pointer-events: none;
-    background: transparent;
+    pointer-events: var(--nav-card-pointer);
+    background: var(--nav-card-background);
 
     /* Isolate from page content */
     isolation: isolate;
     contain: layout style paint;
+  }
+
+  body[data-nav-phase="cleanup"] {
+    --nav-card-border-radius: clamp(0px, var(--nav-card-radius), 0px);
+    --nav-card-box-shadow: none;
+    --nav-card-overflow: visible;
+    --nav-card-pointer: auto;
+    --nav-card-background: var(--background);
+    --nav-card-height: var(--nav-viewport-height);
+    --nav-card-margin-block: 0;
+    --site-shell-offset-x: 0px;
+    --site-shell-scale: 1;
+    --nav-card-offset-y: 0px;
   }
 
   /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */
