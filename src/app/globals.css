@@ -455,7 +455,7 @@ html.dark {
     --site-shell-scale: 0.9;
     --nav-card-inset: clamp(14px, 4vw, 24px);
     --nav-card-radius: clamp(20px, 6vw, 32px);
-    --nav-card-offset-y: clamp(14px, 4vw, 24px);
+    --nav-card-offset-y: 0px;
     --site-shell-inset: var(--nav-card-inset);
     
     /* Create isolated stacking context */
