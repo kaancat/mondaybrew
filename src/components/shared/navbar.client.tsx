@@ -133,11 +133,17 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     };
   }, [locales?.available, locales?.defaultLocale, pathname]);
 
+  const prevRouteRef = useRef(pathname);
   useEffect(() => {
-    // Close on route change via phase controller
-    onOpenChange(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+    if (!mobileOpen) {
+      prevRouteRef.current = pathname;
+      return;
+    }
+    if (prevRouteRef.current !== pathname) {
+      onOpenChange(false);
+    }
+    prevRouteRef.current = pathname;
+  }, [mobileOpen, pathname, onOpenChange]);
 
   const ctaHref = cta?.href ?? "/kontakt";
   const ctaLabel = cta?.label || DEFAULT_CTA_LABEL;
