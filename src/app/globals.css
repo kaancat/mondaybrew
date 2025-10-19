@@ -497,9 +497,19 @@ html.dark {
   body[data-mobile-nav-open="true"] .nav-isolate { transform: none !important; will-change: auto !important; isolation: auto !important; }
 
   [data-slot="sheet-content"].mobile-nav-panel {
-    width: 100vw;
+    /* Drawer panel: left-attached sheet with rounded top-right/bottom-right */
+    box-sizing: border-box;
+    left: 0;
+    right: auto;
+    top: var(--site-shell-inset);
+    bottom: var(--site-shell-inset);
+    width: var(--mobile-nav-width);
+    height: calc(100vh - (var(--site-shell-inset) * 2)) !important; /* override Tailwind h-screen */
     max-width: none;
     padding: 0;
+    border-top-right-radius: clamp(20px, 6vw, 32px);
+    border-bottom-right-radius: clamp(20px, 6vw, 32px);
+    overflow: hidden;
     /* Disable exit animation by default; we add transitions only while open */
     transition: none;
   }
