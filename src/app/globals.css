@@ -52,9 +52,16 @@
   --nav-overlay-duration: 500ms;
   --nav-overlay-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --nav-viewport-height: 100vh;
-  --nav-card-inset: clamp(14px, 4vw, 24px);
-  --nav-card-radius: clamp(20px, 6vw, 32px);
+  --nav-card-inset: 0px;
+  --nav-card-radius: 0px;
   --nav-card-offset-y: 0px;
+  --nav-card-border-radius: 0px;
+  --nav-card-box-shadow: none;
+  --nav-card-overflow: visible;
+  --nav-card-pointer: auto;
+  --nav-card-background: var(--background);
+  --nav-card-height: var(--nav-viewport-height);
+  --nav-card-margin-block: 0;
 
   --layout-max: 86.5rem; /* ~1384px */
   --layout-tight: 60rem; /* ~960px */
