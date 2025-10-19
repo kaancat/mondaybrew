@@ -5,11 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sheet, SheetTrigger, SheetContent, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { defaultThemeId, getThemeDefinition, themeOrder, ThemeId } from "@/theme/registry";
+import { useNavPhase } from "@/components/shared/use-nav-phase";
 
 export type NavbarLink = {
   label: string;
@@ -89,24 +90,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const headerRef = useRef<HTMLElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { mobileOpen, onOpenChange } = useNavPhase();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    // Cleanup on unmount to avoid stale attributes
-    return () => {
-      if (typeof document === "undefined") return;
-      const body = document.body;
-      const html = document.documentElement;
-      body.removeAttribute("data-mobile-nav-open");
-      html.removeAttribute("data-mobile-nav-open");
-      body.removeAttribute("data-mobile-nav-closing");
-      html.removeAttribute("data-mobile-nav-closing");
-    };
-  }, []);
+  // Cleanup handled by useNavPhase
 
   // CSS controls site-shell transforms purely via data attribute and CSS vars.
 
@@ -135,7 +125,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   }, [locales?.available, locales?.defaultLocale, pathname]);
 
   useEffect(() => {
-    setMobileOpen(false);
+    // Close on route change via phase controller
+    onOpenChange(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   const ctaHref = cta?.href ?? "/kontakt";
@@ -221,48 +213,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     return () => window.removeEventListener("resize", updateOffset);
   }, []);
 
-  const handleOpenChange = (open: boolean) => {
-    setMobileOpen(open);
-    if (typeof document === "undefined") return;
-    const body = document.body;
-    const html = document.documentElement;
-
-    if (open) {
-      body.removeAttribute("data-mobile-nav-exiting");
-      html.removeAttribute("data-mobile-nav-exiting");
-      body.setAttribute("data-mobile-nav-open", "true");
-      html.setAttribute("data-mobile-nav-open", "true");
-      return;
-    }
-
-    // Closing: mirror enter by keeping `open` during transition and overriding vars to rest
-    body.setAttribute("data-mobile-nav-exiting", "true");
-    html.setAttribute("data-mobile-nav-exiting", "true");
-
-    const shell = document.querySelector<HTMLElement>(".site-shell");
-    let cleaned = false;
-    const finalize = () => {
-      if (cleaned) return;
-      cleaned = true;
-      body.removeAttribute("data-mobile-nav-exiting");
-      html.removeAttribute("data-mobile-nav-exiting");
-      body.removeAttribute("data-mobile-nav-open");
-      html.removeAttribute("data-mobile-nav-open");
-    };
-    if (shell) {
-      const onEnd = (e: TransitionEvent) => {
-        if (e.propertyName === "transform") {
-          shell.removeEventListener("transitionend", onEnd as any);
-          finalize();
-        }
-      };
-      shell.addEventListener("transitionend", onEnd as any, { once: true });
-      // Fallback if transitionend is missed
-      window.setTimeout(finalize, 700);
-    } else {
-      finalize();
-    }
-  };
+  const handleOpenChange = onOpenChange;
 
   return (
     <header ref={headerRef} className="fixed inset-x-0 top-2 sm:top-3 md:top-4 z-50">
@@ -306,10 +257,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               <SheetContent
                 side="left"
                 hideCloseButton
-                className="mobile-nav-panel fixed inset-0 z-[40] flex h-screen w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
+                className="mobile-nav-panel fixed inset-0 z-[40] flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
               >
+                {/* Accessibility: satisfy Radix requirements without changing visuals */}
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetDescription className="sr-only">Site navigation</SheetDescription>
                 <div className="flex h-full w-full items-stretch">
-                  <div className="mobile-nav-inner flex h-full w-[var(--mobile-nav-width)] flex-col px-6 py-8">
+                  <div className="mobile-nav-inner flex h-full min-h-0 w-[var(--mobile-nav-width)] flex-col px-6 py-8">
                     <div className="flex items-center justify-between pb-5">
                       <div className="flex flex-col">
                         <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
@@ -325,102 +279,104 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         </button>
                       </SheetClose>
                     </div>
-                    {mobileOpen && (
-                      <motion.div
-                        className="no-scrollbar flex-1 space-y-7 overflow-y-auto pb-10"
-                        initial="hidden"
-                        animate="show"
-                        variants={mobileMenuVariants}
-                      >
-                      {megaSections.map((section) => (
-                        <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
-                          <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                            {section.label}
-                          </motion.h2>
-                          <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                            {section.groups.flatMap((group) =>
-                              group.items.map((item) => {
-                                const href = item.href ?? "#";
+                    <div className="mobile-nav-scroll no-scrollbar flex-1 min-h-0 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+24px)] pt-2">
+                      {mobileOpen && (
+                        <motion.div
+                          className="space-y-7"
+                          initial="hidden"
+                          animate="show"
+                          variants={mobileMenuVariants}
+                        >
+                        {megaSections.map((section) => (
+                          <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
+                            <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                              {section.label}
+                            </motion.h2>
+                            <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                              {section.groups.flatMap((group) =>
+                                group.items.map((item) => {
+                                  const href = item.href ?? "#";
+                                  const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                                  return (
+                                    <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
+                                      <Link
+                                        href={href}
+                                        onClick={() => onOpenChange(false)}
+                                        className={cn(
+                                          "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                          active
+                                            ? "text-[color:var(--mobile-nav-text)] font-semibold"
+                                            : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                        )}
+                                      >
+                                        <span>{item.label}</span>
+                                        <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                                      </Link>
+                                    </motion.li>
+                                  );
+                                }),
+                              )}
+                            </motion.ul>
+                          </motion.section>
+                        ))}
+                        {simpleLinks.length ? (
+                          <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
+                            <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                              Mere
+                            </motion.h2>
+                            <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                              {simpleLinks.map((link) => {
+                                const href = link.href ?? "#";
                                 const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
                                 return (
-                                  <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
+                                  <motion.li key={link.label} variants={mobileItemVariants}>
                                     <Link
                                       href={href}
-                                      onClick={() => setMobileOpen(false)}
+                                      onClick={() => onOpenChange(false)}
                                       className={cn(
-                                        "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                        "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
                                         active
                                           ? "text-[color:var(--mobile-nav-text)] font-semibold"
                                           : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
                                       )}
                                     >
-                                      <span>{item.label}</span>
-                                      <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                                      {link.label}
                                     </Link>
                                   </motion.li>
                                 );
-                              }),
-                            )}
-                          </motion.ul>
-                        </motion.section>
-                      ))}
-                      {simpleLinks.length ? (
-                        <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
-                          <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                            Mere
-                          </motion.h2>
-                          <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                            {simpleLinks.map((link) => {
-                              const href = link.href ?? "#";
-                              const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                              return (
-                                <motion.li key={link.label} variants={mobileItemVariants}>
-                                  <Link
-                                    href={href}
-                                    onClick={() => setMobileOpen(false)}
-                                    className={cn(
-                                      "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
-                                      active
-                                        ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                        : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                    )}
-                                  >
-                                    {link.label}
-                                  </Link>
-                                </motion.li>
-                              );
-                            })}
-                          </motion.ul>
-                        </motion.section>
-                      ) : null}
-                      </motion.div>
-                    )}
-                    <div className="mt-auto space-y-3 pb-6 pt-6">
-                      <Link
-                        href={ctaHref}
-                        onClick={() => setMobileOpen(false)}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                      >
-                        <span>{ctaLabel}</span>
-                        <ArrowRight className="size-[16px]" aria-hidden="true" />
-                      </Link>
-                      <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
-                        <button
-                          type="button"
-                          onClick={() => setTheme(nextThemeId)}
-                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                        >
-                          {themeIcon}
-                          <span>Skift tema</span>
-                        </button>
+                              })}
+                            </motion.ul>
+                          </motion.section>
+                        ) : null}
+                        </motion.div>
+                      )}
+                      <div className="mt-8 space-y-3">
                         <Link
-                          href={localeConfig.href}
-                          onClick={() => setMobileOpen(false)}
-                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          href={ctaHref}
+                          onClick={() => onOpenChange(false)}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
                         >
-                          <Globe className="size-[16px]" aria-hidden="true" />
-                          <span>{localeConfig.target}</span>
+                          <span>{ctaLabel}</span>
+                          <ArrowRight className="size-[16px]" aria-hidden="true" />
                         </Link>
+                        <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
+                          <button
+                            type="button"
+                            onClick={() => setTheme(nextThemeId)}
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                          >
+                            {themeIcon}
+                            <span>Skift tema</span>
+                          </button>
+                          <Link
+                            href={localeConfig.href}
+                            onClick={() => onOpenChange(false)}
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          >
+                            <Globe className="size-[16px]" aria-hidden="true" />
+                            <span>{localeConfig.target}</span>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>

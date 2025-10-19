@@ -46,6 +46,16 @@
 :root {
   --radius: 0.625rem;
 
+  /* Nav animation tokens (single source of truth) */
+  --nav-anim-duration: 420ms;
+  --nav-anim-ease: cubic-bezier(0.25, 0.62, 0.32, 1);
+  --nav-overlay-duration: 500ms;
+  --nav-overlay-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --nav-viewport-height: 100vh;
+  --nav-card-inset: clamp(14px, 4vw, 24px);
+  --nav-card-radius: clamp(20px, 6vw, 32px);
+  --nav-card-offset-y: 0px;
+
   --layout-max: 86.5rem; /* ~1384px */
   --layout-tight: 60rem; /* ~960px */
   --layout-gutter: clamp(1.5rem, 5vw, 4rem);
@@ -99,6 +109,12 @@
   --mobile-nav-hover: rgba(255, 255, 255, 0.1);
   --mobile-nav-link: rgba(245, 247, 253, 0.86);
   --mobile-nav-overlay: rgba(10, 7, 18, 0.28);
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --nav-viewport-height: 100dvh;
+  }
 }
 
 /* Mobile: let the Hero fill the viewport without extra bottom gap */
@@ -433,36 +449,33 @@ html.dark {
     position: relative;
   }
 
-  body[data-mobile-nav-open="true"],
-  html[data-mobile-nav-open="true"] {
+  body[data-mobile-nav-open="true"] {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 0.9;
-    --site-shell-inset: clamp(14px, 4vw, 24px);
-    --full-bleed-width: calc(100% - (var(--site-shell-inset) * 2));
-    --full-bleed-inline-start: var(--site-shell-inset);
-    --full-bleed-inline-end: var(--site-shell-inset);
+    --nav-card-inset: clamp(14px, 4vw, 24px);
+    --nav-card-radius: clamp(20px, 6vw, 32px);
+    --nav-card-offset-y: 0px;
+    --site-shell-inset: var(--nav-card-inset);
     
     /* Create isolated stacking context */
     isolation: isolate;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: transparent;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 360ms ease;
-    z-index: 0;
-  }
+  /* Body::before overlay removed — rely on Radix Sheet overlay only */
 
-  body[data-mobile-nav-open="true"]::before,
-  html[data-mobile-nav-open="true"]::before {
-    background: var(--mobile-nav-surface);
-    opacity: 1;
+  /* Exiting phase: keep 'open' but return tokens to closed-state so removing
+     the attribute does not trigger another width/margin transition */
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
+    --site-shell-offset-x: 0px;
+    --site-shell-scale: 1;
+    --nav-card-offset-y: 0px;
   }
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
+    /* Ensure mirrored geometry: keep origin consistent while reversing */
+    transform-origin: left center !important;
+  }
+  /* Exiting: keep 'open' while reversing geometry and restoring presentation */
 
   /* Exiting: keep open flag but drive vars back to rest so transition mirrors enter */
   body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"],
@@ -478,23 +491,22 @@ html.dark {
   .site-shell {
     position: relative;
     z-index: 50;
-    min-height: 100vh;
+    min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1), border-radius 420ms cubic-bezier(0.25, 0.62, 0.32, 1), box-shadow 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
     will-change: transform;
     /* Clamp offset to avoid accidental negative translateX pushing shell off-screen */
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
+    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
   }
 
-  body[data-mobile-nav-open="true"] .site-shell,
-  html[data-mobile-nav-open="true"] .site-shell {
+  body[data-mobile-nav-open="true"] .site-shell {
     transform-origin: left center !important;
-    border-radius: clamp(20px, 6vw, 32px);
+    border-radius: var(--nav-card-radius);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
     overflow: hidden;
-    height: 100vh;
-    margin-block: auto;
+    height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
+    margin-block: 0;
     z-index: 60;
     pointer-events: none;
     background: transparent;
@@ -504,66 +516,15 @@ html.dark {
     contain: layout style paint;
   }
 
-  /* Include navbar in the transform to maintain visual consistency */
-  /* Use higher specificity and !important to override Tailwind's fixed positioning */
-  body[data-mobile-nav-open="true"] header[class*="fixed"],
-  html[data-mobile-nav-open="true"] header[class*="fixed"] {
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale)) !important;
-    transform-origin: left center !important;
-    transition: transform 420ms cubic-bezier(0.25, 0.62, 0.32, 1) !important;
-  }
+  /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */
 
-  /* Prevent third-party scripts from interfering with mobile menu transforms */
-  body[data-mobile-nav-open="true"] iframe,
-  html[data-mobile-nav-open="true"] iframe,
-  body[data-mobile-nav-open="true"] [data-tf-live],
-  html[data-mobile-nav-open="true"] [data-tf-live],
-  body[data-mobile-nav-open="true"] [id*="google-analytics"],
-  html[data-mobile-nav-open="true"] [id*="google-analytics"],
-  body[data-mobile-nav-open="true"] [id*="facebook"],
-  html[data-mobile-nav-open="true"] [id*="facebook"],
-  body[data-mobile-nav-open="true"] [id*="hotjar"],
-  html[data-mobile-nav-open="true"] [id*="hotjar"],
-  body[data-mobile-nav-open="true"] [id*="intercom"],
-  html[data-mobile-nav-open="true"] [id*="intercom"],
-  body[data-mobile-nav-open="true"] [id*="zendesk"],
-  html[data-mobile-nav-open="true"] [id*="zendesk"],
-  body[data-mobile-nav-open="true"] [class*="third-party"],
-  html[data-mobile-nav-open="true"] [class*="third-party"],
-  body[data-mobile-nav-open="true"] [class*="embed"],
-  html[data-mobile-nav-open="true"] [class*="embed"],
-  body[data-mobile-nav-open="true"] [class*="widget"],
-  html[data-mobile-nav-open="true"] [class*="widget"] {
-    transform: none !important;
-    will-change: auto !important;
-    isolation: auto !important;
-  }
-
-  /* Prevent homepage component animations from interfering with mobile menu transforms */
-  body[data-mobile-nav-open="true"] [style*="transform: translateX"],
-  html[data-mobile-nav-open="true"] [style*="transform: translateX"],
-  body[data-mobile-nav-open="true"] [style*="transform: translateY"],
-  html[data-mobile-nav-open="true"] [style*="transform: translateY"],
-  body[data-mobile-nav-open="true"] [style*="transform: translate3d"],
-  html[data-mobile-nav-open="true"] [style*="transform: translate3d"],
-  body[data-mobile-nav-open="true"] [style*="transform: scale"],
-  html[data-mobile-nav-open="true"] [style*="transform: scale"],
-  body[data-mobile-nav-open="true"] video,
-  html[data-mobile-nav-open="true"] video,
-  body[data-mobile-nav-open="true"] img[style*="transform"],
-  html[data-mobile-nav-open="true"] img[style*="transform"],
-  body[data-mobile-nav-open="true"] .hero-feature-carousel,
-  html[data-mobile-nav-open="true"] .hero-feature-carousel,
-  body[data-mobile-nav-open="true"] .case-study-carousel,
-  html[data-mobile-nav-open="true"] .case-study-carousel,
-  body[data-mobile-nav-open="true"] .about-section,
-  html[data-mobile-nav-open="true"] .about-section {
-    transform: none !important;
-    will-change: auto !important;
-    isolation: auto !important;
-  }
+  /* Opt-in helper: wrap any custom embed/component you want to keep stable while opened */
+  body[data-mobile-nav-open="true"] .nav-isolate { transform: none !important; will-change: auto !important; isolation: auto !important; }
 
   [data-slot="sheet-content"].mobile-nav-panel {
+    display: flex;
+    align-items: stretch;
+    height: var(--nav-viewport-height);
     width: 100vw;
     max-width: none;
     padding: 0;
@@ -578,12 +539,20 @@ html.dark {
     visibility: hidden;
   }
 
-  body[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"],
-  html[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"] {
+  body[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"] {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
-    transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
+  }
+
+  /* During exiting, keep the panel in DOM for Radix state but hide it immediately
+     to prevent menu items shining through the semi-transparent shell */
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-content"].mobile-nav-panel {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: none !important;
   }
 
   [data-slot="sheet-overlay"] {
@@ -597,34 +566,21 @@ html.dark {
     opacity: 0;
   }
 
-  body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"],
-  html[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
+  body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
     opacity: 1;
-    transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
   }
-
-  /* Exiting: fade overlay out while shell animates back (open still true) */
-  body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"] [data-slot="sheet-overlay"],
-  html[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"] [data-slot="sheet-overlay"] {
+  /* Fade overlay during exiting while still open */
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"] {
     opacity: 0;
-    transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  /* Add a slight delay so overlay masks color changes while shell begins to close */
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"][data-state="open"] {
+    transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease) 120ms !important;
   }
 
-  /* Disable site-shell exit animation: snap to rest while closing */
-  body[data-mobile-nav-closing="true"] .site-shell,
-  html[data-mobile-nav-closing="true"] .site-shell {
-    transition: none !important;
-    transform: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    pointer-events: auto !important;
-  }
-
-  body[data-mobile-nav-closing="true"] header[class*="fixed"],
-  html[data-mobile-nav-closing="true"] header[class*="fixed"] {
-    transition: none !important;
-    transform: none !important;
-  }
+  /* Remove old snapping guard (no longer used) */
+  /* Remove old snapping guard (no longer used) */
 
   h1,
   h2,
@@ -766,31 +722,18 @@ html.dark {
     width: var(--full-bleed-width) !important;
     margin-left: var(--full-bleed-inline-start) !important;
     margin-right: var(--full-bleed-inline-end) !important;
-    transition: margin 420ms cubic-bezier(0.25, 0.62, 0.32, 1), width 420ms cubic-bezier(0.25, 0.62, 0.32, 1);
+    transition: margin var(--nav-anim-duration) var(--nav-anim-ease), width var(--nav-anim-duration) var(--nav-anim-ease);
   }
 
-  body[data-mobile-nav-open="true"] .full-bleed,
-  html[data-mobile-nav-open="true"] .full-bleed {
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.45);
     overflow: hidden;
   }
 
-  /* When mobile menu is open, prevent full-bleed from escaping the transformed container */
-  body[data-mobile-nav-open="true"] .full-bleed,
-  html[data-mobile-nav-open="true"] .full-bleed {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    max-width: 100%;
-    /* Ensure full-bleed elements don't create visual artifacts */
-    position: relative;
-    left: 0 !important;
-    right: 0 !important;
-    /* Neutralize stacking context that can cause artifacts */
-    isolation: auto !important;
-    contain: none !important;
-  }
+  /* When mobile menu is open, prevent full-bleed from escaping the transformed container
+     Do NOT apply during exiting to avoid post-close snap */
+  /* Removed open-only full-bleed width/margin overrides; rely on shell clipping */
 
   /* Hide native scrollbars but keep scrolling accessible */
   .no-scrollbar {
@@ -829,37 +772,7 @@ html.dark {
   .vr-section-tight { margin-top: var(--section-gap-sm); }
   .vr-section-none { margin-top: 0; }
 
-  /* When mobile menu is open, disable margins that interfere with transform */
-  body[data-mobile-nav-open="true"] .vr-hero,
-  html[data-mobile-nav-open="true"] .vr-hero,
-  body[data-mobile-nav-open="true"] .vr-section,
-  html[data-mobile-nav-open="true"] .vr-section,
-  body[data-mobile-nav-open="true"] .vr-section-tight,
-  html[data-mobile-nav-open="true"] .vr-section-tight {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-
-  /* Prevent hero section from creating visual artifacts when mobile nav is open */
-  body[data-mobile-nav-open="true"] .vr-hero,
-  html[data-mobile-nav-open="true"] .vr-hero {
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  body[data-mobile-nav-open="true"] .vr-hero > *,
-  html[data-mobile-nav-open="true"] .vr-hero > * {
-    max-width: 100%;
-  }
-
-  /* Remove container padding in hero section when mobile nav is open to prevent gaps */
-  body[data-mobile-nav-open="true"] .vr-hero .layout-container,
-  html[data-mobile-nav-open="true"] .vr-hero .layout-container {
-    padding-inline: 0 !important;
-    max-width: none !important;
-  }
+  /* Removed open-only VR/hero overrides for minimal nav; rely on shell clipping */
 
   /* Ensure main element doesn't interfere with transform context */
   main {
@@ -901,3 +814,16 @@ html.dark {
     margin-block-start: var(--flow-space);
   }
 }
+  /* Keep header stationary; do not add extra transform on open */
+  body[data-mobile-nav-open="true"] header[class*="fixed"] {
+    transform: none !important;
+    transition: none !important;
+  }
+  /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
+  body[data-nav-phase="cleanup"] .site-shell,
+  body[data-nav-phase="cleanup"] header[class*="fixed"],
+  body[data-nav-phase="cleanup"] .full-bleed,
+  body[data-nav-phase="cleanup"] .vr-hero,
+  body[data-nav-phase="cleanup"] .vr-hero .layout-container {
+    transition: none !important;
+  }
