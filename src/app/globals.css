@@ -523,8 +523,8 @@ html.dark {
     transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
   }
 
-  body[data-mobile-nav-open="true"] .site-shell,
-  html[data-mobile-nav-open="true"] .site-shell {
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .site-shell,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .site-shell {
     transform-origin: left center !important;
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
@@ -772,8 +772,8 @@ html.dark {
     transition: margin var(--nav-anim-duration) var(--nav-anim-ease), width var(--nav-anim-duration) var(--nav-anim-ease);
   }
 
-  body[data-mobile-nav-open="true"] .full-bleed,
-  html[data-mobile-nav-open="true"] .full-bleed {
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed,
+  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.45);
     overflow: hidden;
@@ -908,14 +908,7 @@ html.dark {
     margin-block-start: var(--flow-space);
   }
 }
-  /* Cleanup micro-phase: disable transitions for 1 frame during attribute removal */
-  body[data-nav-phase="cleanup"] .site-shell,
-  body[data-nav-phase="cleanup"] header[class*="fixed"],
-  body[data-nav-phase="cleanup"] .full-bleed,
-  body[data-nav-phase="cleanup"] .vr-hero,
-  body[data-nav-phase="cleanup"] .vr-hero .layout-container {
-    transition: none !important;
-  }
+  /* Cleanup micro-phase removed after selector audit: no post-close transitions remain */
   /* Include navbar in the transform to maintain visual consistency (fixed header) */
   body[data-mobile-nav-open="true"] header[class*="fixed"],
   html[data-mobile-nav-open="true"] header[class*="fixed"] {
