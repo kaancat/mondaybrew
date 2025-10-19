@@ -439,77 +439,31 @@ html.dark {
     position: relative;
   }
 
-  body[data-mobile-nav-open="true"],
-  html[data-mobile-nav-open="true"] {
+  body[data-mobile-nav-open="true"] {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 0.9;
     --site-shell-inset: clamp(14px, 4vw, 24px);
-    --full-bleed-width: calc(100% - (var(--site-shell-inset) * 2));
-    --full-bleed-inline-start: var(--site-shell-inset);
-    --full-bleed-inline-end: var(--site-shell-inset);
     
     /* Create isolated stacking context */
     isolation: isolate;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: transparent;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 360ms ease;
-    z-index: 0;
-  }
-
-  body[data-mobile-nav-open="true"]::before,
-  html[data-mobile-nav-open="true"]::before {
-    background: var(--mobile-nav-surface);
-    opacity: 1;
-  }
+  /* Body::before overlay removed — rely on Radix Sheet overlay only */
 
   /* Exiting phase: keep 'open' but return tokens to closed-state so removing
      the attribute does not trigger another width/margin transition */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"],
-  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
     --site-shell-offset-x: 0px;
     --site-shell-scale: 1;
-    --site-shell-inset: 0px;
-    --full-bleed-width: 100vw;
-    --full-bleed-inline-start: calc(50% - 50vw);
-    --full-bleed-inline-end: calc(50% - 50vw);
   }
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell,
-  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
     background: var(--background);
     pointer-events: auto;
     border-radius: 0;
     box-shadow: none;
   }
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"]::before,
-  html[data-mobile-nav-open="true"][data-nav-phase="exiting"]::before {
-    opacity: 0;
-  }
-
   /* Exiting: keep 'open' while reversing geometry and restoring presentation */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"],
-  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
-    --site-shell-offset-x: 0px;
-    --site-shell-scale: 1;
-  }
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell,
-  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
-    background: var(--background);
-    pointer-events: auto;
-    border-radius: 0;
-    box-shadow: none;
-  }
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"]::before,
-  html[data-mobile-nav-open="true"][data-nav-phase="exiting"]::before {
-    opacity: 0;
-  }
 
   .site-shell {
     position: relative;
@@ -523,8 +477,7 @@ html.dark {
     transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
   }
 
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .site-shell,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .site-shell {
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .site-shell {
     transform-origin: left center !important;
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
@@ -542,45 +495,8 @@ html.dark {
 
   /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */
 
-  /* Scoped isolation: keep only known components in view neutral while opened */
-  body[data-mobile-nav-open="true"] .hero-feature-carousel,
-  html[data-mobile-nav-open="true"] .hero-feature-carousel,
-  body[data-mobile-nav-open="true"] .case-study-carousel,
-  html[data-mobile-nav-open="true"] .case-study-carousel,
-  body[data-mobile-nav-open="true"] .about-section,
-  html[data-mobile-nav-open="true"] .about-section,
-  body[data-mobile-nav-open="true"] [data-tf-live] {
-    transform: none !important;
-    will-change: auto !important;
-    isolation: auto !important;
-  }
-
   /* Opt-in helper: wrap any custom embed/component you want to keep stable while opened */
   body[data-mobile-nav-open="true"] .nav-isolate { transform: none !important; will-change: auto !important; isolation: auto !important; }
-
-  /* Prevent homepage component animations while open; allow during exiting */
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateX"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateX"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateY"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translateY"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translate3d"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: translate3d"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: scale"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) [style*="transform: scale"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) video,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) video,
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) img[style*="transform"],
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) img[style*="transform"],
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .hero-feature-carousel,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .hero-feature-carousel,
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .case-study-carousel,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .case-study-carousel,
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .about-section,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .about-section {
-    transform: none !important;
-    will-change: auto !important;
-    isolation: auto !important;
-  }
 
   [data-slot="sheet-content"].mobile-nav-panel {
     width: 100vw;
@@ -597,8 +513,7 @@ html.dark {
     visibility: hidden;
   }
 
-  body[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"],
-  html[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"] {
+  body[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"] {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
@@ -616,14 +531,12 @@ html.dark {
     opacity: 0;
   }
 
-  body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"],
-  html[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
+  body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
     opacity: 1;
     transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
   }
   /* Fade overlay during exiting while still open */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"],
-  html[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"] {
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"] {
     opacity: 0;
   }
 
@@ -772,8 +685,7 @@ html.dark {
     transition: margin var(--nav-anim-duration) var(--nav-anim-ease), width var(--nav-anim-duration) var(--nav-anim-ease);
   }
 
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {
+  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {
     border-radius: clamp(20px, 6vw, 32px);
     box-shadow: 0 56px 160px rgba(8, 6, 20, 0.45);
     overflow: hidden;
@@ -781,20 +693,7 @@ html.dark {
 
   /* When mobile menu is open, prevent full-bleed from escaping the transformed container
      Do NOT apply during exiting to avoid post-close snap */
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    max-width: 100%;
-    /* Ensure full-bleed elements don't create visual artifacts */
-    position: relative;
-    left: 0 !important;
-    right: 0 !important;
-    /* Neutralize stacking context that can cause artifacts */
-    isolation: auto !important;
-    contain: none !important;
-  }
+  /* Removed open-only full-bleed width/margin overrides; rely on shell clipping */
 
   /* Hide native scrollbars but keep scrolling accessible */
   .no-scrollbar {
@@ -833,40 +732,7 @@ html.dark {
   .vr-section-tight { margin-top: var(--section-gap-sm); }
   .vr-section-none { margin-top: 0; }
 
-  /* When mobile menu is open, disable margins that interfere with transform
-     Do NOT apply during exiting to avoid post-close snap */
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero,
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-section,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-section,
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-section-tight,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-section-tight {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-
-  /* Prevent hero section from creating visual artifacts when mobile nav is open
-     Do NOT apply during exiting to avoid post-close snap */
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero {
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero > *,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero > * {
-    max-width: 100%;
-  }
-
-  /* Remove container padding in hero section when mobile nav is open to prevent gaps
-     Do NOT apply during exiting to avoid post-close snap */
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero .layout-container,
-  html[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .vr-hero .layout-container {
-    padding-inline: 0 !important;
-    max-width: none !important;
-  }
+  /* Removed open-only VR/hero overrides for minimal nav; rely on shell clipping */
 
   /* Ensure main element doesn't interfere with transform context */
   main {
@@ -908,23 +774,13 @@ html.dark {
     margin-block-start: var(--flow-space);
   }
 }
-  /* Cleanup micro-phase removed after selector audit: no post-close transitions remain */
   /* Include navbar in the transform to maintain visual consistency (fixed header) */
-  body[data-mobile-nav-open="true"] header[class*="fixed"],
-  html[data-mobile-nav-open="true"] header[class*="fixed"] {
+  body[data-mobile-nav-open="true"] header[class*="fixed"] {
     transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale)) !important;
     transform-origin: left center !important;
     transition: transform var(--nav-anim-duration) var(--nav-anim-ease) !important;
   }
-  /* Cleanup micro-phase: disable transitions for 1 frame during attribute removal */
-  body[data-nav-phase="cleanup"] .site-shell,
-  body[data-nav-phase="cleanup"] header[class*="fixed"],
-  body[data-nav-phase="cleanup"] .full-bleed,
-  body[data-nav-phase="cleanup"] .vr-hero,
-  body[data-nav-phase="cleanup"] .vr-hero .layout-container {
-    transition: none !important;
-  }
-  /* Cleanup micro-phase: disable transitions for 1 frame during attribute removal */
+  /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
   body[data-nav-phase="cleanup"] .site-shell,
   body[data-nav-phase="cleanup"] header[class*="fixed"],
   body[data-nav-phase="cleanup"] .full-bleed,

@@ -11,7 +11,6 @@ export function useNavPhase() {
       if (typeof document === "undefined") return;
       document.body.removeAttribute("data-mobile-nav-open");
       document.body.removeAttribute("data-nav-phase");
-      document.documentElement.removeAttribute("data-mobile-nav-open");
     };
   }, []);
 
@@ -20,7 +19,6 @@ export function useNavPhase() {
     const body = document.body;
     body.setAttribute("data-nav-phase", "cleanup");
     body.removeAttribute("data-mobile-nav-open");
-    document.documentElement.removeAttribute("data-mobile-nav-open");
     setMobileOpen(false);
     setTimeout(() => {
       body.removeAttribute("data-nav-phase");
@@ -30,12 +28,10 @@ export function useNavPhase() {
   const onOpenChange = useCallback((open: boolean) => {
     if (typeof document === "undefined") return;
     const body = document.body;
-    const html = document.documentElement;
 
     if (open) {
       setMobileOpen(true);
       body.setAttribute("data-mobile-nav-open", "true");
-      html.setAttribute("data-mobile-nav-open", "true");
       body.removeAttribute("data-nav-phase");
       return;
     }
