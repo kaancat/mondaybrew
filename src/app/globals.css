@@ -553,6 +553,13 @@ html.dark {
     --nav-card-offset-y: 0px;
   }
 
+  body[data-nav-phase="cleanup"] [data-slot="sheet-content"].mobile-nav-panel {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateX(-100%) !important;
+    pointer-events: none !important;
+  }
+
   /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */
 
   /* Opt-in helper: wrap any custom embed/component you want to keep stable while opened */
