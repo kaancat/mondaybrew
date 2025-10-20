@@ -1,5 +1,316 @@
 # Dev Log
 
+## [2025-10-20] – Mobile Menu Bottom Actions Fix
+Goal: Ensure bottom action buttons (Kontakt, theme switcher, language selector) are always visible without scrolling
+
+### Problem
+- Bottom action buttons were placed inside the scrollable container (`.mobile-nav-scroll`)
+- On smaller mobile screens, content overflow caused these buttons to be pushed out of view
+- Users couldn't see the Kontakt button or other actions without scrolling down
+- This broke usability and made it look like the buttons were missing
+
+### Solution
+Restructured the mobile menu layout using flexbox with proper hierarchy:
+
+**Layout Structure** (`web/src/components/shared/navbar.client.tsx`):
+1. **Header section** (lines 483-497): Close button and "MENU" label
+   - Added `shrink-0` to prevent compression
+2. **Scrollable content** (lines 500-569): All menu items (Services, Mere sections)
+   - Uses `flex-1` to take available space
+   - Removed bottom padding from this container
+   - Only the menu links scroll when content overflows
+3. **Fixed bottom section** (lines 572-597): Action buttons pinned to bottom
+   - Added `mt-auto` to push to bottom
+   - Added `shrink-0` to prevent compression
+   - Maintains safe-area padding for notched devices: `pb-[calc(env(safe-area-inset-bottom,0px)+16px)]`
+   - Contains: Kontakt CTA, theme switcher, language selector
+
+### Technical Details
+- Container uses `flex-col` on `.mobile-nav-inner`
+- Middle section uses `flex-1 min-h-0 overflow-y-auto` for proper scroll behavior
+- Bottom section uses `mt-auto` to always stick to the bottom
+- Respects device safe areas (iPhone notches, etc.)
+
+### Impact
+✅ Bottom action buttons are now always visible on all screen sizes
+✅ Only the menu items scroll when there's overflow
+✅ Better UX: users see all key actions immediately
+✅ No changes to animations, transitions, or nav phase system
+✅ Fully compatible with existing mobile nav contract (see `docs/MOBILE_NAV.md`)
+
+### Files Modified
+- `web/src/components/shared/navbar.client.tsx`: Restructured mobile menu layout
+
+---
+
+## [2025-10-20] – Desktop Mega Menu Implementation
+Goal: Create a modern, Nimbus-style desktop mega menu that's completely separate from mobile navigation
+
+### Design Goals
+- Full-width dropdown panel aligned with header container
+- Two-column layout: Featured items (left) + Others/Case card (right)
+- Reuse existing hero feature card styling for case showcases
+- Clean, icon-based navigation with descriptions
+- Completely independent from mobile navigation system
+
+### Components Created
+
+**1. FeatureCard Component** (`web/src/components/shared/feature-card.tsx`)
+- **Why**: Extracted glass-morphic card styling from `HeroFeatureCarousel` for reusability
+- **Features**:
+  - Glass-morphic design with gradient borders
+  - Optional image with gradient overlay and LQIP blur
+  - Backdrop blur (`backdrop-blur-[22px]`) and shadow effects
+  - Hover glow effect with purple radial gradient
+  - Supports both link and static variants
+  - Compact mode for mega menu usage
+- **Styling**: Maintains exact visual parity with hero carousel cards
+  - Gradient border: `from-white/36 via-white/14 to-white/4`
+  - Inner background: `rgba(14,12,26,0.42)`
+  - Border: `border-white/16`
+
+**2. DesktopMegaMenu Component** (`web/src/components/shared/desktop-mega-menu.tsx`)
+- **Why**: Provides rich desktop navigation experience following Nimbus design pattern
+- **Layout**:
+  - Left column (~60%): "HIGHLIGHT FEATURE" section with icon-based menu items
+  - Right column (~40%): "OTHERS" section + featured case card
+  - Full-width grid system with proper spacing
+- **Features**:
+  - Icon mapping for services (Target, Search, Share2, Mail, Globe, ShoppingBag, Sparkles)
+  - Active state detection with accent color highlights
+  - Hover effects: border, background, and icon color transitions
+  - Arrow icons that appear on hover
+  - Uppercase section labels with proper tracking
+- **Accessibility**: Maintains focus management, ARIA labels, semantic HTML
+
+### Integration Changes
+
+**navbar.client.tsx** (`web/src/components/shared/navbar.client.tsx`)
+- Imported `DesktopMegaMenu` component
+- Replaced old `NavigationMenuContent` with new mega menu
+- **Positioning Strategy**:
+  - Uses CSS variables set by header: `--desktop-nav-shell-width`, `--desktop-nav-shell-left`, `--desktop-nav-shell-top`, `--desktop-nav-shell-height`
+  - Fixed positioning: `top-[calc(var(--desktop-nav-shell-top)+var(--desktop-nav-shell-height)+12px)]`
+  - Full-width: `w-[var(--desktop-nav-shell-width)]`
+  - Aligned left: `left-[var(--desktop-nav-shell-left)]`
+  - Gap: 12px below header
+- **Featured Case Data**: Currently uses placeholder data (TODO: integrate with Sanity CMS)
+- **Other Links**: Dynamically configurable per mega menu section
+
+### Technical Implementation
+
+**Icon System**:
+- Lucide React icons mapped to service types
+- Fallback to `Target` icon for unmapped items
+- Supports both exact and fuzzy label matching
+
+**Theming**:
+- Uses CSS custom properties for colors: `--foreground`, `--background`, `--accent`, `--border`, `--surface-base`
+- Color mixing with `color-mix(in oklch, ...)` for opacity variations
+- Respects existing theme system (light-alt, dark, light)
+
+**Positioning**:
+- Leverages existing header measurement system (`updateOffset` in navbar)
+- Fixed positioning ensures mega menu stays aligned during scroll
+- Z-index: 50 to layer correctly with other UI elements
+
+### Separation from Mobile Nav
+
+**Complete Independence**:
+- Desktop mega menu uses Radix `NavigationMenu` primitives
+- Mobile menu uses Radix `Sheet` primitives
+- No shared state, transforms, or animation systems
+- Desktop-only: `hidden md:flex` / Mobile-only: `md:hidden`
+- Mobile nav phase system (`use-nav-phase.ts`) doesn't affect desktop
+
+**Why Separate**:
+- Mobile: Full-page transform/animation system with card effects
+- Desktop: Standard dropdown with fixed positioning
+- Different interaction patterns, different UX requirements
+- Prevents conflicts and maintains clean boundaries
+
+### Files Modified
+- `web/src/components/shared/feature-card.tsx` (new)
+- `web/src/components/shared/desktop-mega-menu.tsx` (new)
+- `web/src/components/shared/navbar.client.tsx` (updated mega menu rendering)
+
+### Positioning Fix (2025-10-20 - Follow-up)
+
+**Problem #1**: Mega menu dropdown was not aligned with header boundaries
+- Dropdown was narrower than header
+- Not positioned at correct left/right edges
+- Constrained by NavigationMenuItem width instead of header shell
+
+**Attempted Solution #1**: 
+- Tried using Radix NavigationMenu with `left-0` + `right-0` positioning
+- Failed because dropdown was still constrained by parent NavigationMenuItem
+
+**Final Solution Implemented**:
+Created custom `MegaMenuTrigger` component that:
+1. Uses refs to measure both the trigger button and `desktop-nav-shell` positions
+2. Calculates dynamic offset: `leftOffset = buttonRect.left - navRect.left`
+3. Sets dropdown width to exact shell width
+4. Applies positioning via inline styles for precision
+5. Uses Framer Motion for smooth fade-in animation
+
+**Technical Details**:
+- **Hover-based**: Opens/closes on mouse enter/leave
+- **Dynamic calculation**: Recalculates on every open to handle scroll/resize
+- **Absolute positioning**: Relative to button, but offset to align with shell
+- **Full width**: Matches `desktop-nav-shell` width exactly
+- **Animation**: 200ms fade + slide with custom easing
+
+**Result**: Mega menu now perfectly aligns with header shell edges (red line boundaries in mockup), spans full width, and works responsively.
+
+### Visual Polish (2025-10-20 - Follow-up #2)
+
+**Adjustments**:
+- Increased gap between header and dropdown from 12px (`mt-3`) to 16px (`mt-4`)
+- Changed dropdown border radius from `rounded-[16px]` to `rounded-[5px]` to match header
+- Updated menu item border radius from `rounded-[12px]` to `rounded-[8px]` for consistency
+
+**Why**: Creates visual differentiation between header and dropdown while maintaining design system consistency. The smaller, matching radius creates a cohesive look.
+
+### Hover Interaction Fix (2025-10-20 - Follow-up #3)
+
+**Problem**: Dropdown was closing when moving mouse from trigger to dropdown content
+- Gap between trigger and dropdown broke hover state
+- Made it difficult/impossible to interact with dropdown items
+
+**Solution Implemented**:
+1. **Delayed close with timeout**: 
+   - Added 150ms delay before closing when mouse leaves
+   - Timeout is cancelled if mouse re-enters before delay expires
+   - Gives smooth transition period for mouse movement
+
+2. **Invisible hover bridge**:
+   - Added invisible div (`h-4`, 16px height) between trigger and dropdown
+   - Covers the gap so hover state is maintained
+   - Uses `aria-hidden="true"` for accessibility
+
+**Technical Details**:
+- `closeTimeoutRef`: Stores timeout reference for cancellation
+- Cleanup effect ensures timeout is cleared on unmount
+- Bridge element maintains hover without visual interference
+
+**Result**: Smooth, reliable hover interaction. Users can easily move from trigger to dropdown and interact with menu items without the menu disappearing.
+
+### Major Bug Fixes (2025-10-20 - Follow-up #4)
+
+**Issues Identified**:
+1. Dropdown flickering when moving between menu items (e.g., Marketing → Web)
+2. Menu content changing color when mouse leaves the menu area
+3. Unreadable text in Light Alt theme due to poor contrast
+
+**Root Causes**:
+1. Each menu item was rendering its own dropdown, causing unmount/remount flickering
+2. Hover states persisting or changing incorrectly after mouse exit
+3. Using color-mix with low opacity percentages (45-55%) that reduced contrast in light themes
+
+**Solutions Implemented**:
+
+**1. Shared Dropdown Architecture**:
+- Created `SharedMegaMenuDropdown` component - single dropdown for all menus
+- Triggers (`MegaMenuTrigger`) now simplified - just buttons that update state
+- Content switches instantly without unmounting the container
+- Uses Framer Motion with `animate` (not conditional rendering) for smooth transitions
+- Fixed positioning calculation using `getBoundingClientRect()` on parent shell
+
+**2. Proper Hover State Management**:
+- Moved timeout logic to parent component (`NavbarClient`)
+- `handleMegaMenuOpen`: Cancels pending close, sets active menu + content
+- `handleMegaMenuClose`: 150ms delayed close with content cleanup
+- `cancelMegaMenuClose`: Clears timeout when re-entering
+- No more hover state conflicts when mouse leaves
+
+**3. Improved Theme Contrast**:
+- Added CSS custom property fallbacks: `--text-secondary`, `--text-tertiary`, `--surface-muted`, `--accent-bg`
+- Increased opacity percentages: 45% → 55%, 55% → 65%, 58% → 70%
+- Better contrast ratios across all themes (Light Alt, Light, Dark)
+- Explicit `text-[color:var(--foreground)]` on base container for inheritance
+- Simplified hover states to reduce color jank
+
+**Technical Details**:
+- SharedMegaMenuDropdown uses `fixed` positioning relative to viewport
+- Calculates position from `desktop-nav-shell` measurements
+- Content persists 200ms after close for smooth exit animation
+- Hover bridge remains to maintain interaction
+- Border transitions: `border-transparent` → `border-[color:var(--border)]`
+
+**Files Modified**:
+- `navbar.client.tsx`: Refactored to shared dropdown architecture
+- `desktop-mega-menu.tsx`: Improved color contrast and hover states
+
+**Result**: 
+✅ No more flickering between menu items
+✅ Stable colors when mouse leaves
+✅ Readable in all themes (Light Alt, Light, Dark)
+✅ Smooth, professional mega menu experience
+
+### Content Transition Animations (2025-10-20 - Follow-up #5)
+
+**Enhancement Request**: Add smooth animated transitions when switching between menu sections (Marketing ↔ Web)
+
+**Problem**: While the shared dropdown architecture fixed flickering, content was still swapping instantly, feeling abrupt and jarring.
+
+**Solution Implemented**:
+
+**AnimatePresence with Cross-fade + Slide**:
+- Wrapped content in Framer Motion's `AnimatePresence` with `mode="wait"`
+- Each menu section gets a unique `key` (label) for proper enter/exit tracking
+- **Exit animation**: Fades out + slides right (`opacity: 0, x: 20`)
+- **Enter animation**: Fades in + slides from left (`opacity: 0, x: -20` → `opacity: 1, x: 0`)
+- Duration: 110ms with instant easing `[0.4, 0, 0.2, 1]`
+
+**Technical Details**:
+```jsx
+<AnimatePresence mode="wait" initial={false}>
+  {contentKey && (
+    <motion.div
+      key={contentKey}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{ duration: 0.11, ease: [0.4, 0, 0.2, 1] }}
+    >
+      {content}
+    </motion.div>
+  )}
+</AnimatePresence>
+```
+
+**Why `mode="wait"`**:
+- Ensures old content fully exits before new content enters
+- Prevents overlap/jank during transition
+- Creates clean "morphing" effect
+
+**Content Cleanup Timing**:
+- Reduced to 120ms for instant cleanup
+- Matches the ultra-fast 80ms animation duration
+
+**Result**: 
+✅ Smooth, polished transitions between menu sections
+✅ Content "morphs" rather than "pops"
+✅ Directional slide (left→right for exit, right→left for enter) provides spatial context
+✅ Professional, intentional feel that matches modern UI standards
+
+### Future Improvements
+- [x] Integrate Sanity CMS for dynamic featured case data per menu section ✅
+- [x] Add image assets to featured case cards ✅
+- [ ] Consider adding keyboard navigation enhancements
+- [ ] Performance: lazy-load featured case images
+- [ ] A/B test mega menu vs. simple dropdown for conversion impact
+
+### Impact
+- Modern, professional desktop navigation experience
+- Improved information architecture with rich menu items
+- Visual consistency with hero section through shared card component
+- Scalable: easy to add new menu sections with minimal code
+- No breaking changes or conflicts with mobile navigation
+- Pixel-perfect alignment with header boundaries
+
+---
+
 ## [2024-12-19] – Mobile Menu Stacking Context Fix (Final)
 Goal: Fix mobile menu panel/sheet interaction where panel either hides the sheet visually or becomes non-interactive
 
@@ -60,5 +371,62 @@ Goal: Fix mobile menu panel/sheet interaction where panel either hides the sheet
 - Preserves interactive functionality
 - Uses existing CSS variable system
 - No breaking changes to existing components
+
+---
+
+## [2024-12-19] – Mega Menu Layout & Hero FeatureCard Integration
+**Goal**: Redistribute mega menu layout and integrate hero FeatureCard for case showcase
+
+**Layout Redistribution**:
+- **Column Widths**: Changed from `[1.8fr, 1fr]` to `[1fr, 1.5fr]` (40% left, 60% right)
+- **Left Column**: Added `max-w-[400px]` to constrain HIGHLIGHT FEATURE section
+- **Content Positioning**: Pushed left column content closer to the left edge
+- **Space Utilization**: Right column now has more room for featured content
+
+**Hero FeatureCard Integration**:
+- **Replaced**: Basic grey card with full `HeroFeatureCarousel` component
+- **Sanity Integration**: Fetches real case studies using `caseStudiesQuery`
+- **Data Mapping**: Converts Sanity case data to `HeroFeatureDisplayItem` format
+- **Features**: Same glass-morphic styling, carousel navigation, image handling, LQIP
+- **Content**: Shows top 3 case studies with proper titles, excerpts, images, and links
+
+**Technical Implementation**:
+```tsx
+// Fetch case studies on component mount
+useEffect(() => {
+  const fetchCases = async () => {
+    const cases = await fetchSanity(caseStudiesQuery, {});
+    const featuredCasesData = (Array.isArray(cases) ? cases : [])
+      .slice(0, 3)
+      .map((caseStudy) => ({
+        key: caseStudy._id,
+        title: caseStudy.title,
+        excerpt: caseStudy.excerpt,
+        href: `/cases/${caseStudy.slug}`,
+        metaLabel: caseStudy.client || "CASE",
+        image: caseStudy.media?.image?.image?.asset ? {
+          url: caseStudy.media.image.image.asset.url,
+          alt: caseStudy.media.image.alt || caseStudy.title,
+          lqip: caseStudy.media.image.image.asset.metadata?.lqip,
+        } : null,
+      }));
+    setFeaturedCases(featuredCasesData);
+  };
+  fetchCases();
+}, []);
+```
+
+**UI Changes**:
+- **Right Column Header**: Added "FEATURED CASES" label
+- **Carousel Integration**: Full `HeroFeatureCarousel` with navigation arrows
+- **Responsive**: Maintains proper layout on all screen sizes
+- **Consistent Styling**: Matches hero section exactly
+
+**Result**:
+✅ **Better Space Utilization**: Left column compact, right column spacious
+✅ **Dynamic Content**: Real case studies from Sanity CMS
+✅ **Rich Interaction**: Full carousel functionality with navigation
+✅ **Visual Consistency**: Identical styling to hero section
+✅ **Performance**: Efficient data fetching and caching
 
 ---

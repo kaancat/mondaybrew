@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, ArrowUpRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import {
   NavigationMenu,
@@ -20,6 +20,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { defaultThemeId, getThemeDefinition, themeOrder, ThemeId } from "@/theme/registry";
 import { useNavPhase } from "@/components/shared/use-nav-phase";
+import { DesktopMegaMenu } from "@/components/shared/desktop-mega-menu";
+import type { HeroFeatureDisplayItem } from "@/components/sections/hero-feature-carousel";
 
 export type NavbarLink = {
   label: string;
@@ -48,6 +50,9 @@ export type NavbarSection =
       kind: "mega";
       label: string;
       groups: NavbarMegaGroup[];
+      megaMenuHeadline?: string;
+      megaMenuDescription?: string;
+      featuredCases?: HeroFeatureDisplayItem[];
     };
 
 export type NavbarBrand = {
@@ -90,8 +95,141 @@ type Props = {
   };
 };
 
-const DEFAULT_CTA_LABEL = "Let’s talk";
+const DEFAULT_CTA_LABEL = "Let's talk";
 const FALLBACK_LOCALE = "da";
+
+/**
+ * MegaMenuTrigger: Simplified trigger button for mega menus
+ */
+function MegaMenuTrigger({
+  label,
+  isOpen,
+  onMouseEnter,
+  onMouseLeave,
+}: {
+  label: string;
+  isOpen: boolean;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}) {
+  return (
+    <div
+      className="relative"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      <button
+        type="button"
+        className={cn(
+          "inline-flex items-center gap-1 rounded-[6px] bg-transparent px-3 py-1.5 text-sm font-medium text-[color:var(--nav-link-text)] transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]",
+          isOpen && "bg-[color:var(--nav-link-hover-bg)]"
+        )}
+      >
+        {label}
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </motion.div>
+      </button>
+    </div>
+  );
+}
+
+/**
+ * SharedMegaMenuDropdown: Single shared dropdown container for all mega menus
+ * Prevents flickering by keeping the container mounted during transitions
+ */
+function SharedMegaMenuDropdown({
+  isOpen,
+  content,
+  contentKey,
+  desktopNavRef,
+  onMouseEnter,
+  onMouseLeave,
+}: {
+  isOpen: boolean;
+  content: React.ReactNode;
+  contentKey: string | null;
+  desktopNavRef: React.RefObject<HTMLDivElement | null>;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}) {
+  const [leftOffset, setLeftOffset] = useState(0);
+  const [width, setWidth] = useState(0);
+  const [topOffset, setTopOffset] = useState(0);
+
+  useEffect(() => {
+    if (!desktopNavRef.current) return;
+
+    const updatePosition = () => {
+      const nav = desktopNavRef.current;
+      if (!nav) return;
+
+      const navRect = nav.getBoundingClientRect();
+      const navList = nav.querySelector('[role="menubar"]') || nav;
+      const navListRect = navList.getBoundingClientRect();
+
+      setLeftOffset(navRect.left);
+      setWidth(navRect.width);
+      setTopOffset(navListRect.bottom + 16); // 16px gap
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
+    };
+  }, [desktopNavRef]);
+
+  if (!content) return null;
+
+  return (
+    <div
+      className="fixed z-50"
+      style={{
+        left: `${leftOffset}px`,
+        top: `${topOffset}px`,
+        width: `${width}px`,
+      }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {/* Invisible bridge to maintain hover state */}
+      <div className="absolute bottom-full left-0 right-0 h-4" aria-hidden="true" />
+
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: isOpen ? 1 : 0, y: isOpen ? 0 : -8 }}
+        transition={{ duration: 0.2, ease: [0.22, 0.61, 0.36, 1] }}
+      >
+        {/* AnimatePresence for smooth content transitions */}
+        <AnimatePresence mode="wait" initial={false}>
+          {contentKey && (
+            <motion.div
+              key={contentKey}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{
+                duration: 0.11,
+                ease: [0.4, 0, 0.2, 1],
+              }}
+            >
+              {content}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
+  );
+}
 
 export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const pathname = usePathname();
@@ -100,10 +238,49 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { mobileOpen, onOpenChange } = useNavPhase();
+  const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
+  const [megaMenuContent, setMegaMenuContent] = useState<React.ReactNode>(null);
+  const desktopNavRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleMegaMenuOpen = (label: string, content: React.ReactNode) => {
+    // Cancel any pending close
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setOpenMegaMenu(label);
+    setMegaMenuContent(content);
+  };
+
+  const handleMegaMenuClose = () => {
+    // Delay closing to allow moving to dropdown
+    closeTimeoutRef.current = setTimeout(() => {
+      setOpenMegaMenu(null);
+      // Keep content mounted for instant exit animation
+      setTimeout(() => setMegaMenuContent(null), 120);
+    }, 150);
+  };
+
+  const cancelMegaMenuClose = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
 
   const prevPathRef = useRef(normalizedPath);
   useEffect(() => {
@@ -253,6 +430,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const handleOpenChange = onOpenChange;
 
   return (
+    <>
     <header ref={headerRef} className="fixed inset-x-0 top-2 sm:top-3 md:top-4 z-50">
       <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -301,7 +479,8 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <SheetDescription className="sr-only">Site navigation</SheetDescription>
                 <div className="flex h-full w-full items-stretch">
                   <div className="mobile-nav-inner flex h-full min-h-0 w-[var(--mobile-nav-width)] flex-col px-6 py-8">
-                    <div className="flex items-center justify-between pb-5">
+                    {/* Header with close button */}
+                    <div className="flex items-center justify-between pb-5 shrink-0">
                       <div className="flex flex-col">
                         <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
                       </div>
@@ -316,7 +495,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         </button>
                       </SheetClose>
                     </div>
-                    <div className="mobile-nav-scroll no-scrollbar flex-1 min-h-0 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+24px)] pt-2">
+                    
+                    {/* Scrollable menu content */}
+                    <div className="mobile-nav-scroll no-scrollbar flex-1 min-h-0 overflow-y-auto pt-2">
                       {mobileOpen && (
                         <motion.div
                           className="space-y-7"
@@ -385,31 +566,33 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         ) : null}
                         </motion.div>
                       )}
-                      <div className="mt-8 space-y-3">
-                        <Link
-                          href={ctaHref}
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                    </div>
+
+                    {/* Fixed bottom action buttons */}
+                    <div className="mt-auto pt-6 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] shrink-0 space-y-3">
+                      <Link
+                        href={ctaHref}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                      >
+                        <span>{ctaLabel}</span>
+                        <ArrowRight className="size-[16px]" aria-hidden="true" />
+                      </Link>
+                      <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
+                        <button
+                          type="button"
+                          onClick={() => setTheme(nextThemeId)}
+                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                         >
-                          <span>{ctaLabel}</span>
-                          <ArrowRight className="size-[16px]" aria-hidden="true" />
+                          {themeIcon}
+                          <span>Skift tema</span>
+                        </button>
+                        <Link
+                          href={localeConfig.href}
+                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                        >
+                          <Globe className="size-[16px]" aria-hidden="true" />
+                          <span>{localeConfig.target}</span>
                         </Link>
-                        <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
-                          <button
-                            type="button"
-                            onClick={() => setTheme(nextThemeId)}
-                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                          >
-                            {themeIcon}
-                            <span>Skift tema</span>
-                          </button>
-                          <Link
-                            href={localeConfig.href}
-                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                          >
-                            <Globe className="size-[16px]" aria-hidden="true" />
-                            <span>{localeConfig.target}</span>
-                          </Link>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -423,7 +606,8 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
           {/* Desktop header */}
   <div
-    className={cn(menuShell, "desktop-nav-shell hidden md:flex items-center gap-5 px-5 py-2.5")}
+    ref={desktopNavRef}
+    className={cn(menuShell, "desktop-nav-shell relative hidden md:flex items-center gap-5 px-5 py-2.5")}
   >
     <Link href="/" className="inline-flex items-center shrink-0">
       {(() => {
@@ -449,88 +633,28 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
       viewport={false}
       className="hidden md:flex w-full max-w-none flex-1 items-center justify-start gap-4 text-[color:var(--nav-link-text)]"
     >
-      <NavigationMenuList className="justify-start gap-2 text-sm font-medium">
+      <NavigationMenuList className="justify-start gap-2 text-sm font-medium" role="menubar">
         {sections.map((section) => {
           if (section.kind === "mega") {
-            const highlightGroup = section.groups.find((group) => group.items.length > 0);
-            const highlightItem = highlightGroup?.items[0];
+            const isOpen = openMegaMenu === section.label;
+            const content = (
+              <DesktopMegaMenu
+                label={section.label}
+                groups={section.groups}
+                featuredCases={section.featuredCases || []}
+                megaMenuHeadline={section.megaMenuHeadline}
+                megaMenuDescription={section.megaMenuDescription}
+              />
+            );
+
             return (
-              <NavigationMenuItem key={section.label} className="md:static">
-                <NavigationMenuTrigger className="rounded-[6px] bg-transparent px-3 py-1.5 text-[color:var(--nav-link-text)] hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)] focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)] focus-visible:ring-2">
-                  {section.label}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="md:absolute md:left-0 md:right-0 md:top-full md:w-full md:min-w-full md:max-w-full md:rounded-[16px] md:border md:border-[color:var(--border)] md:bg-[color:var(--surface-base)] md:text-[color:var(--foreground)] md:p-0 md:shadow-[var(--shadow-elevated-md)]">
-                  <div className="grid gap-6 p-6 md:grid-cols-[minmax(0,3.2fr)_minmax(0,2fr)]">
-                    <div className="flex flex-col gap-6">
-                      {section.groups.map((group) => (
-                        <div key={`${section.label}-${group.title ?? "group"}`} className="flex flex-col gap-3">
-                          {group.title && (
-                            <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[color-mix(in_oklch,var(--foreground)_55%,transparent)]">
-                              {group.title}
-                            </span>
-                          )}
-                          {group.description && (
-                            <p className="text-[13px] text-[color-mix(in_oklch,var(--foreground)_65%,transparent)]">
-                              {group.description}
-                            </p>
-                          )}
-                          <ul className="grid gap-2 sm:grid-cols-2">
-                            {group.items.map((item) => {
-                              const href = item.href ?? "#";
-                              return (
-                                <li key={`${item.label}-${href}`}>
-                                  <Link
-                                    href={href}
-                                    className="group block h-full rounded-[14px] border border-[color:var(--border)] bg-[color-mix(in_oklch,var(--surface-base)_85%,var(--background)_15%)] px-4 py-3 transition-shadow duration-200 hover:-translate-y-0.5 hover:border-[color:var(--accent)] hover:shadow-[0_18px_40px_rgba(10,6,20,0.12)]"
-                                  >
-                                    <div className="flex items-start justify-between gap-4">
-                                      <span className="text-[15px] font-semibold leading-tight text-[color:var(--foreground)]">
-                                        {item.label}
-                                      </span>
-                                      <ArrowUpRight className="mt-0.5 size-[16px] text-[color-mix(in_oklch,var(--foreground)_55%,transparent)] opacity-0 transition group-hover:opacity-100" aria-hidden="true" />
-                                    </div>
-                                    {item.description && (
-                                      <p className="mt-2 text-[13px] leading-snug text-[color-mix(in_oklch,var(--foreground)_55%,transparent)]">
-                                        {item.description}
-                                      </p>
-                                    )}
-                                  </Link>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-col overflow-hidden rounded-[18px] border border-[color:var(--border)] bg-[color:var(--surface-elevated)] shadow-[var(--shadow-elevated-lg)]">
-                      <div className="p-6">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[color-mix(in_oklch,var(--foreground)_55%,transparent)]">
-                          Case spotlight
-                        </span>
-                        <h3 className="mt-3 text-[20px] font-semibold leading-tight text-[color:var(--foreground)]">
-                          {highlightItem?.label ?? "Udforsk vores cases"}
-                        </h3>
-                        <p className="mt-2 text-[14px] leading-relaxed text-[color-mix(in_oklch,var(--foreground)_65%,transparent)]">
-                          {highlightItem?.description ?? "Se hvordan mondaybrew hjælper virksomheder med at skalere deres performance marketing."}
-                        </p>
-                        {highlightItem?.href && (
-                          <Link
-                            href={highlightItem.href}
-                            className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[color:var(--accent)]"
-                          >
-                            Læs casen
-                            <ArrowRight className="size-[16px]" aria-hidden="true" />
-                          </Link>
-                        )}
-                      </div>
-                      <div className="relative h-36 overflow-hidden">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,color-mix(in_oklch,var(--accent)_24%,transparent)_0%,transparent_70%)]" aria-hidden="true" />
-                        <div className="absolute inset-x-0 bottom-0 h-16 bg-[color-mix(in_oklch,var(--accent)_16%,transparent)] blur-3xl" aria-hidden="true" />
-                      </div>
-                    </div>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+              <MegaMenuTrigger
+                key={section.label}
+                label={section.label}
+                isOpen={isOpen}
+                onMouseEnter={() => handleMegaMenuOpen(section.label, content)}
+                onMouseLeave={handleMegaMenuClose}
+              />
             );
           }
 
@@ -592,5 +716,16 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
         </div>
       </div>
     </header>
+
+    {/* Shared mega menu dropdown - rendered outside header for proper positioning */}
+    <SharedMegaMenuDropdown
+      isOpen={!!openMegaMenu}
+      content={megaMenuContent}
+      contentKey={openMegaMenu}
+      desktopNavRef={desktopNavRef}
+      onMouseEnter={cancelMegaMenuClose}
+      onMouseLeave={handleMegaMenuClose}
+    />
+  </>
   );
 }
