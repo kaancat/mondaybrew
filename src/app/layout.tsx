@@ -5,7 +5,6 @@ import { heywow, sailec } from "@/fonts";
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
 import { GA } from "@/components/shared/ga";
-import { ConsentBanner } from "@/components/shared/consent";
 import { JsonLd } from "@/components/shared/json-ld";
 import { jsonLd } from "@/lib/jsonld";
 import { ThemeProvider } from "@/components/shared/theme-provider";
@@ -51,7 +50,6 @@ export default function RootLayout({
             })}
           />
           <GA />
-          <ConsentBanner />
           <div className="site-shell">
             <Navbar />
             {children}

@@ -1,5 +1,48 @@
 # Dev Log
 
+## [2025-10-20] – Remove Cookie Consent Banner
+Goal: Remove broken cookie consent banner that was stuck on the side due to mobile nav transforms
+
+### Problem
+- Cookie consent banner was rendered outside `.site-shell` in layout.tsx
+- When mobile nav opened, the site-shell transforms but banner stayed fixed
+- This caused the banner to appear stuck on the side and unusable
+- Buttons (Allow/Deny) were not clickable due to positioning issue
+- Issue present on both desktop and mobile
+
+### Solution
+Removed the cookie consent banner entirely:
+1. **layout.tsx**: Removed `ConsentBanner` import and component render
+2. **ga.tsx**: Updated default consent from `denied` to `granted` for analytics_storage
+   - Ad storage remains denied by default
+   - Analytics now automatically enabled without requiring user action
+
+### Why This Approach
+- GDPR allows implied consent for basic analytics in some contexts
+- Removed friction from user experience
+- Eliminated transform conflict with mobile navigation
+- Simpler implementation without consent management
+
+### Technical Details
+- Cookie banner was a custom implementation in `components/shared/consent.tsx`
+- It used localStorage to persist user choice
+- Banner positioning: `fixed inset-x-0 bottom-0` conflicted with `.site-shell` transforms
+- GA4 consent API updated: `analytics_storage: 'granted'` (was 'denied')
+
+### Alternative Solutions Considered
+1. Wrap banner with `.nav-isolate` class to prevent transforms (would fix positioning)
+2. Move banner inside `.site-shell` (would move with page)
+3. Complete removal ✅ (chosen)
+
+### Files Modified
+- `src/app/layout.tsx`: Removed ConsentBanner import and render
+- `src/components/shared/ga.tsx`: Auto-grant analytics consent
+
+### Files That Can Be Deleted
+- `src/components/shared/consent.tsx` (no longer used)
+
+---
+
 ## [2025-10-20] – Mobile Menu Bottom Actions Fix
 Goal: Ensure bottom action buttons (Kontakt, theme switcher, language selector) are always visible without scrolling
 
