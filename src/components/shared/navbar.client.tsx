@@ -455,7 +455,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             const highlightGroup = section.groups.find((group) => group.items.length > 0);
             const highlightItem = highlightGroup?.items[0];
             return (
-              <NavigationMenuItem key={section.label}>
+              <NavigationMenuItem key={section.label} className="md:static">
                 <NavigationMenuTrigger className="rounded-[6px] bg-transparent px-3 py-1.5 text-[color:var(--nav-link-text)] hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)] focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)] focus-visible:ring-2">
                   {section.label}
                 </NavigationMenuTrigger>
@@ -537,7 +537,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
           const href = section.href ?? "#";
           const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
           return (
-            <NavigationMenuItem key={section.label}>
+            <NavigationMenuItem key={section.label} className="md:static">
               <NavigationMenuLink asChild active={active} className="rounded-[6px] px-3 py-1.5 transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]">
                 <Link
                   href={href}
