@@ -198,18 +198,17 @@ function MegaMenuFeatureCarousel({ items }: { items: HeroFeatureDisplayItem[] })
               {normalized.map((item, itemIndex) => {
                 const cardHref = item.href?.trim();
                 const isLink = Boolean(cardHref);
-                const CardWrapper = isLink ? Link : "div";
 
                 return (
                   <article className="w-full shrink-0 p-[6px]" key={item.key || itemIndex}>
-                    <CardWrapper
-                      {...(isLink ? { href: cardHref } : {})}
-                      className={cn(
-                        "flex h-full flex-col overflow-hidden rounded-[5px] text-left outline-none",
-                        isLink &&
+                    {isLink && cardHref ? (
+                      <Link
+                        href={cardHref}
+                        className={cn(
+                          "flex h-full flex-col overflow-hidden rounded-[5px] text-left outline-none",
                           "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
-                      )}
-                    >
+                        )}
+                      >
                       {/* Image section */}
                       {item.image?.url && (
                         <div className="relative aspect-[4/3] overflow-hidden rounded-[5px]">
@@ -253,7 +252,58 @@ function MegaMenuFeatureCarousel({ items }: { items: HeroFeatureDisplayItem[] })
                           </p>
                         )}
                       </div>
-                    </CardWrapper>
+                    </Link>
+                    ) : (
+                      <div
+                        className={cn(
+                          "flex h-full flex-col overflow-hidden rounded-[5px] text-left outline-none",
+                        )}
+                      >
+                      {/* Image section */}
+                      {item.image?.url && (
+                        <div className="relative aspect-[4/3] overflow-hidden rounded-[5px]">
+                          <Image
+                            src={item.image.url}
+                            alt={item.image.alt || item.title || ""}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            placeholder={item.image.lqip ? "blur" : "empty"}
+                            blurDataURL={item.image.lqip}
+                          />
+                          {/* Pagination indicator */}
+                          {normalized.length > 1 && (
+                            <div className="absolute right-2 top-2 rounded-[4px] bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
+                              {itemIndex + 1} / {normalized.length}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Content section */}
+                      <div className="flex flex-1 flex-col p-4">
+                        {/* Meta label */}
+                        {item.metaLabel && (
+                          <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/70">
+                            {item.metaLabel}
+                          </div>
+                        )}
+
+                        {/* Title */}
+                        {item.title && (
+                          <h3 className="mb-2 text-base font-semibold text-white line-clamp-2">
+                            {item.title}
+                          </h3>
+                        )}
+
+                        {/* Excerpt */}
+                        {item.excerpt && (
+                          <p className="flex-1 text-[13px] leading-relaxed text-white/80 line-clamp-3">
+                            {item.excerpt}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    )}
                   </article>
                 );
               })}
