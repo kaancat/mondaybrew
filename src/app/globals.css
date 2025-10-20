@@ -219,6 +219,13 @@ html.light-primary {
   --eyebrow-color: var(--mb-accent);
 }
 
+html.light-primary body[data-mobile-nav-open="true"] {
+  /* Keep the site card in brand background instead of transparent tint */
+  --nav-card-background: var(--background);
+  --nav-card-box-shadow: 0 48px 120px rgba(73, 68, 75, 0.24);
+  --mobile-nav-overlay: rgba(73, 68, 75, 0.08);
+}
+
 html.light-alt {
   color-scheme: light;
 
