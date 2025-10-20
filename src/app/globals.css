@@ -597,7 +597,7 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
 
   [data-slot="sheet-overlay"] {
     background: transparent !important;
-    pointer-events: none;
+    pointer-events: auto;
     /* Disable exit animation by default */
     transition: none;
   }
