@@ -108,14 +108,14 @@
   --full-bleed-inline-end: calc(50% - 50vw);
   --full-bleed-width: 100vw;
 
-  --mobile-nav-surface: rgba(16, 14, 26, 0.94);
-  --mobile-nav-text: rgba(245, 247, 253, 0.9);
-  --mobile-nav-muted: rgba(245, 247, 253, 0.62);
-  --mobile-nav-heading: rgba(245, 247, 253, 0.78);
-  --mobile-nav-border: rgba(255, 255, 255, 0.18);
-  --mobile-nav-hover: rgba(255, 255, 255, 0.1);
-  --mobile-nav-link: rgba(245, 247, 253, 0.86);
-  --mobile-nav-overlay: rgba(10, 7, 18, 0.28);
+  --mobile-nav-surface: color-mix(in oklch, var(--mb-bg) 92%, white 8%);
+  --mobile-nav-text: color-mix(in oklch, var(--mb-ink) 92%, black 8%);
+  --mobile-nav-muted: color-mix(in oklch, var(--mb-ink) 60%, white 40%);
+  --mobile-nav-heading: color-mix(in oklch, var(--mb-ink) 70%, var(--mb-accent) 30%);
+  --mobile-nav-border: color-mix(in oklch, var(--mb-ink) 18%, transparent);
+  --mobile-nav-hover: color-mix(in oklch, var(--mb-ink) 10%, transparent);
+  --mobile-nav-link: color-mix(in oklch, var(--mb-ink) 88%, black 12%);
+  --mobile-nav-overlay: rgba(73, 68, 75, 0.12);
 }
 
 @supports (height: 100dvh) {
