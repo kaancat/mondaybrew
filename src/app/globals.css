@@ -471,9 +471,6 @@ html.dark {
     --nav-card-background: transparent;
     --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
     --nav-card-margin-block: 0;
-
-    /* Create isolated stacking context */
-    isolation: isolate;
   }
 
   /* Body::before overlay removed — rely on Radix Sheet overlay only */
@@ -539,8 +536,7 @@ html.dark {
     pointer-events: var(--nav-card-pointer);
     background: var(--nav-card-background);
 
-    /* Isolate from page content */
-    isolation: isolate;
+    /* Remove isolation to prevent stacking context issues */
     contain: layout style paint;
   }
 
@@ -571,6 +567,9 @@ html.dark {
     padding: 0;
     /* Disable exit animation by default; we add transitions only while open */
     transition: none;
+    /* Panel below shell to show the rounded card */
+    z-index: 55 !important;
+    position: relative;
   }
 
   [data-slot="sheet-content"].mobile-nav-panel[data-state="closed"] {
@@ -587,6 +586,8 @@ html.dark {
     transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
   }
 
+
+
   /* During exiting, keep the panel in DOM for Radix state but hide it immediately
      to prevent menu items shining through the semi-transparent shell */
 body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-content"].mobile-nav-panel {
@@ -597,9 +598,11 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
 
   [data-slot="sheet-overlay"] {
     background: transparent !important;
-    pointer-events: none;
+    pointer-events: auto;
     /* Disable exit animation by default */
     transition: none;
+    /* Overlay below panel for click handling */
+    z-index: 50 !important;
   }
 
   [data-slot="sheet-overlay"][data-state="closed"] {
