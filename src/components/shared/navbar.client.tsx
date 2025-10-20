@@ -3,9 +3,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+  NavigationMenuIndicator,
+} from "@/components/ui/navigation-menu";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -221,11 +230,24 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
       const gap = 24;
       const offset = Math.round(top + rect.height + gap);
       document.documentElement.style.setProperty("--hero-offset", `${offset}px`);
+
+      const desktopShell = el.querySelector<HTMLElement>(".desktop-nav-shell");
+      if (desktopShell) {
+        const shellRect = desktopShell.getBoundingClientRect();
+        document.documentElement.style.setProperty("--desktop-nav-shell-width", `${shellRect.width}px`);
+        document.documentElement.style.setProperty("--desktop-nav-shell-left", `${shellRect.left}px`);
+        document.documentElement.style.setProperty("--desktop-nav-shell-top", `${shellRect.top}px`);
+        document.documentElement.style.setProperty("--desktop-nav-shell-height", `${shellRect.height}px`);
+      }
     };
 
     updateOffset();
     window.addEventListener("resize", updateOffset);
-    return () => window.removeEventListener("resize", updateOffset);
+    window.addEventListener("scroll", updateOffset, { passive: true });
+    return () => {
+      window.removeEventListener("resize", updateOffset);
+      window.removeEventListener("scroll", updateOffset);
+    };
   }, []);
 
   const handleOpenChange = onOpenChange;
@@ -400,13 +422,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
           </div>
 
           {/* Desktop header */}
-          <div className={cn(menuShell, "hidden md:flex items-center gap-4 px-5 py-2.5 md:flex-row")}
-            style={{ justifyContent: "space-between" }}
-          >
-            <Link href="/" className="inline-flex items-center">
-              {(() => {
-                const chosen = isLightAlt
-                  ? brand.logoLight ?? brand.logo ?? brand.logoDark
+  <div
+    className={cn(menuShell, "desktop-nav-shell hidden md:flex items-center gap-5 px-5 py-2.5")}
+  >
+    <Link href="/" className="inline-flex items-center shrink-0">
+      {(() => {
+        const chosen = isLightAlt
+          ? brand.logoLight ?? brand.logo ?? brand.logoDark
                   : brand.logoDark ?? brand.logo ?? brand.logoLight;
                 if (chosen?.url) {
                   return (
@@ -420,51 +442,124 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                     />
                   );
                 }
-                return <span className="text-sm font-semibold">{brand.title}</span>;
-              })()}
-            </Link>
-            <nav className={cn("flex flex-wrap items-center gap-3 overflow-x-auto text-sm font-medium md:flex-nowrap", "text-[color:var(--nav-link-text)]")}> 
-              {sections.map((section) => {
-                if (section.kind === "link") {
-                  const href = section.href ?? "#";
-                  const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                  return (
-                    <Link
-                      key={section.label}
-                      href={href}
-                      className={cn(
-                        "whitespace-nowrap rounded-[5px] px-3 py-1.5 transition text-[color:var(--nav-link-text)]",
-                        isLightAlt
-                          ? cn(
-                              active
-                                ? "font-semibold underline underline-offset-[3px] decoration-[color:var(--nav-link-text)]"
-                                : "hover:underline underline-offset-[3px] decoration-[color:var(--nav-link-text)]",
-                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]",
-                            )
-                          : cn(
-                              active
-                                ? "bg-[color:var(--nav-link-active-bg)] text-[color:var(--nav-link-active-text)]"
-                                : "hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]",
-                            ),
-                      )}
-                    >
-                      {section.label}
-                    </Link>
-                  );
-                }
+        return <span className="text-sm font-semibold">{brand.title}</span>;
+      })()}
+    </Link>
+    <NavigationMenu
+      viewport={false}
+      className="hidden md:flex w-full max-w-none flex-1 items-center justify-start gap-4 text-[color:var(--nav-link-text)]"
+    >
+      <NavigationMenuList className="justify-start gap-2 text-sm font-medium">
+        {sections.map((section) => {
+          if (section.kind === "mega") {
+            const highlightGroup = section.groups.find((group) => group.items.length > 0);
+            const highlightItem = highlightGroup?.items[0];
+            return (
+              <NavigationMenuItem key={section.label}>
+                <NavigationMenuTrigger className="rounded-[6px] bg-transparent px-3 py-1.5 text-[color:var(--nav-link-text)] hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)] focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)] focus-visible:ring-2">
+                  {section.label}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="md:absolute md:left-0 md:right-0 md:top-full md:w-full md:min-w-full md:max-w-full md:rounded-[16px] md:border md:border-[color:var(--border)] md:bg-[color:var(--surface-base)] md:text-[color:var(--foreground)] md:p-0 md:shadow-[var(--shadow-elevated-md)]">
+                  <div className="grid gap-6 p-6 md:grid-cols-[minmax(0,3.2fr)_minmax(0,2fr)]">
+                    <div className="flex flex-col gap-6">
+                      {section.groups.map((group) => (
+                        <div key={`${section.label}-${group.title ?? "group"}`} className="flex flex-col gap-3">
+                          {group.title && (
+                            <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[color-mix(in_oklch,var(--foreground)_55%,transparent)]">
+                              {group.title}
+                            </span>
+                          )}
+                          {group.description && (
+                            <p className="text-[13px] text-[color-mix(in_oklch,var(--foreground)_65%,transparent)]">
+                              {group.description}
+                            </p>
+                          )}
+                          <ul className="grid gap-2 sm:grid-cols-2">
+                            {group.items.map((item) => {
+                              const href = item.href ?? "#";
+                              return (
+                                <li key={`${item.label}-${href}`}>
+                                  <Link
+                                    href={href}
+                                    className="group block h-full rounded-[14px] border border-[color:var(--border)] bg-[color-mix(in_oklch,var(--surface-base)_85%,var(--background)_15%)] px-4 py-3 transition-shadow duration-200 hover:-translate-y-0.5 hover:border-[color:var(--accent)] hover:shadow-[0_18px_40px_rgba(10,6,20,0.12)]"
+                                  >
+                                    <div className="flex items-start justify-between gap-4">
+                                      <span className="text-[15px] font-semibold leading-tight text-[color:var(--foreground)]">
+                                        {item.label}
+                                      </span>
+                                      <ArrowUpRight className="mt-0.5 size-[16px] text-[color-mix(in_oklch,var(--foreground)_55%,transparent)] opacity-0 transition group-hover:opacity-100" aria-hidden="true" />
+                                    </div>
+                                    {item.description && (
+                                      <p className="mt-2 text-[13px] leading-snug text-[color-mix(in_oklch,var(--foreground)_55%,transparent)]">
+                                        {item.description}
+                                      </p>
+                                    )}
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex flex-col overflow-hidden rounded-[18px] border border-[color:var(--border)] bg-[color:var(--surface-elevated)] shadow-[var(--shadow-elevated-lg)]">
+                      <div className="p-6">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[color-mix(in_oklch,var(--foreground)_55%,transparent)]">
+                          Case spotlight
+                        </span>
+                        <h3 className="mt-3 text-[20px] font-semibold leading-tight text-[color:var(--foreground)]">
+                          {highlightItem?.label ?? "Udforsk vores cases"}
+                        </h3>
+                        <p className="mt-2 text-[14px] leading-relaxed text-[color-mix(in_oklch,var(--foreground)_65%,transparent)]">
+                          {highlightItem?.description ?? "Se hvordan mondaybrew hjælper virksomheder med at skalere deres performance marketing."}
+                        </p>
+                        {highlightItem?.href && (
+                          <Link
+                            href={highlightItem.href}
+                            className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[color:var(--accent)]"
+                          >
+                            Læs casen
+                            <ArrowRight className="size-[16px]" aria-hidden="true" />
+                          </Link>
+                        )}
+                      </div>
+                      <div className="relative h-36 overflow-hidden">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,color-mix(in_oklch,var(--accent)_24%,transparent)_0%,transparent_70%)]" aria-hidden="true" />
+                        <div className="absolute inset-x-0 bottom-0 h-16 bg-[color-mix(in_oklch,var(--accent)_16%,transparent)] blur-3xl" aria-hidden="true" />
+                      </div>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            );
+          }
 
-                return (
-                  <button
-                    key={section.label}
-                    type="button"
-                    className="whitespace-nowrap rounded-[5px] px-3 py-1.5 text-left transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]"
-                  >
-                    {section.label}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+          const href = section.href ?? "#";
+          const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+          return (
+            <NavigationMenuItem key={section.label}>
+              <NavigationMenuLink asChild active={active} className="rounded-[6px] px-3 py-1.5 transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]">
+                <Link
+                  href={href}
+                  className={cn(
+                    "whitespace-nowrap",
+                    isLightAlt
+                      ? "underline-offset-[3px] hover:underline"
+                      : active
+                        ? "font-semibold"
+                        : undefined,
+                  )}
+                >
+                  {section.label}
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          );
+        })}
+      </NavigationMenuList>
+      <NavigationMenuIndicator className="hidden md:flex" />
+    </NavigationMenu>
+  </div>
 
           <div className="hidden md:flex flex-wrap items-center gap-2 px-0 py-0 sm:gap-3 md:flex-nowrap md:justify-end md:pl-4">
             {(() => {

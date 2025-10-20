@@ -69,6 +69,12 @@
   --container-max: 1840px;
   --container-gutter: 28px;
 
+  /* Desktop nav geometry (populated at runtime) */
+  --desktop-nav-shell-width: auto;
+  --desktop-nav-shell-left: 0px;
+  --desktop-nav-shell-top: 0px;
+  --desktop-nav-shell-height: 0px;
+
   --hero-offset: 140px;
   --hero-bottom-gap: 72px;
 
