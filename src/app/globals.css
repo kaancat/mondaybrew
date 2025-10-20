@@ -577,6 +577,11 @@ html.dark {
     /* Panel below shell to show the rounded card */
     z-index: 55 !important;
     position: relative;
+    /* Default hidden so brief attribute gaps don't flash content */
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   [data-slot="sheet-content"].mobile-nav-panel[data-state="closed"] {
@@ -590,6 +595,7 @@ html.dark {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
     transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
   }
 
