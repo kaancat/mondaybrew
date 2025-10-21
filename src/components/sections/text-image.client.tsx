@@ -105,7 +105,7 @@ export function TextImageClient({
 
                 {/* Body Text - Normal size and weight */}
                 {body && (
-                    <p className="mb-8">
+                    <p className="body-text mb-8">
                         {body}
                     </p>
                 )}

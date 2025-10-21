@@ -87,12 +87,12 @@ export function TextOnlyClient({
                             </span>
                         )}
 
-                {/* Title - Smaller size for left column */}
-                {title && (
-                    <h3 className="text-2xl md:text-3xl">
-                        {title}
-                    </h3>
-                )}
+                        {/* Title - Smaller size for left column */}
+                        {title && (
+                            <h3 className="text-2xl md:text-3xl">
+                                {title}
+                            </h3>
+                        )}
                     </div>
 
                     {/* Right column - Body text and CTA */}
@@ -102,7 +102,7 @@ export function TextOnlyClient({
 
                         {/* Body text - offset to align with title */}
                         {body && (
-                            <p className="mt-8">
+                            <p className="body-text mt-8">
                                 {body}
                             </p>
                         )}

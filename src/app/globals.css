@@ -504,8 +504,8 @@ html.dark {
     margin: 0;
   }
 
-  /* Paragraph - Body text style (light weight) */
-  p {
+  /* Global body text class - for consistent typography */
+  .body-text {
     font-family: var(--font-body);
     font-size: var(--font-body);
     font-weight: 300; /* font-light */
