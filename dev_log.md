@@ -1,5 +1,56 @@
 # Dev Log
 
+## [2025-10-20] – Fix Sanity Webhook Revalidation
+Goal: Make Sanity webhooks properly revalidate navbar and all content instantly
+
+### Problem
+- Sanity webhook was configured and firing correctly
+- Revalidate API endpoint was being called
+- BUT changes to navigation (mega menu data) weren't showing up immediately
+- Required full rebuild or long wait time for changes to appear
+
+### Root Cause
+The `fetchSanity()` function wasn't tagging its requests with Next.js cache tags.
+When the webhook called `revalidateTag("sanity:site")`, it had no effect because
+no fetches were tagged with "sanity:site".
+
+### Solution
+Added Next.js fetch options with cache tags to all Sanity fetches:
+
+**sanity.client.ts** (lines 40-44):
+```typescript
+const fetchOptions = {
+  next: {
+    tags: ["sanity:site"], // Tag all Sanity fetches so webhook can revalidate them
+  },
+};
+```
+
+Now all Sanity data fetches (including navbar, pages, etc.) are tagged.
+When Sanity webhook fires → `/api/revalidate` → `revalidateTag("sanity:site")` →
+All tagged data is revalidated instantly.
+
+### How It Works
+1. **Before**: Sanity webhook → API called `revalidateTag("sanity:site")` → Nothing happened (no tagged fetches)
+2. **After**: Sanity webhook → API calls `revalidateTag("sanity:site")` → All Sanity data invalidated → Next.js refetches on next request
+
+### Impact
+✅ Instant content updates when publishing in Sanity (no rebuild needed)
+✅ Navbar changes (mega menu data) appear immediately  
+✅ All pages refresh their Sanity data on-demand
+✅ Proper ISR (Incremental Static Regeneration) working as expected
+
+### Technical Details
+- Used `next.tags` fetch option supported by Sanity Client v6+
+- Works with both server client (with token) and public clients
+- Applies to all Sanity queries: navbar, pages, settings, etc.
+- Compatible with existing `revalidate = 60` page-level settings
+
+### Files Modified
+- `src/lib/sanity.client.ts`: Added cache tags to fetchSanity function
+
+---
+
 ## [2025-10-20] – Remove Cookie Consent Banner
 Goal: Remove broken cookie consent banner that was stuck on the side due to mobile nav transforms
 
