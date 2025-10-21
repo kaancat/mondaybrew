@@ -241,7 +241,6 @@ export default async function Home() {
               <TextOnlySection
                 eyebrow={section.eyebrow}
                 title={section.title}
-                subheading={section.subheading}
                 body={section.body}
                 cta={section.cta}
                 cta2={section.cta2}
