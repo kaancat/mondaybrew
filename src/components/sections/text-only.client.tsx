@@ -3,13 +3,10 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 type TextOnlyClientProps = {
     eyebrow?: string;
     title?: string;
-    subheading?: string;
     body?: string;
     cta?: {
         label: string;
@@ -35,7 +32,6 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 export function TextOnlyClient({
     eyebrow,
     title,
-    subheading,
     body,
     cta,
     cta2,

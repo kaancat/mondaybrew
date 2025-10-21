@@ -227,7 +227,6 @@ export default async function Home() {
               <TextImageSection
                 eyebrow={section.eyebrow}
                 title={section.title}
-                subheading={section.subheading}
                 body={section.body}
                 image={section.image}
                 imagePosition={section.imagePosition}

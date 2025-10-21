@@ -4,7 +4,6 @@ import { TextOnlyClient } from "./text-only.client";
 export type TextOnlySectionData = {
     eyebrow?: string | null;
     title?: string | null;
-    subheading?: string | null;
     body?: string | null;
     cta?: {
         label?: string | null;
@@ -30,7 +29,6 @@ const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "gho
 export function TextOnlySection({
     eyebrow,
     title,
-    subheading,
     body,
     cta,
     cta2,
@@ -40,7 +38,6 @@ export function TextOnlySection({
             <TextOnlyClient
                 eyebrow={eyebrow?.trim()}
                 title={title?.trim()}
-                subheading={subheading?.trim()}
                 body={body?.trim()}
                 cta={buildCta(cta)}
                 cta2={buildCta(cta2)}
