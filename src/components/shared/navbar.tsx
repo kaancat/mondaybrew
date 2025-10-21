@@ -191,23 +191,12 @@ export async function Navbar() {
   const brand = mapBrand(settings);
   const cta = mapCta(settings?.headerCta);
 
-  // Debug data for development
-  const debugData = {
-    settings: settings,
-    sections: sections,
-    megaSections: sections.filter(s => s.kind === 'mega'),
-    hasMegaMenu: sections.some(s => s.kind === 'mega'),
-  };
-
   return (
-    <>
-      <div data-nav-debug={JSON.stringify(debugData)} style={{ display: 'none' }} />
-      <NavbarClient
-        brand={brand}
-        sections={sections}
-        cta={cta}
-        locales={{ available: ["da", "en"], defaultLocale: DEFAULT_LOCALE }}
-      />
-    </>
+    <NavbarClient
+      brand={brand}
+      sections={sections}
+      cta={cta}
+      locales={{ available: ["da", "en"], defaultLocale: DEFAULT_LOCALE }}
+    />
   );
 }

@@ -48,6 +48,28 @@ export const siteSettingsQuery = `*[_type=="siteSettings"][0]{
           locale
         }
       }
+    },
+    megaMenuHeadline,
+    megaMenuDescription,
+    featuredCases[]->{
+      _id,
+      title,
+      client,
+      "excerpt": coalesce(excerpt, summary),
+      "slug": slug.current,
+      media{
+        mode,
+        image{
+          alt,
+          image{asset->{url,metadata{lqip,dimensions}}}
+        },
+        videoUrl,
+        videoFile{asset->{url,mimeType}},
+        poster{
+          alt,
+          image{asset->{url,metadata{lqip,dimensions}}}
+        }
+      }
     }
   },
   headerCta {

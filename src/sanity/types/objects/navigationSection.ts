@@ -54,6 +54,31 @@ export default defineType({
           return true;
         }),
     }),
+    defineField({
+      name: "megaMenuHeadline",
+      title: "Mega Menu Headline",
+      type: "string",
+      description: "Main headline shown at the top of the mega menu (desktop only)",
+      placeholder: "e.g., HIGHLIGHT FEATURE",
+      hidden: ({ parent }) => parent?.variant !== "mega",
+    }),
+    defineField({
+      name: "megaMenuDescription",
+      title: "Mega Menu Description",
+      type: "string",
+      description: "Description text shown below the headline (desktop only)",
+      placeholder: "e.g., Performance på tværs af hele funnel'en.",
+      hidden: ({ parent }) => parent?.variant !== "mega",
+    }),
+    defineField({
+      name: "featuredCases",
+      title: "Featured Cases",
+      type: "array",
+      description: "Case studies to showcase in the mega menu carousel (desktop only, max 3 recommended)",
+      of: [{ type: "reference", to: [{ type: "caseStudy" }] }],
+      hidden: ({ parent }) => parent?.variant !== "mega",
+      validation: (Rule) => Rule.max(5),
+    }),
   ],
   preview: {
     select: {
