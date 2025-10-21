@@ -11,6 +11,8 @@ import servicesSplit from "./types/sections/servicesSplit";
 import caseStudyCarousel from "./types/sections/caseStudyCarousel";
 import clientsSection from "./types/sections/clientsSection";
 import testimonialsMarquee from "./types/sections/testimonialsMarquee";
+import textImage from "./types/sections/textImage";
+import textOnly from "./types/sections/textOnly";
 
 import seo from "./types/objects/seo";
 import cta from "./types/objects/cta";
@@ -44,6 +46,8 @@ const schemas = [
   caseStudyCarousel,
   clientsSection,
   testimonialsMarquee,
+  textImage,
+  textOnly,
   // objects
   seo,
   cta,

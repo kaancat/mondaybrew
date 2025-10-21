@@ -27,6 +27,8 @@ export default defineType({
         { type: "clientsSection" },
         { type: "testimonialsMarquee" },
         { type: "aboutSection" },
+        { type: "textImage" },
+        { type: "textOnly" },
       ],
     }),
     defineField({ name: "seo", type: "seo" }),

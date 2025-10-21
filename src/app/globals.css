@@ -461,7 +461,8 @@ html.dark {
   body {
     font-family: var(--font-body);
     font-size: var(--font-body);
-    line-height: 1.5;
+    font-weight: 300; /* font-light */
+    line-height: 1.625; /* leading-relaxed */
     background: var(--background);
     color: var(--foreground);
     margin: 0;
