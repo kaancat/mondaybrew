@@ -44,7 +44,7 @@ export function HeroFeatureCarousel({ items }: Props) {
 
   return (
     <div
-      className="group absolute bottom-4 right-4 w-[60vw] max-w-[19rem] text-white sm:bottom-6 sm:right-6 sm:w-[56vw] sm:max-w-[20rem] md:bottom-10 md:right-10 md:w-full md:max-w-[27.5rem]"
+      className="group absolute bottom-4 left-6 right-6 text-white sm:bottom-6 sm:left-10 sm:right-10 md:bottom-10 md:left-auto md:right-10 md:w-full md:max-w-[27.5rem]"
       style={{ zIndex: 10 }}
     >
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-85 transition-opacity duration-500 group-hover:opacity-100">
@@ -70,11 +70,11 @@ export function HeroFeatureCarousel({ items }: Props) {
                       className={cn(
                         "flex h-full flex-col overflow-hidden rounded-[5px] text-left outline-none",
                         isLink &&
-                          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
+                        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
                       )}
                     >
                       {item.image?.url ? (
-                        <div className="relative aspect-[16/9] sm:aspect-[4/3] w-full overflow-hidden rounded-[5px]">
+                        <div className="relative aspect-[16/7] sm:aspect-[16/9] md:aspect-[4/3] w-full overflow-hidden rounded-[5px]">
                           <Image
                             src={item.image.url}
                             alt={item.image.alt || item.title || "Hero feature"}

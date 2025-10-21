@@ -58,19 +58,19 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
     >
       {/* Note: Section provides the padded Container already (width=full). Avoid nested Containers to prevent double gutters. */}
       <div className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]">
-          {eyebrow ? (
-            <p className="eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">
-              {eyebrow}
-            </p>
-          ) : null}
-          {headline ? (
-            <h2 className="text-balance text-[clamp(32px,6vw,58px)] font-semibold leading-[1.03] tracking-tight text-[color:var(--foreground)]">
-              {headline}
-            </h2>
-          ) : null}
-          {subheading ? (
-            <p className="max-w-[78ch] text-[length:var(--font-body)] leading-[1.7] text-muted-foreground">{subheading}</p>
-          ) : null}
+        {eyebrow ? (
+          <p className="eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.25em] text-[color:var(--eyebrow-color)]">
+            {eyebrow}
+          </p>
+        ) : null}
+        {headline ? (
+          <h2 className="text-balance text-[color:var(--foreground)]">
+            {headline}
+          </h2>
+        ) : null}
+        {subheading ? (
+          <p className="max-w-[78ch] text-[length:var(--font-body)] leading-[1.7] text-muted-foreground">{subheading}</p>
+        ) : null}
       </div>
       <div className="flex flex-1">
         <TestimonialsMarqueeClient

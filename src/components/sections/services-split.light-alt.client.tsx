@@ -251,12 +251,12 @@ export function ServicesSplitLightAlt({
             </span>
           ) : null}
           {activeHeadline ? (
-            <h2 className="mt-3 text-[clamp(32px,6vw,58px)] font-semibold leading-[1.05] tracking-tight text-[color:var(--services-ink-strong)]">
+            <h2 className="mt-3 text-[color:var(--services-ink-strong)]">
               {activeHeadline}
             </h2>
           ) : null}
           {activeDescription ? (
-            <p className="mt-5 max-w-xl text-[clamp(16px,1.9vw,20px)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)]">
+            <p className="mt-5 max-w-xl text-[length:var(--font-body)] font-light leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)]">
               {activeDescription}
             </p>
           ) : null}
@@ -288,7 +288,7 @@ export function ServicesSplitLightAlt({
                   }}
                   onKeyDown={(event) => handleTabKeyDown(event, tabIndex)}
                   className={cn(
-                    "relative inline-flex items-center justify-center rounded-[5px] px-3 py-2 text-[15px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
+                    "relative inline-flex items-center justify-center rounded-[5px] px-3 py-2 text-sm font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
                     isActive
                       ? "after:absolute after:bottom-[-1px] after:left-1 after:right-1 after:h-[2px] after:rounded-full after:bg-[color:var(--mb-accent)]"
                       : "text-[color:color-mix(in_oklch,var(--services-ink-strong)_68%,white_32%)] hover:text-[color:var(--services-ink-strong)]",
@@ -357,7 +357,7 @@ export function ServicesSplitLightAlt({
                 animate="visible"
                 exit="hidden"
                 variants={detailVariants}
-                className="rounded-[5px] border border-[color:var(--nav-shell-border)] bg-[color:var(--services-card-bg)] p-6 text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
+                className="rounded-[5px] bg-[color:var(--services-card-bg)] p-6 text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
               >
                 {renderMedia(activeService.media)}
 
@@ -370,14 +370,14 @@ export function ServicesSplitLightAlt({
                       {activeService.detailTitle || activeService.title}
                     </h3>
                     {activeService.summary ? (
-                    <p className="text-[17px] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_88%,white_12%)]">
-                      {activeService.summary}
-                    </p>
+                      <p className="text-[length:var(--font-body)] font-light leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_88%,white_12%)]">
+                        {activeService.summary}
+                      </p>
                     ) : null}
                   </header>
 
                   {activeService.description ? (
-                    <p className="text-[16px] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_84%,white_16%)]">
+                    <p className="text-[length:var(--font-body)] font-light leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_84%,white_16%)]">
                       {activeService.description}
                     </p>
                   ) : null}
@@ -448,7 +448,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
     return index === 0 ? "primary" : "secondary";
   })();
   const baseStyles =
-    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] px-6 py-[0.65rem] text-sm font-semibold leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--services-card-bg)]";
+    "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] px-6 py-[0.65rem] text-sm font-normal leading-[1.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--services-card-bg)]";
 
   if (resolvedVariant === "primary") {
     return (
@@ -468,7 +468,7 @@ function CtaButton({ cta, index }: { cta: ServicesSplitCta; index: number }) {
       href={cta.href}
       target={cta.target}
       rel={cta.rel}
-      className={cn(baseStyles, "border border-[color:var(--cta-secondary-border)] bg-[color:var(--cta-secondary-bg)] text-[color:var(--cta-secondary-text)] hover:border-[color:var(--cta-secondary-hover-border)]")}
+      className={cn(baseStyles, "bg-[color:var(--cta-secondary-bg)] text-[color:var(--cta-secondary-text)] hover:bg-[color:color-mix(in oklch,var(--cta-secondary-bg)_90%,var(--cta-secondary-text)_10%)]")}
     >
       {cta.label}
     </Link>

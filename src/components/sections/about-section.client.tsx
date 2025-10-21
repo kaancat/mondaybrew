@@ -115,7 +115,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
           </p>
         ) : null}
         {headline ? (
-          <h2 className="text-balance text-[clamp(32px,6vw,58px)] font-semibold leading-[1.03] tracking-tight text-[color:var(--foreground)]">
+          <h2 className="text-balance text-[color:var(--foreground)]">
             {headline}
           </h2>
         ) : null}
@@ -182,25 +182,25 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
               )}
             >
               <div className="px-[clamp(28px,5vw,60px)] py-[clamp(32px,5.5vh,52px)]">
-              <dl
-                className={cn(
-                  "grid w-full gap-y-[clamp(18px,3.2vh,26px)] gap-x-[clamp(16px,3vw,36px)]",
-                  "text-center place-items-center",
-                  gridCols,
-                  "lg:[&>div]:px-[min(2.2vw,36px)]",
-                  "lg:[&>div:not(:first-child)]:border-l lg:[&>div:not(:first-child)]:border-l-white/20",
-                )}
-              >
-                {stats.map((stat, index) => (
-                  <AnimatedStat
-                    key={`${stat.label || stat.value || index}`}
-                    index={index}
-                    stat={stat}
-                    isActive={isInView}
-                    prefersReducedMotion={prefersReducedMotion}
-                  />
-                ))}
-              </dl>
+                <dl
+                  className={cn(
+                    "grid w-full gap-y-[clamp(18px,3.2vh,26px)] gap-x-[clamp(16px,3vw,36px)]",
+                    "text-center place-items-center",
+                    gridCols,
+                    "lg:[&>div]:px-[min(2.2vw,36px)]",
+                    "lg:[&>div:not(:first-child)]:border-l lg:[&>div:not(:first-child)]:border-l-white/20",
+                  )}
+                >
+                  {stats.map((stat, index) => (
+                    <AnimatedStat
+                      key={`${stat.label || stat.value || index}`}
+                      index={index}
+                      stat={stat}
+                      isActive={isInView}
+                      prefersReducedMotion={prefersReducedMotion}
+                    />
+                  ))}
+                </dl>
               </div>
             </motion.div>
           ) : null}

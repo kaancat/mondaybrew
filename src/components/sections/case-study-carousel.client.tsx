@@ -83,7 +83,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
 
   const prefersReduced = useMemo(() =>
     typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  []);
+    []);
 
   // Arrow chunk scroll (nudge)
   const [canPrev, setCanPrev] = useState(false);
@@ -123,11 +123,11 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           {eyebrow ? (
             <div className="eyebrow text-xs uppercase tracking-[0.25em] text-[color:var(--eyebrow-color,currentColor)] mb-2">{eyebrow}</div>
           ) : null}
-          <h2 className="font-semibold text-foreground break-words">
+          <h2 className="text-foreground break-words">
             {headlineText || "Our work"}
           </h2>
           {intro ? (
-            <p className="mt-2 max-w-prose text-sm text-muted-foreground">{intro}</p>
+            <p className="mt-2 max-w-prose body-text">{intro}</p>
           ) : null}
         </div>
         {exploreHref && (
@@ -251,7 +251,7 @@ function CaseCard({ item }: { item: CaseStudy }) {
           </div>
         )}
         <div className="text-foreground text-[1.25rem] font-semibold leading-snug">{item.title}</div>
-        {item.excerpt && <p className="text-muted-foreground mt-2 text-sm leading-relaxed line-clamp-3">{item.excerpt}</p>}
+        {item.excerpt && <p className="body-text mt-2 line-clamp-3">{item.excerpt}</p>}
       </div>
     </a>
   );
@@ -271,7 +271,7 @@ function VideoAuto({ src, poster }: { src: string; poster?: string }) {
       if (!el) return;
       if (entry.isIntersecting) {
         el.muted = true;
-        el.play().catch(() => {});
+        el.play().catch(() => { });
       } else {
         el.pause();
       }

@@ -73,10 +73,10 @@ export function TextImageClient({
     };
 
     return (
-        <div ref={sectionRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-start">
+        <div ref={sectionRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center min-h-[500px]">
             {/* Text Content - All animated together as one block */}
             <motion.div
-                className={cn("flex flex-col h-full relative", textOrder)}
+                className={cn("flex flex-col h-full justify-center relative", textOrder)}
                 {...animateText}
             >
                 {/* Decorative gradient blur orb in background */}
@@ -84,40 +84,39 @@ export function TextImageClient({
 
                 {/* Vertical accent bar - matching eyebrow style */}
                 <div className="absolute -left-8 top-0 bottom-0 hidden md:flex items-center pointer-events-none">
-                    <div className="h-full w-[2px] bg-[color:var(--mb-accent)]" />
+                    <div className="h-full w-[1px] bg-[color:var(--mb-accent)] opacity-40" />
                 </div>
 
-                {/* Eyebrow - Small yellow label */}
-                {eyebrow && (
-                    <div className="mb-4 w-fit">
+                {/* Text content - tightly spaced */}
+                <div className="flex flex-col gap-3">
+                    {/* Eyebrow - Small yellow label */}
+                    {eyebrow && (
                         <span className="eyebrow">
                             {eyebrow}
                         </span>
-                    </div>
-                )}
+                    )}
 
-                {/* Title - Large and Bold */}
-                {title && (
-                    <h2 className="mb-3">
-                        {title}
-                    </h2>
-                )}
+                    {/* Title - Large and Bold */}
+                    {title && (
+                        <h2 className="text-[color:var(--foreground)]">
+                            {title}
+                        </h2>
+                    )}
 
-                {/* Body Text - Normal size and weight */}
-                {body && (
-                    <p className="body-text mb-8">
-                        {body}
-                    </p>
-                )}
+                    {/* Body Text - Normal size and weight */}
+                    {body && (
+                        <p className="body-text">
+                            {body}
+                        </p>
+                    )}
 
-                {/* CTA Button - Pushed to bottom to align with image */}
-                {cta && (
-                    <div className="mt-auto">
-                        <Button asChild variant={cta.variant} size="lg">
+                    {/* CTA Button */}
+                    {cta && (
+                        <Button asChild variant={cta.variant} size="lg" className="self-start">
                             <Link href={cta.href}>{cta.label}</Link>
                         </Button>
-                    </div>
-                )}
+                    )}
+                </div>
             </motion.div>
 
             {/* Image */}

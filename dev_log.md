@@ -1,5 +1,104 @@
 # Dev Log
 
+## [2025-10-21] – Text and Image Component (Phase 1: Frontend Design)
+**Goal**: Create a new flexible text-and-image section component for the homepage
+
+### Component Overview
+Built a reusable `TextImageSection` component that displays text content alongside an image with configurable placement.
+
+### Features Implemented
+**Layout & Positioning:**
+- ✅ Supports both left and right image placement (configurable via `imagePosition` prop)
+- ✅ Flexible, responsive images with 5px rounded corners (matches design system)
+- ✅ Proper container spacing using existing layout components (`Section`, `Container`)
+- ✅ Text always left-aligned; position relative to image controlled by placement setting
+
+**Content Structure:**
+- ✅ **Title**: Large, bold text using `--font-h2` CSS variable
+- ✅ **Subheading**: Medium size, semibold text using `--font-h3`
+- ✅ **Body**: Normal text size with proper line height using `--font-body`
+- ✅ **CTA Button**: Optional call-to-action with variant support (default, secondary, outline, ghost, link)
+
+**Responsive Design:**
+- ✅ Desktop: Text and image side-by-side (2-column grid)
+- ✅ Tablet/Mobile: Image always below text (stacked layout)
+- ✅ Responsive image sizing with proper aspect ratios
+- ✅ Maintains readability across all screen sizes
+
+**Visual Style:**
+- ✅ Matches existing section design patterns
+- ✅ Uses theme CSS variables for colors and typography
+- ✅ Proper vertical rhythm with `vr-section` spacing
+- ✅ Support for LQIP (Low Quality Image Placeholder) blur effect
+- ✅ Next.js Image optimization with responsive `sizes` attribute
+
+### Files Created
+1. **`src/components/sections/text-image.tsx`** - Server component with Sanity data mapping
+   - Type definitions for Sanity image assets
+   - Data resolution functions (image, CTA, button variants)
+   - Type guard for section identification
+2. **`src/components/sections/text-image.client.tsx`** - Client component for rendering
+   - Dynamic grid ordering based on image position
+   - Responsive layout logic
+   - Image component with blur placeholder support
+
+### Files Modified
+- **`src/app/page.tsx`**: 
+  - Added component imports and type definitions
+  - Integrated into homepage section rendering
+  - Added temporary test instance with placeholder data (to be removed once in Sanity)
+
+### Test Implementation
+Added temporary hardcoded section with:
+- Placeholder text: "Empowering Brands Through Strategic Innovation"
+- Stock image from Unsplash
+- Left-side image placement
+- Primary CTA button linking to `/om-os`
+- Positioned directly after ServicesSplit section
+
+### Technical Details
+**Type Safety:**
+- Full TypeScript support with proper type guards
+- Sanity data types mapped to resolved client types
+- Button variant validation with allowed values set
+
+**Performance:**
+- Uses Next.js `Image` component for optimization
+- Lazy loading with priority=false
+- Responsive image sizes: `(max-width: 768px) 100vw, 50vw`
+- LQIP blur placeholder support
+
+**Design System Compliance:**
+- Uses existing `Section` and `Container` layout components
+- Leverages CSS custom properties from theme
+- Matches typography scale and spacing tokens
+- Compatible with existing vertical rhythm system
+
+### Next Steps (Phase 2: Sanity Integration)
+- [ ] Create Sanity schema for `textImage` section type
+- [ ] Add schema to homepage sections array
+- [ ] Configure image upload settings
+- [ ] Add to Sanity Studio structure
+- [ ] Test content editing in CMS
+- [ ] Remove temporary hardcoded test data
+- [ ] Document usage in Sanity for team members
+
+### Why This Approach
+Split implementation into two phases:
+1. **Frontend First**: Design and test the component visually with placeholder data
+2. **CMS Integration**: Once design is approved, wire it up to Sanity for content management
+
+This allows for rapid iteration on design without needing to rebuild CMS schemas repeatedly.
+
+### Impact
+- ✅ New flexible content block for marketing/editorial pages
+- ✅ Reusable across different pages (homepage, about, services, etc.)
+- ✅ Maintains design consistency with existing sections
+- ✅ Easy for non-technical team members to use once in Sanity
+- ✅ No breaking changes to existing components
+
+---
+
 ## [2025-10-20] – Fix Sanity Webhook Revalidation
 Goal: Make Sanity webhooks properly revalidate navbar and all content instantly
 

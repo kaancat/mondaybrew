@@ -40,18 +40,18 @@ export type NavbarMegaGroup = {
 
 export type NavbarSection =
   | {
-      kind: "link";
-      label: string;
-      href?: string;
-    }
+    kind: "link";
+    label: string;
+    href?: string;
+  }
   | {
-      kind: "mega";
-      label: string;
-      groups: NavbarMegaGroup[];
-      megaMenuHeadline?: string;
-      megaMenuDescription?: string;
-      featuredCases?: HeroFeatureDisplayItem[];
-    };
+    kind: "mega";
+    label: string;
+    groups: NavbarMegaGroup[];
+    megaMenuHeadline?: string;
+    megaMenuDescription?: string;
+    featuredCases?: HeroFeatureDisplayItem[];
+  };
 
 export type NavbarBrand = {
   title: string;
@@ -119,7 +119,7 @@ function MegaMenuTrigger({
       <button
         type="button"
         className={cn(
-          "inline-flex items-center gap-1 rounded-[6px] bg-transparent px-3 py-1.5 text-sm font-medium text-[color:var(--nav-link-text)] transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]",
+          "inline-flex items-center gap-1 rounded-[6px] bg-transparent px-3 py-1.5 text-sm font-normal text-[color:var(--nav-link-text)] transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]",
           isOpen && "bg-[color:var(--nav-link-hover-bg)]"
         )}
       >
@@ -129,7 +129,7 @@ function MegaMenuTrigger({
           transition={{ duration: 0.3 }}
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </motion.div>
       </button>
@@ -429,301 +429,301 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
   return (
     <>
-    <header ref={headerRef} className="fixed inset-x-0 top-2 sm:top-3 md:top-4 z-50">
-      <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          {/* Mobile header: brand + hamburger inside glass shell */}
-          <div className={cn(menuShell, "flex items-center justify-between px-5 py-1.5 md:py-2.5 md:hidden")}
-            aria-label="Mobile header"
-          >
-            <Link href="/" className="inline-flex items-center">
-              {(() => {
-                const chosen = isLightAlt
-                  ? brand.logoLight ?? brand.logo ?? brand.logoDark
-                  : brand.logoDark ?? brand.logo ?? brand.logoLight;
-                if (chosen?.url) {
-                  return (
-                    <Image
-                      src={chosen.url}
-                      alt={chosen.alt || brand.title}
-                      width={chosen.width ?? 150}
-                      height={chosen.height ?? 32}
-                      className="h-6 w-auto"
-                      priority
-                    />
-                  );
-                }
-                return <span className="text-sm font-semibold">{brand.title}</span>;
-              })()}
-            </Link>
+      <header ref={headerRef} className="fixed inset-x-0 top-2 sm:top-3 md:top-4 z-50">
+        <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            {/* Mobile header: brand + hamburger inside glass shell */}
+            <div className={cn(menuShell, "flex items-center justify-between px-5 py-1.5 md:py-2.5 md:hidden")}
+              aria-label="Mobile header"
+            >
+              <Link href="/" className="inline-flex items-center">
+                {(() => {
+                  const chosen = isLightAlt
+                    ? brand.logoLight ?? brand.logo ?? brand.logoDark
+                    : brand.logoDark ?? brand.logo ?? brand.logoLight;
+                  if (chosen?.url) {
+                    return (
+                      <Image
+                        src={chosen.url}
+                        alt={chosen.alt || brand.title}
+                        width={chosen.width ?? 150}
+                        height={chosen.height ?? 32}
+                        className="h-6 w-auto"
+                        priority
+                      />
+                    );
+                  }
+                  return <span className="text-sm font-normal">{brand.title}</span>;
+                })()}
+              </Link>
 
-            <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
-              <SheetTrigger asChild>
-                <button
-                  type="button"
-                  aria-label="Open menu"
-                  className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+              <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
+                <SheetTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Open menu"
+                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                  >
+                    <Menu className="size-[18px]" aria-hidden="true" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent
+                  side="left"
+                  hideCloseButton
+                  className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
                 >
-                  <Menu className="size-[18px]" aria-hidden="true" />
-                </button>
-              </SheetTrigger>
-              <SheetContent
-                side="left"
-                hideCloseButton
-                className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
-              >
-                {/* Accessibility: satisfy Radix requirements without changing visuals */}
-                <SheetTitle className="sr-only">Menu</SheetTitle>
-                <SheetDescription className="sr-only">Site navigation</SheetDescription>
-                <div className="flex h-full w-full items-stretch">
-                  <div className="mobile-nav-inner flex h-full min-h-0 w-[var(--mobile-nav-width)] flex-col px-6 py-8">
-                    {/* Header with close button */}
-                    <div className="flex items-center justify-between pb-5 shrink-0">
-                      <div className="flex flex-col">
-                        <span className="text-[11px] font-medium uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
+                  {/* Accessibility: satisfy Radix requirements without changing visuals */}
+                  <SheetTitle className="sr-only">Menu</SheetTitle>
+                  <SheetDescription className="sr-only">Site navigation</SheetDescription>
+                  <div className="flex h-full w-full items-stretch">
+                    <div className="mobile-nav-inner flex h-full min-h-0 w-[var(--mobile-nav-width)] flex-col px-6 py-8">
+                      {/* Header with close button */}
+                      <div className="flex items-center justify-between pb-5 shrink-0">
+                        <div className="flex flex-col">
+                          <span className="text-[11px] font-normal uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
+                        </div>
+                        <SheetClose asChild>
+                          <button
+                            type="button"
+                            aria-label="Luk menu"
+                            className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                          >
+                            <X className="size-[18px]" aria-hidden="true" />
+                            <span className="sr-only">Luk</span>
+                          </button>
+                        </SheetClose>
                       </div>
-                      <SheetClose asChild>
-                        <button
-                          type="button"
-                          aria-label="Luk menu"
-                          className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                        >
-                          <X className="size-[18px]" aria-hidden="true" />
-                          <span className="sr-only">Luk</span>
-                        </button>
-                      </SheetClose>
-                    </div>
-                    
-                    {/* Scrollable menu content */}
-                    <div className="mobile-nav-scroll no-scrollbar flex-1 min-h-0 overflow-y-auto pt-2">
-                      {mobileOpen && (
-                        <motion.div
-                          className="space-y-7"
-                          initial="hidden"
-                          animate="show"
-                          variants={mobileMenuVariants}
-                        >
-                        {megaSections.map((section) => (
-                          <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
-                            <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                              {section.label}
-                            </motion.h2>
-                            <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                              {section.groups.flatMap((group) =>
-                                group.items.map((item) => {
-                                  const href = item.href ?? "#";
-                                  const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                                  return (
-                                    <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
-                                      <Link
-                                        href={href}
-                                        className={cn(
-                                          "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
-                                          active
-                                            ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                            : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                        )}
-                                      >
-                                        <span>{item.label}</span>
-                                        <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
-                                      </Link>
-                                    </motion.li>
-                                  );
-                                }),
-                              )}
-                            </motion.ul>
-                          </motion.section>
-                        ))}
-                        {simpleLinks.length ? (
-                          <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
-                            <motion.h2 variants={mobileItemVariants} className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                              Mere
-                            </motion.h2>
-                            <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                              {simpleLinks.map((link) => {
-                                const href = link.href ?? "#";
-                                const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                                return (
-                                  <motion.li key={link.label} variants={mobileItemVariants}>
-                                    <Link
-                                      href={href}
-                                      className={cn(
-                                        "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
-                                        active
-                                          ? "text-[color:var(--mobile-nav-text)] font-semibold"
-                                          : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                      )}
-                                    >
-                                      {link.label}
-                                    </Link>
-                                  </motion.li>
-                                );
-                              })}
-                            </motion.ul>
-                          </motion.section>
-                        ) : null}
-                        </motion.div>
-                      )}
-                    </div>
 
-                    {/* Fixed bottom action buttons */}
-                    <div className="mt-auto pt-6 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] shrink-0 space-y-3">
-                      <Link
-                        href={ctaHref}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-semibold text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                      >
-                        <span>{ctaLabel}</span>
-                        <ArrowRight className="size-[16px]" aria-hidden="true" />
-                      </Link>
-                      <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
-                        <button
-                          type="button"
-                          onClick={() => setTheme(nextThemeId)}
-                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                        >
-                          {themeIcon}
-                          <span>Skift tema</span>
-                        </button>
+                      {/* Scrollable menu content */}
+                      <div className="mobile-nav-scroll no-scrollbar flex-1 min-h-0 overflow-y-auto pt-2">
+                        {mobileOpen && (
+                          <motion.div
+                            className="space-y-7"
+                            initial="hidden"
+                            animate="show"
+                            variants={mobileMenuVariants}
+                          >
+                            {megaSections.map((section) => (
+                              <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
+                                <motion.h2 variants={mobileItemVariants} className="text-sm font-normal uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                                  {section.label}
+                                </motion.h2>
+                                <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                                  {section.groups.flatMap((group) =>
+                                    group.items.map((item) => {
+                                      const href = item.href ?? "#";
+                                      const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                                      return (
+                                        <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
+                                          <Link
+                                            href={href}
+                                            className={cn(
+                                              "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                              active
+                                                ? "text-[color:var(--mobile-nav-text)] font-normal"
+                                                : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                            )}
+                                          >
+                                            <span>{item.label}</span>
+                                            <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                                          </Link>
+                                        </motion.li>
+                                      );
+                                    }),
+                                  )}
+                                </motion.ul>
+                              </motion.section>
+                            ))}
+                            {simpleLinks.length ? (
+                              <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
+                                <motion.h2 variants={mobileItemVariants} className="text-sm font-normal uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
+                                  Mere
+                                </motion.h2>
+                                <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
+                                  {simpleLinks.map((link) => {
+                                    const href = link.href ?? "#";
+                                    const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                                    return (
+                                      <motion.li key={link.label} variants={mobileItemVariants}>
+                                        <Link
+                                          href={href}
+                                          className={cn(
+                                            "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
+                                            active
+                                              ? "text-[color:var(--mobile-nav-text)] font-normal"
+                                              : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                          )}
+                                        >
+                                          {link.label}
+                                        </Link>
+                                      </motion.li>
+                                    );
+                                  })}
+                                </motion.ul>
+                              </motion.section>
+                            ) : null}
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Fixed bottom action buttons */}
+                      <div className="mt-auto pt-6 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] shrink-0 space-y-3">
                         <Link
-                          href={localeConfig.href}
-                          className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          href={ctaHref}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-normal text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
                         >
-                          <Globe className="size-[16px]" aria-hidden="true" />
-                          <span>{localeConfig.target}</span>
+                          <span>{ctaLabel}</span>
+                          <ArrowRight className="size-[16px]" aria-hidden="true" />
                         </Link>
+                        <div className="flex items-center justify-between text-[13px] text-[color:var(--mobile-nav-muted)]">
+                          <button
+                            type="button"
+                            onClick={() => setTheme(nextThemeId)}
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                          >
+                            {themeIcon}
+                            <span>Skift tema</span>
+                          </button>
+                          <Link
+                            href={localeConfig.href}
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          >
+                            <Globe className="size-[16px]" aria-hidden="true" />
+                            <span>{localeConfig.target}</span>
+                          </Link>
+                        </div>
                       </div>
                     </div>
+                    <SheetClose asChild>
+                      <button type="button" tabIndex={-1} aria-hidden="true" className="flex-1 bg-transparent" />
+                    </SheetClose>
                   </div>
-                  <SheetClose asChild>
-                    <button type="button" tabIndex={-1} aria-hidden="true" className="flex-1 bg-transparent" />
-                  </SheetClose>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+                </SheetContent>
+              </Sheet>
+            </div>
 
-          {/* Desktop header */}
-  <div
-    ref={desktopNavRef}
-    className={cn(menuShell, "desktop-nav-shell relative hidden md:flex items-center gap-5 px-5 py-2.5")}
-  >
-    <Link href="/" className="inline-flex items-center shrink-0">
-      {(() => {
-        const chosen = isLightAlt
-          ? brand.logoLight ?? brand.logo ?? brand.logoDark
-                  : brand.logoDark ?? brand.logo ?? brand.logoLight;
-                if (chosen?.url) {
-                  return (
-                    <Image
-                      src={chosen.url}
-                      alt={chosen.alt || brand.title}
-                      width={chosen.width ?? 150}
-                      height={chosen.height ?? 32}
-                      className="h-6 w-auto"
-                      priority
-                    />
-                  );
-                }
-        return <span className="text-sm font-semibold">{brand.title}</span>;
-      })()}
-    </Link>
-    <NavigationMenu
-      viewport={false}
-      className="hidden md:flex w-full max-w-none flex-1 items-center justify-start gap-4 text-[color:var(--nav-link-text)]"
-    >
-      <NavigationMenuList className="justify-start gap-2 text-sm font-medium" role="menubar">
-        {sections.map((section) => {
-          if (section.kind === "mega") {
-            const isOpen = openMegaMenu === section.label;
-            const content = (
-              <DesktopMegaMenu
-                label={section.label}
-                groups={section.groups}
-                featuredCases={section.featuredCases || []}
-                megaMenuHeadline={section.megaMenuHeadline}
-                megaMenuDescription={section.megaMenuDescription}
-              />
-            );
-
-            return (
-              <MegaMenuTrigger
-                key={section.label}
-                label={section.label}
-                isOpen={isOpen}
-                onMouseEnter={() => handleMegaMenuOpen(section.label, content)}
-                onMouseLeave={handleMegaMenuClose}
-              />
-            );
-          }
-
-          const href = section.href ?? "#";
-          const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-          return (
-            <NavigationMenuItem key={section.label} className="md:static">
-              <NavigationMenuLink asChild active={active} className="rounded-[6px] px-3 py-1.5 transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]">
-                <Link
-                  href={href}
-                  className={cn(
-                    "whitespace-nowrap",
-                    isLightAlt
-                      ? "underline-offset-[3px] hover:underline"
-                      : active
-                        ? "font-semibold"
-                        : undefined,
-                  )}
-                >
-                  {section.label}
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          );
-        })}
-      </NavigationMenuList>
-      <NavigationMenuIndicator className="hidden md:flex" />
-    </NavigationMenu>
-  </div>
-
-          <div className="hidden md:flex flex-wrap items-center gap-2 px-0 py-0 sm:gap-3 md:flex-nowrap md:justify-end md:pl-4">
-            {(() => {
-              return (
-                <button
-                  type="button"
-                  onClick={() => setTheme(nextThemeId)}
-                  className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent px-2 py-1.5 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                  aria-label={`Switch to ${nextTheme.label}`}
-                >
-                  {themeIcon}
-                </button>
-              );
-            })()}
-            <Link
-              href={ctaHref}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-1.5 text-xs font-semibold text-[color:var(--nav-cta-text)] transition-colors hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+            {/* Desktop header */}
+            <div
+              ref={desktopNavRef}
+              className={cn(menuShell, "desktop-nav-shell relative hidden md:flex items-center gap-5 px-5 py-2.5")}
             >
-              <span>{ctaLabel}</span>
-              <ArrowRight className="size-[16px]" aria-hidden="true" />
-            </Link>
-            <Link
-              href={localeConfig.href}
-              className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-locale-border)] bg-transparent px-3 py-1.5 text-xs font-semibold text-[color:var(--nav-locale-text)] transition-colors hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-            >
-              <Globe className="size-[16px]" aria-hidden="true" />
-              <span>{localeConfig.active}</span>
-            </Link>
+              <Link href="/" className="inline-flex items-center shrink-0">
+                {(() => {
+                  const chosen = isLightAlt
+                    ? brand.logoLight ?? brand.logo ?? brand.logoDark
+                    : brand.logoDark ?? brand.logo ?? brand.logoLight;
+                  if (chosen?.url) {
+                    return (
+                      <Image
+                        src={chosen.url}
+                        alt={chosen.alt || brand.title}
+                        width={chosen.width ?? 150}
+                        height={chosen.height ?? 32}
+                        className="h-6 w-auto"
+                        priority
+                      />
+                    );
+                  }
+                  return <span className="text-sm font-normal">{brand.title}</span>;
+                })()}
+              </Link>
+              <NavigationMenu
+                viewport={false}
+                className="hidden md:flex w-full max-w-none flex-1 items-center justify-start gap-4 text-[color:var(--nav-link-text)]"
+              >
+                <NavigationMenuList className="justify-start gap-2 text-sm font-normal" role="menubar">
+                  {sections.map((section) => {
+                    if (section.kind === "mega") {
+                      const isOpen = openMegaMenu === section.label;
+                      const content = (
+                        <DesktopMegaMenu
+                          label={section.label}
+                          groups={section.groups}
+                          featuredCases={section.featuredCases || []}
+                          megaMenuHeadline={section.megaMenuHeadline}
+                          megaMenuDescription={section.megaMenuDescription}
+                        />
+                      );
+
+                      return (
+                        <MegaMenuTrigger
+                          key={section.label}
+                          label={section.label}
+                          isOpen={isOpen}
+                          onMouseEnter={() => handleMegaMenuOpen(section.label, content)}
+                          onMouseLeave={handleMegaMenuClose}
+                        />
+                      );
+                    }
+
+                    const href = section.href ?? "#";
+                    const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                    return (
+                      <NavigationMenuItem key={section.label} className="md:static">
+                        <NavigationMenuLink asChild active={active} className="rounded-[6px] px-3 py-1.5 transition hover:bg-[color:var(--nav-link-hover-bg)] hover:text-[color:var(--nav-link-hover-text)]">
+                          <Link
+                            href={href}
+                            className={cn(
+                              "whitespace-nowrap",
+                              isLightAlt
+                                ? "underline-offset-[3px] hover:underline"
+                                : active
+                                  ? "font-normal"
+                                  : undefined,
+                            )}
+                          >
+                            {section.label}
+                          </Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    );
+                  })}
+                </NavigationMenuList>
+                <NavigationMenuIndicator className="hidden md:flex" />
+              </NavigationMenu>
+            </div>
+
+            <div className="hidden md:flex flex-wrap items-center gap-2 px-0 py-0 sm:gap-3 md:flex-nowrap md:justify-end md:pl-4">
+              {(() => {
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setTheme(nextThemeId)}
+                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent px-2 py-1.5 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                    aria-label={`Switch to ${nextTheme.label}`}
+                  >
+                    {themeIcon}
+                  </button>
+                );
+              })()}
+              <Link
+                href={ctaHref}
+                className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-1.5 text-xs font-normal text-[color:var(--nav-cta-text)] transition-colors hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+              >
+                <span>{ctaLabel}</span>
+                <ArrowRight className="size-[16px]" aria-hidden="true" />
+              </Link>
+              <Link
+                href={localeConfig.href}
+                className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-locale-border)] bg-transparent px-3 py-1.5 text-xs font-normal text-[color:var(--nav-locale-text)] transition-colors hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+              >
+                <Globe className="size-[16px]" aria-hidden="true" />
+                <span>{localeConfig.active}</span>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    {/* Shared mega menu dropdown - rendered outside header for proper positioning */}
-    <SharedMegaMenuDropdown
-      isOpen={!!openMegaMenu}
-      content={megaMenuContent}
-      contentKey={openMegaMenu}
-      desktopNavRef={desktopNavRef}
-      onMouseEnter={cancelMegaMenuClose}
-      onMouseLeave={handleMegaMenuClose}
-    />
-  </>
+      {/* Shared mega menu dropdown - rendered outside header for proper positioning */}
+      <SharedMegaMenuDropdown
+        isOpen={!!openMegaMenu}
+        content={megaMenuContent}
+        contentKey={openMegaMenu}
+        desktopNavRef={desktopNavRef}
+        onMouseEnter={cancelMegaMenuClose}
+        onMouseLeave={handleMegaMenuClose}
+      />
+    </>
   );
 }
