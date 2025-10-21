@@ -829,6 +829,13 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
     position: relative;
     padding-block: var(--section-padding);
   }
+  
+  /* Reduce top padding on mobile */
+  @media (max-width: 767px) {
+    .layout-section {
+      padding-top: 1rem;
+    }
+  }
 
   .layout-section-sm {
     padding-block: var(--section-padding-sm);
