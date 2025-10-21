@@ -78,10 +78,10 @@
   --hero-offset: 140px;
   --hero-bottom-gap: 72px;
 
-  --section-padding: clamp(2.5rem, 8vw, 6.5rem);
-  --section-padding-sm: clamp(2rem, 6vw, 4.5rem);
-  --section-padding-lg: clamp(3rem, 10vw, 8rem);
-  --flow-space: clamp(1rem, 3vw, 2.5rem);
+  --section-padding: clamp(1.5rem, 8vw, 6.5rem);
+  --section-padding-sm: clamp(1.25rem, 6vw, 4.5rem);
+  --section-padding-lg: clamp(2rem, 10vw, 8rem);
+  --flow-space: clamp(0.75rem, 3vw, 2.5rem);
 
   /* Vertical rhythm tokens */
   /* Slightly tighter on mobile */
