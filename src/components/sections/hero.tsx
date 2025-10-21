@@ -241,8 +241,8 @@ export function HeroSection({
   const justifyMd = alignment === "start" ? "md:justify-start" : alignment === "end" ? "md:justify-end" : "md:justify-center";
 
   const hasFeature = featureItems.length > 0;
-  // Adjust safe padding for the featured card footprint on mobile (shorter card)
-  const mobileFeaturePad = hasFeature ? "pb-[140px] sm:pb-[220px] md:pb-10" : "";
+  // Adjust safe padding for the featured card footprint on mobile (compact 2-column layout)
+  const mobileFeaturePad = hasFeature ? "pb-[180px] sm:pb-[200px] md:pb-10" : "";
 
   return (
     <Section
@@ -283,9 +283,9 @@ export function HeroSection({
         </div>
 
         <div
-          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-24 pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
+          className={`relative z-10 flex h-full flex-col ${hasFeature ? 'justify-start md:justify-between' : `justify-start ${justifyMd}`} ${contentGap} px-6 pt-24 pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
         >
-          <div className="max-w-2xl text-white">
+          <div className="max-w-2xl text-white flex-shrink-0">
             {eyebrow ? (
               <span className="eyebrow mb-4 block text-sm font-medium text-[color:var(--eyebrow-color,currentColor)]">
                 {eyebrow}
