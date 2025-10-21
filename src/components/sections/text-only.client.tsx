@@ -62,12 +62,12 @@ export function TextOnlyClient({
                 {/* Mobile title section - shown only on small screens */}
                 <div className="md:hidden mb-8 flex flex-col gap-4">
                     {eyebrow && (
-                        <span className="eyebrow text-xs uppercase tracking-[0.25em] text-[color:var(--mb-accent)] font-medium block">
+                        <span className="eyebrow block">
                             {eyebrow}
                         </span>
                     )}
                     {title && (
-                        <h3 className="font-display text-2xl font-bold leading-tight tracking-tight text-[color:var(--foreground)]">
+                        <h3 className="text-2xl">
                             {title}
                         </h3>
                     )}
@@ -82,17 +82,17 @@ export function TextOnlyClient({
                     <div className="hidden md:flex flex-col gap-4">
                         {/* Eyebrow - Small label */}
                         {eyebrow && (
-                            <span className="eyebrow text-xs uppercase tracking-[0.25em] text-[color:var(--mb-accent)] font-medium block">
+                            <span className="eyebrow block">
                                 {eyebrow}
                             </span>
                         )}
 
-                        {/* Title - Smaller size for left column */}
-                        {title && (
-                            <h3 className="font-display text-2xl md:text-3xl font-bold leading-tight tracking-tight text-[color:var(--foreground)]">
-                                {title}
-                            </h3>
-                        )}
+                {/* Title - Smaller size for left column */}
+                {title && (
+                    <h3 className="text-2xl md:text-3xl">
+                        {title}
+                    </h3>
+                )}
                     </div>
 
                     {/* Right column - Body text and CTA */}
@@ -102,7 +102,7 @@ export function TextOnlyClient({
 
                         {/* Body text - offset to align with title */}
                         {body && (
-                            <p className="text-[color:var(--foreground)]/70 mt-8">
+                            <p className="mt-8">
                                 {body}
                             </p>
                         )}

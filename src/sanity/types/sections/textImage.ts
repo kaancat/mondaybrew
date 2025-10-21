@@ -18,12 +18,6 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
-            name: "subheading",
-            title: "Subheading",
-            type: "string",
-            description: "Optional subheading below the title",
-        }),
-        defineField({
             name: "body",
             title: "Body text",
             type: "text",

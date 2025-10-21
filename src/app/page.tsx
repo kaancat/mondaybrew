@@ -136,7 +136,6 @@ export default async function Home() {
     _key: "test-text-image",
     eyebrow: "OUR APPROACH",
     title: "Empowering Brands Through Strategic Innovation",
-    subheading: "Data-Driven Solutions for Modern Businesses",
     body: "We combine cutting-edge technology with creative storytelling to deliver exceptional results. Our team of experts works collaboratively to transform your vision into reality, ensuring every touchpoint resonates with your audience and drives measurable growth. From initial strategy to final execution, we focus on creating meaningful connections that not only capture attention but also convert prospects into loyal customers. Our approach is built on deep market research, continuous optimization, and a commitment to delivering ROI that exceeds expectations. We believe in the power of data-informed creativity, where insights drive innovation and results speak for themselves.",
     imagePosition: "left",
     image: {

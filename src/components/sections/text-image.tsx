@@ -18,7 +18,6 @@ type SanityImageAsset = {
 export type TextImageSectionData = {
     eyebrow?: string | null;
     title?: string | null;
-    subheading?: string | null;
     body?: string | null;
     image?: SanityImageAsset;
     imagePosition?: "left" | "right" | null;
@@ -41,7 +40,6 @@ const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "gho
 export function TextImageSection({
     eyebrow,
     title,
-    subheading,
     body,
     image,
     imagePosition,
@@ -55,7 +53,6 @@ export function TextImageSection({
             <TextImageClient
                 eyebrow={eyebrow?.trim()}
                 title={title?.trim()}
-                subheading={subheading?.trim()}
                 body={body?.trim()}
                 image={resolvedImage}
                 imagePosition={position}

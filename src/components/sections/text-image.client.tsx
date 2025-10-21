@@ -18,7 +18,6 @@ export type TextImageResolvedImage = {
 type TextImageClientProps = {
     eyebrow?: string;
     title?: string;
-    subheading?: string;
     body?: string;
     image: TextImageResolvedImage | null;
     imagePosition: "left" | "right";
@@ -42,7 +41,6 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 export function TextImageClient({
     eyebrow,
     title,
-    subheading,
     body,
     image,
     imagePosition,
@@ -92,7 +90,7 @@ export function TextImageClient({
                 {/* Eyebrow - Small yellow label */}
                 {eyebrow && (
                     <div className="mb-4 w-fit">
-                        <span className="eyebrow text-xs uppercase tracking-[0.25em] text-[color:var(--mb-accent)] font-medium">
+                        <span className="eyebrow">
                             {eyebrow}
                         </span>
                     </div>
@@ -100,21 +98,14 @@ export function TextImageClient({
 
                 {/* Title - Large and Bold */}
                 {title && (
-                    <h2 className="font-display text-[length:var(--font-h2)] font-bold leading-tight tracking-tight text-[color:var(--foreground)] mb-3">
+                    <h2 className="mb-3">
                         {title}
                     </h2>
                 )}
 
-                {/* Subheading - Medium size, less bold */}
-                {subheading && (
-                    <h3 className="font-body text-[length:var(--font-h3)] font-semibold leading-snug text-[color:var(--foreground)]/90 mb-6">
-                        {subheading}
-                    </h3>
-                )}
-
                 {/* Body Text - Normal size and weight */}
                 {body && (
-                    <p className="font-body text-[length:var(--font-body)] leading-relaxed text-[color:var(--foreground)]/70 mb-8">
+                    <p className="mb-8">
                         {body}
                     </p>
                 )}
