@@ -164,7 +164,6 @@ export default async function Home() {
     _key: "test-text-only",
     eyebrow: "OUR PHILOSOPHY",
     title: "Building lasting partnerships",
-    subheading: "Quality-driven partnerships",
     body: "We believe in creating long-term partnerships with our clients, where success is measured not just by deliverables, but by the lasting impact we create together. Our approach combines strategic thinking with hands-on execution, ensuring that every project we undertake drives real business value. Through continuous collaboration and transparent communication, we transform ambitious visions into digital realities that stand the test of time. From the initial discovery phase through design, development, and beyond, we maintain an unwavering commitment to quality and innovation. Our team brings together decades of combined experience in digital strategy, user experience design, and cutting-edge development practices. We don't just build products—we build relationships that foster mutual growth and long-term success.",
     cta: {
       label: "Start Your Project",
