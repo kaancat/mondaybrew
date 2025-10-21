@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/shared/json-ld";
 import { jsonLd } from "@/lib/jsonld";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import TokenDump from "@/components/dev/token-dump.client";
+import { NavDebug } from "@/components/dev/nav-debug";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body className={`${sailec.variable} ${heywow.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
           {process.env.NEXT_PUBLIC_DUMP_TOKENS === "1" ? <TokenDump /> : null}
+          <NavDebug />
           <JsonLd
             id="org-jsonld"
             data={jsonLd.organization({

@@ -30,6 +30,28 @@ type SanityNavigationSection = {
     description?: string;
     items?: SanityNavigationLink[];
   }>;
+  megaMenuHeadline?: string;
+  megaMenuDescription?: string;
+  featuredCases?: Array<{
+    _id?: string;
+    title?: string;
+    client?: string;
+    excerpt?: string;
+    slug?: string;
+    media?: {
+      image?: {
+        image?: {
+          asset?: {
+            url?: string;
+            metadata?: {
+              lqip?: string;
+            };
+          };
+        };
+        alt?: string;
+      };
+    };
+  }>;
 };
 
 type SanityLogo = {
@@ -90,10 +112,29 @@ function mapSections(sections?: SanityNavigationSection[]): NavbarSection[] {
     .map((section) => {
       const kind = section.variant === "mega" ? "mega" : section.variant === "link" ? "link" : "link";
       if (kind === "mega") {
+        // Map featured cases from Sanity
+        const featuredCases = (section.featuredCases || [])
+          .filter((caseStudy) => caseStudy && caseStudy.title)
+          .map((caseStudy) => ({
+            key: caseStudy._id || "",
+            title: caseStudy.title,
+            excerpt: caseStudy.excerpt,
+            href: `/cases/${caseStudy.slug}`,
+            metaLabel: caseStudy.client || "CASE STUDY",
+            image: caseStudy.media?.image?.image?.asset ? {
+              url: caseStudy.media.image.image.asset.url,
+              alt: caseStudy.media.image.alt || caseStudy.title,
+              lqip: caseStudy.media.image.image.asset.metadata?.lqip,
+            } : null,
+          }));
+
         return {
           kind,
           label: section.title ?? "",
           groups: mapGroups(section.groups),
+          megaMenuHeadline: section.megaMenuHeadline,
+          megaMenuDescription: section.megaMenuDescription,
+          featuredCases,
         } satisfies NavbarSection;
       }
 
@@ -150,12 +191,23 @@ export async function Navbar() {
   const brand = mapBrand(settings);
   const cta = mapCta(settings?.headerCta);
 
+  // Debug data for development
+  const debugData = {
+    settings: settings,
+    sections: sections,
+    megaSections: sections.filter(s => s.kind === 'mega'),
+    hasMegaMenu: sections.some(s => s.kind === 'mega'),
+  };
+
   return (
-    <NavbarClient
-      brand={brand}
-      sections={sections}
-      cta={cta}
-      locales={{ available: ["da", "en"], defaultLocale: DEFAULT_LOCALE }}
-    />
+    <>
+      <div data-nav-debug={JSON.stringify(debugData)} style={{ display: 'none' }} />
+      <NavbarClient
+        brand={brand}
+        sections={sections}
+        cta={cta}
+        locales={{ available: ["da", "en"], defaultLocale: DEFAULT_LOCALE }}
+      />
+    </>
   );
 }
