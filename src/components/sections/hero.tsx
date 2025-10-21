@@ -283,7 +283,7 @@ export function HeroSection({
         </div>
 
         <div
-          className={`relative z-10 flex h-full flex-col ${hasFeature ? 'justify-start md:justify-between' : `justify-start ${justifyMd}`} ${contentGap} px-6 pt-24 pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
+          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-24 pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
         >
           <div className="max-w-2xl text-white flex-shrink-0">
             {eyebrow ? (
