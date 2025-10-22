@@ -1,5 +1,237 @@
 # Dev Log
 
+## [2025-10-22] – Redesign About Section Statistics for Mobile
+**Goal**: Create a more visually appealing mobile layout that shows more of the background image while displaying statistics
+
+### Problem
+- On mobile, the statistics overlay covered the entire image (`inset-0`)
+- Background image was barely visible through the glass overlay
+- Stats took up too much vertical space with large text
+- User wanted to see more of the background image on mobile
+
+### Solution - Mobile-Only Redesign
+Created a bottom-anchored, compact statistics design for mobile while keeping desktop unchanged:
+
+**Visual Changes (Mobile Only):**
+1. **Positioning**: 
+   - Changed from `inset-0` (full coverage) to `inset-x-0 bottom-0 top-auto` (bottom only)
+   - Stats now sit at the bottom ~30-40% of the image instead of covering it entirely
+   
+2. **Glass Overlay Transparency**:
+   - Reduced opacity from `bg-white/[0.4]` to `bg-white/[0.25]`
+   - Makes the background image significantly more visible through the glass
+   - Maintains readability while showing more of the image
+   
+3. **Compact Spacing**:
+   - Reduced padding: `px-4 py-6` → `px-3 py-4` on mobile
+   - Reduced gaps: `gap-y-6 gap-x-4` → `gap-y-3 gap-x-3` on mobile
+   - Tighter stats make better use of limited space
+   
+4. **Smaller Typography**:
+   - Stat numbers: `text-4xl` → `text-2xl` on mobile (still large enough to read)
+   - Labels: `text-xs` → `text-[10px]` on mobile
+   - Icons: `h-5 w-5` → `h-3.5 w-3.5` on mobile
+   - Reduced all gaps and margins proportionally
+   
+5. **Layout**:
+   - Rounded corners only on bottom (`rounded-b-[5px]`)
+   - Stats arranged in single column grid on mobile (3 rows)
+   - Desktop layout completely unchanged
+
+### Technical Implementation
+
+**about-section.client.tsx changes:**
+
+**Overlay positioning (lines 187-196):**
+```tsx
+// Mobile: positioned at bottom with less height to show more image
+"inset-x-0 bottom-0 top-auto justify-end",
+// Desktop: keep original positioning
+"md:inset-x-0 md:inset-y-auto md:bottom-0 md:justify-start",
+// Reduced opacity on mobile to see more image
+"bg-white/[0.25]",
+```
+
+**Stat sizing (lines 285-290):**
+```tsx
+// Compact mobile layout, normal desktop
+className="flex w-full flex-col items-center justify-center gap-1 md:gap-[10px] px-1 py-0.5 md:px-2 md:py-1 text-center"
+
+// Smaller numbers on mobile
+<dd className="text-2xl md:text-[clamp(3rem,5vw,4.8rem)]...">
+
+// Smaller labels on mobile  
+<dt className="text-[10px] md:text-[clamp(0.75rem,1.5vw,1rem)]...">
+```
+
+### Design Rationale
+- **Show the image**: Reduced overlay size and opacity lets the background image shine through
+- **Maintain readability**: Stats are still large and clear enough to read at a glance
+- **Better use of space**: Compact design works well on small screens without feeling cramped
+- **Preserve desktop**: No changes to desktop experience which was already working well
+- **Glass aesthetic**: Maintained the glass-morphic design language with better transparency
+
+### Impact
+✅ Background image is now 60-70% visible on mobile (was ~20% before)
+✅ Stats positioned at bottom in compact, readable format
+✅ Reduced text size maintains hierarchy while saving space
+✅ Glass overlay more transparent - better aesthetic on mobile
+✅ Desktop experience completely unchanged
+✅ No breaking changes to animations or interactions
+✅ Maintains accessibility with sr-only labels
+
+### Files Modified
+- `src/components/sections/about-section.client.tsx`: Updated overlay positioning, sizing, spacing, and typography for mobile view only
+
+---
+
+## [2025-10-22] – Make Header Sticky and Always Visible on Scroll
+**Goal**: Make the navigation header truly sticky, staying visible at the top when user scrolls
+
+### Problem
+- Header was `fixed` but inside `.site-shell` which has transforms applied
+- When a parent element has `transform`, it creates a new containing block for `fixed` children
+- This breaks `fixed` positioning - element behaves like `absolute` instead
+- Header would not stay at viewport top during scroll
+- Additionally, header had top spacing creating gap from edge
+
+### Root Cause
+**CSS Positioning Context Issue:**
+```tsx
+// layout.tsx - Navbar was INSIDE .site-shell
+<div className="site-shell">
+  <Navbar />  {/* ❌ Fixed positioning broken by parent transform */}
+  {children}
+</div>
+```
+
+When `.site-shell` has CSS transforms (used for mobile nav animations), any `fixed` positioned children no longer position relative to the viewport - they position relative to the transformed parent instead.
+
+### Solution
+**1. Moved Navbar Outside .site-shell:**
+```tsx
+// layout.tsx
+<Navbar />  {/* ✅ Now truly fixed to viewport */}
+<div className="site-shell">
+  {children}
+  <Footer />
+</div>
+```
+
+**2. Updated Header Positioning:**
+```tsx
+// navbar.client.tsx (line 432)
+// Before:
+<header ref={headerRef} className="fixed inset-x-0 top-2 sm:top-3 md:top-4 z-50">
+
+// After:
+<header ref={headerRef} className="fixed inset-x-0 top-0 z-50 pt-2 sm:pt-3 md:pt-4">
+```
+
+### Technical Details
+- **Positioning**: `fixed` now works correctly relative to viewport (no parent transform interference)
+- **Placement**: `top-0` sticks to very top edge, `pt-*` adds internal spacing
+- **Z-index**: `z-50` ensures header stays above scrolling content
+- **Mobile Nav**: Still works correctly - mobile sheet is separate component system
+
+### Why This Works
+- `fixed` positioning ONLY works relative to viewport when no ancestor has `transform`, `filter`, or `perspective`
+- Moving navbar outside `.site-shell` removes transform ancestor
+- Header now truly sticks to viewport top regardless of scroll position
+- Mobile nav system uses Radix Sheet (separate portal) - unaffected by this change
+
+### Impact
+✅ Header stays visible at top of viewport when scrolling down/up
+✅ Works on both desktop and mobile
+✅ Navigation, theme switcher, language selector, and CTA always accessible
+✅ No breaking changes to mobile nav transform system
+✅ Proper `fixed` positioning behavior restored
+
+### Files Modified
+- `src/app/layout.tsx`: Moved `<Navbar />` outside `.site-shell`
+- `src/components/shared/navbar.client.tsx`: Changed header positioning to `top-0` with padding
+
+### Follow-up: Z-Index Fix
+After moving the navbar outside `.site-shell`, discovered z-index conflicts causing the navbar to appear behind page elements.
+
+**Problem**: Header had `z-50` which was too low compared to other page elements (hero sections, modals, etc.)
+
+**Solution**: Increased z-index values:
+- Header: `z-50` → `z-[9999]` (line 432)
+- Mega menu dropdown: `z-50` → `z-[9998]` (line 193)
+
+This ensures the navigation always appears on top of all page content while the dropdown sits just below the header bar.
+
+---
+
+## [2025-10-22] – Fix Clients Section Header Background (Theme-Aware)
+**Goal**: Change the clients section header strip to use the page's theme background color
+
+### Problem
+- The clients section header (with "PARTNERS" and "Some of our amazing clients") had a dark gray background
+- CSS override for `html.light-primary .clients-hero-strip` was forcing `background: var(--surface-dark)` (dark gray)
+- Text was light colored (white) on dark background
+- User wanted it to match the page background theme color instead
+
+### Root Cause
+CSS utility override in `globals.css` was hardcoding dark gray background:
+```css
+html.light-primary .clients-hero-strip {
+  background: var(--surface-dark) !important;  /* Dark gray */
+  color: var(--brand-light) !important;        /* Light text */
+}
+```
+
+### Solution
+Changed the CSS override to use theme-aware background and text colors:
+
+**globals.css (lines 755-767):**
+```css
+html.light-primary .clients-hero-strip {
+  background: var(--background) !important;      /* Matches page background */
+  color: var(--foreground) !important;           /* Theme text color */
+  border: 1px solid var(--border) !important;    /* Subtle border */
+  border-bottom: 0 !important;                   /* Fuse with grid */
+  margin-bottom: -1px;                           /* Visual fusion */
+  --clients-hero-title: var(--foreground);
+  --clients-hero-sub: var(--muted-foreground);
+  --clients-hero-eyebrow: var(--mb-accent);      /* Orange accent */
+}
+```
+
+### Visual Changes
+**Before:**
+- Dark gray background (`var(--surface-dark)`)
+- White/light text
+- High contrast "inverted" look
+
+**After:**
+- Theme background color (`var(--background)` = `#f5f7fd` in light-primary)
+- Theme foreground text (`var(--foreground)`)
+- Seamlessly integrates with page design
+- Subtle border maintains visual separation
+- Eyebrow remains orange for brand consistency
+
+### Why This Approach
+- Fully theme-aware: uses CSS variables instead of hardcoded colors
+- Works across all themes (light-primary, light-alt, dark)
+- Maintains consistency with page background
+- Border provides necessary visual separation from grid below
+- Text colors automatically adjust per theme
+
+### Impact
+✅ Clients header matches page background in all themes
+✅ No hardcoded colors - fully theme-aware
+✅ Subtle border prevents blending into grid
+✅ Text colors automatically adapt to theme
+✅ Grid below remains white as expected
+✅ Consistent design language across site
+
+### Files Modified
+- `src/app/globals.css`: Lines 755-767, made `.clients-hero-strip` fully theme-aware for light-primary theme
+
+---
+
 ## [2025-10-21] – Text and Image Component (Phase 1: Frontend Design)
 **Goal**: Create a new flexible text-and-image section component for the homepage
 

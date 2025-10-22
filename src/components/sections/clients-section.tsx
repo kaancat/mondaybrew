@@ -37,8 +37,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
         <div
           className={cn(
             "clients-hero-strip rounded-none shadow-[var(--shadow-elevated-md)]",
-            "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)]",
-            "dark:!bg-[color:var(--accent)] dark:!text-[color:var(--accent-foreground)]",
+            "bg-background text-foreground",
             "px-6 py-[20px]",
             "relative overflow-hidden",
           )}
@@ -46,14 +45,14 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           {/* Left-aligned copy */}
           <div className="max-w-[56ch] pr-10">
             {eyebrow ? (
-              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-[color:var(--clients-hero-eyebrow,currentColor)]">
+              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-accent">
                 {eyebrow.toUpperCase()}
               </p>
             ) : null}
             {headline ? (
               <h2
                 id="clients-heading"
-                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-[color:var(--clients-hero-title,inherit)]"
+                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-foreground"
               >
                 {headline}
               </h2>
@@ -63,7 +62,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
                 className={cn(
                   "mt-3 text-[15px]/[1.6]",
                   // Use theme-driven variable so we can tune per mode
-                  "text-[color:var(--clients-hero-sub,color-mix(in_oklch,var(--accent-foreground)_78%,white_22%))]",
+                  "text-muted-foreground",
                 )}
               >
                 {subheading}
@@ -94,8 +93,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
         <div
           className={cn(
             "clients-hero-strip rounded-[5px] shadow-[var(--shadow-elevated-md)]",
-            "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)]",
-            "dark:!bg-[color:var(--accent)] dark:!text-[color:var(--accent-foreground)]",
+            "bg-background text-foreground",
             "px-10 py-20 lg:px-12 lg:py-24",
             "relative overflow-hidden",
           )}
@@ -103,14 +101,14 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           {/* Left-aligned copy */}
           <div className="max-w-[56ch] pr-10">
             {eyebrow ? (
-              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-[color:var(--clients-hero-eyebrow,currentColor)]">
+              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-accent">
                 {eyebrow.toUpperCase()}
               </p>
             ) : null}
             {headline ? (
               <h2
                 id="clients-heading"
-                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-[color:var(--clients-hero-title,inherit)]"
+                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-foreground"
               >
                 {headline}
               </h2>
@@ -120,7 +118,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
                 className={cn(
                   "mt-3 text-[15px]/[1.6]",
                   // Use theme-driven variable so we can tune per mode
-                  "text-[color:var(--clients-hero-sub,color-mix(in_oklch,var(--accent-foreground)_78%,white_22%))]",
+                  "text-muted-foreground",
                 )}
               >
                 {subheading}
@@ -131,7 +129,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           {/* Optional geometric line art (subtle, trivial) */}
           <svg
             aria-hidden
-            className="pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 hidden md:block opacity-30"
+            className="hidden"
             width="140"
             height="120"
             viewBox="0 0 140 120"

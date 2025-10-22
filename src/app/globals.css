@@ -752,13 +752,13 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
 }
 
 @layer utilities {
-  /* Clients/Partners: primary theme uses dark grey card like Services */
+  /* Clients/Partners: primary theme uses page background color */
   html.light-primary .clients-hero-strip {
-    background: var(--surface-dark) !important;
-    color: var(--brand-light) !important;
-    /* Title and subheading tones on dark grey */
-    --clients-hero-title: color-mix(in oklch, var(--brand-light) 94%, black 6%);
-    --clients-hero-sub: color-mix(in oklch, var(--brand-light) 76%, black 24%);
+    background: var(--background) !important;
+    color: var(--foreground) !important;
+    /* Title and subheading tones */
+    --clients-hero-title: var(--foreground);
+    --clients-hero-sub: var(--muted-foreground);
     /* Eyebrow follows brand orange in Primary */
     --clients-hero-eyebrow: var(--mb-accent);
   }
@@ -849,6 +849,10 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
     margin-left: var(--full-bleed-inline-start) !important;
     margin-right: var(--full-bleed-inline-end) !important;
     transition: margin var(--nav-anim-duration) var(--nav-anim-ease), width var(--nav-anim-duration) var(--nav-anim-ease);
+  }
+  /* Allow full-bleed children to have rounded corners individually */
+  .full-bleed > * {
+    border-radius: 0;
   }
 
   body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {

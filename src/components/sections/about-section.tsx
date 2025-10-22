@@ -57,6 +57,16 @@ const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "gho
 
 export function AboutSection({ eyebrow, headline, subheading, mainImage, stats, cta }: AboutSectionData) {
   const image = resolveImage(mainImage);
+  // Allow easy override from environment or static public file during design tweaks
+  // Prefer explicit envs; fall back to a common dev filename in public/ if present.
+  // Examples: "/statistics_billede.png" or any absolute URL.
+  const overrideUrl =
+    process.env.NEXT_PUBLIC_ABOUT_IMAGE_URL?.trim() ||
+    process.env.ABOUT_IMAGE_URL?.trim() ||
+    (process.env.NODE_ENV !== "production" ? "/statistics_billede.png" : undefined);
+  const mergedImage: AboutSectionResolvedImage | null = overrideUrl
+    ? { url: overrideUrl, alt: image?.alt ?? "About image", lqip: image?.lqip, width: image?.width, height: image?.height }
+    : image;
   const sanitizedStats = (stats ?? []).reduce<AboutSectionResolvedStat[]>((acc, stat) => {
     const value = stat?.value?.trim();
     const label = stat?.label?.trim();
@@ -74,7 +84,7 @@ export function AboutSection({ eyebrow, headline, subheading, mainImage, stats, 
         eyebrow={eyebrow?.trim()}
         headline={headline?.trim()}
         subheading={subheading?.trim()}
-        image={image}
+        image={mergedImage}
         stats={sanitizedStats}
         cta={buildCta(cta)}
       />

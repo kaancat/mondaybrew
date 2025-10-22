@@ -50,8 +50,8 @@ export default function RootLayout({
             })}
           />
           <GA />
+          <Navbar />
           <div className="site-shell">
-            <Navbar />
             {children}
             <Footer />
           </div>
