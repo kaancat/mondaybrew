@@ -23,7 +23,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
 
   return (
     <section aria-labelledby="clients-heading" className="group/clients">
-      <div className="layout-container">
+      <div className="md:layout-container">
         <div
           className={cn(
             "clients-hero-strip rounded-none md:rounded-[5px] shadow-[var(--shadow-elevated-md)]",
