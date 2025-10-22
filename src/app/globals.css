@@ -133,13 +133,17 @@
   --mobile-nav-secondary-border: var(--mobile-nav-border);
   --mobile-nav-secondary-hover-bg: color-mix(in oklch, var(--mb-ink) 18%, transparent);
 
-  /* Clients section tokens (desktop + mobile) */
-  --clients-hero-bg: var(--mb-accent);
-  --clients-hero-text: var(--brand-light);
-  --clients-hero-eyebrow: color-mix(in oklch, var(--brand-light) 88%, white 12%);
-  --clients-hero-muted: color-mix(in oklch, var(--brand-light) 82%, var(--mb-bg) 18%);
-  --clients-hero-graphic: color-mix(in oklch, var(--brand-light) 28%, transparent);
-  --clients-grid-bg: var(--mb-bg);
+  /* Default Services tokens (Primary theme) */
+  --services-card-bg: var(--mb-ink); /* dark card on Primary */
+  --services-ink-strong: #0a0a0a; /* retain for Light-Alt usage */
+
+  /* Clients section tokens (follow services card style) */
+  --clients-hero-bg: var(--services-card-bg);
+  --clients-hero-text: var(--mb-bg);
+  --clients-hero-eyebrow: color-mix(in oklch, var(--mb-bg) 85%, var(--surface-dark) 15%);
+  --clients-hero-muted: color-mix(in oklch, var(--mb-bg) 78%, var(--mb-ink) 22%);
+  --clients-hero-graphic: color-mix(in oklch, var(--mb-bg) 18%, transparent);
+  --clients-grid-bg: var(--services-card-bg);
 }
 
 @supports (height: 100dvh) {
@@ -472,13 +476,13 @@ html.dark {
   --mobile-nav-link: color-mix(in oklch, white 84%, var(--surface-base) 16%);
   --mobile-nav-overlay: rgba(8, 6, 18, 0.3);
 
-  /* Clients section (Dark) */
-  --clients-hero-bg: color-mix(in oklch, var(--surface-dark) 78%, var(--mb-accent) 22%);
-  --clients-hero-text: var(--brand-light);
-  --clients-hero-eyebrow: color-mix(in oklch, var(--brand-light) 85%, white 15%);
-  --clients-hero-muted: color-mix(in oklch, var(--brand-light) 72%, var(--surface-base) 28%);
-  --clients-hero-graphic: color-mix(in oklch, var(--brand-light) 22%, transparent);
-  --clients-grid-bg: color-mix(in oklch, var(--surface-dark) 70%, var(--surface-base) 30%);
+  /* Clients section (Dark) — follow services card (light card on dark canvas) */
+  --clients-hero-bg: var(--services-card-bg);
+  --clients-hero-text: var(--services-ink-strong);
+  --clients-hero-eyebrow: var(--mb-accent);
+  --clients-hero-muted: color-mix(in oklch, var(--services-ink-strong) 72%, white 28%);
+  --clients-hero-graphic: color-mix(in oklch, var(--services-ink-strong) 12%, transparent);
+  --clients-grid-bg: var(--services-card-bg);
 }
 
 @media (min-width: 1920px) {
@@ -800,19 +804,20 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
 
 @layer utilities {
   /* Clients/Partners: primary theme uses page background color */
-  html.light-primary .clients-hero-strip {
-    background: var(--background) !important;
-    color: var(--foreground) !important;
+html.light-primary .clients-hero-strip {
+    /* Follow services card style on Primary (dark card) */
+    background: var(--services-card-bg) !important;
+    color: var(--mb-bg) !important;
     /* Title and subheading tones */
-    --clients-hero-title: var(--foreground);
-    --clients-hero-sub: var(--muted-foreground);
-    /* Eyebrow follows brand orange in Primary */
-    --clients-hero-eyebrow: var(--mb-accent);
+    --clients-hero-title: var(--mb-bg);
+    --clients-hero-sub: color-mix(in oklch, var(--mb-bg) 80%, var(--mb-ink) 20%);
+    /* Eyebrow: subtle light tint on dark card */
+    --clients-hero-eyebrow: color-mix(in oklch, var(--mb-bg) 85%, var(--surface-dark) 15%);
   }
   /* Clients/Partners: dark theme eyebrow should be brand orange */
   html.dark .clients-hero-strip { --clients-hero-eyebrow: var(--mb-accent); }
   /* Clients/Partners: dark mode title should use house grey, not pure black */
-  html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--services-ink-strong) 72%, white 28%); }
+html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--services-ink-strong) 80%, white 20%); }
   /* About section: Light-Alt theme now uses default see-through glass effect */
   html.light-alt .about-stats-label {
     /* Labels should be strict black in Light-Alt */
