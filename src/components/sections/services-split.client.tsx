@@ -389,7 +389,7 @@ export function ServicesSplit({
                   "full-bleed rounded-none p-0 md:rounded-[5px] md:p-6",
                   isLightAlt
                     ? "md:border md:border-[color:color-mix(in oklch,var(--services-ink-strong)_10%,white_90%)] bg-white text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
-                    : "md:border md:border-[color:color-mix(in oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
+                    : "bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
                 )}
               >
                 {renderMedia(activeService.media, isLightAlt)}
@@ -541,11 +541,11 @@ export function ServicesSplit({
                 exit="hidden"
                 variants={detailVariants}
                 className={cn(
-                  // Desktop: padded card with border/radius
+                  // Desktop: padded card; no border in Primary/Dark
                   "rounded-[5px] p-6",
                   isLightAlt
                     ? "border border-[color:color-mix(in oklch,var(--services-ink-strong)_10%,white_90%)] bg-white text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
-                    : "border border-[color:color-mix(in oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
+                    : "bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
                 )}
               >
                 {renderMedia(activeService.media, isLightAlt)}
