@@ -578,8 +578,8 @@ function RowMobile({ items }: { items: TCard[] }) {
   }, [items]);
 
   return (
-    <div
-      className="overflow-x-scroll scrollbar-none -mx-[var(--container-gutter)]"
+    <div 
+      className="overflow-x-scroll scrollbar-none"
       style={{
         WebkitOverflowScrolling: "touch"
       }}
@@ -604,7 +604,7 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
       {/* Mobile scrollable rows (desktop unchanged) */}
-      <div className="md:hidden flex flex-col gap-4 pb-2 justify-start" style={{ height: "auto", minHeight: "400px" }}>
+      <div className="md:hidden flex flex-col gap-4 pb-2 justify-start -mx-[var(--container-gutter)]" style={{ height: "auto", minHeight: "400px" }}>
         <RowMobile items={top} />
         <RowMobile items={bottom} />
       </div>
