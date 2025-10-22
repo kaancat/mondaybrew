@@ -980,10 +980,9 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
     transition: none !important;
   }
 
-  /* Mobile only: when menu is open, hide the fixed header so it doesn't cover the sheet */
+  /* Mobile only: hide header only while menu is fully open; show it during exiting for instant return */
   @media (max-width: 767px) {
-    body[data-mobile-nav-open="true"] header[class*="fixed"],
-    body[data-mobile-nav-open="true"][data-nav-phase="exiting"] header[class*="fixed"] {
+    body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) header[class*="fixed"] {
       display: none !important;
     }
   }
