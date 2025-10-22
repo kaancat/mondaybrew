@@ -449,18 +449,6 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
 
   const directionFactor = direction === -1 ? -1 : 1;
 
-  const trackStyle = useMemo<CSSProperties | undefined>(() => {
-    if (prefersReducedMotion || !totalWidth) return undefined;
-    const distance = totalWidth;
-    const duration = (distance / (speed * 20)) * 10; // tune speed
-    return {
-      animationName: directionFactor === 1 ? "marquee-slide" : "marquee-slide-rev",
-      animationDuration: `${duration}s`,
-      animationTimingFunction: "linear",
-      animationIterationCount: "infinite",
-    } satisfies CSSProperties;
-  }, [prefersReducedMotion, totalWidth, speed, directionFactor]);
-
   useLayoutEffect(() => {
     const refresh = () => {
       const node = trackRef.current;
@@ -521,13 +509,25 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     [dragOffset],
   );
 
-  const animatedTrackStyle = useMemo<CSSProperties | undefined>(() => {
-    if (!trackStyle) return undefined;
-    return {
-      ...trackStyle,
-      animationPlayState: isInteracting ? "paused" : "running",
-    } satisfies CSSProperties;
-  }, [trackStyle, isInteracting]);
+  // Drive marquee with requestAnimationFrame for robust infinite loop (no CSS keyframe drift)
+  useLayoutEffect(() => {
+    if (prefersReducedMotion || !totalWidth) return;
+    let rafId: number | null = null;
+    let last = performance.now();
+    const pxPerSec = speed * 20; // tune speed similar to legacy
+    const step = (now: number) => {
+      const dt = Math.max(0, (now - last) / 1000);
+      last = now;
+      if (!isInteracting) {
+        setDragOffset((v) => wrapOffset(v - directionFactor * pxPerSec * dt));
+      }
+      rafId = requestAnimationFrame(step);
+    };
+    rafId = requestAnimationFrame(step);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapOffset]);
 
   return (
     <div ref={viewportRef} className={cn("relative overflow-hidden", prefersReducedMotion && "no-scrollbar overflow-x-auto")}
@@ -539,7 +539,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       style={{ touchAction: "pan-y" }}
     >
       <div className="flex py-2" style={wrapperStyle}>
-        <div className={cn("flex w-max", !prefersReducedMotion && setWidth ? "marquee-track" : undefined)} style={animatedTrackStyle}>
+        <div className={cn("flex w-max")}> 
           {clones.map((_, idx) => (
             <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex" aria-hidden={idx > 0}>
               {normalizedItems.map((card, i) => (
