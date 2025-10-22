@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { heywow, sailec } from "@/fonts";
@@ -22,6 +22,13 @@ export const metadata: Metadata = {
   },
   description: "Digital agency in Denmark specializing in websites, webapps, and PPC.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://mondaybrew-website.vercel.app"),
+};
+
+// Ensure proper safe-area handling on iOS (enables env(safe-area-*))
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
