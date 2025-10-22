@@ -598,7 +598,9 @@ function RowMobile({ items }: { items: TCard[] }) {
         WebkitOverflowScrolling: "touch", 
         touchAction: "pan-x" as const,
         scrollBehavior: "smooth",
-        overscrollBehavior: "contain"
+        overscrollBehavior: "contain",
+        overflowX: "auto",
+        overflowY: "hidden"
       }}
     >
       <div className="flex gap-4 px-0 py-2" style={{ width: "max-content" }}>
@@ -621,7 +623,7 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
       {/* Mobile scroll-snap variant (desktop unchanged) */}
-      <div className="md:hidden flex flex-col gap-4 pb-2">
+      <div className="md:hidden flex flex-col gap-4 pb-2" style={{ height: "auto", minHeight: "400px" }}>
         <RowMobile items={top} />
         <RowMobile items={bottom} />
       </div>
