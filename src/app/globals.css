@@ -980,23 +980,11 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
     transition: none !important;
   }
 
-  /* Mobile only: Fade out navbar when sidebar opens, fade back in when it closes */
+  /* Mobile only: when menu is open, hide the fixed header so it doesn't cover the sheet */
   @media (max-width: 767px) {
-    /* Keep header visible; do not fade it during mobile menu */
-    body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) header[class*="fixed"] {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    
-    /* During exit, fade back in */
+    body[data-mobile-nav-open="true"] header[class*="fixed"],
     body[data-mobile-nav-open="true"][data-nav-phase="exiting"] header[class*="fixed"] {
-      opacity: 1;
-    }
-    
-    /* Default state: visible */
-    body:not([data-mobile-nav-open]) header[class*="fixed"] {
-      opacity: 1;
-      transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1);
+      display: none !important;
     }
   }
   /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
