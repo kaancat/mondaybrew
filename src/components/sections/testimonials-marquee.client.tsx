@@ -597,12 +597,17 @@ function RowMobile({ items }: { items: TCard[] }) {
       style={{ 
         WebkitOverflowScrolling: "touch", 
         touchAction: "pan-x" as const,
-        scrollBehavior: "smooth"
+        scrollBehavior: "smooth",
+        minHeight: "400px"
       }}
     >
-      <div className="flex gap-4 px-0 py-2" style={{ width: "max-content" }}>
+      <div className="flex gap-4 px-0 py-2" style={{ width: "max-content", minWidth: "200vw" }}>
         {normalizedItems.map((card, i) => (
           <CardMobile key={i} card={card} />
+        ))}
+        {/* Add duplicate items to ensure scrolling */}
+        {normalizedItems.map((card, i) => (
+          <CardMobile key={`dup-${i}`} card={card} />
         ))}
       </div>
     </div>
