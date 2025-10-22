@@ -357,11 +357,11 @@ export function ServicesSplitLightAlt({
                 animate="visible"
                 exit="hidden"
                 variants={detailVariants}
-                className="rounded-[5px] bg-[color:var(--services-card-bg)] p-6 text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
+                className="full-bleed rounded-none p-0 md:rounded-[5px] md:p-6 bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
               >
                 {renderMedia(activeService.media)}
 
-                <div className="mt-6 flex flex-col gap-4">
+                <div className="mt-6 flex flex-col gap-4 px-5 pb-5 md:px-0 md:pb-0">
                   <header className="space-y-3">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--services-ink-strong)]">
                       {activeTab.label}
@@ -398,7 +398,7 @@ export function ServicesSplitLightAlt({
 }
 
 function renderMedia(media?: ServicesSplitMedia | null) {
-  const wrapperClasses = "relative w-full overflow-hidden rounded-[5px] bg-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--mb-ink)_10%)]";
+  const wrapperClasses = "relative w-full overflow-hidden rounded-none md:rounded-[5px] bg-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--mb-ink)_10%)]";
   const heightClasses = "h-[clamp(340px,40vh,500px)]";
 
   if (!media) {

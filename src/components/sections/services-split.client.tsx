@@ -383,7 +383,7 @@ export function ServicesSplit({
                 exit="hidden"
                 variants={detailVariants}
                 className={cn(
-                  "rounded-[5px] p-6",
+                  "full-bleed rounded-none p-0 md:rounded-[5px] md:p-6",
                   isLightAlt
                     ? "border border-[color:color-mix(in oklch,var(--services-ink-strong)_10%,white_90%)] bg-white text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
                     : "border border-[color:color-mix(in oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
@@ -391,7 +391,7 @@ export function ServicesSplit({
               >
                 {renderMedia(activeService.media, isLightAlt)}
 
-                <div className="mt-6 flex flex-col gap-4">
+                <div className="mt-6 flex flex-col gap-4 px-5 pb-5 md:px-0 md:pb-0">
                   <header className="space-y-3">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:color-mix(in oklch,var(--mb-bg)_75%,var(--mb-ink)_25%)]">
                       {activeTab.label}
@@ -433,8 +433,8 @@ export function ServicesSplit({
 
 function renderMedia(media: ServicesSplitMedia | null | undefined, isLightAlt: boolean) {
   const wrapperClasses = isLightAlt
-    ? "relative w-full overflow-hidden rounded-[5px] bg-black/[0.04]"
-    : "relative w-full overflow-hidden rounded-[5px] bg-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--mb-ink)_10%)]";
+    ? "relative w-full overflow-hidden rounded-none md:rounded-[5px] bg-black/[0.04]"
+    : "relative w-full overflow-hidden rounded-none md:rounded-[5px] bg-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--mb-ink)_10%)]";
   const heightClasses = "h-[clamp(340px,40vh,500px)]";
 
   if (!media) {
