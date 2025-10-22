@@ -267,7 +267,7 @@ export function ServicesSplit({
 
   return (
     <section className={cn("py-[10px] md:py-24", className)}>
-      <Container className="edge-to-edge grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
+      <Container className="grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
         <div className="flex flex-col">
           {eyebrow ? (
             <span className="eyebrow text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--eyebrow-color,currentColor)]">
@@ -383,10 +383,11 @@ export function ServicesSplit({
                 exit="hidden"
                 variants={detailVariants}
                 className={cn(
+                  // Mobile: full-bleed, no outer border to avoid edge lines; Desktop: padded card with border/radius
                   "full-bleed rounded-none p-0 md:rounded-[5px] md:p-6",
                   isLightAlt
-                    ? "border border-[color:color-mix(in oklch,var(--services-ink-strong)_10%,white_90%)] bg-white text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
-                    : "border border-[color:color-mix(in oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
+                    ? "md:border md:border-[color:color-mix(in oklch,var(--services-ink-strong)_10%,white_90%)] bg-white text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
+                    : "md:border md:border-[color:color-mix(in oklch,var(--mb-ink)_70%,var(--mb-bg)_30%)] bg-[color:var(--mb-ink)] text-[color:var(--mb-bg)] shadow-[var(--shadow-elevated-lg)]",
                 )}
               >
                 {renderMedia(activeService.media, isLightAlt)}
@@ -433,8 +434,8 @@ export function ServicesSplit({
 
 function renderMedia(media: ServicesSplitMedia | null | undefined, isLightAlt: boolean) {
   const wrapperClasses = isLightAlt
-    ? "relative w-full overflow-hidden rounded-none md:rounded-[5px] bg-black/[0.04]"
-    : "relative w-full overflow-hidden rounded-none md:rounded-[5px] bg-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--mb-ink)_10%)]";
+    ? "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[2px] bg-[color:var(--services-card-bg)]"
+    : "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[2px] bg-[color:var(--mb-ink)]";
   const heightClasses = "h-[clamp(340px,40vh,500px)]";
 
   if (!media) {

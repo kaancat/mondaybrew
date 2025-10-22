@@ -243,7 +243,7 @@ export function ServicesSplitLightAlt({
 
   return (
     <section className={cn("py-[10px] md:py-24", className)}>
-      <Container className="edge-to-edge grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
+      <Container className="grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
         <div className="flex flex-col">
           {eyebrow ? (
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--foreground)_78%,white_22%)]">
@@ -398,7 +398,7 @@ export function ServicesSplitLightAlt({
 }
 
 function renderMedia(media?: ServicesSplitMedia | null) {
-  const wrapperClasses = "relative w-full overflow-hidden rounded-none md:rounded-[5px] bg-[color:color-mix(in_oklch,var(--mb-bg)_90%,var(--mb-ink)_10%)]";
+  const wrapperClasses = "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[2px] bg-[color:var(--services-card-bg)]";
   const heightClasses = "h-[clamp(340px,40vh,500px)]";
 
   if (!media) {
