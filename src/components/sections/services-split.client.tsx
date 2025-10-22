@@ -592,8 +592,8 @@ export function ServicesSplit({
 
 function renderMedia(media: ServicesSplitMedia | null | undefined, isLightAlt: boolean) {
   const wrapperClasses = isLightAlt
-    ? "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[2px] bg-[color:var(--services-card-bg)]"
-    : "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[2px] bg-[color:var(--mb-ink)]";
+    ? "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[3px] md:p-[2px] bg-[color:var(--services-card-bg)]"
+    : "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[3px] md:p-[2px] bg-[color:var(--mb-ink)]";
   const heightClasses = "h-[clamp(340px,40vh,500px)]";
 
   if (!media) {

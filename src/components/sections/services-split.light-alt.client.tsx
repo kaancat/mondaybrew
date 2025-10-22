@@ -530,7 +530,7 @@ export function ServicesSplitLightAlt({
 }
 
 function renderMedia(media?: ServicesSplitMedia | null) {
-  const wrapperClasses = "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[2px] bg-[color:var(--services-card-bg)]";
+  const wrapperClasses = "relative w-full overflow-hidden rounded-none md:rounded-[5px] p-[3px] md:p-[2px] bg-[color:var(--services-card-bg)]";
   const heightClasses = "h-[clamp(340px,40vh,500px)]";
 
   if (!media) {
