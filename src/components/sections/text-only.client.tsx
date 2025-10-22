@@ -56,7 +56,7 @@ export function TextOnlyClient({
         >
             <div className="relative">
                 {/* Mobile title section - shown only on small screens */}
-                <div className="md:hidden mb-8 flex flex-col gap-4">
+                <div className="md:hidden mb-4 flex flex-col gap-3">
                     {eyebrow && (
                         <span className="eyebrow block">
                             {eyebrow}
@@ -69,8 +69,8 @@ export function TextOnlyClient({
                     )}
                 </div>
 
-                {/* Horizontal divider line */}
-                <div className="w-full border-b border-[color:color-mix(in_oklch,var(--foreground)_18%,var(--background)_82%)] mb-12" />
+                {/* Horizontal divider line - hidden on mobile, shown on desktop */}
+                <div className="hidden md:block w-full border-b border-[color:color-mix(in_oklch,var(--foreground)_18%,var(--background)_82%)] mb-12" />
 
                 {/* Two column layout */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-start">
@@ -98,7 +98,7 @@ export function TextOnlyClient({
 
                         {/* Body text - offset to align with title */}
                         {body && (
-                            <p className="body-text mt-8">
+                            <p className="body-text mt-0 md:mt-8">
                                 {body}
                             </p>
                         )}

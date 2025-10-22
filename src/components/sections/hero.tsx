@@ -284,7 +284,7 @@ export function HeroSection({
         </div>
 
         <div
-          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-[88px] pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
+          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-[120px] pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
         >
           <div className="max-w-2xl text-white flex-shrink-0 space-y-4 md:space-y-0">
             {eyebrow ? (

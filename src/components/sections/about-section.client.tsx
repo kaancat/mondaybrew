@@ -95,10 +95,10 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
 
   const gridCols = useMemo(() => {
     if (!stats?.length) return "";
-    if (stats.length >= 4) return "sm:grid-cols-2 lg:grid-cols-4";
-    if (stats.length === 3) return "sm:grid-cols-2 lg:grid-cols-3";
-    if (stats.length === 2) return "sm:grid-cols-2";
-    return "";
+    if (stats.length >= 4) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
+    if (stats.length === 3) return "grid-cols-1 md:grid-cols-3";
+    if (stats.length === 2) return "grid-cols-1 md:grid-cols-2";
+    return "grid-cols-1";
   }, [stats]);
 
   return (
@@ -133,14 +133,14 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,color-mix(in_oklch,var(--accent)_15%,transparent)_0%,transparent_60%)]",
           )}
         >
-          <div className="aspect-[16/6]" />
+          <div className="aspect-[4/5] md:aspect-[16/6]" />
 
           {/* Image layer with its own mask and parallax (prevents the bottom fade from affecting overlay text) */}
           {image?.url ? (
             <motion.div
               aria-hidden
               style={imageLayerMotionStyle}
-              className="absolute inset-0 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)] [-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)]"
+              className="absolute inset-0 w-full h-full md:[mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)] md:[-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)]"
             >
               <Image
                 src={image.url}
@@ -150,7 +150,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
                 placeholder={image.lqip ? "blur" : undefined}
                 blurDataURL={image.lqip || undefined}
                 sizes="(min-width: 1280px) 1100px, (min-width: 1024px) 960px, (min-width: 768px) 720px, 92vw"
-                className="object-cover"
+                className="object-cover object-center scale-110 md:scale-100"
                 priority={false}
               />
             </motion.div>
@@ -175,20 +175,21 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
               initial="hidden"
               animate={overlayControls}
               className={cn(
-                "about-stats absolute inset-x-0 bottom-0 z-10 flex flex-col",
-                "overflow-hidden shadow-[0_-12px_60px_rgba(8,6,20,0.24)] backdrop-blur-[30px] rounded-b-[5px]",
-                // Use CSS variables for theme-appropriate background/border that we can override in globals
-                "border-t border-[color:var(--about-overlay-border,rgba(255,255,255,0.18))] bg-[color:var(--about-overlay-bg,rgba(255,255,255,0.14))]",
+                "about-stats absolute z-10 flex flex-col",
+                "inset-0 justify-center md:inset-x-0 md:inset-y-auto md:bottom-0 md:justify-start",
+                "overflow-hidden shadow-[0_-12px_60px_rgba(8,6,20,0.24)] backdrop-blur-[8px] rounded-[5px] md:rounded-b-[5px] md:rounded-t-none",
+                // Increased opacity for better text readability on mobile
+                "border md:border-t border-white/18 bg-white/[0.4]",
               )}
             >
-              <div className="px-[clamp(28px,5vw,60px)] py-[clamp(32px,5.5vh,52px)]">
+              <div className="px-4 py-6 md:px-[clamp(28px,5vw,60px)] md:py-[clamp(32px,5.5vh,52px)]">
                 <dl
                   className={cn(
-                    "grid w-full gap-y-[clamp(18px,3.2vh,26px)] gap-x-[clamp(16px,3vw,36px)]",
+                    "grid w-full gap-y-6 gap-x-4 md:gap-y-[clamp(18px,3.2vh,26px)] md:gap-x-[clamp(16px,3vw,36px)]",
                     "text-center place-items-center",
                     gridCols,
-                    "lg:[&>div]:px-[min(2.2vw,36px)]",
-                    "lg:[&>div:not(:first-child)]:border-l lg:[&>div:not(:first-child)]:border-l-white/20",
+                    "md:[&>div]:px-[min(2.2vw,36px)]",
+                    "md:[&>div:not(:first-child)]:border-l md:[&>div:not(:first-child)]:border-l-white/20",
                   )}
                 >
                   {stats.map((stat, index) => (
@@ -268,19 +269,19 @@ function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedS
       initial="hidden"
       animate={controls}
       custom={index}
-      className="flex w-full flex-col items-center justify-center gap-[10px] px-2 py-1 text-center"
+      className="flex w-full flex-col items-center justify-center gap-2 md:gap-[10px] px-2 py-1 text-center"
     >
-      <dd className="text-balance text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[1.02] text-[color:var(--foreground)] dark:text-white">
+      <dd className="text-balance text-4xl md:text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[1.02] text-[color:var(--foreground)] dark:text-white">
         {displayValue || "—"}
       </dd>
-      <dt className="about-stats-label mt-2 flex items-center justify-center gap-2 text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.05em] text-muted-foreground dark:text-white/80">
+      <dt className="about-stats-label mt-1 md:mt-2 flex items-center justify-center gap-2 text-xs md:text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.05em] text-muted-foreground dark:text-white/80">
         {icon?.url ? (
           <Image
             src={icon.url}
             alt={icon.alt || ""}
             width={icon.width ? Math.min(44, Math.round(icon.width)) : 36}
             height={icon.height ? Math.min(44, Math.round(icon.height)) : 36}
-            className="h-7 w-7 shrink-0 object-contain opacity-80"
+            className="h-5 w-5 md:h-7 md:w-7 shrink-0 object-contain opacity-80"
             placeholder={icon.lqip ? "blur" : undefined}
             blurDataURL={icon.lqip || undefined}
             aria-hidden={icon.alt ? undefined : true}

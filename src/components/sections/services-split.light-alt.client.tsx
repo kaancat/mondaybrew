@@ -242,7 +242,7 @@ export function ServicesSplitLightAlt({
   const activeDescription = activeTab.description ?? fallbackDescription;
 
   return (
-    <section className={cn("py-24", className)}>
+    <section className={cn("py-[10px] md:py-24", className)}>
       <Container className="grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
         <div className="flex flex-col">
           {eyebrow ? (

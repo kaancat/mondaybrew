@@ -29,7 +29,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
             "clients-hero-strip rounded-[5px] shadow-[var(--shadow-elevated-md)]",
             "bg-[color:var(--accent)] text-[color:var(--accent-foreground)]",
             "dark:!bg-[color:var(--services-card-bg)] dark:!text-[color:var(--services-ink-strong)]",
-            "px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12",
+            "px-6 py-[10px] md:px-10 md:py-10 lg:px-12 lg:py-12",
             "relative overflow-hidden",
           )}
         >
@@ -120,7 +120,7 @@ function LinedGrid({ items, more, locale, forceBlackLogos }: { items: ClientLogo
           : "none",
       }}
     >
-      <div className={cn("grid gap-0", "grid-cols-3 md:grid-cols-4 lg:grid-cols-5")}> 
+      <div className={cn("grid gap-0", "grid-cols-3 md:grid-cols-4 lg:grid-cols-5")}>
         {items.map((logo, i) => (
           <GridCell key={i} logo={logo} />
         ))}
@@ -192,7 +192,7 @@ function MoreCell({ label = "+ Many more →", href = "/cases" }: { label?: stri
       aria-label={`Browse more clients`}
     >
       <span className="inline-flex items-center gap-2 opacity-80 group-hover:opacity-100 transition">
-        {label} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5"/></svg>
+        {label} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" /></svg>
       </span>
     </a>
   );
