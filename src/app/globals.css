@@ -796,14 +796,12 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
   }
   /* About eyebrow override removed: now uses global --eyebrow-color */
 
-  /* Clients/Partners: override hero strip in Light-Alt to be pure white card with strong ink */
+  /* Clients/Partners: Light-Alt — keep hero strip flat (no card border/shadow), just text */
   html.light-alt .clients-hero-strip {
     background: var(--services-card-bg) !important;
     color: var(--services-ink-strong) !important;
-    border: 1px solid var(--nav-shell-border) !important;
-    /* Avoid double rule with grid's top hairline */
-    border-bottom: 0 !important;
-    margin-bottom: -1px; /* visually fuse with grid top line */
+    border: 0 !important;
+    margin-bottom: 0;
     /* Eyebrow uses brand orange for consistency */
     --clients-hero-eyebrow: var(--mb-accent);
   }

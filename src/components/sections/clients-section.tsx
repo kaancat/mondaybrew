@@ -36,7 +36,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
       <div className="md:hidden">
         <div
           className={cn(
-            "clients-hero-strip rounded-none shadow-[var(--shadow-elevated-md)]",
+            "clients-hero-strip rounded-none",
             "bg-background text-foreground",
             "px-6 py-[20px]",
             "relative overflow-hidden",
@@ -92,7 +92,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
       <div className="hidden md:block layout-container">
         <div
           className={cn(
-            "clients-hero-strip rounded-[5px] shadow-[var(--shadow-elevated-md)]",
+            "clients-hero-strip rounded-[5px]",
             "bg-background text-foreground",
             "px-10 py-20 lg:px-12 lg:py-24",
             "relative overflow-hidden",
