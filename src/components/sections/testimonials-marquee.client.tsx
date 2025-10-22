@@ -592,8 +592,8 @@ function RowMobile({ items }: { items: TCard[] }) {
     <div
       ref={viewportRef}
       onWheel={onWheel}
-      className="-mx-4 overflow-x-auto px-0 scrollbar-none snap-x snap-mandatory"
-      style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x", overscrollBehaviorX: "contain" as any }}
+      className="-mx-4 overflow-x-auto px-0 scrollbar-none snap-x snap-mandatory overscroll-x-contain"
+      style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" as const }}
     >
       <div className="flex gap-4 px-0 py-2">
         {normalizedItems.map((card, i) => (
