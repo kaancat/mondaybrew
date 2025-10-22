@@ -1,3 +1,5 @@
+import Image from "next/image";
+import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import ClientsMarquee from "./clients.marquee.client";
 
@@ -37,7 +39,8 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
         <div
           className={cn(
             "clients-hero-strip rounded-none",
-            "bg-background text-foreground",
+            // Theme-driven capsule colors
+            "bg-[color:var(--clients-hero-bg)] text-[color:var(--clients-hero-text)]",
             "px-6 py-[20px]",
             "relative overflow-hidden",
           )}
@@ -45,14 +48,14 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           {/* Left-aligned copy */}
           <div className="max-w-[56ch] pr-10">
             {eyebrow ? (
-              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-accent">
+              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-[color:var(--clients-hero-eyebrow)]">
                 {eyebrow.toUpperCase()}
               </p>
             ) : null}
             {headline ? (
               <h2
                 id="clients-heading"
-                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-foreground"
+                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold"
               >
                 {headline}
               </h2>
@@ -61,8 +64,8 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
               <p
                 className={cn(
                   "mt-3 text-[15px]/[1.6]",
-                  // Use theme-driven variable so we can tune per mode
-                  "text-muted-foreground",
+                  // Theme-driven muted color for contrast in the capsule
+                  "text-[color:var(--clients-hero-muted)]",
                 )}
               >
                 {subheading}
@@ -73,7 +76,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           {/* Optional geometric line art (subtle, trivial) */}
           <svg
             aria-hidden
-            className="hidden"
+            className="hidden md:block absolute right-2 top-2 text-[color:var(--clients-hero-graphic)]"
             width="140"
             height="120"
             viewBox="0 0 140 120"
@@ -93,7 +96,8 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
         <div
           className={cn(
             "clients-hero-strip rounded-[5px]",
-            "bg-background text-foreground",
+            // Theme-driven capsule colors
+            "bg-[color:var(--clients-hero-bg)] text-[color:var(--clients-hero-text)]",
             "px-10 py-20 lg:px-12 lg:py-24",
             "relative overflow-hidden",
           )}
@@ -101,14 +105,14 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           {/* Left-aligned copy */}
           <div className="max-w-[56ch] pr-10">
             {eyebrow ? (
-              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-accent">
+              <p className="clients-hero-eyebrow mb-3 text-[12px] font-medium tracking-[0.25em] text-[color:var(--clients-hero-eyebrow)]">
                 {eyebrow.toUpperCase()}
               </p>
             ) : null}
             {headline ? (
               <h2
                 id="clients-heading"
-                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-foreground"
+                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold"
               >
                 {headline}
               </h2>
@@ -117,8 +121,8 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
               <p
                 className={cn(
                   "mt-3 text-[15px]/[1.6]",
-                  // Use theme-driven variable so we can tune per mode
-                  "text-muted-foreground",
+                  // Theme-driven muted color for contrast in the capsule
+                  "text-[color:var(--clients-hero-muted)]",
                 )}
               >
                 {subheading}
@@ -129,7 +133,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
           {/* Optional geometric line art (subtle, trivial) */}
           <svg
             aria-hidden
-            className="hidden"
+            className="absolute right-8 top-8 text-[color:var(--clients-hero-graphic)]"
             width="140"
             height="120"
             viewBox="0 0 140 120"
@@ -165,18 +169,21 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
 
 function LinedGrid({ items, more, forceBlackLogos }: { items: ClientLogo[]; more?: { label?: string; href?: string; reference?: { slug?: string; locale?: string } } | null; forceBlackLogos?: boolean }) {
   // 5 columns on large, 4 on md, 3 on sm
+  const styleVars = ({
+    "--color-border": "var(--border)",
+  } as unknown) as CSSProperties & Record<string, string>;
+  if (forceBlackLogos) {
+    styleVars["--clients-logo-filter"] = "brightness(0) saturate(100%)";
+  }
   return (
     <div
       className={cn(
-        "relative clients-grid bg-white",
+        "relative clients-grid",
+        "bg-[color:var(--clients-grid-bg)]",
         // outer bottom/right hairlines
         "[box-shadow:inset_0_-1px_var(--color-border),inset_-1px_0_var(--color-border)]",
       )}
-      style={{
-        // token alias to simplify arbitrary properties
-        // @ts-expect-error CSS var
-        "--color-border": "var(--border)",
-      }}
+      style={styleVars}
     >
       <div className="grid grid-cols-3 gap-0 md:grid-cols-4 lg:grid-cols-5">
         {items.map((logo, i) => (
@@ -229,11 +236,12 @@ function Logo({ logo, forceBlackLogos }: { logo: ClientLogo; forceBlackLogos?: b
     const h = maxHeight;
 
     return (
-      <img
+      <Image
         src={image.image.asset.url}
         alt={alt}
         width={Math.round(w)}
         height={Math.round(h)}
+        sizes="160px"
         className="max-h-[40px] w-auto opacity-90 [filter:var(--clients-logo-filter,grayscale(100%))] group-hover:[filter:var(--clients-logo-hover-filter,none)]"
         style={{ mixBlendMode: "multiply" }}
       />

@@ -132,6 +132,14 @@
   --mobile-nav-secondary-text: var(--mobile-nav-text);
   --mobile-nav-secondary-border: var(--mobile-nav-border);
   --mobile-nav-secondary-hover-bg: color-mix(in oklch, var(--mb-ink) 18%, transparent);
+
+  /* Clients section tokens (desktop + mobile) */
+  --clients-hero-bg: var(--mb-accent);
+  --clients-hero-text: var(--brand-light);
+  --clients-hero-eyebrow: color-mix(in oklch, var(--brand-light) 88%, white 12%);
+  --clients-hero-muted: color-mix(in oklch, var(--brand-light) 82%, var(--mb-bg) 18%);
+  --clients-hero-graphic: color-mix(in oklch, var(--brand-light) 28%, transparent);
+  --clients-grid-bg: var(--mb-bg);
 }
 
 @supports (height: 100dvh) {
@@ -356,6 +364,14 @@ html.light-alt {
   --mobile-nav-hover: rgba(0, 0, 0, 0.04);
   --mobile-nav-link: color-mix(in oklch, var(--services-ink-strong) 84%, black 16%);
   --mobile-nav-overlay: rgba(24, 22, 30, 0.22);
+
+  /* Clients section (Light Alt — black/white aesthetic) */
+  --clients-hero-bg: var(--services-card-bg); /* pure white */
+  --clients-hero-text: var(--services-ink-strong); /* strict black */
+  --clients-hero-eyebrow: var(--eyebrow-color); /* keep brand orange eyebrow for contrast */
+  --clients-hero-muted: color-mix(in oklch, var(--services-ink-strong) 72%, white 28%);
+  --clients-hero-graphic: color-mix(in oklch, var(--services-ink-strong) 12%, transparent);
+  --clients-grid-bg: var(--services-card-bg);
 }
 
 html.dark {
@@ -455,6 +471,14 @@ html.dark {
   --mobile-nav-hover: color-mix(in oklch, white 12%, transparent);
   --mobile-nav-link: color-mix(in oklch, white 84%, var(--surface-base) 16%);
   --mobile-nav-overlay: rgba(8, 6, 18, 0.3);
+
+  /* Clients section (Dark) */
+  --clients-hero-bg: color-mix(in oklch, var(--surface-dark) 78%, var(--mb-accent) 22%);
+  --clients-hero-text: var(--brand-light);
+  --clients-hero-eyebrow: color-mix(in oklch, var(--brand-light) 85%, white 15%);
+  --clients-hero-muted: color-mix(in oklch, var(--brand-light) 72%, var(--surface-base) 28%);
+  --clients-hero-graphic: color-mix(in oklch, var(--brand-light) 22%, transparent);
+  --clients-grid-bg: color-mix(in oklch, var(--surface-dark) 70%, var(--surface-base) 30%);
 }
 
 @media (min-width: 1920px) {
