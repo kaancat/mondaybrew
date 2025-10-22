@@ -38,7 +38,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
       <div className="md:hidden">
         <div
           className={cn(
-            "clients-hero-strip rounded-none",
+            "clients-hero-strip rounded-none border-b border-[color:var(--clients-hero-divider)]",
             // Theme-driven capsule colors
             "bg-[color:var(--clients-hero-bg)] text-[color:var(--clients-hero-text)]",
             "px-6 py-[20px]",
@@ -81,7 +81,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
       <div className="hidden md:block layout-container">
         <div
           className={cn(
-            "clients-hero-strip rounded-[5px]",
+            "clients-hero-strip rounded-t-[5px] rounded-b-none border-b border-[color:var(--clients-hero-divider)]",
             // Theme-driven capsule colors
             "bg-[color:var(--clients-hero-bg)] text-[color:var(--clients-hero-text)]",
             "px-10 py-20 lg:px-12 lg:py-24",

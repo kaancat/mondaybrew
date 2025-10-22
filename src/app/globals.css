@@ -140,10 +140,11 @@
   /* Clients section tokens (follow services card style) */
   --clients-hero-bg: var(--services-card-bg);
   --clients-hero-text: var(--mb-bg);
-  --clients-hero-eyebrow: color-mix(in oklch, var(--mb-bg) 85%, var(--surface-dark) 15%);
+  --clients-hero-eyebrow: var(--mb-accent);
   --clients-hero-muted: color-mix(in oklch, var(--mb-bg) 78%, var(--mb-ink) 22%);
   --clients-hero-graphic: color-mix(in oklch, var(--mb-bg) 18%, transparent);
   --clients-grid-bg: var(--services-card-bg);
+  --clients-hero-divider: var(--border);
 }
 
 @supports (height: 100dvh) {
@@ -811,8 +812,8 @@ html.light-primary .clients-hero-strip {
     /* Title and subheading tones */
     --clients-hero-title: var(--mb-bg);
     --clients-hero-sub: color-mix(in oklch, var(--mb-bg) 80%, var(--mb-ink) 20%);
-    /* Eyebrow: subtle light tint on dark card */
-    --clients-hero-eyebrow: color-mix(in oklch, var(--mb-bg) 85%, var(--surface-dark) 15%);
+    /* Eyebrow: always brand orange */
+    --clients-hero-eyebrow: var(--mb-accent);
   }
   /* Clients/Partners: dark theme eyebrow should be brand orange */
   html.dark .clients-hero-strip { --clients-hero-eyebrow: var(--mb-accent); }
@@ -833,6 +834,7 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     margin-bottom: 0;
     /* Eyebrow uses brand orange for consistency */
     --clients-hero-eyebrow: var(--mb-accent);
+    --clients-hero-divider: var(--services-ink-strong);
   }
   /* Clients grid hairlines should match the hero border in Light-Alt */
   html.light-alt .clients-grid {
