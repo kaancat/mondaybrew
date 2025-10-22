@@ -243,7 +243,139 @@ export function ServicesSplitLightAlt({
 
   return (
     <section className={cn("py-[10px] md:py-24", className)}>
-      <Container className="grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
+      {/* Mobile layout: left column in container, card full-bleed below */}
+      <div className="md:hidden">
+        <Container>
+          <div className="flex flex-col">
+            {eyebrow ? (
+              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--foreground)_78%,white_22%)]">
+                {eyebrow}
+              </span>
+            ) : null}
+            {activeHeadline ? (
+              <h2 className="mt-3 text-[color:var(--services-ink-strong)]">
+                {activeHeadline}
+              </h2>
+            ) : null}
+            {activeDescription ? (
+              <p className="mt-5 max-w-xl text-[length:var(--font-body)] font-light leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)]">
+                {activeDescription}
+              </p>
+            ) : null}
+            <div
+              role="tablist"
+              aria-label="Service pillars"
+              aria-orientation="horizontal"
+              className="mt-10 flex flex-wrap items-center gap-2 border-b border-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)] text-[color:var(--services-ink-strong)]"
+            >
+              {normalized.tabs.map((tab, tabIndex) => {
+                const isActive = tab.id === activeTab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls={`${tab.id}-service-list`}
+                    id={`${tab.id}-tab`}
+                    tabIndex={isActive ? 0 : -1}
+                    ref={(node) => { tabRefs.current[tabIndex] = node; }}
+                    onClick={() => { setActiveTabId(tab.id); setActiveServiceId(tab.services[0]?.id ?? ""); }}
+                    onKeyDown={(event) => handleTabKeyDown(event, tabIndex)}
+                    className={cn(
+                      "relative inline-flex items-center justify-center rounded-[5px] px-3 py-2 text-sm font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
+                      isActive
+                        ? "after:absolute after:bottom-[-1px] after:left-1 after:right-1 after:h-[2px] after:rounded-full after:bg-[color:var(--mb-accent)]"
+                        : "text-[color:color-mix(in_oklch,var(--services-ink-strong)_68%,white_32%)] hover:text-[color:var(--services-ink-strong)]",
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-8">
+              <AnimatePresence mode="wait">
+                <motion.ul
+                  key={activeTab.id}
+                  role="list"
+                  aria-labelledby={`${activeTab.id}-tab`}
+                  id={`${activeTab.id}-service-list`}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={listVariants}
+                  className="divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)] border-b border-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)]"
+                >
+                  {activeTab.services.map((service) => {
+                    const isActiveService = service.id === activeService?.id;
+                    return (
+                      <motion.li key={service.id} variants={itemVariants}>
+                        <button
+                          type="button"
+                          className={cn(
+                            "group flex w-full items-center justify-between gap-6 px-0 py-4 text-left text-[20px] font-medium transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mb-accent)] focus-visible:ring-offset-2",
+                            isActiveService
+                              ? "font-semibold text-[color:var(--services-ink-strong)]"
+                              : "text-[color:color-mix(in_oklch,var(--services-ink-strong)_70%,white_30%)] hover:text-[color:var(--services-ink-strong)]",
+                          )}
+                          onClick={() => setActiveServiceId(service.id)}
+                          aria-current={isActiveService ? "true" : undefined}
+                        >
+                          <span className="truncate">{service.title}</span>
+                          <span className={cn("inline-flex size-9 min-h-9 min-w-9 items-center justify-center text-[color:color-mix(in_oklch,var(--services-ink-strong)_65%,white_35%)] transition-transform duration-200 group-hover:translate-x-[0.35rem]", isActiveService && "text-[color:var(--services-ink-strong)]")} aria-hidden>
+                            <ArrowRight className="size-[18px]" />
+                          </span>
+                        </button>
+                      </motion.li>
+                    );
+                  })}
+                </motion.ul>
+              </AnimatePresence>
+            </div>
+          </div>
+        </Container>
+
+        <div className="relative md:hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            {activeService ? (
+              <motion.article
+                key={`m-${activeTab.id}-${activeService.id}`}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={detailVariants}
+                className="full-bleed rounded-none p-0 md:rounded-[5px] md:p-6 bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
+              >
+                {renderMedia(activeService.media)}
+                <div className="mt-6 flex flex-col gap-4 px-5 pb-5 md:px-0 md:pb-0">
+                  <header className="space-y-3">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:color-mix(in_oklch,var(--services-ink-strong)_40%,white_60%)]">
+                      {activeTab.label}
+                    </p>
+                    <h3 className="text-[clamp(24px,3vw,34px)] font-semibold leading-tight">
+                      {activeService.detailTitle || activeService.title}
+                    </h3>
+                    {activeService.summary ? (
+                      <p className="text-[length:var(--font-body)] font-light leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_75%,white_25%)]">
+                        {activeService.summary}
+                      </p>
+                    ) : null}
+                  </header>
+                  {activeService.description ? (
+                    <p className="text-[length:var(--font-body)] font-light leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_70%,white_30%)]">
+                      {activeService.description}
+                    </p>
+                  ) : null}
+                </div>
+              </motion.article>
+            ) : null}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Desktop/tablet layout unchanged */}
+      <Container className="hidden md:grid gap-12 md:grid-cols-2 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,0.6fr)]">
         <div className="flex flex-col">
           {eyebrow ? (
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--foreground)_78%,white_22%)]">
