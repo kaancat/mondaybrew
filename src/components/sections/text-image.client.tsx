@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
@@ -50,6 +50,14 @@ export function TextImageClient({
     const sectionRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(sectionRef, { once: true, margin: "0px 0px -200px 0px" });
     const shouldReduceMotion = useReducedMotion();
+    const [isMobile, setIsMobile] = useState(true);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
 
     // Determine grid order based on image position
     const imageOrder = imagePosition === "right" ? "md:order-2" : "md:order-1";
@@ -59,14 +67,14 @@ export function TextImageClient({
     const imageSlideFrom = imagePosition === "left" ? -60 : 60;
     const textSlideFrom = imagePosition === "left" ? 60 : -60;
 
-    // Skip animations if reduced motion is preferred
-    const animateImage = shouldReduceMotion ? {} : {
+    // Skip animations if reduced motion is preferred or on mobile
+    const animateImage = shouldReduceMotion || isMobile ? {} : {
         initial: { opacity: 0, x: imageSlideFrom },
         animate: isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: imageSlideFrom },
         transition: { duration: 0.7, ease: EASE_OUT },
     };
 
-    const animateText = shouldReduceMotion ? {} : {
+    const animateText = shouldReduceMotion || isMobile ? {} : {
         initial: { opacity: 0, x: textSlideFrom },
         animate: isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: textSlideFrom },
         transition: { duration: 0.7, ease: EASE_OUT },

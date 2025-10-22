@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 
@@ -40,9 +40,17 @@ export function TextOnlyClient({
     const sectionRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(sectionRef, { once: true, margin: "0px 0px -200px 0px" });
     const shouldReduceMotion = useReducedMotion();
+    const [isMobile, setIsMobile] = useState(true);
 
-    // Animation config
-    const animateContent = shouldReduceMotion ? {} : {
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
+    // Animation config - disabled on mobile
+    const animateContent = shouldReduceMotion || isMobile ? {} : {
         initial: { opacity: 0, y: 20 },
         animate: isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 },
         transition: { duration: 0.7, ease: EASE_OUT },

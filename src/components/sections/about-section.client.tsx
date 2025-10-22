@@ -80,9 +80,19 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
   const isInView = useInView(sectionRef, { once: true, amount: 0.55 });
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   // Parallax should affect the image only – not the overlay/content.
   // We therefore apply the mask + transform to an inner image layer instead of the container.
-  const imageLayerMotionStyle = prefersReducedMotion
+  // Disabled on mobile for better performance and to prevent gaps
+  const imageLayerMotionStyle = prefersReducedMotion || isMobile
     ? undefined
     : ({ y: parallaxY } as const);
 

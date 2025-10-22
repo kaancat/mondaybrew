@@ -26,7 +26,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
       <div className="layout-container">
         <div
           className={cn(
-            "clients-hero-strip rounded-[5px] shadow-[var(--shadow-elevated-md)]",
+            "clients-hero-strip rounded-none md:rounded-[5px] shadow-[var(--shadow-elevated-md)]",
             "bg-[color:var(--accent)] text-[color:var(--accent-foreground)]",
             "dark:!bg-[color:var(--services-card-bg)] dark:!text-[color:var(--services-ink-strong)]",
             "px-6 py-[10px] md:px-10 md:py-10 lg:px-12 lg:py-12",
@@ -86,7 +86,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
 
       {/* Mobile: marquee rows (prefers-reduced-motion handled inside) */}
       <div
-        className="layout-container md:hidden"
+        className="md:hidden"
         style={{
           // @ts-expect-error CSS var
           "--clients-logo-filter": forceBlackLogos ? "brightness(0) saturate(100%)" : "grayscale(100%)",
