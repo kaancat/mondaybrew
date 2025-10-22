@@ -25,7 +25,7 @@ export default function ClientsMarquee({ items }: { items: ClientLogo[] }) {
 
   return (
     <div
-      className="clients-marquee relative overflow-hidden rounded-none md:rounded-[5px] bg-white md:bg-[color:var(--card)]"
+      className="clients-marquee relative overflow-hidden rounded-none md:rounded-[5px] bg-white"
       style={{
         // @ts-expect-error CSS var
         "--color-border": "var(--border)",
@@ -47,7 +47,7 @@ function MarqueeRow({ items, duration, direction, paused }: { items: ClientLogo[
     <div className="clients-marquee-row relative border-t border-[color:var(--color-border)] first:border-t-0">
       <div
         ref={trackRef}
-        className="flex gap-8 py-6 md:gap-8 md:py-6 will-change-transform"
+        className="flex gap-8 py-6 will-change-transform"
         style={{ animation: anim }}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
@@ -80,7 +80,7 @@ function Logo({ logo }: { logo: ClientLogo }) {
       height={Math.round(h)}
       placeholder={logo.image?.image?.asset?.metadata?.lqip ? "blur" : undefined}
       blurDataURL={logo.image?.image?.asset?.metadata?.lqip}
-      className="max-h-[48px] md:max-h-[40px] w-auto opacity-90 [filter:var(--clients-logo-filter,grayscale(100%))] group-hover:[filter:var(--clients-logo-hover-filter,none)]"
+      className="max-h-[40px] w-auto opacity-90 [filter:var(--clients-logo-filter,grayscale(100%))] group-hover:[filter:var(--clients-logo-hover-filter,none)]"
       style={{ mixBlendMode: "multiply" }}
     />
   ) : (
