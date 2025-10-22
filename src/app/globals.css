@@ -966,6 +966,27 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
     transform: none !important;
     transition: none !important;
   }
+
+  /* Mobile only: Fade out navbar when sidebar opens, fade back in when it closes */
+  @media (max-width: 767px) {
+    body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) header[class*="fixed"] {
+      opacity: 0;
+      transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+      pointer-events: none;
+    }
+    
+    /* During exit, fade back in */
+    body[data-mobile-nav-open="true"][data-nav-phase="exiting"] header[class*="fixed"] {
+      opacity: 1;
+      transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1) 80ms !important;
+    }
+    
+    /* Default state: visible */
+    body:not([data-mobile-nav-open]) header[class*="fixed"] {
+      opacity: 1;
+      transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
   /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
   body[data-nav-phase="cleanup"] .site-shell,
   body[data-nav-phase="cleanup"] header[class*="fixed"],
