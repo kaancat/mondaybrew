@@ -63,7 +63,7 @@ export function AboutSection({ eyebrow, headline, subheading, mainImage, stats, 
   const overrideUrl =
     process.env.NEXT_PUBLIC_ABOUT_IMAGE_URL?.trim() ||
     process.env.ABOUT_IMAGE_URL?.trim() ||
-    (process.env.NODE_ENV !== "production" ? "/statistics_billede.png" : undefined);
+    "/statistics_billede.png"; // Use new image by default
   const mergedImage: AboutSectionResolvedImage | null = overrideUrl
     ? { url: overrideUrl, alt: image?.alt ?? "About image", lqip: image?.lqip, width: image?.width, height: image?.height }
     : image;
