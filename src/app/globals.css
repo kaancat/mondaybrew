@@ -982,16 +982,15 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
 
   /* Mobile only: Fade out navbar when sidebar opens, fade back in when it closes */
   @media (max-width: 767px) {
+    /* Keep header visible; do not fade it during mobile menu */
     body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) header[class*="fixed"] {
-      opacity: 0;
-      transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1) !important;
-      pointer-events: none;
+      opacity: 1;
+      pointer-events: auto;
     }
     
     /* During exit, fade back in */
     body[data-mobile-nav-open="true"][data-nav-phase="exiting"] header[class*="fixed"] {
       opacity: 1;
-      transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1) 80ms !important;
     }
     
     /* Default state: visible */

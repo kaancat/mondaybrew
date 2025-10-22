@@ -27,7 +27,7 @@ export type ClientsSectionData = {
   logos?: ClientLogo[];
 };
 
-export default function ClientsSection({ eyebrow, headline, subheading, logos, more, locale: _locale, forceBlackLogos }: ClientsSectionData & { locale?: "da" | "en" }) {
+export default function ClientsSection({ eyebrow, headline, subheading, logos, more, forceBlackLogos }: ClientsSectionData & { locale?: "da" | "en" }) {
   const items = (logos || []).filter((l) => (l?.title || l?.image?.image?.asset?.url)).slice(0, 60);
 
   return (
