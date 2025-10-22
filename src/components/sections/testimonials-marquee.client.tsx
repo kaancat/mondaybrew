@@ -136,8 +136,8 @@ function CardFrameMobile({ children }: { children: ReactNode }) {
     <div
       className="group/card relative shrink-0"
       style={{
-        width: "85vw",
-        minWidth: "85vw",
+        width: "300px",
+        minWidth: "300px",
         flex: "0 0 auto",
         contain: "layout paint",
         contentVisibility: "auto",
@@ -578,10 +578,17 @@ function RowMobile({ items }: { items: TCard[] }) {
   }, [items]);
 
   return (
-    <div className="flex gap-4 py-2 overflow-x-auto scrollbar-none" style={{ WebkitOverflowScrolling: "touch" }}>
-      {normalizedItems.map((card, i) => (
-        <CardMobile key={i} card={card} />
-      ))}
+    <div
+      className="overflow-x-scroll scrollbar-none -mx-[var(--container-gutter)]"
+      style={{
+        WebkitOverflowScrolling: "touch"
+      }}
+    >
+      <div className="flex gap-4 py-2 px-[var(--container-gutter)]" style={{ width: "max-content" }}>
+        {normalizedItems.map((card, i) => (
+          <CardMobile key={i} card={card} />
+        ))}
+      </div>
     </div>
   );
 }
