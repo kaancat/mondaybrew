@@ -204,10 +204,10 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             )}
           >
             {/* Accent chip and micro-label for mobile only */}
-            <div className="md:hidden px-3 pt-2.5">
+            <div className="md:hidden px-5 pt-2.5">
               <div className="h-[2px] w-12 rounded-full bg-[color:var(--accent)]/85 drop-shadow-[0_0_6px_var(--accent)]" />
             </div>
-            <div className="px-3 pb-[max(env(safe-area-inset-bottom,8px),10px)] pt-1.5 md:px-[clamp(28px,5vw,60px)] md:py-[clamp(32px,5.5vh,52px)]">
+            <div className="px-5 pb-[max(env(safe-area-inset-bottom,8px),10px)] pt-1.5 md:px-[clamp(28px,5vw,60px)] md:py-[clamp(32px,5.5vh,52px)]">
               <dl
                 className={cn(
                   "grid w-full gap-y-2 gap-x-3 md:gap-y-[clamp(18px,3.2vh,26px)] md:gap-x-[clamp(16px,3vw,36px)]",
