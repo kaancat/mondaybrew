@@ -14,7 +14,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 export type TImage = {
   url?: string | null;
@@ -134,7 +134,7 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
 function CardFrameMobile({ children }: { children: ReactNode }) {
   return (
     <div
-      className="group/card relative shrink-0 first:ml-4 last:mr-4"
+      className="group/card relative shrink-0"
       style={{
         width: "85vw",
         minWidth: "85vw",
@@ -578,19 +578,10 @@ function RowMobile({ items }: { items: TCard[] }) {
   }, [items]);
 
   return (
-    <div 
-      className="overflow-x-scroll scrollbar-none"
-      style={{
-        WebkitOverflowScrolling: "touch",
-        scrollBehavior: "smooth",
-        overflowX: "scroll"
-      }}
-    >
-      <div className="flex gap-4 py-2 px-4" style={{ width: "max-content" }}>
-        {normalizedItems.map((card, i) => (
-          <CardMobile key={i} card={card} />
-        ))}
-      </div>
+    <div className="flex gap-4 py-2 overflow-x-auto scrollbar-none" style={{ WebkitOverflowScrolling: "touch" }}>
+      {normalizedItems.map((card, i) => (
+        <CardMobile key={i} card={card} />
+      ))}
     </div>
   );
 }
@@ -605,8 +596,8 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
         <Row items={top} speed={speedTop} direction={1} />
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
-      {/* Mobile scroll-snap variant (desktop unchanged) */}
-      <div className="md:hidden flex flex-col gap-4 pb-2" style={{ height: "auto", minHeight: "400px" }}>
+      {/* Mobile scrollable rows (desktop unchanged) */}
+      <div className="md:hidden flex flex-col gap-4 pb-2 justify-start" style={{ height: "auto", minHeight: "400px" }}>
         <RowMobile items={top} />
         <RowMobile items={bottom} />
       </div>
