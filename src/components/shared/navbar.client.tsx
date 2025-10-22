@@ -587,14 +587,14 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                           <button
                             type="button"
                             onClick={() => setTheme(nextThemeId)}
-                            className="inline-flex items-center gap-2 rounded-[6px] border px-3 py-1.5 bg-[color:var(--mobile-nav-secondary-bg)] text-[color:var(--mobile-nav-secondary-text)] border-[color:var(--mobile-nav-secondary-border)] transition-colors hover:bg-[color:var(--mobile-nav-secondary-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[color:var(--mobile-nav-secondary-link)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                           >
                             {themeIcon}
                             <span>Skift tema</span>
                           </button>
                           <Link
                             href={localeConfig.href}
-                            className="inline-flex items-center gap-2 rounded-[6px] border px-3 py-1.5 bg-[color:var(--mobile-nav-secondary-bg)] text-[color:var(--mobile-nav-secondary-text)] border-[color:var(--mobile-nav-secondary-border)] transition-colors hover:bg-[color:var(--mobile-nav-secondary-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[color:var(--mobile-nav-secondary-link)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
                           >
                             <Globe className="size-[16px]" aria-hidden="true" />
                             <span>{localeConfig.target}</span>

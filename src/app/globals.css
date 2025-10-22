@@ -125,6 +125,8 @@
   --mobile-nav-hover: color-mix(in oklch, var(--mb-ink) 10%, transparent);
   --mobile-nav-link: color-mix(in oklch, var(--mb-ink) 88%, black 12%);
   --mobile-nav-overlay: rgba(73, 68, 75, 0.12);
+  /* Secondary action (theme/lang) link color */
+  --mobile-nav-secondary-link: var(--mobile-nav-muted);
   /* Mobile menu secondary action tokens (theme toggle, language) */
   --mobile-nav-secondary-bg: color-mix(in oklch, var(--mb-ink) 12%, transparent);
   --mobile-nav-secondary-text: var(--mobile-nav-text);
@@ -247,11 +249,8 @@ html.light-primary body[data-mobile-nav-open="true"] {
   /* Brand the mobile menu section headings and top eyebrow in primary theme */
   --mobile-nav-heading: var(--mb-accent);
   --mobile-nav-muted: var(--mb-accent);
-  /* Brand gray for secondary actions */
-  --mobile-nav-secondary-bg: var(--mb-ink);
-  --mobile-nav-secondary-text: var(--brand-light);
-  --mobile-nav-secondary-border: color-mix(in oklch, var(--brand-light) 18%, transparent);
-  --mobile-nav-secondary-hover-bg: color-mix(in oklch, var(--mb-ink) 90%, black 10%);
+  /* Brand gray text/icon for secondary actions (no bg/border) */
+  --mobile-nav-secondary-link: var(--mb-ink);
 }
 
 html.light-alt {
@@ -305,7 +304,8 @@ html.light-alt {
   /* Light Alt: nudge more see-through */
   /* Make header shell more transparent and subtle on Light Alt */
   --nav-shell-bg: color-mix(in oklch, white 56%, transparent); /* lighter glass */
-  --nav-shell-border: color-mix(in oklch, var(--foreground) 18%, transparent); /* softer stroke */
+  /* Distinct black border on header in Light Alt */
+  --nav-shell-border: color-mix(in oklch, var(--foreground) 32%, transparent);
   --nav-shell-text: var(--foreground); /* near-black text in shell */
   --nav-shell-shadow: 0 24px 48px color-mix(in oklch, var(--foreground) 8%, transparent);
   --nav-link-text: var(--foreground);
@@ -1012,3 +1012,7 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
   body[data-nav-phase="cleanup"] .vr-hero .layout-container {
     transition: none !important;
   }
+/* Light Alt: when mobile menu is open, make Contact CTA clearly outlined */
+html.light-alt body[data-mobile-nav-open="true"] {
+  --nav-cta-border: var(--brand-ink-strong);
+}
