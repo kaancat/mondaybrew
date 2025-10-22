@@ -119,8 +119,6 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
         minWidth: width,
         flex: "0 0 auto",
         marginInline: CARD_GAP / 2,
-        contain: "layout paint",
-        contentVisibility: "auto",
       }}
     >
       {children}
@@ -142,8 +140,6 @@ function CardFrameMobile({ children }: { children: ReactNode }) {
         width: "300px",
         minWidth: "300px",
         flex: "0 0 auto",
-        contain: "layout paint",
-        contentVisibility: "auto",
       }}
     >
       {children}
@@ -521,8 +517,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   }, [prefersReducedMotion, clearInteractionTimeout]);
 
   const wrapperStyle = useMemo(
-    () => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: isInteracting ? "transform" : undefined }),
-    [dragOffset, isInteracting],
+    () => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }),
+    [dragOffset],
   );
 
   const animatedTrackStyle = useMemo<CSSProperties | undefined>(() => {
