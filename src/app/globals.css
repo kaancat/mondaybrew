@@ -840,6 +840,13 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
     max-width: none;
   }
 
+  /* Helper: remove inline padding for full-bleed layouts on mobile only */
+  @media (max-width: 767px) {
+    .layout-container.edge-to-edge {
+      padding-inline: 0 !important;
+    }
+  }
+
   .right-list {
     transform: translateZ(0);
     will-change: transform;
