@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="da" suppressHydrationWarning>
-      <body className={`${sailec.variable} ${heywow.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${sailec.variable} ${heywow.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <ThemeProvider>
           {process.env.NEXT_PUBLIC_DUMP_TOKENS === "1" ? <TokenDump /> : null}
           <JsonLd
