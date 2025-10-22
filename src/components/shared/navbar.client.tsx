@@ -427,37 +427,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
   const handleOpenChange = onOpenChange;
 
-  // iOS visual viewport fix: ensure fixed header remains visible while browser UI collapses/expands
-  useEffect(() => {
-    const el = headerRef.current;
-    if (!el || typeof window === "undefined") return;
-
-    const vv: VisualViewport | undefined = typeof window !== "undefined" && 'visualViewport' in window ? window.visualViewport! : undefined;
-    if (!vv) return;
-
-    let rafId: number | null = null;
-    const apply = () => {
-      rafId = null;
-      const y = Math.max(0, Math.round(vv.offsetTop || 0));
-      el.style.transform = y ? `translateY(${y}px)` : "translateY(0)";
-    };
-    const queue = () => {
-      if (rafId != null) return;
-      rafId = window.requestAnimationFrame(apply);
-    };
-
-    vv.addEventListener("scroll", queue);
-    vv.addEventListener("resize", queue);
-    // Initial apply
-    apply();
-
-    return () => {
-      vv.removeEventListener("scroll", queue);
-      vv.removeEventListener("resize", queue);
-      if (rafId != null) cancelAnimationFrame(rafId);
-      el.style.transform = "";
-    };
-  }, []);
+  // Note: Avoid VisualViewport translations on iOS — they can cause the header
+  // to drift while the user holds a finger on the screen. Keeping the header
+  // purely fixed at top is more stable across engines.
 
   return (
     <>
