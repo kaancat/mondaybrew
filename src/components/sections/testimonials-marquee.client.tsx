@@ -579,13 +579,14 @@ function RowMobile({ items }: { items: TCard[] }) {
 
   return (
     <div 
-      className="overflow-x-auto scrollbar-none"
+      className="overflow-x-scroll scrollbar-none"
       style={{
         WebkitOverflowScrolling: "touch",
-        scrollBehavior: "smooth"
+        scrollBehavior: "smooth",
+        overflowX: "scroll"
       }}
     >
-      <div className="flex gap-4 py-2" style={{ width: "max-content", minWidth: "100vw" }}>
+      <div className="flex gap-4 py-2 px-4" style={{ width: "max-content" }}>
         {normalizedItems.map((card, i) => (
           <CardMobile key={i} card={card} />
         ))}
