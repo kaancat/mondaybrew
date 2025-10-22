@@ -588,10 +588,30 @@ function RowMobile({ items }: { items: TCard[] }) {
     }
   }, []);
 
+  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    const el = viewportRef.current;
+    if (!el) return;
+    el.style.scrollBehavior = "auto";
+  }, []);
+
+  const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    // Allow natural touch scrolling
+  }, []);
+
+  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    const el = viewportRef.current;
+    if (!el) return;
+    el.style.scrollBehavior = "smooth";
+  }, []);
+
   return (
     <div
       ref={viewportRef}
       onWheel={onWheel}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
       className="-mx-4 overflow-x-auto px-0 scrollbar-none snap-x snap-mandatory overscroll-x-contain"
       style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" as const }}
     >
