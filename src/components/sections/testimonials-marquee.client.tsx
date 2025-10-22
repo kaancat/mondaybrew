@@ -437,7 +437,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     setSetWidth(rect.width);
   }, []);
 
-  const totalWidth = setWidth + CARD_GAP * normalizedItems.length;
+  // Use exact measured width of one set (including margins) for wrap distance
+  const totalWidth = setWidth;
 
   const wrapOffset = useCallback((value: number) => {
     if (!totalWidth) return 0;
@@ -491,7 +492,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (pointerIdRef.current !== e.pointerId) return;
     e.preventDefault();
     const dx = e.clientX - startXRef.current;
-    setDragOffset(wrapOffset(startOffsetRef.current + dx));
+    // Intuitive drag: dragging to the right moves content right
+    setDragOffset(wrapOffset(startOffsetRef.current - dx));
   }, [prefersReducedMotion, wrapOffset]);
 
   const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
