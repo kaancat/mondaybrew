@@ -576,34 +576,16 @@ function RowMobile({ items }: { items: TCard[] }) {
       return { ...card, tone: toneKey, background: preset.background, colors: preset };
     });
   }, [items]);
-  const viewportRef = useRef<HTMLDivElement | null>(null);
-
-  const onWheel = useCallback((e: ReactWheelEvent<HTMLDivElement>) => {
-    const el = viewportRef.current;
-    if (!el) return;
-    // Map vertical wheel/trackpad to horizontal scroll for convenience in dev tools
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      el.scrollLeft += e.deltaY;
-      e.preventDefault();
-    }
-  }, []);
-
 
   return (
-    <div
-      ref={viewportRef}
-      onWheel={onWheel}
-      className="-mx-4 overflow-x-auto px-0 scrollbar-none"
-      style={{ 
-        WebkitOverflowScrolling: "touch", 
-        touchAction: "pan-x pan-y" as const,
-        scrollBehavior: "smooth",
-        overscrollBehavior: "contain",
-        overflowX: "auto",
-        overflowY: "hidden"
+    <div 
+      className="overflow-x-auto scrollbar-none"
+      style={{
+        WebkitOverflowScrolling: "touch",
+        scrollBehavior: "smooth"
       }}
     >
-      <div className="flex gap-4 px-0 py-2" style={{ width: "max-content" }}>
+      <div className="flex gap-4 py-2" style={{ width: "max-content", minWidth: "100vw" }}>
         {normalizedItems.map((card, i) => (
           <CardMobile key={i} card={card} />
         ))}
