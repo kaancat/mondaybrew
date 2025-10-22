@@ -578,16 +578,24 @@ function RowMobile({ items }: { items: TCard[] }) {
   }, [items]);
 
   return (
-    <div 
-      className="overflow-x-scroll scrollbar-none"
-      style={{
-        WebkitOverflowScrolling: "touch"
-      }}
-    >
-      <div className="flex gap-4 py-2 px-[var(--container-gutter)]" style={{ width: "max-content" }}>
-        {normalizedItems.map((card, i) => (
-          <CardMobile key={i} card={card} />
-        ))}
+    <div className="relative">
+      {/* Fade overlays for scroll indication */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent" />
+      
+      <div 
+        className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory"
+        style={{
+          WebkitOverflowScrolling: "touch"
+        }}
+      >
+        <div className="flex gap-4 py-2 px-[var(--container-gutter)]" style={{ width: "max-content" }}>
+          {normalizedItems.map((card, i) => (
+            <div key={i} className="snap-start">
+              <CardMobile card={card} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
