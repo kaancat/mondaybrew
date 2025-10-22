@@ -303,10 +303,11 @@ html.light-alt {
 
   /* Navbar tokens tuned for Light Alt white/glass + black ink */
   /* Light Alt: nudge more see-through */
-  --nav-shell-bg: color-mix(in oklch, white 80%, transparent); /* translucent white */
-  --nav-shell-border: color-mix(in oklch, var(--foreground) 92%, transparent); /* crisp dark stroke */
+  /* Make header shell more transparent and subtle on Light Alt */
+  --nav-shell-bg: color-mix(in oklch, white 56%, transparent); /* lighter glass */
+  --nav-shell-border: color-mix(in oklch, var(--foreground) 18%, transparent); /* softer stroke */
   --nav-shell-text: var(--foreground); /* near-black text in shell */
-  --nav-shell-shadow: 0 24px 48px color-mix(in oklch, var(--foreground) 12%, transparent);
+  --nav-shell-shadow: 0 24px 48px color-mix(in oklch, var(--foreground) 8%, transparent);
   --nav-link-text: var(--foreground);
   --nav-link-hover-bg: transparent; /* no card fill */
   --nav-link-hover-text: var(--foreground);
