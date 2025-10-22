@@ -129,61 +129,8 @@ export default async function Home() {
   const locale = (page?.locale as "da" | "en" | undefined) ?? "da";
   const hasHero = sections.some(isHeroSection);
 
-  // TEMPORARY: Add test TextImage section for development
-  // TODO: Remove this once the component is added to Sanity
-  const testTextImageSection: TextImageSectionWithType = {
-    _type: "textImage",
-    _key: "test-text-image",
-    eyebrow: "OUR APPROACH",
-    title: "Empowering Brands Through Strategic Innovation",
-    body: "We combine cutting-edge technology with creative storytelling to deliver exceptional results. Our team of experts works collaboratively to transform your vision into reality, ensuring every touchpoint resonates with your audience and drives measurable growth. From initial strategy to final execution, we focus on creating meaningful connections that not only capture attention but also convert prospects into loyal customers. Our approach is built on deep market research, continuous optimization, and a commitment to delivering ROI that exceeds expectations. We believe in the power of data-informed creativity, where insights drive innovation and results speak for themselves.",
-    imagePosition: "left",
-    image: {
-      alt: "Developer coding at modern workspace",
-      asset: {
-        url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&h=900&fit=crop",
-        metadata: {
-          lqip: null,
-          dimensions: {
-            width: 1200,
-            height: 900,
-          },
-        },
-      },
-    },
-    cta: {
-      label: "Learn More",
-      href: "/om-os",
-      variant: "default",
-    },
-  };
-
-  // TEMPORARY: Add test TextOnly section for development
-  const testTextOnlySection: TextOnlySectionWithType = {
-    _type: "textOnly",
-    _key: "test-text-only",
-    eyebrow: "OUR PHILOSOPHY",
-    title: "Building lasting partnerships",
-    body: "We believe in creating long-term partnerships with our clients, where success is measured not just by deliverables, but by the lasting impact we create together. Our approach combines strategic thinking with hands-on execution, ensuring that every project we undertake drives real business value. Through continuous collaboration and transparent communication, we transform ambitious visions into digital realities that stand the test of time. From the initial discovery phase through design, development, and beyond, we maintain an unwavering commitment to quality and innovation. Our team brings together decades of combined experience in digital strategy, user experience design, and cutting-edge development practices. We don't just build products—we build relationships that foster mutual growth and long-term success.",
-    cta: {
-      label: "Start Your Project",
-      href: "/kontakt",
-      variant: "default",
-    },
-    cta2: {
-      label: "View Our Work",
-      href: "/work",
-      variant: "default",
-    },
-  };
-
-  // Insert test sections after ServicesSplit section
-  const sectionsWithTest = [...sections];
-  const servicesSplitIndex = sectionsWithTest.findIndex(isServicesSplitSection);
-  if (servicesSplitIndex !== -1) {
-    sectionsWithTest.splice(servicesSplitIndex + 1, 0, testTextImageSection);
-    sectionsWithTest.splice(servicesSplitIndex + 2, 0, testTextOnlySection);
-  }
+  // Render Sanity sections in the exact order defined in Studio
+  const sectionsWithTest = sections;
 
   return (
     <main>

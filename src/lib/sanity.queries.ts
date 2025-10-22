@@ -531,6 +531,26 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
           cta{ label, href }
         }
       },
+      _type == "textImage" => {
+        _type,
+        eyebrow,
+        title,
+        body,
+        imagePosition,
+        image{
+          alt,
+          asset->{ url, metadata{ lqip, dimensions } }
+        },
+        cta{ label, href, variant }
+      },
+      _type == "textOnly" => {
+        _type,
+        eyebrow,
+        title,
+        body,
+        cta{ label, href, variant },
+        cta2{ label, href, variant }
+      },
       true => {}
     )
   }
