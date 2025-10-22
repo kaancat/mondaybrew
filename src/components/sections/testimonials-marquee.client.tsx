@@ -440,10 +440,12 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   // Use exact measured width of one set (including margins) for wrap distance
   const totalWidth = setWidth;
 
-  const wrapOffset = useCallback((value: number) => {
-    if (!totalWidth) return 0;
+  const wrapTx = useCallback((tx: number) => {
+    if (!totalWidth) return tx;
+    let v = tx;
     const w = totalWidth;
-    const v = ((value % w) + w) % w; // positive modulo
+    while (v <= -w) v += w;
+    while (v > 0) v -= w;
     return v;
   }, [totalWidth]);
 
@@ -473,10 +475,10 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
     e.preventDefault();
     setIsInteracting(true);
-    setDragOffset((v) => wrapOffset(v - e.deltaX));
+    setDragOffset((v) => wrapTx(v - e.deltaX));
     clearInteractionTimeout();
     interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 200);
-  }, [prefersReducedMotion, wrapOffset, clearInteractionTimeout]);
+  }, [prefersReducedMotion, wrapTx, clearInteractionTimeout]);
 
   const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     if (prefersReducedMotion) return;
@@ -492,9 +494,9 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (pointerIdRef.current !== e.pointerId) return;
     e.preventDefault();
     const dx = e.clientX - startXRef.current;
-    // Intuitive drag: dragging to the right moves content right
-    setDragOffset(wrapOffset(startOffsetRef.current - dx));
-  }, [prefersReducedMotion, wrapOffset]);
+    // Intuitive drag: translate equals dx
+    setDragOffset(wrapTx(startOffsetRef.current + dx));
+  }, [prefersReducedMotion, wrapTx]);
 
   const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     if (prefersReducedMotion) return;
@@ -506,8 +508,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   }, [prefersReducedMotion, clearInteractionTimeout]);
 
   const wrapperStyle = useMemo(
-    () => ({ transform: `translate3d(${directionFactor * -dragOffset}px,0,0)`, willChange: "transform" }),
-    [dragOffset, directionFactor],
+    () => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }),
+    [dragOffset],
   );
 
   // Drive marquee with requestAnimationFrame for robust infinite loop (no CSS keyframe drift)
@@ -520,7 +522,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       const dt = Math.max(0, (now - last) / 1000);
       last = now;
       if (!isInteracting) {
-        setDragOffset((v) => wrapOffset(v - directionFactor * pxPerSec * dt));
+        setDragOffset((v) => wrapTx(v + directionFactor * pxPerSec * dt));
       }
       rafId = requestAnimationFrame(step);
     };
@@ -528,7 +530,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapOffset]);
+  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapTx]);
 
   return (
     <div ref={viewportRef} className={cn("relative overflow-hidden", prefersReducedMotion && "no-scrollbar overflow-x-auto")}
