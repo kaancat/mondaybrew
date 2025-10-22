@@ -37,8 +37,8 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
         <div
           className={cn(
             "clients-hero-strip rounded-none shadow-[var(--shadow-elevated-md)]",
-            "bg-[color:var(--accent)] text-[color:var(--accent-foreground)]",
-            "dark:!bg-[color:var(--services-card-bg)] dark:!text-[color:var(--services-ink-strong)]",
+            "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)]",
+            "dark:!bg-[color:var(--accent)] dark:!text-[color:var(--accent-foreground)]",
             "px-6 py-[20px]",
             "relative overflow-hidden",
           )}
@@ -94,8 +94,8 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
         <div
           className={cn(
             "clients-hero-strip rounded-[5px] shadow-[var(--shadow-elevated-md)]",
-            "bg-[color:var(--accent)] text-[color:var(--accent-foreground)]",
-            "dark:!bg-[color:var(--services-card-bg)] dark:!text-[color:var(--services-ink-strong)]",
+            "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)]",
+            "dark:!bg-[color:var(--accent)] dark:!text-[color:var(--accent-foreground)]",
             "px-10 py-20 lg:px-12 lg:py-24",
             "relative overflow-hidden",
           )}
