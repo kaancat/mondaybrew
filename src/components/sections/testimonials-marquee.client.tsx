@@ -131,6 +131,23 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
   );
 }
 
+function CardFrameMobile({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="group/card relative shrink-0 snap-center first:ml-4 last:mr-4"
+      style={{
+        width: "85vw",
+        minWidth: "85vw",
+        flex: "0 0 auto",
+        contain: "layout paint",
+        contentVisibility: "auto",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function CardCta({ card, colors, className }: { card: TCard; colors: ToneStyle; className?: string }) {
   if (!card.cta?.label || !card.cta.href) return null;
   const ctaColor = "var(--mb-accent)"; // brand orange
@@ -154,7 +171,7 @@ function QuoteCard({ card }: { card: TCard }) {
     <CardFrame card={card}>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[400px] flex-col rounded-[5px] p-8",
+          "card-inner relative flex h-full min-h=[400px] flex-col rounded-[5px] p-8",
           "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
@@ -180,6 +197,37 @@ function QuoteCard({ card }: { card: TCard }) {
         <CardCta card={card} colors={colors} className="mt-8" />
       </div>
     </CardFrame>
+  );
+}
+
+function QuoteCardMobile({ card }: { card: TCard }) {
+  const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
+  const colors = card.colors ?? MODE_PRESETS[tone];
+  return (
+    <CardFrameMobile>
+      <div
+        className={cn(
+          "card-inner relative flex h-full min-h-[360px] flex-col rounded-[8px] p-6",
+          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+        )}
+        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
+      >
+        <CardLogo card={card} className="mb-6 self-start" />
+        <div className="flex flex-1 flex-col gap-4">
+          {card.quote ? (
+            <blockquote className="text-balance text-[clamp(18px,5vw,22px)] leading-snug" style={{ color: colors.ink }}>
+              “{card.quote}”
+            </blockquote>
+          ) : null}
+          <div className="h-px w-10" style={{ background: colors.divider }} />
+          <div className="text-xs font-medium uppercase tracking-[0.18em]" style={{ color: colors.sub }}>
+            {card.author}
+            {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+          </div>
+        </div>
+        <CardCta card={card} colors={colors} className="mt-6" />
+      </div>
+    </CardFrameMobile>
   );
 }
 
@@ -236,6 +284,52 @@ function ImageQuoteCard({ card }: { card: TCard }) {
   );
 }
 
+function ImageQuoteCardMobile({ card }: { card: TCard }) {
+  if (!card.image?.url) return null;
+  const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
+  const colors = card.colors ?? MODE_PRESETS[tone];
+  return (
+    <CardFrameMobile>
+      <div
+        className={cn(
+          "card-inner relative flex h-full min-h-[360px] overflow-hidden rounded-[8px]",
+          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+        )}
+        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
+      >
+        <div className="relative flex-[0_0_48%] min-w-[180px]">
+          <Image
+            src={card.image.url}
+            alt={card.image.alt || ""}
+            draggable={false}
+            fill
+            sizes="70vw"
+            placeholder={card.image.lqip ? "blur" : undefined}
+            blurDataURL={card.image.lqip || undefined}
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <div className="flex flex-1 flex-col p-5">
+          <CardLogo card={card} className="mb-6 self-start" />
+          <div className="flex flex-col gap-4">
+            {card.quote ? (
+              <blockquote className="text-balance text-[clamp(18px,5vw,22px)] leading-snug">
+                “{card.quote}”
+              </blockquote>
+            ) : null}
+            <div className="h-px w-10" style={{ background: colors.divider }} />
+            <div className="text-xs font-medium uppercase tracking-[0.18em]" style={{ color: colors.sub }}>
+              {card.author}
+              {card.role ? <span className="opacity-70"> — {card.role}</span> : null}
+            </div>
+          </div>
+          <CardCta card={card} colors={colors} className="mt-auto" />
+        </div>
+      </div>
+    </CardFrameMobile>
+  );
+}
+
 function ImageOnlyCard({ card }: { card: TCard }) {
   if (!card.image?.url) return null;
   return (
@@ -286,6 +380,32 @@ function ImageOnlyCard({ card }: { card: TCard }) {
   );
 }
 
+function ImageOnlyCardMobile({ card }: { card: TCard }) {
+  if (!card.image?.url) return null;
+  return (
+    <CardFrameMobile>
+      <div
+        className={cn(
+          "card-inner relative flex h-full min-h-[360px] overflow-hidden rounded-[8px]",
+          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+        )}
+      >
+        <Image
+          src={card.image.url}
+          alt={card.image.alt || ""}
+          draggable={false}
+          fill
+          sizes="80vw"
+          placeholder={card.image.lqip ? "blur" : undefined}
+          blurDataURL={card.image.lqip || undefined}
+          className="h-full w-full object-cover"
+        />
+        <CardLogo card={card} className="absolute left-5 top-5 z-20" />
+      </div>
+    </CardFrameMobile>
+  );
+}
+
 function Card({ card }: { card: TCard }) {
   if (card.variant === "image") {
     return <ImageOnlyCard card={card} />;
@@ -294,6 +414,16 @@ function Card({ card }: { card: TCard }) {
     return <ImageQuoteCard card={card} />;
   }
   return <QuoteCard card={card} />;
+}
+
+function CardMobile({ card }: { card: TCard }) {
+  if (card.variant === "image") {
+    return <ImageOnlyCardMobile card={card} />;
+  }
+  if (card.variant === "imageQuote") {
+    return <ImageQuoteCardMobile card={card} />;
+  }
+  return <QuoteCardMobile card={card} />;
 }
 
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
@@ -438,14 +568,56 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   );
 }
 
+function RowMobile({ items }: { items: TCard[] }) {
+  const normalizedItems = useMemo(() => {
+    return items.map((card, i) => {
+      const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
+      const preset = MODE_PRESETS[toneKey];
+      return { ...card, tone: toneKey, background: preset.background, colors: preset };
+    });
+  }, [items]);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+
+  const onWheel = useCallback((e: ReactWheelEvent<HTMLDivElement>) => {
+    const el = viewportRef.current;
+    if (!el) return;
+    // Map vertical wheel/trackpad to horizontal scroll for convenience in dev tools
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      el.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }
+  }, []);
+
+  return (
+    <div
+      ref={viewportRef}
+      onWheel={onWheel}
+      className="-mx-4 overflow-x-auto px-0 scrollbar-none snap-x snap-mandatory"
+      style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x", overscrollBehaviorX: "contain" as any }}
+    >
+      <div className="flex gap-4 px-0 py-2">
+        {normalizedItems.map((card, i) => (
+          <CardMobile key={i} card={card} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
   return (
     <div className="relative flex flex-1 flex-col justify-end">
       {/* subtle peek of bottom row */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[12vh] bg-gradient-to-t from-background to-transparent" />
-      <div className="flex flex-col gap-3 pb-3">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[12vh] bg-gradient-to-t from-background to-transparent hidden md:block" />
+      {/* Desktop/original marquee */}
+      <div className="hidden md:flex flex-col gap-3 pb-3">
         <Row items={top} speed={speedTop} direction={1} />
         <Row items={bottom} speed={speedBottom} direction={-1} />
+      </div>
+      {/* Mobile scroll-snap variant (desktop unchanged) */}
+      <div className="md:hidden flex flex-col gap-4 pb-2">
+        <RowMobile items={top} />
+        <RowMobile items={bottom} />
       </div>
     </div>
   );

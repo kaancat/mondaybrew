@@ -221,8 +221,11 @@ function Logo({ logo, forceBlackLogos }: { logo: ClientLogo; forceBlackLogos?: b
   const alt = image?.alt || title || "Logo";
 
   if (image?.image?.asset?.url) {
-    const { width, height } = image.image.asset.metadata?.dimensions || { width: 120, height: 60 };
-    const aspectRatio = width / height;
+    const dims = image.image.asset.metadata?.dimensions as { width?: number; height?: number } | undefined;
+    const width = (dims?.width ?? 120) as number;
+    const height = (dims?.height ?? 60) as number;
+    const safeHeight = height === 0 ? 60 : height;
+    const aspectRatio = width / safeHeight;
     const maxHeight = 40;
     const w = maxHeight * aspectRatio;
     const h = maxHeight;
