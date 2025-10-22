@@ -116,7 +116,7 @@ const portableComponents: Partial<PortableTextReactComponents> = {
   },
   block: {
     normal: ({ children }: { children?: ReactNode }) => (
-      <h1 className="text-balance text-[clamp(2.5rem,4vw+1rem,4.5rem)] font-semibold leading-[1.05] text-white">
+      <h1 className="text-balance text-[clamp(2rem,4vw+1rem,4.5rem)] font-semibold leading-[1.05] text-white">
         {children}
       </h1>
     ),
@@ -196,7 +196,7 @@ export function HeroSection({
   const featureItemsSource = feature?.items?.length
     ? feature.items
     : feature
-    ? [
+      ? [
         {
           title: feature.title,
           excerpt: feature.excerpt,
@@ -206,7 +206,7 @@ export function HeroSection({
           reference: feature.reference,
         },
       ]
-    : [];
+      : [];
 
   const featureItems = featureItemsSource
     .map((item, idx) => {
@@ -242,7 +242,8 @@ export function HeroSection({
 
   const hasFeature = featureItems.length > 0;
   // Adjust safe padding for the featured card footprint on mobile (compact 2-column layout)
-  const mobileFeaturePad = hasFeature ? "pb-[180px] sm:pb-[200px] md:pb-10" : "";
+  // Increased bottom padding on mobile to prevent overlap with feature carousel
+  const mobileFeaturePad = hasFeature ? "pb-[220px] sm:pb-[240px] md:pb-10" : "";
 
   return (
     <Section
@@ -283,37 +284,37 @@ export function HeroSection({
         </div>
 
         <div
-          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-24 pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
+          className={`relative z-10 flex h-full flex-col justify-start ${justifyMd} ${contentGap} px-6 pt-[88px] pb-10 sm:px-10 sm:pt-20 lg:px-16 ${mobileFeaturePad}`}
         >
-          <div className="max-w-2xl text-white flex-shrink-0">
+          <div className="max-w-2xl text-white flex-shrink-0 space-y-4 md:space-y-0">
             {eyebrow ? (
-              <span className="eyebrow mb-4 block text-sm font-medium text-[color:var(--eyebrow-color,currentColor)]">
+              <span className="eyebrow mb-3 md:mb-4 block text-sm font-medium text-[color:var(--eyebrow-color,currentColor)]">
                 {eyebrow}
               </span>
             ) : null}
             {Array.isArray(headline) ? (
               <PortableText value={headline as PortableTextBlock[]} components={portableComponents} />
             ) : typeof headline === "string" && headline ? (
-              <h1 className="text-balance text-[clamp(2.5rem,4vw+1rem,4.5rem)] font-semibold leading-[1.05] text-white">
+              <h1 className="text-balance text-[clamp(2rem,4vw+1rem,4.5rem)] font-semibold leading-[1.05] text-white">
                 {headline}
               </h1>
             ) : heading ? (
-              <h1 className="text-balance text-[clamp(2.5rem,4vw+1rem,4.5rem)] font-semibold leading-[1.05] text-white">
+              <h1 className="text-balance text-[clamp(2rem,4vw+1rem,4.5rem)] font-semibold leading-[1.05] text-white">
                 {heading}
               </h1>
             ) : null}
             {subheading ? (
-              <p className="mt-5 max-w-xl text-lg text-white/80 md:text-xl">
+              <p className="mt-3 md:mt-5 max-w-xl text-base md:text-lg text-white/80 md:text-xl leading-snug md:leading-normal">
                 {subheading}
               </p>
             ) : null}
             {helperText ? (
-              <p className="mt-6 text-sm font-medium uppercase tracking-[0.18em] text-white/70">
+              <p className="mt-4 md:mt-6 text-sm font-medium uppercase tracking-[0.18em] text-white/70">
                 {helperText}
               </p>
             ) : null}
             {ctaData ? (
-              <div className="mt-6">
+              <div className="mt-4 md:mt-6">
                 <Button asChild size="lg" variant={resolveVariant(ctaData, "default")}>
                   <Link href={ctaHref} className="inline-flex items-center gap-2">
                     <span>{ctaLabel}</span>
