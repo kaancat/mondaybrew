@@ -234,8 +234,7 @@ export function HeroSection({
     })
     .filter(Boolean) as HeroFeatureDisplayItem[];
 
-  // Fill the viewport regardless of header height
-  const heroHeight = `100dvh`;
+  // Use CSS to control full-height with stable viewport units
 
   const contentGap = alignment === "center" ? "gap-12" : "gap-10";
   const justifyMd = alignment === "start" ? "md:justify-start" : alignment === "end" ? "md:justify-end" : "md:justify-center";
@@ -253,8 +252,9 @@ export function HeroSection({
       data-hero-full="true"
     >
       <div
+        data-hero-surface="true"
         className="full-bleed relative md:isolate flex w-full flex-col overflow-hidden md:rounded-[5px] md:border md:border-white/10 md:bg-black/60 shadow-[var(--shadow-hero)]"
-        style={{ minHeight: "560px", height: heroHeight }}
+        style={{ minHeight: "560px" }}
       >
         <div className="absolute inset-0">
           {videoUrl ? (

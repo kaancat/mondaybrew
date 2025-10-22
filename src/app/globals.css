@@ -597,7 +597,9 @@ html.dark {
     overflow: visible;
     pointer-events: auto;
     background: var(--background);
-    height: var(--nav-viewport-height);
+    /* Allow page to grow naturally while nav is closed to avoid dvh-driven jumps */
+    min-height: var(--nav-viewport-height);
+    height: auto;
     margin-block: 0;
   }
 
@@ -899,6 +901,14 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
   .vr-hero { margin-bottom: var(--section-gap-md); }
   /* If the hero declares 100vh, remove external rhythm spacing */
   .vr-hero:has([data-hero-full="true"]) { margin-bottom: 0 !important; }
+
+  /* Stable full-height hero surface: prefer 100svh to prevent iOS address-bar resize jumps */
+  [data-hero-surface="true"] {
+    height: 100svh;
+  }
+  @supports not (height: 100svh) {
+    [data-hero-surface="true"] { height: 100vh; }
+  }
 
   .vr-section { margin-top: var(--section-gap-sm); }
   @media (min-width: 768px) { .vr-section { margin-top: var(--section-gap-md); } }
