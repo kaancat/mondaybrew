@@ -6,7 +6,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
   type ReactNode,
@@ -14,7 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 
 export type TImage = {
   url?: string | null;
@@ -505,8 +504,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   }, [prefersReducedMotion, clearInteractionTimeout]);
 
   const wrapperStyle = useMemo(
-    () => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }),
-    [dragOffset],
+    () => ({ transform: `translate3d(${directionFactor * -dragOffset}px,0,0)`, willChange: "transform" }),
+    [dragOffset, directionFactor],
   );
 
   // Drive marquee with requestAnimationFrame for robust infinite loop (no CSS keyframe drift)
@@ -514,7 +513,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (prefersReducedMotion || !totalWidth) return;
     let rafId: number | null = null;
     let last = performance.now();
-    const pxPerSec = speed * 20; // tune speed similar to legacy
+    const pxPerSec = speed * 2; // match legacy CSS-driven speed mapping
     const step = (now: number) => {
       const dt = Math.max(0, (now - last) / 1000);
       last = now;
