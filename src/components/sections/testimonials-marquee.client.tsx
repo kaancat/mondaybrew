@@ -596,7 +596,7 @@ function RowMobile({ items }: { items: TCard[] }) {
       className="-mx-4 overflow-x-auto px-0 scrollbar-none"
       style={{ 
         WebkitOverflowScrolling: "touch", 
-        touchAction: "pan-x" as const,
+        touchAction: "pan-x pan-y" as const,
         scrollBehavior: "smooth",
         overscrollBehavior: "contain",
         overflowX: "auto",
