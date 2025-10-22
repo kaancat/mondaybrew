@@ -216,8 +216,8 @@ html.light-primary {
   /* no explicit active state in 160f45d navbar for light alt */
   --nav-toggle-border: transparent;
   --nav-toggle-bg: color-mix(in oklch, var(--surface-dark) 75%, var(--surface-base) 25%);
-  /* Primary theme: hamburger icon (nav toggle) should be brand white */
-  --nav-toggle-text: var(--brand-light);
+  /* Primary theme: theme toggle icon/button text should be brand gray (match locale selector) */
+  --nav-toggle-text: var(--foreground);
   --nav-toggle-hover-border: color-mix(in oklch, var(--mb-ink) 35%, var(--mb-bg) 65%);
   --nav-toggle-hover-bg: color-mix(in oklch, var(--surface-dark) 85%, var(--surface-base) 15%);
   --nav-toggle-ring: rgba(255, 145, 77, 0.7);
