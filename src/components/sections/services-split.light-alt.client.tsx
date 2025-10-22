@@ -336,7 +336,7 @@ export function ServicesSplitLightAlt({
           </div>
         </Container>
 
-        <div className="relative md:hidden">
+        <div className="relative md:hidden mt-6">
           <AnimatePresence mode="wait" initial={false}>
             {activeService ? (
               <motion.article
@@ -345,7 +345,7 @@ export function ServicesSplitLightAlt({
                 animate="visible"
                 exit="hidden"
                 variants={detailVariants}
-                className="full-bleed rounded-none p-0 md:rounded-[5px] md:p-6 bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)]"
+                className="full-bleed rounded-none p-0 md:rounded-[5px] md:p-6 bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] shadow-[var(--shadow-elevated-md)] z-0"
               >
                 {renderMedia(activeService.media)}
                 <div className="mt-6 flex flex-col gap-4 px-5 pb-5 md:px-0 md:pb-0">
