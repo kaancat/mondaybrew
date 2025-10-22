@@ -431,7 +431,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     <>
       <header
         ref={headerRef}
-        className="fixed inset-x-0 top-0 z-[9999] pt-2 sm:pt-3 md:pt-4"
+        className="sticky md:fixed inset-x-0 top-0 z-[9999] pt-2 sm:pt-3 md:pt-4"
         style={{ top: "env(safe-area-inset-top, 0px)" }}
       >
         <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
