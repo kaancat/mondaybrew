@@ -134,7 +134,7 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
 function CardFrameMobile({ children }: { children: ReactNode }) {
   return (
     <div
-      className="group/card relative shrink-0 snap-center first:ml-4 last:mr-4"
+      className="group/card relative shrink-0 first:ml-4 last:mr-4"
       style={{
         width: "85vw",
         minWidth: "85vw",
@@ -598,16 +598,12 @@ function RowMobile({ items }: { items: TCard[] }) {
         WebkitOverflowScrolling: "touch", 
         touchAction: "pan-x" as const,
         scrollBehavior: "smooth",
-        minHeight: "400px"
+        overscrollBehavior: "contain"
       }}
     >
-      <div className="flex gap-4 px-0 py-2" style={{ width: "max-content", minWidth: "200vw" }}>
+      <div className="flex gap-4 px-0 py-2" style={{ width: "max-content" }}>
         {normalizedItems.map((card, i) => (
           <CardMobile key={i} card={card} />
-        ))}
-        {/* Add duplicate items to ensure scrolling */}
-        {normalizedItems.map((card, i) => (
-          <CardMobile key={`dup-${i}`} card={card} />
         ))}
       </div>
     </div>
