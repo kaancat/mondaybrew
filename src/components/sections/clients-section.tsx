@@ -55,7 +55,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
             {headline ? (
               <h2
                 id="clients-heading"
-                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold"
+                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-[color:var(--clients-hero-title,var(--clients-hero-text))]"
               >
                 {headline}
               </h2>
@@ -73,21 +73,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
             ) : null}
           </div>
 
-          {/* Optional geometric line art (subtle, trivial) */}
-          <svg
-            aria-hidden
-            className="hidden md:block absolute right-2 top-2 text-[color:var(--clients-hero-graphic)]"
-            width="140"
-            height="120"
-            viewBox="0 0 140 120"
-            fill="none"
-          >
-            <g stroke="currentColor" strokeOpacity="0.4">
-              <path d="M0 120 L120 0" />
-              <path d="M40 120 L140 20" />
-              <path d="M0 80 L80 0" />
-            </g>
-          </svg>
+          {/* Decorative SVG removed per request */}
         </div>
       </div>
 
@@ -112,7 +98,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
             {headline ? (
               <h2
                 id="clients-heading"
-                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold"
+                className="text-[clamp(28px,3.4vw,40px)] leading-tight font-semibold text-[color:var(--clients-hero-title,var(--clients-hero-text))]"
               >
                 {headline}
               </h2>
@@ -130,21 +116,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
             ) : null}
           </div>
 
-          {/* Optional geometric line art (subtle, trivial) */}
-          <svg
-            aria-hidden
-            className="absolute right-8 top-8 text-[color:var(--clients-hero-graphic)]"
-            width="140"
-            height="120"
-            viewBox="0 0 140 120"
-            fill="none"
-          >
-            <g stroke="currentColor" strokeOpacity="0.4">
-              <path d="M0 120 L120 0" />
-              <path d="M40 120 L140 20" />
-              <path d="M0 80 L80 0" />
-            </g>
-          </svg>
+          {/* Decorative SVG removed per request */}
         </div>
       </div>
 

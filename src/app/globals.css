@@ -825,11 +825,11 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
   }
   /* About eyebrow override removed: now uses global --eyebrow-color */
 
-  /* Clients/Partners: Light-Alt — keep hero strip flat (no card border/shadow), just text */
+  /* Clients/Partners: Light-Alt — white card with distinct black border */
   html.light-alt .clients-hero-strip {
     background: var(--services-card-bg) !important;
     color: var(--services-ink-strong) !important;
-    border: 0 !important;
+    border: 1px solid var(--services-ink-strong) !important;
     margin-bottom: 0;
     /* Eyebrow uses brand orange for consistency */
     --clients-hero-eyebrow: var(--mb-accent);
