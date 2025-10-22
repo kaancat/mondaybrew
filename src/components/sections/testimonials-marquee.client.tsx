@@ -578,15 +578,16 @@ function RowMobile({ items }: { items: TCard[] }) {
   }, [items]);
 
   return (
-    <div className="relative">
+    <div className="relative -mx-[var(--container-gutter)]">
       {/* Fade overlays for scroll indication */}
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent" />
       
       <div 
-        className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory"
+        className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory touch-pan-x"
         style={{
-          WebkitOverflowScrolling: "touch"
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-x pan-y"
         }}
       >
         <div className="flex gap-4 py-2 px-[var(--container-gutter)]" style={{ width: "max-content" }}>
@@ -612,7 +613,7 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
       {/* Mobile scrollable rows (desktop unchanged) */}
-      <div className="md:hidden flex flex-col gap-4 pb-2 justify-start -mx-[var(--container-gutter)]" style={{ height: "auto", minHeight: "400px" }}>
+      <div className="md:hidden flex flex-col gap-4 pb-2 justify-start" style={{ height: "auto", minHeight: "400px" }}>
         <RowMobile items={top} />
         <RowMobile items={bottom} />
       </div>
