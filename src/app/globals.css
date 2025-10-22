@@ -125,6 +125,11 @@
   --mobile-nav-hover: color-mix(in oklch, var(--mb-ink) 10%, transparent);
   --mobile-nav-link: color-mix(in oklch, var(--mb-ink) 88%, black 12%);
   --mobile-nav-overlay: rgba(73, 68, 75, 0.12);
+  /* Mobile menu secondary action tokens (theme toggle, language) */
+  --mobile-nav-secondary-bg: color-mix(in oklch, var(--mb-ink) 12%, transparent);
+  --mobile-nav-secondary-text: var(--mobile-nav-text);
+  --mobile-nav-secondary-border: var(--mobile-nav-border);
+  --mobile-nav-secondary-hover-bg: color-mix(in oklch, var(--mb-ink) 18%, transparent);
 }
 
 @supports (height: 100dvh) {
@@ -242,6 +247,11 @@ html.light-primary body[data-mobile-nav-open="true"] {
   /* Brand the mobile menu section headings and top eyebrow in primary theme */
   --mobile-nav-heading: var(--mb-accent);
   --mobile-nav-muted: var(--mb-accent);
+  /* Brand gray for secondary actions */
+  --mobile-nav-secondary-bg: var(--mb-ink);
+  --mobile-nav-secondary-text: var(--brand-light);
+  --mobile-nav-secondary-border: color-mix(in oklch, var(--brand-light) 18%, transparent);
+  --mobile-nav-secondary-hover-bg: color-mix(in oklch, var(--mb-ink) 90%, black 10%);
 }
 
 html.light-alt {
