@@ -313,10 +313,10 @@ function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedS
       custom={index}
       className="flex w-full flex-col items-start md:items-center justify-center gap-1 md:gap-[10px] px-1 py-0.5 md:px-2 md:py-1 text-left md:text-center"
     >
-      <dd className="text-balance text-[clamp(1.25rem,3.8vw,1.5rem)] md:text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[1.05] tracking-[-0.01em] text-[color:var(--foreground)] dark:text-white">
+      <dd className="text-balance text-[clamp(1.25rem,3.8vw,1.5rem)] md:text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[1.05] tracking-[-0.01em] text-gray-900">
         {displayValue || "—"}
       </dd>
-      <dt className="about-stats-label mt-0.5 md:mt-2 inline-flex items-center gap-1.5 text-[11px] md:text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.06em] text-[color:var(--foreground)]/70 dark:text-white/80">
+      <dt className="about-stats-label mt-0.5 md:mt-2 inline-flex items-center gap-1.5 text-[11px] md:text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.06em] text-gray-700">
         {icon?.url ? (
           <Image
             src={icon.url}
