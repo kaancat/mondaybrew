@@ -1,9 +1,8 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 export type TImage = {
   url?: string | null;
@@ -113,7 +112,7 @@ function QuoteCard({ card, colors }: { card: TCard; colors: ToneStyle }) {
       
       {card.quote && (
         <blockquote className="text-lg leading-relaxed mb-4 flex-1">
-          "{card.quote}"
+          &ldquo;{card.quote}&rdquo;
         </blockquote>
       )}
 
@@ -180,7 +179,7 @@ function ImageQuoteCard({ card, colors }: { card: TCard; colors: ToneStyle }) {
         
         {card.quote && (
           <blockquote className="text-base leading-relaxed mb-4" style={{ color: colors.ink }}>
-            "{card.quote}"
+            &ldquo;{card.quote}&rdquo;
           </blockquote>
         )}
 

@@ -27,7 +27,7 @@ export type ClientsSectionData = {
   logos?: ClientLogo[];
 };
 
-export default function ClientsSection({ eyebrow, headline, subheading, logos, more, locale, forceBlackLogos }: ClientsSectionData & { locale?: "da" | "en" }) {
+export default function ClientsSection({ eyebrow, headline, subheading, logos, more, locale: _locale, forceBlackLogos }: ClientsSectionData & { locale?: "da" | "en" }) {
   const items = (logos || []).filter((l) => (l?.title || l?.image?.image?.asset?.url)).slice(0, 60);
 
   return (
@@ -146,7 +146,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
 
       {/* Desktop/Tablet: lined grid */}
       <div className="layout-container hidden md:block">
-        <LinedGrid items={items} more={more} locale={locale} forceBlackLogos={forceBlackLogos} />
+        <LinedGrid items={items} more={more} forceBlackLogos={forceBlackLogos} />
       </div>
 
       {/* Mobile: marquee rows (prefers-reduced-motion handled inside) */}
@@ -163,7 +163,7 @@ export default function ClientsSection({ eyebrow, headline, subheading, logos, m
   );
 }
 
-function LinedGrid({ items, more, locale, forceBlackLogos }: { items: ClientLogo[]; more?: { label?: string; href?: string; reference?: { slug?: string; locale?: string } } | null; locale?: "da" | "en"; forceBlackLogos?: boolean }) {
+function LinedGrid({ items, more, forceBlackLogos }: { items: ClientLogo[]; more?: { label?: string; href?: string; reference?: { slug?: string; locale?: string } } | null; forceBlackLogos?: boolean }) {
   // 5 columns on large, 4 on md, 3 on sm
   return (
     <div
@@ -215,7 +215,7 @@ function LinedGrid({ items, more, locale, forceBlackLogos }: { items: ClientLogo
 }
 
 function Logo({ logo, forceBlackLogos }: { logo: ClientLogo; forceBlackLogos?: boolean }) {
-  const { title, url, image } = logo;
+  const { title, image } = logo;
   const alt = image?.alt || title || "Logo";
 
   if (image?.image?.asset?.url) {
