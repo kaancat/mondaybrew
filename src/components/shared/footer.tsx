@@ -1,205 +1,163 @@
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 /**
  * Full-size footer component
- * 
- * Large, bold footer with huge logo background, multiple link columns,
- * contact info, and CTA. Inspired by modern agency footer designs.
+ *
+ * Horizontal full-width layout with dark purple-gray background
+ * and orange accent colors from the design.
  */
 export function Footer() {
   return (
-    <footer className="relative bg-background border-t border-border overflow-hidden mt-24">
-      {/* Huge background logo */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-        <div className="relative w-full h-full">
-          <Image
-            src="/brand/MondayBrew - Logo Stor - 1.png"
-            alt=""
-            fill
-            className="object-contain"
-            priority={false}
-          />
-        </div>
-      </div>
-
+    <footer className="relative overflow-hidden" style={{
+      backgroundColor: "#49444B",
+      height: "100vh",
+    } as React.CSSProperties}>
       {/* Footer content */}
-      <div className="relative z-10">
-        <div className="container mx-auto px-[var(--container-gutter)] py-16 md:py-24">
-          {/* Top section with CTA */}
-          <div className="mb-16 md:mb-24">
-            <div className="max-w-3xl">
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
+      <div className="relative z-10 h-full flex flex-col justify-end">
+        {/* Main footer content */}
+        <div className="w-full px-[var(--container-gutter)] pb-16">
+          {/* Logo */}
+          <div className="mb-12" style={{ marginTop: "25rem" } as React.CSSProperties}>
+            <div className="relative w-[400px] h-40 md:w-[500px] md:h-52 lg:w-[600px] lg:h-60">
+              <Image
+                src="/brand/Copy of Hvidt Logo - 1.png"
+                alt="MondayBrew"
+                fill
+                className="object-contain object-left"
+                priority={false}
+              />
+            </div>
+          </div>
+
+          {/* Horizontal content row */}
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 mb-16">
+            {/* Left: CTA */}
+            <div className="flex-1 max-w-2xl">
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
                 Lad os bygge noget fedt sammen
               </h2>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8">
+              <p className="text-lg text-white/70 mb-8 leading-relaxed">
                 Vi hjælper ambitiøse brands med at vokse gennem moderne web og performance marketing.
               </p>
-              <Link
-                href="/kontakt"
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 text-base"
-              >
-                Start et projekt
-              </Link>
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  href="/kontakt"
+                  className="inline-flex items-center justify-center rounded-md font-medium transition-colors h-12 px-8"
+                  style={{
+                    backgroundColor: "#F97844",
+                    color: "#FFFFFF",
+                  } as React.CSSProperties}
+                >
+                  Start et projekt
+                </Link>
+                <Link
+                  href="/services"
+                  className="inline-flex items-center justify-center rounded-md font-medium transition-colors h-12 px-8"
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    color: "#4A4458",
+                  } as React.CSSProperties}
+                >
+                  Se vores services
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: Links and Contact */}
+            <div className="flex flex-wrap gap-12 lg:gap-16">
+              {/* Quick links */}
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/50 mb-4">
+                  Navigation
+                </h3>
+                <ul className="space-y-3">
+                  <li>
+                    <Link href="/services/web/websites" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      Websites
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/services/web/ecommerce" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      eCommerce
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/services/marketing/paid-social" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      Paid Social
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/services/marketing/paid-search" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      Paid Search
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/50 mb-4">
+                  Virksomhed
+                </h3>
+                <ul className="space-y-3">
+                  <li>
+                    <Link href="/om-os" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      Om os
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/cases" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      Cases
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/blog" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      Blog
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/kontakt" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      Kontakt
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Contact */}
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/50 mb-4">
+                  Kontakt
+                </h3>
+                <ul className="space-y-3">
+                  <li>
+                    <a href="mailto:hej@mondaybrew.dk" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      hej@mondaybrew.dk
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tel:+4512345678" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                      +45 12 34 56 78
+                    </a>
+                  </li>
+                  <li className="text-white/50 text-sm">
+                    København, Danmark
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
-          {/* Links grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-16">
-            {/* Services - Web */}
-            <div>
-              <h3 className="font-semibold mb-4 text-sm uppercase tracking-wider text-muted-foreground">
-                Web
-              </h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link
-                    href="/services/web/websites"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Websites
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/services/web/ecommerce"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    eCommerce
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/services/web/ai"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    AI-løsninger
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Services - Marketing */}
-            <div>
-              <h3 className="font-semibold mb-4 text-sm uppercase tracking-wider text-muted-foreground">
-                Marketing
-              </h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link
-                    href="/services/marketing/paid-social"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Paid Social
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/services/marketing/paid-search"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Paid Search
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/services/marketing/email-marketing"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Email Marketing
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/services/marketing/full-funnel-performance"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Full-Funnel Performance
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <h3 className="font-semibold mb-4 text-sm uppercase tracking-wider text-muted-foreground">
-                Virksomhed
-              </h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link
-                    href="/om-os"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Om os
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/cases"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Cases
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/blog"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/kontakt"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    Kontakt
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h3 className="font-semibold mb-4 text-sm uppercase tracking-wider text-muted-foreground">
-                Kontakt
-              </h3>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href="mailto:hej@mondaybrew.dk"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    hej@mondaybrew.dk
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="tel:+4512345678"
-                    className="text-foreground hover:text-[color:var(--mb-accent)] transition-colors"
-                  >
-                    +45 12 34 56 78
-                  </a>
-                </li>
-                <li className="text-muted-foreground">
-                  København, Danmark
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom section */}
-          <div className="pt-8 border-t border-border">
+          {/* Bottom bar */}
+          <div className="pt-8 border-t border-white/10">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center gap-6">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-white/40">
                   © MondayBrew {new Date().getFullYear()}
                 </p>
                 <Link
                   href="/privacy-policy"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-xs text-white/40 hover:text-[#F97844] transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -209,7 +167,7 @@ export function Footer() {
                   href="https://www.linkedin.com/company/mondaybrew"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-[color:var(--mb-accent)] transition-colors"
+                  className="text-white/40 hover:text-[#F97844] transition-colors"
                   aria-label="LinkedIn"
                 >
                   <svg
@@ -225,7 +183,7 @@ export function Footer() {
                   href="https://www.instagram.com/mondaybrew"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-[color:var(--mb-accent)] transition-colors"
+                  className="text-white/40 hover:text-[#F97844] transition-colors"
                   aria-label="Instagram"
                 >
                   <svg
