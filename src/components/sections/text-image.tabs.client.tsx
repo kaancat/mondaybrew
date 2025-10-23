@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -32,13 +32,34 @@ export function TextImageTabs({
   tabs: Tab[];
   cta?: { label: string; href: string; variant: "default" | "secondary" | "outline" | "ghost" | "link" } | null;
 }) {
-  const [activeId, setActiveId] = useState(tabs[0]?.id);
-  useMemo(() => tabs.find((t) => t.id === activeId) || tabs[0], [tabs, activeId]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const activeTab = useMemo(() => tabs.find((t) => t.id === activeId) ?? null, [tabs, activeId]);
 
   const leftFirst = imagePosition !== "left"; // text panel first when image is right
 
+  // Height sync between panels with smooth growth + max cap
+  const textCardRef = useRef<HTMLDivElement>(null);
+  const [measuredTextHeight, setMeasuredTextHeight] = useState<number>(520);
+
+  useEffect(() => {
+    const el = textCardRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const h = Math.round(entries[0].contentRect.height);
+      setMeasuredTextHeight(h);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const BASE_HEIGHT = 520; // closed state base height
+  const MIN_HEIGHT = 520; // keep within site constraints
+  const MAX_HEIGHT = 720; // do not grow beyond this
+  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+  const targetHeight = clamp(measuredTextHeight, MIN_HEIGHT, MAX_HEIGHT);
+
   return (
-    <div className={cn("grid gap-6 md:gap-10", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
+    <div className={cn("grid gap-4 md:gap-6", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
       {/* Text panel */}
       <div className={cn(leftFirst ? "order-1" : "order-2", "relative")}> 
         <div
@@ -47,6 +68,7 @@ export function TextImageTabs({
             "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)]",
             "border md:border md:border-[color:color-mix(in_oklch,var(--services-ink-strong)_10%,white_90%)]"
           )}
+          ref={textCardRef}
           style={{ minHeight: 520 }}
         >
           {eyebrow ? (
@@ -61,21 +83,21 @@ export function TextImageTabs({
             <p className="mt-3 text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_82%,white_18%)]">{body}</p>
           ) : null}
 
-          <div className="my-6 h-[1px] w-full bg-[color:color-mix(in_oklch,var(--services-ink-strong)_18%,white_82%)]" />
+          <div className="mt-6 mb-0 h-[1px] w-full bg-[color:color-mix(in_oklch,var(--services-ink-strong)_18%,white_82%)]" />
 
-          <ul className="divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)]">
+          <ul className="pt-2.5 divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)]"> 
             {tabs.map((t, i) => {
               const active = t.id === activeId;
               const num = String(i + 1).padStart(2, "0");
               return (
-                <li key={t.id} className="py-2">
+                <li key={t.id} className="py-1.5">
                   <button
                     type="button"
                     className={cn(
-                      "flex w-full items-center justify-between gap-4 py-3 text-left transition-colors",
+                      "flex w-full items-center justify-between gap-4 py-2.5 text-left transition-colors",
                       active ? "font-semibold" : "text-[color:color-mix(in_oklch,var(--services-ink-strong)_68%,white_32%)] hover:text-[color:var(--services-ink-strong)]"
                     )}
-                    onClick={() => setActiveId(t.id)}
+                    onClick={() => setActiveId(active ? null : t.id)}
                     aria-expanded={active}
                   >
                     <span className="truncate">{t.label || t.title || `Item ${num}`}</span>
@@ -93,7 +115,7 @@ export function TextImageTabs({
                         className="overflow-hidden pr-10"
                       >
                         {t.title ? (
-                          <h3 className="mt-2 text-[length:var(--font-h3)] font-semibold text-[color:var(--services-ink-strong)]">{t.title}</h3>
+                          <h3 className="mt-2 text-[length:var(--font-h4)] font-semibold text-[color:var(--services-ink-strong)]">{t.title}</h3>
                         ) : null}
                         {t.body ? (
                           <p className="mt-2 text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_80%,white_20%)]">{t.body}</p>
@@ -110,9 +132,12 @@ export function TextImageTabs({
 
       {/* Image panel */}
       <div className={cn(leftFirst ? "order-2" : "order-1", "relative")}> 
-        <div
+        <motion.div
+          initial={false}
+          animate={{ height: targetHeight }}
+          transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
           className={cn(
-            "relative h-full rounded-[5px]",
+            "relative rounded-[5px]",
             image ? "bg-black/5" : "bg-transparent",
             // Keep image box visually same height as text panel
             "overflow-hidden"
@@ -131,14 +156,14 @@ export function TextImageTabs({
                 src={image.url}
                 alt={image.alt || ""}
                 fill
-                className="object-cover"
+                className="object-cover scale-[1.06] md:scale-[1.10]"
                 sizes="(min-width: 768px) 50vw, 100vw"
                 placeholder={image.lqip ? "blur" : "empty"}
                 blurDataURL={image.lqip || undefined}
               />
             </motion.div>
           ) : null}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
