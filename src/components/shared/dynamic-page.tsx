@@ -87,50 +87,48 @@ export async function DynamicPage({
                     );
                 }
 
-                if (isTextImageSection(section)) {
-                    return (
-                        <div className="vr-section" key={key}>
-                            <TextImageSection
-                                sectionId={section.sectionId as { current?: string | null } | null | undefined}
-                                eyebrow={section.eyebrow as string | undefined}
-                                title={section.title as string | undefined}
-                                body={section.body as string | undefined}
-                                image={section.image as {
-                                    alt?: string | null;
-                                    asset?: {
-                                        url?: string | null;
-                                        metadata?: {
-                                            lqip?: string | null;
-                                            dimensions?: {
-                                                width?: number | null;
-                                                height?: number | null;
-                                            } | null;
-                                        } | null;
-                                    } | null;
-                                } | null | undefined}
-                                imagePosition={section.imagePosition as "left" | "right" | null | undefined}
-                                cta={section.cta as {
-                                    label?: string | null;
-                                    href?: string | null;
-                                    variant?: string | null;
-                                } | null | undefined}
-                            />
-                        </div>
-                    );
-                }
+        if (isTextImageSection(section)) {
+          return (
+            <div className="vr-section" key={key} id={key}>
+              <TextImageSection
+                eyebrow={section.eyebrow as string | undefined}
+                title={section.title as string | undefined}
+                body={section.body as string | undefined}
+                image={section.image as {
+                  alt?: string | null;
+                  asset?: {
+                    url?: string | null;
+                    metadata?: {
+                      lqip?: string | null;
+                      dimensions?: {
+                        width?: number | null;
+                        height?: number | null;
+                      } | null;
+                    } | null;
+                  } | null;
+                } | null | undefined}
+                imagePosition={section.imagePosition as "left" | "right" | null | undefined}
+                cta={section.cta as {
+                  label?: string | null;
+                  href?: string | null;
+                  variant?: string | null;
+                } | null | undefined}
+              />
+            </div>
+          );
+        }
 
-                if (isTextOnlySection(section)) {
-                    return (
-                        <div className="vr-section" key={key}>
-                            <TextOnlySection
-                                sectionId={section.sectionId as { current?: string | null } | null | undefined}
-                                eyebrow={section.eyebrow as string | null | undefined}
-                                title={section.title as string | null | undefined}
-                                body={section.body as string | null | undefined}
-                            />
-                        </div>
-                    );
-                }
+        if (isTextOnlySection(section)) {
+          return (
+            <div className="vr-section" key={key} id={key}>
+              <TextOnlySection
+                eyebrow={section.eyebrow as string | null | undefined}
+                title={section.title as string | null | undefined}
+                body={section.body as string | null | undefined}
+              />
+            </div>
+          );
+        }
 
                 // Unknown section type - skip silently
                 return null;

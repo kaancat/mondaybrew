@@ -97,7 +97,7 @@ export const heroPage = defineType({
             name: "breadcrumbs",
             title: "Breadcrumbs / Page Navigation",
             type: "array",
-            description: "Page-specific navigation links. WORKFLOW: 1) Add content sections below (Text+Image, Text Only, etc.), 2) Generate their Section IDs, 3) Come back here and select them from the dropdown.",
+            description: "Page-specific navigation links. WORKFLOW: 1) Add content blocks below (Text+Image, Text Only, etc.), 2) Come back here and select which blocks to link to from the dropdown.",
             of: [
                 {
                     type: "object",

@@ -533,7 +533,6 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
       },
       _type == "textImage" => {
         _type,
-        sectionId,
         eyebrow,
         title,
         body,
@@ -546,7 +545,6 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
       },
       _type == "textOnly" => {
         _type,
-        sectionId,
         eyebrow,
         title,
         body,
@@ -960,7 +958,6 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
       },
       _type == "textImage" => {
         _type,
-        sectionId,
         eyebrow,
         title,
         body,
@@ -973,7 +970,6 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
       },
       _type == "textOnly" => {
         _type,
-        sectionId,
         eyebrow,
         title,
         body,
