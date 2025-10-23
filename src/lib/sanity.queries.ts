@@ -956,6 +956,26 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
           anchor
         }
       },
+      _type == "textImage" => {
+        _type,
+        eyebrow,
+        title,
+        body,
+        imagePosition,
+        "image": {
+          "alt": image.alt,
+          "asset": image.image.asset->{ url, metadata{ lqip, dimensions } }
+        },
+        cta{ label, href, variant }
+      },
+      _type == "textOnly" => {
+        _type,
+        eyebrow,
+        title,
+        body,
+        cta{ label, href, variant },
+        cta2{ label, href, variant }
+      },
       true => {}
     )
   }
