@@ -139,7 +139,7 @@ export function TextImageTabs({
             // Keep image box visually same height as text panel
             "overflow-hidden"
           )}
-  style={{ height: targetHeight, minHeight: 520, transition: \"height 0.45s cubic-bezier(0.22, 0.61, 0.36, 1)\" }}
+  style={{ height: targetHeight, minHeight: 520, transition: "height 0.45s cubic-bezier(0.22, 0.61, 0.36, 1)" }}
         >
           {image?.url ? (
             <div className="absolute inset-0">
