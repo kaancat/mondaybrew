@@ -1,5 +1,26 @@
 # Dev Log
 
+## [2025-10-23] – Hero Page Available in Sanity Studio
+**Goal**: Make the Hero Page component available as a content block in Sanity Studio
+
+### Changes Made
+- Added `{ type: "heroPage" }` to the sections array in the page document schema
+- Committed and pushed changes to GitHub
+- Deployed Sanity schema to production
+
+**File Updated:** `src/sanity/types/documents/page.ts`
+
+The Hero Page content block is now available when editing pages in Sanity Studio at https://mondaybrew.sanity.studio/
+
+You can add it to any page and configure:
+- Eyebrow text
+- Heading (H1)
+- Subheading
+- Media (image or video)
+- Breadcrumbs (page sections/anchors)
+
+---
+
 ## [2025-10-23] – Mobile Responsive Design for Hero Page Component
 **Goal**: Make the Hero Page component mobile-friendly with specific layout changes for mobile devices
 
