@@ -52,8 +52,8 @@ export function TextImageTabs({
     return () => ro.disconnect();
   }, []);
 
-  const BASE_HEIGHT = 420; // closed state base height
-  const MIN_HEIGHT = 480;  // keep within site constraints
+  const BASE_HEIGHT = 520; // closed state base height
+  const MIN_HEIGHT = 520;  // keep within site constraints
   const MAX_HEIGHT = 720;  // do not grow beyond this
   const clamp = (v:number, min:number, max:number) => Math.max(min, Math.min(max, v));
   const targetHeight = clamp(activeTab ? measuredTextHeight : BASE_HEIGHT, MIN_HEIGHT, MAX_HEIGHT);
@@ -83,9 +83,9 @@ export function TextImageTabs({
             <p className="mt-3 text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_82%,white_18%)]">{body}</p>
           ) : null}
 
-          <div className="my-4 h-[1px] w-full bg-[color:color-mix(in_oklch,var(--services-ink-strong)_18%,white_82%)]" />
+          <div className="mt-6 mb-0 h-[1px] w-full bg-[color:color-mix(in_oklch,var(--services-ink-strong)_18%,white_82%)]" />
 
-          <ul className="divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)]">
+          <ul className="pt-2.5 divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)]">
             {tabs.map((t, i) => {
               const active = t.id === activeId;
               const num = String(i + 1).padStart(2, "0");
@@ -127,7 +127,7 @@ export function TextImageTabs({
               );
             })}
           </ul>
-        </div>
+        </motion.div>
       </div>
 
       {/* Image panel */}
@@ -142,7 +142,7 @@ export function TextImageTabs({
             // Keep image box visually same height as text panel
             "overflow-hidden"
           )}
-          style={{ minHeight: 480 }}
+          style={{ minHeight: 520 }}
         >
           {image?.url ? (
             <motion.div
@@ -156,7 +156,7 @@ export function TextImageTabs({
                 src={image.url}
                 alt={image.alt || ""}
                 fill
-                className="object-cover"
+                className="object-cover scale-[1.06] md:scale-[1.10]"
                 sizes="(min-width: 768px) 50vw, 100vw"
                 placeholder={image.lqip ? "blur" : "empty"}
                 blurDataURL={image.lqip || undefined}
