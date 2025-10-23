@@ -132,7 +132,7 @@ export function TextImageTabs({
       
       {/* Image panel */}
       <div className={cn(leftFirst ? "order-2" : "order-1", "relative")}> 
-        <div style={{ height: targetHeight, transition: "height 0.45s cubic-bezier(0.22, 0.61, 0.36, 1)" }}
+        <div
           className={cn(
             "relative rounded-[5px]",
             image ? "bg-black/5" : "bg-transparent",
