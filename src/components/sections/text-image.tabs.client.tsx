@@ -69,7 +69,7 @@ export function TextImageTabs({
             "border md:border md:border-[color:color-mix(in_oklch,var(--services-ink-strong)_10%,white_90%)]"
           )}
           ref={textCardRef}
-          style={{ minHeight: 480 }}
+          style={{ minHeight: 420 }}
         >
           {eyebrow ? (
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--services-ink-strong)_65%,white_35%)]">
@@ -132,7 +132,10 @@ export function TextImageTabs({
 
       {/* Image panel */}
       <div className={cn(leftFirst ? "order-2" : "order-1", "relative")}> 
-        <div
+        <motion.div
+          initial={false}
+          animate={{ height: targetHeight }}
+          transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
           className={cn(
             "relative rounded-[5px]",
             image ? "bg-black/5" : "bg-transparent",
