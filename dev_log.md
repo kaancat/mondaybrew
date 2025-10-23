@@ -1,5 +1,35 @@
 # Dev Log
 
+## [2025-10-23] – Hero Page Component: Hybrid Approach
+**Goal**: Make Hero Page available in Sanity Studio while keeping existing pages hardcoded
+
+### What Was Done
+
+1. **Added Hero Page to Sanity Queries** (`src/lib/sanity.queries.ts`)
+   - Added `heroPage` section type to `pageBySlugQuery`
+   - Allows Hero Page content blocks to be fetched from Sanity for pages that use it
+
+2. **Kept Existing Pages Hardcoded** (`src/app/services/web/websites/page.tsx`)
+   - Reverted to hardcoded Hero Page component
+   - User prefers not to create new page documents in Sanity when pages already exist as routes
+
+3. **Hero Page Component Now Available in Two Ways**:
+   - **Hardcoded**: Can be imported and used directly in Next.js pages (like `/services/web/websites`)
+   - **Dynamic**: Can be added as a content block to existing Sanity Page documents and rendered dynamically
+
+### Why This Approach?
+- Existing page routes don't need Sanity documents created for them
+- Hero Page content block is still available in Sanity Studio for pages that DO use Sanity
+- Best of both worlds: flexibility without forcing migration to Sanity
+
+### Technical Details
+- **Files Updated**: 
+  - `src/lib/sanity.queries.ts` - Added heroPage to query
+  - `src/sanity/types/documents/page.ts` - Added heroPage to content blocks
+  - `src/app/services/web/websites/page.tsx` - Kept hardcoded
+  
+---
+
 ## [2025-10-23] – Hero Page Available in Sanity Studio
 **Goal**: Make the Hero Page component available as a content block in Sanity Studio
 
