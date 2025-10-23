@@ -80,9 +80,25 @@ export default async function WebsitesPage() {
                 eyebrow={section.eyebrow as string | undefined}
                 title={section.title as string | undefined}
                 body={section.body as string | undefined}
-                image={section.image as unknown}
-                imagePosition={section.imagePosition as "left" | "right" | undefined}
-                cta={section.cta as unknown}
+                image={section.image as {
+                  alt?: string | null;
+                  asset?: {
+                    url?: string | null;
+                    metadata?: {
+                      lqip?: string | null;
+                      dimensions?: {
+                        width?: number | null;
+                        height?: number | null;
+                      } | null;
+                    } | null;
+                  } | null;
+                } | null | undefined}
+                imagePosition={section.imagePosition as "left" | "right" | null | undefined}
+                cta={section.cta as {
+                  label?: string | null;
+                  href?: string | null;
+                  variant?: string | null;
+                } | null | undefined}
               />
             </div>
           );
@@ -92,9 +108,9 @@ export default async function WebsitesPage() {
           return (
             <div className="vr-section" key={key}>
               <TextOnlySection
-                eyebrow={section.eyebrow as string | undefined}
-                title={section.title as string | undefined}
-                body={section.body as string | undefined}
+                eyebrow={section.eyebrow as string | null | undefined}
+                title={section.title as string | null | undefined}
+                body={section.body as string | null | undefined}
               />
             </div>
           );
