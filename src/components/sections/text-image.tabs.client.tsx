@@ -71,8 +71,7 @@ export function TextImageTabs({
             "border md:border md:border-[color:color-mix(in_oklch,var(--services-ink-strong)_10%,white_90%)]"
           )}
           ref={textCardRef}
-          style={{ minHeight: 520 }}
-        >
+          style={{ minHeight: 520 }}>
           {eyebrow ? (
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--services-ink-strong)_65%,white_35%)]">
               {eyebrow}
@@ -122,7 +121,7 @@ export function TextImageTabs({
                         {t.body ? (
                           <p className="mt-2 text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_80%,white_20%)]">{t.body}</p>
                         ) : null}
-                      </motion.div>
+                      </div>
                     ) : null}
                   </AnimatePresence>
                 </li>
@@ -133,10 +132,7 @@ export function TextImageTabs({
       
       {/* Image panel */}
       <div className={cn(leftFirst ? "order-2" : "order-1", "relative")}> 
-        <motion.div
-          initial={false}
-          animate={{ height: targetHeight }}
-          transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
+        <div style={{ height: targetHeight, transition: "height 0.45s cubic-bezier(0.22, 0.61, 0.36, 1)" }}
           className={cn(
             "relative rounded-[5px]",
             image ? "bg-black/5" : "bg-transparent",
@@ -158,7 +154,7 @@ export function TextImageTabs({
               />
             </div>
           ) : null}
-        </motion.div>
+        </div>
       </div>
     </div>
   );
