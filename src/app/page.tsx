@@ -171,11 +171,14 @@ export default async function Home() {
           return (
             <div className="vr-section" key={key}>
               <TextImageSection
+                variant={section.variant}
+                enableTabs={section.enableTabs}
                 eyebrow={section.eyebrow}
                 title={section.title}
                 body={section.body}
                 image={section.image}
                 imagePosition={section.imagePosition}
+                tabs={section.tabs}
                 cta={section.cta}
               />
             </div>
