@@ -1,14 +1,17 @@
-import { Section } from "@/components/layout/section";
+import { DynamicPage } from "@/components/shared/dynamic-page";
 
+/**
+ * Email Marketing service page
+ * Dynamically renders content from Sanity CMS
+ */
 export default function EmailMarketingPage() {
   return (
-    <Section innerClassName="flow">
-      <span className="eyebrow text-sm uppercase tracking-[0.2em] text-[color:var(--eyebrow-color,currentColor)]">Marketing</span>
-      <h1>E-mail Marketing</h1>
-      <p className="text-muted-foreground max-w-2xl">
-        Placeholder for e-mail marketing. Her beskriver vi flows, segmentering, platforme som
-        Klaviyo/HubSpot og hvordan vi kobler automation med performance data.
-      </p>
-    </Section>
+    <DynamicPage
+      slug="services/marketing/email-marketing"
+      fallbackTitle="E-mail Marketing"
+      fallbackDescription="Placeholder for e-mail marketing. Her beskriver vi flows, segmentering, platforme som Klaviyo/HubSpot og hvordan vi kobler automation med performance data."
+    />
   );
 }
+
+export const revalidate = 60;

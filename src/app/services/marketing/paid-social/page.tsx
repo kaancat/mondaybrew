@@ -1,14 +1,17 @@
-import { Section } from "@/components/layout/section";
+import { DynamicPage } from "@/components/shared/dynamic-page";
 
+/**
+ * Paid Social service page
+ * Dynamically renders content from Sanity CMS
+ */
 export default function PaidSocialPage() {
   return (
-    <Section innerClassName="flow">
-      <span className="eyebrow text-sm uppercase tracking-[0.2em] text-[color:var(--eyebrow-color,currentColor)]">Marketing</span>
-      <h1>Paid Social</h1>
-      <p className="text-muted-foreground max-w-2xl">
-        Placeholder til paid social. Her kommer vores frameworks for kampagnestrukturer, kreative,
-        audience design og platforme som Meta, TikTok og LinkedIn.
-      </p>
-    </Section>
+    <DynamicPage
+      slug="services/marketing/paid-social"
+      fallbackTitle="Paid Social"
+      fallbackDescription="Placeholder til paid social. Her kommer vores frameworks for kampagnestrukturer, kreative, audience design og platforme som Meta, TikTok og LinkedIn."
+    />
   );
 }
+
+export const revalidate = 60;
