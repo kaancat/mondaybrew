@@ -52,9 +52,9 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
     const imageAlt = media?.image?.alt || "Hero image";
 
     // Breadcrumbs component to avoid duplication
-    const BreadcrumbsNav = () => (
+    const BreadcrumbsNav = ({ className = "" }: { className?: string }) => (
         breadcrumbs && breadcrumbs.length > 0 ? (
-            <nav aria-label="Page sections" className="flex-shrink-0">
+            <nav aria-label="Page sections" className={`flex-shrink-0 ${className}`}>
                 <ol className="flex items-center gap-5 text-sm">
                     {breadcrumbs.map((crumb, index) => (
                         <React.Fragment key={crumb._key}>
@@ -111,8 +111,8 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
                             </p>
                         )}
 
-                        {/* Breadcrumbs */}
-                        <BreadcrumbsNav />
+                        {/* Breadcrumbs - Desktop only (next to paragraph) */}
+                        <BreadcrumbsNav className="hidden lg:flex" />
                     </div>
                 </div>
 
@@ -149,6 +149,9 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
                         </div>
                     )}
                 </div>
+
+                {/* Breadcrumbs - Mobile only (below image) */}
+                <BreadcrumbsNav className="lg:hidden" />
             </div>
         </Section>
     );
