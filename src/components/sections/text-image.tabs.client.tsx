@@ -129,9 +129,8 @@ export function TextImageTabs({
               );
             })}
           </ul>
-        </motion.div>
-      </div>
-
+        </div>
+      
       {/* Image panel */}
       <div className={cn(leftFirst ? "order-2" : "order-1", "relative")}> 
         <motion.div
