@@ -55,7 +55,7 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
     const BreadcrumbsNav = () => (
         breadcrumbs && breadcrumbs.length > 0 ? (
             <nav aria-label="Page sections" className="flex-shrink-0">
-                <ol className="flex flex-wrap items-center gap-3 lg:gap-5 text-xs lg:text-sm">
+                <ol className="flex items-center gap-5 text-sm">
                     {breadcrumbs.map((crumb, index) => (
                         <React.Fragment key={crumb._key}>
                             <li>
@@ -69,7 +69,7 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
                             {index < breadcrumbs.length - 1 && (
                                 <li
                                     aria-hidden="true"
-                                    className="h-3 lg:h-4 w-px bg-[color:var(--mb-accent)] opacity-30"
+                                    className="h-4 w-px bg-[color:var(--mb-accent)] opacity-30"
                                 ></li>
                             )}
                         </React.Fragment>
@@ -82,7 +82,7 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
     return (
         <Section>
             <div
-                className="flex flex-col pt-20 lg:pt-0"
+                className="flex flex-col"
                 style={{
                     height: "calc(100vh - var(--section-padding) - var(--container-gutter))",
                     gap: "var(--container-gutter)"
@@ -108,24 +108,23 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
                     <div className="flex items-center justify-between gap-4">
                         {subheading && (
                             <p
-                                className="text-muted-foreground max-w-2xl text-sm lg:text-base"
+                                className="text-muted-foreground max-w-2xl"
                                 style={{ lineHeight: "1.5", margin: 0 }}
                             >
                                 {subheading}
                             </p>
                         )}
 
-                        {/* Breadcrumbs - Desktop only (hidden on mobile) */}
-                        <div className="hidden lg:block">
-                            <BreadcrumbsNav />
-                        </div>
+                        {/* Breadcrumbs */}
+                        <BreadcrumbsNav />
                     </div>
                 </div>
 
-                {/* Media container - Full width on mobile, contained on desktop */}
+                {/* Media container */}
                 <div
-                    className="flex-1 overflow-hidden relative rounded-none lg:rounded-[5px] -mx-[var(--container-gutter)] lg:mx-0"
+                    className="flex-1 overflow-hidden relative"
                     style={{
+                        borderRadius: "5px",
                         minHeight: "300px"
                     } as React.CSSProperties}
                 >
@@ -153,11 +152,6 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
                             <span>Media placeholder</span>
                         </div>
                     )}
-                </div>
-
-                {/* Breadcrumbs - Mobile only (hidden on desktop) */}
-                <div className="lg:hidden -mt-[var(--container-gutter)] pt-4">
-                    <BreadcrumbsNav />
                 </div>
             </div>
         </Section>
