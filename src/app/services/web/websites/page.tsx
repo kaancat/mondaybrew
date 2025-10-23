@@ -1,14 +1,31 @@
-import { Section } from "@/components/layout/section";
+import { HeroPage } from "@/components/sections/hero-page";
 
+/**
+ * Websites service page - demonstrates the Hero Page component
+ * TODO: Connect to Sanity CMS to fetch content
+ */
 export default function WebsitesPage() {
   return (
-    <Section innerClassName="flow">
-      <span className="eyebrow text-sm uppercase tracking-[0.2em] text-[color:var(--eyebrow-color,currentColor)]">Web</span>
-      <h1>Websites</h1>
-      <p className="text-muted-foreground max-w-2xl">
-        Placeholder for website-ydelser. Her beskriver vi design- og udviklingsprocessen, stack
-        (Next.js, Sanity, Vercel) og fokus på performance & SEO.
-      </p>
-    </Section>
+    <HeroPage
+      eyebrow="Web"
+      heading="Websites"
+      subheading="Placeholder for website-ydelser. Her beskriver vi design- og udviklingsprocessen, stack (Next.js, Sanity, Vercel) og fokus på performance & SEO."
+      media={{
+        mediaType: "image",
+        image: {
+          asset: {
+            url: "https://placehold.co/1920x1080/e5e7eb/9ca3af?text=Website+Preview"
+          },
+          alt: "Website preview placeholder"
+        }
+      }}
+      breadcrumbs={[
+        { _key: "overview", label: "Overblik", anchor: "overview" },
+        { _key: "process", label: "Proces", anchor: "process" },
+        { _key: "tech", label: "Tech", anchor: "tech" },
+        { _key: "cases", label: "Cases", anchor: "cases" },
+        { _key: "pricing", label: "Priser", anchor: "pricing" },
+      ]}
+    />
   );
 }

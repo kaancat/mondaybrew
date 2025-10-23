@@ -6,6 +6,7 @@ import category from "./types/documents/category";
 import author from "./types/documents/author";
 
 import hero from "./types/sections/hero";
+import { heroPage } from "./types/sections/heroPage";
 import aboutSection from "./types/sections/aboutSection";
 import servicesSplit from "./types/sections/servicesSplit";
 import caseStudyCarousel from "./types/sections/caseStudyCarousel";
@@ -41,6 +42,7 @@ const schemas = [
   author,
   // sections
   hero,
+  heroPage,
   aboutSection,
   servicesSplit,
   caseStudyCarousel,
