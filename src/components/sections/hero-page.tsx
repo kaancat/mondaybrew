@@ -82,10 +82,7 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
     return (
         <Section>
             <div
-                className="flex flex-col pt-20 lg:pt-0 h-[calc(100vh-var(--section-padding)-var(--container-gutter)-var(--container-gutter)-5rem)] lg:h-[calc(100vh-var(--section-padding)-var(--container-gutter))]"
-                style={{
-                    gap: "var(--container-gutter)"
-                } as React.CSSProperties}
+                className="flex flex-col gap-4 lg:gap-[var(--container-gutter)] pt-20 lg:pt-0 h-[calc(100vh-var(--section-padding)-5rem)] lg:h-[calc(100vh-var(--section-padding)-var(--container-gutter))]"
             >
                 {/* Text content block */}
                 <div className="flex flex-col" style={{ gap: "1em" } as React.CSSProperties}>
