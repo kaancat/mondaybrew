@@ -124,9 +124,9 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
 
                 {/* Media container - Full width on mobile, contained on desktop */}
                 <div
-                    className="aspect-video lg:aspect-auto lg:flex-1 overflow-hidden relative rounded-none lg:rounded-[5px] -mx-[var(--container-gutter)] lg:mx-0"
+                    className="flex-1 overflow-hidden relative rounded-none lg:rounded-[5px] -mx-[var(--container-gutter)] lg:mx-0"
                     style={{
-                        minHeight: "200px"
+                        minHeight: "300px"
                     } as React.CSSProperties}
                 >
                     {videoSrc ? (
