@@ -158,7 +158,7 @@ export function TextImageTabs({
               />
             </div>
           ) : null}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
