@@ -1,11 +1,11 @@
 import { defineType, defineField } from "sanity";
+import { BreadcrumbSectionSelector } from "../../components/BreadcrumbSectionSelector";
 
 /**
  * Hero Page section schema
  * 
  * Full-viewport hero section with eyebrow, heading, subheading, breadcrumbs, and media.
- * The breadcrumbs are page-specific navigation links that can be connected to H2 anchors
- * on the page (section IDs in future content blocks).
+ * The breadcrumbs are page-specific navigation links that can be connected to content sections.
  */
 export const heroPage = defineType({
     name: "heroPage",
@@ -97,7 +97,7 @@ export const heroPage = defineType({
             name: "breadcrumbs",
             title: "Breadcrumbs / Page Navigation",
             type: "array",
-            description: "Page-specific navigation links. WORKFLOW: 1) First add content sections below (Text+Image, Text Only, etc.), 2) Click 'Generate' on each section's 'Section ID' field, 3) Come back here and enter those same Section IDs in the breadcrumbs.",
+            description: "Page-specific navigation links. WORKFLOW: 1) Add content sections below (Text+Image, Text Only, etc.), 2) Generate their Section IDs, 3) Come back here and select them from the dropdown.",
             of: [
                 {
                     type: "object",
@@ -113,9 +113,12 @@ export const heroPage = defineType({
                         },
                         {
                             name: "anchor",
-                            title: "Target Section ID",
+                            title: "Target Section",
                             type: "string",
-                            description: "Copy the 'Section ID' from one of your content blocks below. For example: if your Text+Image section has ID 'test-tekstfelt-nr-1', paste that here.",
+                            description: "Select which content section this breadcrumb should scroll to.",
+                            components: {
+                                input: BreadcrumbSectionSelector,
+                            },
                             validation: (Rule) => Rule.required(),
                         },
                     ],
