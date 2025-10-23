@@ -122,14 +122,14 @@ export function TextImageTabs({
                         {t.body ? (
                           <p className="mt-2 text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_80%,white_20%)]">{t.body}</p>
                         ) : null}
-                      </div>
+                      </motion.div>
                     ) : null}
                   </AnimatePresence>
                 </li>
               );
             })}
           </ul>
-        </div>
+        </motion.div>
       </div>
 
       {/* Image panel */}
