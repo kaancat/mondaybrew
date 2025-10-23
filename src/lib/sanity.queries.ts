@@ -533,6 +533,7 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
       },
       _type == "textImage" => {
         _type,
+        variant,
         eyebrow,
         title,
         body,
@@ -541,6 +542,7 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
           "alt": image.alt,
           "asset": image.image.asset->{ url, metadata{ lqip, dimensions } }
         },
+        tabs[]{ label, title, body },
         cta{ label, href, variant }
       },
       _type == "textOnly" => {

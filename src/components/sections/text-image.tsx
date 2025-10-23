@@ -1,4 +1,5 @@
 import { Section } from "@/components/layout/section";
+import { TextImageSwitch } from "./text-image.switch.client";
 import { TextImageClient, type TextImageResolvedImage } from "./text-image.client";
 
 type SanityImageAsset = {
@@ -16,11 +17,13 @@ type SanityImageAsset = {
 } | null;
 
 export type TextImageSectionData = {
+    variant?: "default" | "tabs" | null;
     eyebrow?: string | null;
     title?: string | null;
     body?: string | null;
     image?: SanityImageAsset;
     imagePosition?: "left" | "right" | null;
+    tabs?: { label?: string | null; title?: string | null; body?: string | null }[] | null;
     cta?: {
         label?: string | null;
         href?: string | null;
@@ -38,22 +41,54 @@ const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "gho
  * where text and visual content need equal emphasis
  */
 export function TextImageSection({
+    variant,
     eyebrow,
     title,
     body,
     image,
     imagePosition,
+    tabs,
     cta,
 }: TextImageSectionData) {
     const resolvedImage = resolveImage(image);
     const position = imagePosition === "right" ? "right" : "left"; // Default to left
 
+    // If tabs variant and tabs provided, render the interactive layout
+    if ((variant === "tabs" || (Array.isArray(tabs) && tabs.length > 0)) && tabs && tabs.length) {
+        const safeTabs = tabs
+            .map((t, i) => ({
+                id: `tab-${i}`,
+                label: (t.label || `0${i + 1}`).trim(),
+                title: (t.title || "").trim(),
+                body: (t.body || "").trim(),
+            }))
+            .filter((t) => t.label.length > 0 || t.title.length > 0 || t.body.length > 0);
+
+        if (safeTabs.length) {
+            return (
+                <Section innerClassName="">
+                    <TextImageSwitch
+                        variant="tabs"
+                        eyebrow={eyebrow?.trim() || undefined}
+                        title={title?.trim() || undefined}
+                        body={body?.trim() || undefined}
+                        image={resolvedImage}
+                        imagePosition={position}
+                        tabs={safeTabs}
+                        cta={buildCta(cta)}
+                    />
+                </Section>
+            );
+        }
+    }
+
     return (
         <Section innerClassName="flex flex-col gap-[var(--flow-space)]">
-            <TextImageClient
-                eyebrow={eyebrow?.trim()}
-                title={title?.trim()}
-                body={body?.trim()}
+            <TextImageSwitch
+                variant={variant || "default"}
+                eyebrow={eyebrow?.trim() || undefined}
+                title={title?.trim() || undefined}
+                body={body?.trim() || undefined}
                 image={resolvedImage}
                 imagePosition={position}
                 cta={buildCta(cta)}
@@ -113,4 +148,3 @@ export function isTextImageSection(
 ): section is TextImageSectionData & { _type: "textImage" } {
     return Boolean(section && section._type === "textImage");
 }
-

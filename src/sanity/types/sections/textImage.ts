@@ -6,6 +6,19 @@ export default defineType({
     type: "object",
     fields: [
         defineField({
+            name: "variant",
+            title: "Variant",
+            type: "string",
+            options: {
+                list: [
+                    { title: "Default (no tabs)", value: "default" },
+                    { title: "Tabbed", value: "tabs" },
+                ],
+                layout: "radio",
+            },
+            initialValue: "default",
+        }),
+        defineField({
             name: "eyebrow",
             title: "Eyebrow",
             type: "string",
@@ -29,6 +42,28 @@ export default defineType({
             title: "Image",
             type: "imageWithAlt",
             validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: "tabs",
+            title: "Tabs",
+            type: "array",
+            description: "Optional list of tabs shown in the text panel. Shown only when variant is 'Tabbed'.",
+            hidden: ({ parent }) => parent?.variant !== "tabs",
+            of: [
+                defineField({
+                    type: "object",
+                    name: "tab",
+                    fields: [
+                        defineField({ name: "label", title: "Tab Label", type: "string", validation: (Rule) => Rule.required() }),
+                        defineField({ name: "title", title: "Title", type: "string" }),
+                        defineField({ name: "body", title: "Body", type: "text", rows: 4 }),
+                    ],
+                    preview: {
+                        select: { title: "label" },
+                        prepare({ title }) { return { title: title || "Tab" }; },
+                    },
+                }),
+            ],
         }),
         defineField({
             name: "imagePosition",
