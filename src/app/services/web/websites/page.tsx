@@ -1,31 +1,61 @@
-import { HeroPage } from "@/components/sections/hero-page";
+import { fetchSanity } from "@/lib/sanity.client";
+import { pageBySlugQuery } from "@/lib/sanity.queries";
+import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
+import { Section } from "@/components/layout/section";
 
 /**
- * Websites service page
- * Hero Page component with hardcoded content
+ * Websites service page - Dynamically renders content from Sanity
+ * Add a Hero Page content block in Sanity Studio to display hero content
  */
-export default function WebsitesPage() {
+
+export const revalidate = 60;
+
+export default async function WebsitesPage() {
+  const page = await fetchSanity<any>(pageBySlugQuery, {
+    slug: "services/web/websites",
+    locale: "da",
+  });
+
+  if (!page) {
+    return (
+      <Section innerClassName="flow">
+        <span className="eyebrow text-sm uppercase tracking-[0.2em] text-[color:var(--eyebrow-color,currentColor)]">
+          Setup Required
+        </span>
+        <h1>Websites</h1>
+        <p className="max-w-2xl text-muted-foreground">
+          This page needs to be set up in Sanity. Please create a Page document with slug{" "}
+          <code className="bg-muted px-2 py-1 rounded">services/web/websites</code> and add a Hero Page
+          section.
+        </p>
+      </Section>
+    );
+  }
+
+  const sections = page?.sections ?? [];
+
   return (
-    <HeroPage
-      eyebrow="Web"
-      heading="Websites"
-      subheading="Placeholder for website-ydelser. Her beskriver vi design- og udviklingsprocessen, stack (Next.js, Sanity, Vercel) og fokus på performance & SEO."
-      media={{
-        mediaType: "image",
-        image: {
-          asset: {
-            url: "https://placehold.co/1920x1080/e5e7eb/9ca3af?text=Website+Preview"
-          },
-          alt: "Website preview placeholder"
+    <main>
+      {sections.map((section: any, index: number) => {
+        const key = section?._key ?? `section-${index}`;
+
+        if (isHeroPage(section)) {
+          return (
+            <HeroPage
+              key={key}
+              eyebrow={section.eyebrow}
+              heading={section.heading}
+              subheading={section.subheading}
+              media={section.media}
+              breadcrumbs={section.breadcrumbs}
+            />
+          );
         }
-      }}
-      breadcrumbs={[
-        { _key: "overview", label: "Overblik", anchor: "overview" },
-        { _key: "process", label: "Proces", anchor: "process" },
-        { _key: "tech", label: "Tech", anchor: "tech" },
-        { _key: "cases", label: "Cases", anchor: "cases" },
-        { _key: "pricing", label: "Priser", anchor: "pricing" },
-      ]}
-    />
+
+        // Add other section types here as needed
+
+        return null;
+      })}
+    </main>
   );
 }
