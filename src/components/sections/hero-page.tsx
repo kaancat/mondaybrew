@@ -41,6 +41,9 @@ type Props = HeroPageData;
  * 
  * The layout ensures the entire hero fits within viewport height on load,
  * with the media container dynamically filling remaining space.
+ * 
+ * Mobile: breadcrumbs move below media, media goes full-width with no border radius.
+ * Desktop: breadcrumbs next to paragraph, media has container padding and border radius.
  */
 export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: Props) {
     const videoSrc = media?.videoFile?.asset?.url || media?.videoUrl;
@@ -48,10 +51,38 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
     const posterSrc = media?.poster?.asset?.url;
     const imageAlt = media?.image?.alt || "Hero image";
 
+    // Breadcrumbs component to avoid duplication
+    const BreadcrumbsNav = () => (
+        breadcrumbs && breadcrumbs.length > 0 ? (
+            <nav aria-label="Page sections" className="flex-shrink-0">
+                <ol className="flex flex-wrap items-center gap-3 lg:gap-5 text-xs lg:text-sm">
+                    {breadcrumbs.map((crumb, index) => (
+                        <React.Fragment key={crumb._key}>
+                            <li>
+                                <a
+                                    href={`#${crumb.anchor || ""}`}
+                                    className="hover:text-foreground transition-colors text-muted-foreground font-medium whitespace-nowrap"
+                                >
+                                    {crumb.label}
+                                </a>
+                            </li>
+                            {index < breadcrumbs.length - 1 && (
+                                <li
+                                    aria-hidden="true"
+                                    className="h-3 lg:h-4 w-px bg-[color:var(--mb-accent)] opacity-30"
+                                ></li>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </ol>
+            </nav>
+        ) : null
+    );
+
     return (
         <Section>
             <div
-                className="flex flex-col"
+                className="flex flex-col pt-20 lg:pt-0"
                 style={{
                     height: "calc(100vh - var(--section-padding) - var(--container-gutter))",
                     gap: "var(--container-gutter)"
@@ -77,46 +108,25 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
                     <div className="flex items-center justify-between gap-4">
                         {subheading && (
                             <p
-                                className="text-muted-foreground max-w-2xl"
+                                className="text-muted-foreground max-w-2xl text-sm lg:text-base"
                                 style={{ lineHeight: "1.5", margin: 0 }}
                             >
                                 {subheading}
                             </p>
                         )}
 
-                        {breadcrumbs && breadcrumbs.length > 0 && (
-                            <nav aria-label="Page sections" className="flex-shrink-0">
-                                <ol className="flex items-center gap-5 text-sm">
-                                    {breadcrumbs.map((crumb, index) => (
-                                        <React.Fragment key={crumb._key}>
-                                            <li>
-                                                <a
-                                                    href={`#${crumb.anchor || ""}`}
-                                                    className="hover:text-foreground transition-colors text-muted-foreground font-medium"
-                                                >
-                                                    {crumb.label}
-                                                </a>
-                                            </li>
-                                            {index < breadcrumbs.length - 1 && (
-                                                <li
-                                                    aria-hidden="true"
-                                                    className="h-4 w-px bg-[color:var(--mb-accent)] opacity-30"
-                                                ></li>
-                                            )}
-                                        </React.Fragment>
-                                    ))}
-                                </ol>
-                            </nav>
-                        )}
+                        {/* Breadcrumbs - Desktop only (hidden on mobile) */}
+                        <div className="hidden lg:block">
+                            <BreadcrumbsNav />
+                        </div>
                     </div>
                 </div>
 
-                {/* Media container */}
+                {/* Media container - Full width on mobile, contained on desktop */}
                 <div
-                    className="flex-1 overflow-hidden relative"
+                    className="aspect-video lg:aspect-auto lg:flex-1 overflow-hidden relative rounded-none lg:rounded-[5px] -mx-[var(--container-gutter)] lg:mx-0"
                     style={{
-                        borderRadius: "5px",
-                        minHeight: "300px"
+                        minHeight: "200px"
                     } as React.CSSProperties}
                 >
                     {videoSrc ? (
@@ -143,6 +153,11 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
                             <span>Media placeholder</span>
                         </div>
                     )}
+                </div>
+
+                {/* Breadcrumbs - Mobile only (hidden on desktop) */}
+                <div className="lg:hidden -mt-[var(--container-gutter)] pt-4">
+                    <BreadcrumbsNav />
                 </div>
             </div>
         </Section>

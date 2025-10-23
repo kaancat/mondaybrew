@@ -1,5 +1,65 @@
 # Dev Log
 
+## [2025-10-23] – Mobile Responsive Design for Hero Page Component
+**Goal**: Make the Hero Page component mobile-friendly with specific layout changes for mobile devices
+
+### Changes Made
+
+**Mobile-Specific Behavior:**
+1. **Content Spacing**:
+   - Mobile: Added `pt-12` top padding to prevent navbar overlap
+   - Desktop: No top padding (`lg:pt-0`)
+   - Ensures hero content doesn't get hidden behind the fixed navbar on mobile
+
+2. **Typography Scaling**:
+   - Heading (H1): `text-3xl` on mobile, inherits full size on desktop (`lg:text-[inherit]`)
+   - Subheading: `text-sm` on mobile, `lg:text-base` on desktop
+   - Makes text more readable on smaller screens
+
+3. **Breadcrumbs Positioning & Styling**:
+   - Desktop: Breadcrumbs remain next to the paragraph text (top right)
+   - Mobile: Breadcrumbs move below the image/video section
+   - Mobile: Smaller text (`text-xs lg:text-sm`), tighter gaps (`gap-3 lg:gap-5`)
+   - Mobile: Breadcrumbs wrap if needed (`flex-wrap`)
+   - Mobile: Separator lines are shorter (`h-3 lg:h-4`)
+   - Implementation: Used Tailwind's `hidden lg:block` and `lg:hidden` classes to conditionally render breadcrumbs in different positions
+
+4. **Image/Video Container**:
+   - Mobile: Full-width (edge-to-edge), no container gutter on x-axis
+   - Mobile: No border radius (`rounded-none`)
+   - Mobile: Fixed aspect ratio (`aspect-video`) to properly display landscape content
+   - Desktop: `lg:aspect-auto lg:flex-1` to fill remaining viewport height
+   - Desktop: Maintains container padding and 5px border radius
+   - Implementation: Used `-mx-[var(--container-gutter)] lg:mx-0` to break out of container on mobile only, and `rounded-none lg:rounded-[5px]` for conditional border radius
+
+5. **Code Quality**:
+   - Created a `BreadcrumbsNav` component to avoid code duplication between mobile and desktop breadcrumbs
+   - Updated component documentation to reflect mobile/desktop differences
+
+### Technical Details
+
+**File Updated:** `src/components/sections/hero-page.tsx`
+
+**Key Classes:**
+- Main container: `pt-12 lg:pt-0` (navbar clearance)
+- Heading: `text-3xl lg:text-[inherit]`
+- Subheading: `text-sm lg:text-base`
+- Media container: `aspect-video lg:aspect-auto lg:flex-1 rounded-none lg:rounded-[5px] -mx-[var(--container-gutter)] lg:mx-0`
+- Breadcrumbs: `flex-wrap gap-3 lg:gap-5 text-xs lg:text-sm`
+- Desktop breadcrumbs wrapper: `hidden lg:block`
+- Mobile breadcrumbs wrapper: `lg:hidden -mt-[var(--container-gutter)] pt-4`
+
+### Why These Changes?
+- Mobile users need a simpler, more vertical layout
+- Fixed aspect ratio ensures landscape images/videos are fully visible on phones
+- Smaller typography and tighter spacing optimize for limited screen space
+- Top padding prevents content from being obscured by fixed navbar
+- Full-width media on mobile provides more immersive experience
+- Breadcrumbs below media on mobile reduces horizontal crowding
+- Desktop layout remains unchanged as requested
+
+---
+
 ## [2025-10-22] – Redesign About Section Statistics for Mobile
 **Goal**: Create a more visually appealing mobile layout that shows more of the background image while displaying statistics
 
