@@ -1,11 +1,13 @@
 import { fetchSanity } from "@/lib/sanity.client";
 import { pageBySlugQuery } from "@/lib/sanity.queries";
 import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
+import { TextImageSection } from "@/components/sections/text-image";
+import { TextOnlySection } from "@/components/sections/text-only";
 import { Section } from "@/components/layout/section";
 
 /**
  * Websites service page - Dynamically renders content from Sanity
- * Add a Hero Page content block in Sanity Studio to display hero content
+ * Supports Hero Page, Text+Image, and Text Only content blocks
  */
 
 type PageSection = {
@@ -17,6 +19,15 @@ type PageSection = {
 type PagePayload = {
   sections?: PageSection[];
 };
+
+// Type guards
+function isTextImageSection(section: PageSection): boolean {
+  return section?._type === "textImage";
+}
+
+function isTextOnlySection(section: PageSection): boolean {
+  return section?._type === "textOnly";
+}
 
 export const revalidate = 60;
 
@@ -62,8 +73,34 @@ export default async function WebsitesPage() {
           );
         }
 
-        // Add other section types here as needed
+        if (isTextImageSection(section)) {
+          return (
+            <div className="vr-section" key={key}>
+              <TextImageSection
+                eyebrow={section.eyebrow}
+                title={section.title}
+                body={section.body}
+                image={section.image}
+                imagePosition={section.imagePosition}
+                cta={section.cta}
+              />
+            </div>
+          );
+        }
 
+        if (isTextOnlySection(section)) {
+          return (
+            <div className="vr-section" key={key}>
+              <TextOnlySection
+                eyebrow={section.eyebrow}
+                title={section.title}
+                body={section.body}
+              />
+            </div>
+          );
+        }
+
+        // Unknown section type - skip silently
         return null;
       })}
     </main>
