@@ -61,7 +61,7 @@ export function TextImageTabs({
   const targetHeight = clamp(measuredTextHeight, MIN_HEIGHT, MAX_HEIGHT);
 
   return (
-    <div className={cn("grid gap-3 md:gap-5", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
+    <div className={cn("grid gap-2 md:gap-4", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
       {/* Text panel */}
       <div className={cn(leftFirst ? "order-1" : "order-2", "relative")}> 
         <div
@@ -71,7 +71,7 @@ export function TextImageTabs({
             "border md:border md:border-[color:color-mix(in_oklch,var(--services-ink-strong)_10%,white_90%)]"
           )}
           ref={textCardRef}
-          style={{ minHeight: 420 }}
+          style={{ minHeight: 520 }}
         >
           {eyebrow ? (
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--services-ink-strong)_65%,white_35%)]">
