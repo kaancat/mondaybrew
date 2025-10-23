@@ -961,6 +961,8 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
       },
       _type == "textImage" => {
         _type,
+        variant,
+        enableTabs,
         eyebrow,
         title,
         body,
@@ -969,6 +971,7 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
           "alt": image.alt,
           "asset": image.image.asset->{ url, metadata{ lqip, dimensions } }
         },
+        tabs[]{ label, title, body },
         cta{ label, href, variant }
       },
       _type == "textOnly" => {

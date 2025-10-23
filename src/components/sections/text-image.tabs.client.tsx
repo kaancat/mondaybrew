@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export type TabsImage = {
@@ -32,8 +32,8 @@ export function TextImageTabs({
   tabs: Tab[];
   cta?: { label: string; href: string; variant: "default" | "secondary" | "outline" | "ghost" | "link" } | null;
 }) {
+  void cta;
   const [activeId, setActiveId] = useState<string | null>(null);
-  const activeTab = useMemo(() => tabs.find((t) => t.id === activeId) ?? null, [tabs, activeId]);
 
   const leftFirst = imagePosition !== "left"; // text panel first when image is right
 
@@ -41,25 +41,29 @@ export function TextImageTabs({
   const textCardRef = useRef<HTMLDivElement>(null);
   const [measuredTextHeight, setMeasuredTextHeight] = useState<number>(520);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = textCardRef.current;
     if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      const h = Math.round(entries[0].contentRect.height);
-      setMeasuredTextHeight(h);
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      const nextHeight = Math.round(entry?.contentRect.height ?? el.getBoundingClientRect().height);
+      setMeasuredTextHeight(nextHeight);
     });
-    ro.observe(el);
-    return () => ro.disconnect();
+
+    observer.observe(el, { box: "border-box" });
+    setMeasuredTextHeight(Math.round(el.getBoundingClientRect().height));
+
+    return () => observer.disconnect();
   }, []);
 
-  const BASE_HEIGHT = 520; // closed state base height
   const MIN_HEIGHT = 520; // keep within site constraints
   const MAX_HEIGHT = 720; // do not grow beyond this
-  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+  const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
   const targetHeight = clamp(measuredTextHeight, MIN_HEIGHT, MAX_HEIGHT);
 
   return (
-    <div className={cn("grid gap-4 md:gap-6", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
+    <div className={cn("grid gap-2 md:gap-4", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
       {/* Text panel */}
       <div className={cn(leftFirst ? "order-1" : "order-2", "relative")}> 
         <div
@@ -69,7 +73,7 @@ export function TextImageTabs({
             "border md:border md:border-[color:color-mix(in_oklch,var(--services-ink-strong)_10%,white_90%)]"
           )}
           ref={textCardRef}
-          style={{ minHeight: 520 }}
+          style={{ minHeight: MIN_HEIGHT }}
         >
           {eyebrow ? (
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--services-ink-strong)_65%,white_35%)]">
@@ -85,7 +89,7 @@ export function TextImageTabs({
 
           <div className="mt-6 mb-0 h-[1px] w-full bg-[color:color-mix(in_oklch,var(--services-ink-strong)_18%,white_82%)]" />
 
-          <ul className="pt-2.5 divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)]"> 
+          <ul className="pt-2.5 divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)]">
             {tabs.map((t, i) => {
               const active = t.id === activeId;
               const num = String(i + 1).padStart(2, "0");
@@ -132,38 +136,29 @@ export function TextImageTabs({
 
       {/* Image panel */}
       <div className={cn(leftFirst ? "order-2" : "order-1", "relative")}> 
-        <motion.div
-          initial={false}
-          animate={{ height: targetHeight }}
-          transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
+        <div
           className={cn(
             "relative rounded-[5px]",
             image ? "bg-black/5" : "bg-transparent",
             // Keep image box visually same height as text panel
             "overflow-hidden"
           )}
-          style={{ minHeight: 520 }}
+          style={{ height: targetHeight, minHeight: MIN_HEIGHT, transition: "height 0.45s cubic-bezier(0.22, 0.61, 0.36, 1)" }}
         >
           {image?.url ? (
-            <motion.div
-              key={activeId}
-              initial={{ scale: 0.98, opacity: 0.85 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.35, ease: [0.22, 0.61, 0.36, 1] }}
-              className="absolute inset-0"
-            >
+            <div className="absolute inset-0">
               <Image
                 src={image.url}
                 alt={image.alt || ""}
                 fill
-                className="object-cover scale-[1.06] md:scale-[1.10]"
+                className="object-cover scale-[1.06] md:scale-[1.08] will-change-transform"
                 sizes="(min-width: 768px) 50vw, 100vw"
                 placeholder={image.lqip ? "blur" : "empty"}
                 blurDataURL={image.lqip || undefined}
               />
-            </motion.div>
+            </div>
           ) : null}
-        </motion.div>
+        </div>
       </div>
     </div>
   );
