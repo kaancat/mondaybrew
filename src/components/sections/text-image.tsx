@@ -18,6 +18,7 @@ type SanityImageAsset = {
 
 export type TextImageSectionData = {
     variant?: "default" | "tabs" | null;
+    enableTabs?: boolean | null;
     eyebrow?: string | null;
     title?: string | null;
     body?: string | null;
@@ -42,6 +43,7 @@ const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "gho
  */
 export function TextImageSection({
     variant,
+    enableTabs,
     eyebrow,
     title,
     body,
@@ -54,7 +56,8 @@ export function TextImageSection({
     const position = imagePosition === "right" ? "right" : "left"; // Default to left
 
     // If tabs variant and tabs provided, render the interactive layout
-    if ((variant === "tabs" || (Array.isArray(tabs) && tabs.length > 0)) && tabs && tabs.length) {
+    const wantsTabs = Boolean(variant === "tabs" || enableTabs || (Array.isArray(tabs) && tabs.length > 0));
+    if (wantsTabs && tabs && tabs.length) {
         const safeTabs = tabs
             .map((t, i) => ({
                 id: `tab-${i}`,

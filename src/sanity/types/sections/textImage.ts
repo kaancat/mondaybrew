@@ -15,18 +15,19 @@ export default defineType({
                 maxLength: 50,
             },
         }),
+        // Old variant field kept hidden for compatibility
         defineField({
             name: "variant",
-            title: "Variant",
+            title: "Variant (deprecated)",
             type: "string",
-            options: {
-                list: [
-                    { title: "Default (no tabs)", value: "default" },
-                    { title: "Tabbed", value: "tabs" },
-                ],
-                layout: "radio",
-            },
-            initialValue: "default",
+            hidden: true,
+        }),
+        defineField({
+            name: "enableTabs",
+            title: "Use tabs",
+            type: "boolean",
+            description: "Enable tabbed items inside the text panel.",
+            initialValue: false,
         }),
         defineField({
             name: "eyebrow",
@@ -57,8 +58,8 @@ export default defineType({
             name: "tabs",
             title: "Tabs",
             type: "array",
-            description: "Optional list of tabs shown in the text panel. Shown only when variant is 'Tabbed'.",
-            hidden: ({ parent }) => parent?.variant !== "tabs",
+            description: "Tabs shown when 'Use tabs' is enabled.",
+            hidden: ({ parent }) => parent?.enableTabs !== true,
             of: [
                 defineField({
                     type: "object",

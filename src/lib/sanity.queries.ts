@@ -534,6 +534,7 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
       _type == "textImage" => {
         _type,
         variant,
+        enableTabs,
         eyebrow,
         title,
         body,
