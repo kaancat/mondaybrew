@@ -81,7 +81,10 @@ export function TextImageClient({
     };
 
     return (
-        <div ref={sectionRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center min-h-[500px]">
+        <div 
+            ref={sectionRef}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center min-h-[500px]"
+        >
             {/* Text Content - All animated together as one block */}
             <motion.div
                 className={cn("flex flex-col h-full justify-center relative", textOrder)}
@@ -89,11 +92,6 @@ export function TextImageClient({
             >
                 {/* Decorative gradient blur orb in background */}
                 <div className="absolute -left-20 top-20 w-64 h-64 bg-[color:var(--accent)] opacity-[0.03] blur-[80px] rounded-full pointer-events-none" />
-
-                {/* Vertical accent bar - matching eyebrow style */}
-                <div className="absolute -left-8 top-0 bottom-0 hidden md:flex items-center pointer-events-none">
-                    <div className="h-full w-[1px] bg-[color:var(--mb-accent)] opacity-40" />
-                </div>
 
                 {/* Text content - tightly spaced */}
                 <div className="flex flex-col gap-3">

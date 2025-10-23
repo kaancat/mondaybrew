@@ -22,6 +22,7 @@ export default defineType({
       type: "array",
       of: [
         { type: "hero" },
+        { type: "heroPage" },
         { type: "servicesSplit" },
         { type: "caseStudyCarousel" },
         { type: "clientsSection" },

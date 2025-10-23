@@ -1,0 +1,3027 @@
+[
+  {
+    "fields": [
+      {
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "name": "max_width",
+        "type": "number"
+      },
+      {
+        "name": "max_frame_rate",
+        "type": "number"
+      },
+      {
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "name": "max_height",
+        "type": "number"
+      }
+    ],
+    "name": "mux.track",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "name": "policy",
+        "type": "string"
+      }
+    ],
+    "name": "mux.playbackId",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "ext",
+        "type": "string"
+      },
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "width",
+        "type": "number"
+      },
+      {
+        "name": "bitrate",
+        "type": "number"
+      },
+      {
+        "name": "filesize",
+        "type": "number"
+      },
+      {
+        "name": "height",
+        "type": "number"
+      }
+    ],
+    "name": "mux.staticRenditionFile",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "type": "mux.staticRenditionFile"
+          }
+        ],
+        "name": "files",
+        "type": "array"
+      }
+    ],
+    "name": "mux.staticRenditions",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "resolution_tier",
+        "type": "string"
+      },
+      {
+        "name": "upload_id",
+        "type": "string"
+      },
+      {
+        "name": "created_at",
+        "type": "string"
+      },
+      {
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "name": "max_stored_resolution",
+        "type": "string"
+      },
+      {
+        "name": "passthrough",
+        "type": "string"
+      },
+      {
+        "name": "encoding_tier",
+        "type": "string"
+      },
+      {
+        "name": "master_access",
+        "type": "string"
+      },
+      {
+        "name": "aspect_ratio",
+        "type": "string"
+      },
+      {
+        "name": "duration",
+        "type": "number"
+      },
+      {
+        "name": "max_stored_frame_rate",
+        "type": "number"
+      },
+      {
+        "name": "mp4_support",
+        "type": "string"
+      },
+      {
+        "name": "max_resolution_tier",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "type": "mux.track"
+          }
+        ],
+        "name": "tracks",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "type": "mux.playbackId"
+          }
+        ],
+        "name": "playback_ids",
+        "type": "array"
+      },
+      {
+        "name": "static_renditions",
+        "type": "mux.staticRenditions"
+      }
+    ],
+    "name": "mux.assetData",
+    "type": "object",
+    "title": "Mux asset data"
+  },
+  {
+    "fields": [
+      {
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "name": "assetId",
+        "type": "string"
+      },
+      {
+        "name": "playbackId",
+        "type": "string"
+      },
+      {
+        "name": "filename",
+        "type": "string"
+      },
+      {
+        "name": "thumbTime",
+        "type": "number"
+      },
+      {
+        "name": "data",
+        "type": "mux.assetData"
+      }
+    ],
+    "name": "mux.videoAsset",
+    "type": "document",
+    "title": "Video asset"
+  },
+  {
+    "fields": [
+      {
+        "weak": true,
+        "to": [
+          {
+            "type": "mux.videoAsset"
+          }
+        ],
+        "name": "asset",
+        "type": "reference",
+        "title": "Video"
+      }
+    ],
+    "name": "mux.video",
+    "type": "object",
+    "title": "Video asset reference"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "name": "logo",
+        "type": "image"
+      },
+      {
+        "description": "Optional logo variant optimized for dark UI surfaces like the header.",
+        "name": "logoOnDark",
+        "type": "image",
+        "title": "Logo (dark backgrounds)"
+      },
+      {
+        "description": "Shown in the browser tab.",
+        "name": "favicon",
+        "type": "image"
+      },
+      {
+        "name": "seo",
+        "type": "seo"
+      },
+      {
+        "description": "Links shown in the header (left to right).",
+        "of": [
+          {
+            "type": "navigationSection"
+          }
+        ],
+        "name": "mainNavigation",
+        "type": "array"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Primary action button on the right side of the header.",
+        "name": "headerCta",
+        "type": "navigationLink",
+        "title": "Header CTA"
+      },
+      {
+        "of": [
+          {
+            "type": "button"
+          }
+        ],
+        "name": "footer",
+        "type": "array"
+      }
+    ],
+    "name": "siteSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "initialValue": false,
+        "description": "Markér hvis dette er forsiden.",
+        "name": "isHome",
+        "type": "boolean",
+        "title": "Homepage"
+      },
+      {
+        "options": {
+          "list": [
+            "da",
+            "en"
+          ]
+        },
+        "initialValue": "da",
+        "name": "locale",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "type": "hero"
+          },
+          {
+            "type": "heroPage"
+          },
+          {
+            "initialValue": {
+              "eyebrow": "Our Pillars",
+              "title": "Expert care tailored to how your brand grows.",
+              "description": "Two teams, one partnership. Switch between Marketing and Web to explore the specialist services we bring together.",
+              "marketing": {
+                "label": "Marketing",
+                "headline": "We help brands grow across the full funnel.",
+                "description": "From acquisition to retention, we plan and optimize the touchpoints that matter.",
+                "services": [
+                  {
+                    "_key": "marketing-full-funnel",
+                    "title": "Full-Funnel Performance",
+                    "summary": "Campaign architecture that follows your customer from awareness to retention with measurable milestones along the way.",
+                    "description": "We design experiments and reporting loops that connect every stage of the funnel, so we can re-invest in what compounds."
+                  },
+                  {
+                    "_key": "marketing-paid-search",
+                    "title": "Paid Search",
+                    "summary": "High-intent capture on Google and Microsoft Ads with creative testing, negative keyword hygiene, and live dashboards.",
+                    "description": "From keyword mining to smart bidding calibration, we keep your account efficient while scaling profitable conversions."
+                  },
+                  {
+                    "_key": "marketing-paid-social",
+                    "title": "Paid Social",
+                    "summary": "Stories and feeds that convert. We iterate fast across Meta, TikTok, and LinkedIn with creative sprints and cohort reporting.",
+                    "description": "Lean into creative volume and audience insights to keep your acquisition curve healthy across every platform."
+                  },
+                  {
+                    "_key": "marketing-email",
+                    "title": "E-Mail Marketing",
+                    "summary": "Lifecycle flows, broadcast campaigns, and segmentation that keeps customers moving without feeling spammed.",
+                    "description": "Automations and newsletters tuned for retention—mixing personalization, testing, and deliverability best practice."
+                  }
+                ]
+              },
+              "web": {
+                "label": "Web",
+                "headline": "We design and ship fast, resilient web experiences.",
+                "description": "Websites, products, and commerce—built to scale and easy to maintain.",
+                "services": [
+                  {
+                    "_key": "web-sites",
+                    "title": "Hjemmesider",
+                    "summary": "Conversion-first marketing sites built with Next.js, tuned for performance, localization, and a design system you can scale.",
+                    "description": "Launch a flagship experience with CMS workflows, modular sections, and analytics wired in from day one."
+                  },
+                  {
+                    "_key": "web-crm",
+                    "title": "CRM",
+                    "summary": "Implementations and automations that keep your pipeline visible and optimised across marketing and sales teams.",
+                    "description": "We audit, migrate, and extend tools like HubSpot and Salesforce so your data syncs cleanly across the stack."
+                  },
+                  {
+                    "_key": "web-ai",
+                    "title": "AI",
+                    "summary": "Pragmatic AI integrations powered by your real workflows—assistants, automation, and data loops that actually save time.",
+                    "description": "Experiment quickly with prototypes, then harden the winners into production features with clear guardrails."
+                  },
+                  {
+                    "_key": "web-ecommerce",
+                    "title": "eCommerce",
+                    "summary": "Composable commerce experiences with fast product discovery, checkout clarity, and analytics wired in from day one.",
+                    "description": "Optimise merchandising, PDP storytelling, and retention journeys with a modern commerce stack."
+                  }
+                ]
+              }
+            },
+            "type": "servicesSplit",
+            "title": "Services split"
+          },
+          {
+            "type": "caseStudyCarousel"
+          },
+          {
+            "type": "clientsSection",
+            "title": "Clients / Partners"
+          },
+          {
+            "type": "testimonialsMarquee",
+            "title": "Testimonials — Full Page Marquee"
+          },
+          {
+            "initialValue": {
+              "eyebrow": "About mondaybrew",
+              "headline": "We build digital experiences that move the metrics you care about",
+              "subheading": "Strategy, engineering, design, and growth sit under one roof—so we can translate your ambition into experiments, launches, and optimizations that compound over time.",
+              "stats": [
+                {
+                  "_key": "stat-experience",
+                  "label": "Digital specialists on the core team",
+                  "value": "15+"
+                },
+                {
+                  "_key": "stat-products",
+                  "label": "Products launched across Europe",
+                  "value": "120"
+                },
+                {
+                  "_key": "stat-nps",
+                  "label": "Average client NPS over the past year",
+                  "value": "72"
+                }
+              ]
+            },
+            "type": "aboutSection",
+            "title": "About (Glass overlay)"
+          },
+          {
+            "type": "textImage",
+            "title": "Text & Image"
+          },
+          {
+            "type": "textOnly"
+          }
+        ],
+        "name": "sections",
+        "type": "array"
+      },
+      {
+        "name": "seo",
+        "type": "seo"
+      }
+    ],
+    "name": "page",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "list": [
+            "da",
+            "en"
+          ]
+        },
+        "initialValue": "da",
+        "name": "locale",
+        "type": "string"
+      },
+      {
+        "to": [
+          {
+            "type": "author"
+          }
+        ],
+        "name": "author",
+        "type": "reference"
+      },
+      {
+        "name": "date",
+        "type": "datetime"
+      },
+      {
+        "name": "excerpt",
+        "type": "text"
+      },
+      {
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "i18nTitleKey": "inputs.portable-text.annotation.link",
+                  "options": {
+                    "modal": {
+                      "type": "popover"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^tel$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": true,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "description": "A valid web, email, phone, or relative link.",
+                      "name": "href",
+                      "type": "url",
+                      "title": "Link"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                },
+                {
+                  "value": "underline",
+                  "title": "Underline"
+                },
+                {
+                  "value": "strike-through",
+                  "title": "Strike"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "body",
+        "type": "array"
+      },
+      {
+        "name": "seo",
+        "type": "seo"
+      }
+    ],
+    "name": "post",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "client",
+        "type": "string"
+      },
+      {
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "list": [
+            "da",
+            "en"
+          ]
+        },
+        "initialValue": "da",
+        "name": "locale",
+        "type": "string"
+      },
+      {
+        "name": "summary",
+        "type": "text"
+      },
+      {
+        "description": "Short teaser shown in listings",
+        "name": "excerpt",
+        "type": "text"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "tags",
+        "type": "array"
+      },
+      {
+        "description": "Upload image or video. If both are present, video is preferred.",
+        "name": "media",
+        "type": "servicesSplitMedia"
+      },
+      {
+        "name": "publishedAt",
+        "type": "datetime"
+      },
+      {
+        "description": "Structured content blocks coming soon — use the summary field for now.",
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "i18nTitleKey": "inputs.portable-text.annotation.link",
+                  "options": {
+                    "modal": {
+                      "type": "popover"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^tel$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": true,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "description": "A valid web, email, phone, or relative link.",
+                      "name": "href",
+                      "type": "url",
+                      "title": "Link"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                },
+                {
+                  "value": "underline",
+                  "title": "Underline"
+                },
+                {
+                  "value": "strike-through",
+                  "title": "Strike"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "sections",
+        "type": "array"
+      },
+      {
+        "name": "seo",
+        "type": "seo"
+      }
+    ],
+    "name": "caseStudy",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      }
+    ],
+    "name": "category",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "avatar",
+        "type": "image"
+      },
+      {
+        "name": "bio",
+        "type": "text"
+      }
+    ],
+    "name": "author",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "name": "background",
+        "type": "heroBackground",
+        "title": "Background media"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "marks": {
+              "annotations": [],
+              "decorators": [
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                }
+              ]
+            },
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "headline",
+        "type": "array"
+      },
+      {
+        "name": "subheading",
+        "type": "text"
+      },
+      {
+        "name": "helper",
+        "type": "string"
+      },
+      {
+        "name": "cta",
+        "type": "button",
+        "title": "CTA"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Top",
+              "value": "start"
+            },
+            {
+              "title": "Center",
+              "value": "center"
+            },
+            {
+              "title": "Bottom",
+              "value": "end"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "center",
+        "name": "alignment",
+        "type": "string",
+        "title": "Text alignment"
+      },
+      {
+        "name": "feature",
+        "type": "heroFeature",
+        "title": "Feature card"
+      },
+      {
+        "hidden": true,
+        "name": "primary",
+        "type": "button"
+      },
+      {
+        "hidden": true,
+        "name": "secondary",
+        "type": "button"
+      },
+      {
+        "hidden": true,
+        "name": "media",
+        "type": "imageWithAlt"
+      }
+    ],
+    "name": "hero",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "description": "Small text above the heading (e.g., 'Web', 'Marketing')",
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Main heading (H1)",
+        "name": "heading",
+        "type": "string"
+      },
+      {
+        "rows": 3,
+        "description": "Supporting text below the heading",
+        "name": "subheading",
+        "type": "text"
+      },
+      {
+        "description": "Image or video for the hero section",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Image",
+                  "value": "image"
+                },
+                {
+                  "title": "Video",
+                  "value": "video"
+                }
+              ],
+              "layout": "radio"
+            },
+            "initialValue": "image",
+            "name": "mediaType",
+            "type": "string"
+          },
+          {
+            "options": {
+              "hotspot": true
+            },
+            "fields": [
+              {
+                "name": "alt",
+                "type": "string",
+                "title": "Alt Text"
+              }
+            ],
+            "hidden": "conditional",
+            "name": "image",
+            "type": "image"
+          },
+          {
+            "options": {
+              "accept": "video/*"
+            },
+            "description": "Upload a video file",
+            "hidden": "conditional",
+            "name": "videoFile",
+            "type": "file"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "description": "Or provide a video URL",
+            "hidden": "conditional",
+            "name": "videoUrl",
+            "type": "url",
+            "title": "Video URL"
+          },
+          {
+            "description": "Thumbnail/poster image for the video",
+            "hidden": "conditional",
+            "name": "poster",
+            "type": "image",
+            "title": "Video Poster"
+          }
+        ],
+        "name": "media",
+        "type": "object"
+      },
+      {
+        "description": "Page-specific navigation links. WORKFLOW: 1) Add content blocks below (Text+Image, Text Only, etc.), 2) Come back here and select which blocks to link to from the dropdown.",
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "What visitors see (e.g., 'Overview', 'Process', 'Pricing')",
+                "name": "label",
+                "type": "string",
+                "title": "Link Text"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Select which content section this breadcrumb should scroll to.",
+                "name": "anchor",
+                "type": "string",
+                "title": "Target Section"
+              }
+            ],
+            "type": "object",
+            "name": "breadcrumb",
+            "title": "Breadcrumb Link"
+          }
+        ],
+        "name": "breadcrumbs",
+        "type": "array",
+        "title": "Breadcrumbs / Page Navigation"
+      }
+    ],
+    "name": "heroPage",
+    "type": "object"
+  },
+  {
+    "initialValue": {
+      "eyebrow": "About mondaybrew",
+      "headline": "We build digital experiences that move the metrics you care about",
+      "subheading": "Strategy, engineering, design, and growth sit under one roof—so we can translate your ambition into experiments, launches, and optimizations that compound over time.",
+      "stats": [
+        {
+          "_key": "stat-experience",
+          "label": "Digital specialists on the core team",
+          "value": "15+"
+        },
+        {
+          "_key": "stat-products",
+          "label": "Products launched across Europe",
+          "value": "120"
+        },
+        {
+          "_key": "stat-nps",
+          "label": "Average client NPS over the past year",
+          "value": "72"
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 6
+              }
+            ],
+            "level": "warning",
+            "message": "Consider a descriptive headline."
+          }
+        ],
+        "name": "headline",
+        "type": "string"
+      },
+      {
+        "rows": 4,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 24
+              }
+            ],
+            "level": "warning",
+            "message": "Write at least a short paragraph."
+          }
+        ],
+        "name": "subheading",
+        "type": "text"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "fields": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "alt",
+            "type": "string",
+            "title": "Alt text"
+          }
+        ],
+        "name": "mainImage",
+        "type": "image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              },
+              {
+                "flag": "max",
+                "constraint": 4
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "value",
+                "type": "string"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "label",
+                "type": "string"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "fields": [
+                  {
+                    "name": "alt",
+                    "type": "string",
+                    "title": "Alt text"
+                  }
+                ],
+                "name": "icon",
+                "type": "image",
+                "title": "Icon (optional)"
+              }
+            ],
+            "type": "object",
+            "name": "stat"
+          }
+        ],
+        "name": "stats",
+        "type": "array"
+      },
+      {
+        "description": "Optional call-to-action rendered below the image.",
+        "name": "cta",
+        "type": "button",
+        "title": "CTA (optional)"
+      }
+    ],
+    "name": "aboutSection",
+    "type": "object",
+    "title": "About (Glass overlay)"
+  },
+  {
+    "initialValue": {
+      "eyebrow": "Our Pillars",
+      "title": "Expert care tailored to how your brand grows.",
+      "description": "Two teams, one partnership. Switch between Marketing and Web to explore the specialist services we bring together.",
+      "marketing": {
+        "label": "Marketing",
+        "headline": "We help brands grow across the full funnel.",
+        "description": "From acquisition to retention, we plan and optimize the touchpoints that matter.",
+        "services": [
+          {
+            "_key": "marketing-full-funnel",
+            "title": "Full-Funnel Performance",
+            "summary": "Campaign architecture that follows your customer from awareness to retention with measurable milestones along the way.",
+            "description": "We design experiments and reporting loops that connect every stage of the funnel, so we can re-invest in what compounds."
+          },
+          {
+            "_key": "marketing-paid-search",
+            "title": "Paid Search",
+            "summary": "High-intent capture on Google and Microsoft Ads with creative testing, negative keyword hygiene, and live dashboards.",
+            "description": "From keyword mining to smart bidding calibration, we keep your account efficient while scaling profitable conversions."
+          },
+          {
+            "_key": "marketing-paid-social",
+            "title": "Paid Social",
+            "summary": "Stories and feeds that convert. We iterate fast across Meta, TikTok, and LinkedIn with creative sprints and cohort reporting.",
+            "description": "Lean into creative volume and audience insights to keep your acquisition curve healthy across every platform."
+          },
+          {
+            "_key": "marketing-email",
+            "title": "E-Mail Marketing",
+            "summary": "Lifecycle flows, broadcast campaigns, and segmentation that keeps customers moving without feeling spammed.",
+            "description": "Automations and newsletters tuned for retention—mixing personalization, testing, and deliverability best practice."
+          }
+        ]
+      },
+      "web": {
+        "label": "Web",
+        "headline": "We design and ship fast, resilient web experiences.",
+        "description": "Websites, products, and commerce—built to scale and easy to maintain.",
+        "services": [
+          {
+            "_key": "web-sites",
+            "title": "Hjemmesider",
+            "summary": "Conversion-first marketing sites built with Next.js, tuned for performance, localization, and a design system you can scale.",
+            "description": "Launch a flagship experience with CMS workflows, modular sections, and analytics wired in from day one."
+          },
+          {
+            "_key": "web-crm",
+            "title": "CRM",
+            "summary": "Implementations and automations that keep your pipeline visible and optimised across marketing and sales teams.",
+            "description": "We audit, migrate, and extend tools like HubSpot and Salesforce so your data syncs cleanly across the stack."
+          },
+          {
+            "_key": "web-ai",
+            "title": "AI",
+            "summary": "Pragmatic AI integrations powered by your real workflows—assistants, automation, and data loops that actually save time.",
+            "description": "Experiment quickly with prototypes, then harden the winners into production features with clear guardrails."
+          },
+          {
+            "_key": "web-ecommerce",
+            "title": "eCommerce",
+            "summary": "Composable commerce experiences with fast product discovery, checkout clarity, and analytics wired in from day one.",
+            "description": "Optimise merchandising, PDP storytelling, and retention journeys with a modern commerce stack."
+          }
+        ]
+      }
+    },
+    "fields": [
+      {
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string",
+        "title": "Headline"
+      },
+      {
+        "rows": 3,
+        "name": "description",
+        "type": "text",
+        "title": "Intro paragraph"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "marketing",
+        "type": "servicesSplitPillar",
+        "title": "Marketing tab"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "web",
+        "type": "servicesSplitPillar",
+        "title": "Web tab"
+      }
+    ],
+    "name": "servicesSplit",
+    "type": "object",
+    "title": "Services split"
+  },
+  {
+    "fields": [
+      {
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "marks": {
+              "annotations": [],
+              "decorators": [
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                }
+              ]
+            },
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "headline",
+        "type": "array"
+      },
+      {
+        "rows": 3,
+        "description": "Optional short description shown under the heading.",
+        "name": "intro",
+        "type": "text",
+        "title": "Intro text"
+      },
+      {
+        "description": "Optional link shown top‑right (e.g. ‘Explore all cases’).",
+        "name": "explore",
+        "type": "button",
+        "title": "Explore link"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Optional deep‑link into a specific slide (0‑based).",
+        "name": "initialIndex",
+        "type": "number",
+        "title": "Initial index"
+      },
+      {
+        "description": "Optional content block rendered below the heading and above the carousel.",
+        "name": "feature",
+        "type": "heroFeature",
+        "title": "Feature card"
+      },
+      {
+        "initialValue": "v1",
+        "readOnly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "string"
+      }
+    ],
+    "name": "caseStudyCarousel",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "name": "headline",
+        "type": "string"
+      },
+      {
+        "rows": 3,
+        "name": "subheading",
+        "type": "text"
+      },
+      {
+        "initialValue": true,
+        "description": "Applies a filter so uploaded logos render as solid black regardless of original color.",
+        "name": "forceBlackLogos",
+        "type": "boolean",
+        "title": "Force monochrome black logos"
+      },
+      {
+        "initialValue": {
+          "label": "+ Many more →",
+          "href": "/cases",
+          "variant": "link"
+        },
+        "description": "Controls the final 'Many more' cell. Leave empty to hide it.",
+        "name": "more",
+        "type": "button",
+        "title": "More link (final cell)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 8
+              },
+              {
+                "flag": "max",
+                "constraint": 60
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "clientLogo"
+          }
+        ],
+        "name": "logos",
+        "type": "array"
+      },
+      {
+        "initialValue": "v1",
+        "readOnly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "string"
+      }
+    ],
+    "name": "clientsSection",
+    "type": "object",
+    "title": "Clients / Partners"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "What our clients say",
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "name": "headline",
+        "type": "string"
+      },
+      {
+        "rows": 2,
+        "name": "subheading",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 3
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "testimonialCard"
+          }
+        ],
+        "name": "top",
+        "type": "array",
+        "title": "Top row items"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 3
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "testimonialCard"
+          }
+        ],
+        "name": "bottom",
+        "type": "array",
+        "title": "Bottom row items"
+      },
+      {
+        "initialValue": 30,
+        "description": "Pixels/second (default 30)",
+        "name": "speedTop",
+        "type": "number",
+        "title": "Speed (top)"
+      },
+      {
+        "initialValue": 24,
+        "description": "Pixels/second (default 24)",
+        "name": "speedBottom",
+        "type": "number",
+        "title": "Speed (bottom)"
+      }
+    ],
+    "name": "testimonialsMarquee",
+    "type": "object",
+    "title": "Testimonials — Full Page Marquee"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 50
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Optional ID for this section. Click 'Generate' to create from title. Used by breadcrumb navigation.",
+        "name": "sectionId",
+        "type": "slug",
+        "title": "Section ID (for navigation)"
+      },
+      {
+        "description": "Small label above the title",
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "rows": 4,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "body",
+        "type": "text",
+        "title": "Body text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "image",
+        "type": "imageWithAlt"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Left",
+              "value": "left"
+            },
+            {
+              "title": "Right",
+              "value": "right"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "left",
+        "name": "imagePosition",
+        "type": "string"
+      },
+      {
+        "description": "Optional call to action button",
+        "name": "cta",
+        "type": "button",
+        "title": "Call to Action"
+      }
+    ],
+    "name": "textImage",
+    "type": "object",
+    "title": "Text & Image"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 50
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Optional ID for this section. Click 'Generate' to create from title. Used by breadcrumb navigation.",
+        "name": "sectionId",
+        "type": "slug",
+        "title": "Section ID (for navigation)"
+      },
+      {
+        "description": "Small label above the title",
+        "name": "eyebrow",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Appears in the left column",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "description": "Optional subheading in the right column",
+        "name": "subheading",
+        "type": "string"
+      },
+      {
+        "rows": 6,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Main content text in the right column",
+        "name": "body",
+        "type": "text",
+        "title": "Body text"
+      },
+      {
+        "description": "Primary call to action button",
+        "name": "cta",
+        "type": "button",
+        "title": "Primary CTA"
+      },
+      {
+        "description": "Optional secondary call to action button",
+        "name": "cta2",
+        "type": "button",
+        "title": "Secondary CTA"
+      }
+    ],
+    "name": "textOnly",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "description": "Page title override.",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "rows": 3,
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Open Graph image"
+      },
+      {
+        "description": "Accessibility text for social previews.",
+        "name": "imageAlt",
+        "type": "string",
+        "title": "OG image alt text"
+      },
+      {
+        "description": "Optional override for social cards (Twitter title).",
+        "name": "imageTitle",
+        "type": "string",
+        "title": "OG image title"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "canonical",
+        "type": "url"
+      },
+      {
+        "name": "noindex",
+        "type": "boolean"
+      }
+    ],
+    "name": "seo",
+    "type": "object",
+    "title": "SEO"
+  },
+  {
+    "fields": [
+      {
+        "name": "heading",
+        "type": "string"
+      },
+      {
+        "name": "subheading",
+        "type": "text"
+      },
+      {
+        "name": "primary",
+        "type": "button"
+      },
+      {
+        "name": "secondary",
+        "type": "button"
+      }
+    ],
+    "name": "cta",
+    "type": "object",
+    "title": "CTA"
+  },
+  {
+    "fields": [
+      {
+        "name": "label",
+        "type": "string"
+      },
+      {
+        "name": "href",
+        "type": "string"
+      },
+      {
+        "options": {
+          "disableNew": true
+        },
+        "to": [
+          {
+            "type": "page"
+          },
+          {
+            "type": "post"
+          },
+          {
+            "type": "caseStudy"
+          }
+        ],
+        "name": "reference",
+        "type": "reference",
+        "title": "Internal reference"
+      },
+      {
+        "initialValue": "default",
+        "name": "variant",
+        "type": "string"
+      }
+    ],
+    "name": "button",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image"
+      },
+      {
+        "name": "alt",
+        "type": "string"
+      }
+    ],
+    "name": "imageWithAlt",
+    "type": "object",
+    "title": "Image with Alt"
+  },
+  {
+    "fields": [
+      {
+        "name": "label",
+        "type": "string"
+      }
+    ],
+    "name": "badge",
+    "type": "object"
+  },
+  {
+    "validation": [
+      {
+        "rules": [
+          {
+            "flag": "custom"
+          }
+        ],
+        "level": "error"
+      }
+    ],
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "label",
+        "type": "string"
+      },
+      {
+        "description": "Optional helper text shown in mega menu panels.",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "options": {
+          "disableNew": true
+        },
+        "to": [
+          {
+            "type": "page"
+          },
+          {
+            "type": "post"
+          },
+          {
+            "type": "caseStudy"
+          }
+        ],
+        "name": "reference",
+        "type": "reference",
+        "title": "Internal reference"
+      },
+      {
+        "description": "Used if no internal reference is selected (accepts absolute or relative URLs).",
+        "name": "href",
+        "type": "string",
+        "title": "External URL"
+      }
+    ],
+    "name": "navigationLink",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "custom"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "type": "navigationLink"
+          }
+        ],
+        "name": "items",
+        "type": "array",
+        "title": "Links"
+      }
+    ],
+    "name": "navigationGroup",
+    "type": "object",
+    "title": "Group"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string",
+        "title": "Label"
+      },
+      {
+        "initialValue": "link",
+        "options": {
+          "list": [
+            {
+              "title": "Simple link",
+              "value": "link"
+            },
+            {
+              "title": "Mega menu",
+              "value": "mega"
+            }
+          ],
+          "layout": "radio"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "link",
+                  "mega"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "variant",
+        "type": "string",
+        "title": "Type"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "link",
+        "type": "navigationLink"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "navigationGroup",
+            "title": "Group"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "groups",
+        "type": "array"
+      },
+      {
+        "placeholder": "e.g., HIGHLIGHT FEATURE",
+        "description": "Main headline shown at the top of the mega menu (desktop only)",
+        "hidden": "conditional",
+        "name": "megaMenuHeadline",
+        "type": "string"
+      },
+      {
+        "placeholder": "e.g., Performance på tværs af hele funnel'en.",
+        "description": "Description text shown below the headline (desktop only)",
+        "hidden": "conditional",
+        "name": "megaMenuDescription",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 5
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Case studies to showcase in the mega menu carousel (desktop only, max 3 recommended)",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "caseStudy"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to case study"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "featuredCases",
+        "type": "array"
+      }
+    ],
+    "name": "navigationSection",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "image",
+        "type": "imageWithAlt"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Optional MP4/Mux playback URL. If provided, it will play over the image.",
+        "name": "videoUrl",
+        "type": "url",
+        "title": "Video URL"
+      },
+      {
+        "name": "poster",
+        "type": "imageWithAlt",
+        "title": "Video poster"
+      },
+      {
+        "description": "Accessibility description for the background media when needed.",
+        "name": "alt",
+        "type": "string",
+        "title": "Alt text"
+      }
+    ],
+    "name": "heroBackground",
+    "type": "object",
+    "title": "Hero background"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "layout": "grid",
+          "sortable": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              },
+              {
+                "flag": "max",
+                "constraint": 8
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Add one or more featured cards. Each card can link to CMS content or a manual URL, and you can override the image, title, and copy per card.",
+        "of": [
+          {
+            "fieldsets": [
+              {
+                "name": "link"
+              },
+              {
+                "name": "content"
+              },
+              {
+                "name": "meta"
+              }
+            ],
+            "type": "heroFeatureItem",
+            "title": "Hero feature item"
+          }
+        ],
+        "name": "items",
+        "type": "array",
+        "title": "Cards"
+      }
+    ],
+    "name": "heroFeature",
+    "type": "object",
+    "title": "Hero feature"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "reference",
+        "options": {
+          "layout": "radio",
+          "list": [
+            {
+              "title": "Link to CMS entry",
+              "value": "reference"
+            },
+            {
+              "title": "Manual URL",
+              "value": "manual"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "reference",
+                  "manual"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "linkType",
+        "type": "string",
+        "title": "Link type",
+        "fieldset": "link"
+      },
+      {
+        "weak": true,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "to": [
+          {
+            "type": "page"
+          },
+          {
+            "type": "post"
+          },
+          {
+            "type": "caseStudy"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "reference",
+        "type": "reference",
+        "title": "Linked content",
+        "fieldset": "link"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Use for external or bespoke URLs. Include protocol for external links (https://).",
+        "hidden": "conditional",
+        "name": "href",
+        "type": "string",
+        "title": "Manual URL",
+        "fieldset": "link"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Shown on the card. For linked content, leave blank to inherit the document title.",
+        "name": "title",
+        "type": "string",
+        "fieldset": "content"
+      },
+      {
+        "rows": 3,
+        "description": "Short supporting copy. Falls back to the linked document summary when left blank.",
+        "name": "excerpt",
+        "type": "text",
+        "title": "Description",
+        "fieldset": "content"
+      },
+      {
+        "description": "Small label under the copy (e.g. ‘Latest entries’).",
+        "name": "metaLabel",
+        "type": "string",
+        "title": "Meta label",
+        "fieldset": "meta"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Upload to override the linked document image or provide art for manual cards.",
+        "name": "image",
+        "type": "imageWithAlt",
+        "title": "Card image"
+      }
+    ],
+    "fieldsets": [
+      {
+        "name": "link"
+      },
+      {
+        "name": "content"
+      },
+      {
+        "name": "meta"
+      }
+    ],
+    "name": "heroFeatureItem",
+    "type": "object",
+    "title": "Hero feature item"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "readOnly": true,
+        "name": "label",
+        "type": "string",
+        "title": "Tab label"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "headline",
+        "type": "string",
+        "title": "Headline (shown when this tab is active)"
+      },
+      {
+        "rows": 3,
+        "name": "description",
+        "type": "text",
+        "title": "Supporting paragraph"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "servicesSplitService",
+            "title": "Service"
+          }
+        ],
+        "name": "services",
+        "type": "array"
+      }
+    ],
+    "name": "servicesSplitPillar",
+    "type": "object",
+    "title": "Services pillar"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string",
+        "title": "Service title"
+      },
+      {
+        "description": "Optional title used in the right-hand detail panel. Defaults to the service title.",
+        "name": "detailTitle",
+        "type": "string",
+        "title": "Detail title"
+      },
+      {
+        "options": {
+          "source": "title"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Used to create stable IDs for the frontend. Leave as generated unless you have a specific requirement.",
+        "name": "key",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "summary",
+        "type": "text"
+      },
+      {
+        "rows": 5,
+        "name": "description",
+        "type": "text",
+        "title": "Supporting copy"
+      },
+      {
+        "name": "media",
+        "type": "servicesSplitMedia"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 2
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "button"
+          }
+        ],
+        "name": "ctas",
+        "type": "array",
+        "title": "CTAs"
+      }
+    ],
+    "name": "servicesSplitService",
+    "type": "object",
+    "title": "Service"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Image",
+              "value": "image"
+            },
+            {
+              "title": "Video",
+              "value": "video"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "image",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "image",
+                  "video"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "mode",
+        "type": "string",
+        "title": "Media type"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "image",
+        "type": "imageWithAlt"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "videoUrl",
+        "type": "url",
+        "title": "Video URL"
+      },
+      {
+        "options": {
+          "accept": "video/*"
+        },
+        "description": "Upload an MP4 or WebM file. Optional if a video URL is provided.",
+        "hidden": "conditional",
+        "name": "videoFile",
+        "type": "file",
+        "title": "Video file"
+      },
+      {
+        "description": "Optional poster image for the video",
+        "hidden": "conditional",
+        "name": "poster",
+        "type": "imageWithAlt",
+        "title": "Poster image"
+      }
+    ],
+    "name": "servicesSplitMedia",
+    "type": "object",
+    "title": "Service media"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "url",
+        "type": "url",
+        "title": "URL"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": false
+        },
+        "name": "image",
+        "type": "imageWithAlt"
+      }
+    ],
+    "name": "clientLogo",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Image only",
+              "value": "image"
+            },
+            {
+              "title": "Quote only",
+              "value": "quote"
+            },
+            {
+              "title": "Image + Text",
+              "value": "imageQuote"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "quote",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "image",
+                  "quote",
+                  "imageQuote"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "variant",
+        "type": "string"
+      },
+      {
+        "description": "Legacy manual color. Prefer the tone selector below.",
+        "hidden": true,
+        "name": "background",
+        "type": "string",
+        "title": "Background color"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Primary",
+              "value": "primary"
+            },
+            {
+              "title": "Light Alt",
+              "value": "lightAlt"
+            },
+            {
+              "title": "Dark",
+              "value": "dark"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "primary",
+        "description": "Choose one of the three presets used by Service cards. No custom colors.",
+        "hidden": "conditional",
+        "name": "tone",
+        "type": "string",
+        "title": "Card color"
+      },
+      {
+        "description": "Optional mark displayed on quote-based cards",
+        "hidden": "conditional",
+        "name": "logo",
+        "type": "imageWithAlt",
+        "title": "Logo (quote cards)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Required for image variants. Left column for Image + Text, full-bleed for Image only.",
+        "hidden": "conditional",
+        "name": "image",
+        "type": "imageWithAlt",
+        "title": "Main image"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "quote",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "author",
+        "type": "string",
+        "title": "Name"
+      },
+      {
+        "hidden": "conditional",
+        "name": "role",
+        "type": "string",
+        "title": "Title / Role"
+      },
+      {
+        "description": "Shows at bottom of card for all variants",
+        "name": "cta",
+        "type": "button",
+        "title": "CTA"
+      }
+    ],
+    "name": "testimonialCard",
+    "type": "object"
+  }
+]

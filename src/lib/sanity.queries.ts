@@ -923,6 +923,61 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
           reference->{"slug": slug.current, locale}
         }
       },
+      _type == "heroPage" => {
+        _type,
+        eyebrow,
+        heading,
+        subheading,
+        media {
+          mediaType,
+          image {
+            alt,
+            asset->{
+              url,
+              metadata{ lqip, dimensions }
+            }
+          },
+          video {
+            asset->{
+              url,
+              mimeType
+            }
+          },
+          videoUrl,
+          poster {
+            alt,
+            asset->{
+              url,
+              metadata{ lqip, dimensions }
+            }
+          }
+        },
+        breadcrumbs[]{
+          _key,
+          label,
+          anchor
+        }
+      },
+      _type == "textImage" => {
+        _type,
+        eyebrow,
+        title,
+        body,
+        imagePosition,
+        "image": {
+          "alt": image.alt,
+          "asset": image.image.asset->{ url, metadata{ lqip, dimensions } }
+        },
+        cta{ label, href, variant }
+      },
+      _type == "textOnly" => {
+        _type,
+        eyebrow,
+        title,
+        body,
+        cta{ label, href, variant },
+        cta2{ label, href, variant }
+      },
       true => {}
     )
   }
