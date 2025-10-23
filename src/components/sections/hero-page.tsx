@@ -82,7 +82,7 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
     return (
         <Section>
             <div
-                className="flex flex-col pt-20 lg:pt-0 h-[calc(100vh-var(--section-padding)-var(--container-gutter)-5rem)] lg:h-[calc(100vh-var(--section-padding)-var(--container-gutter))]"
+                className="flex flex-col pt-20 lg:pt-0 h-[calc(100vh-var(--section-padding)-var(--container-gutter)-var(--container-gutter)-5rem)] lg:h-[calc(100vh-var(--section-padding)-var(--container-gutter))]"
                 style={{
                     gap: "var(--container-gutter)"
                 } as React.CSSProperties}
