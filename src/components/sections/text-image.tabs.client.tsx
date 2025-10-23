@@ -39,7 +39,7 @@ export function TextImageTabs({
 
   // Height sync between panels with smooth growth + max cap
   const textCardRef = useRef<HTMLDivElement>(null);
-  const [measuredTextHeight, setMeasuredTextHeight] = useState<number>(440);
+  const [measuredTextHeight, setMeasuredTextHeight] = useState<number>(520);
 
   useEffect(() => {
     const el = textCardRef.current;
@@ -56,7 +56,7 @@ export function TextImageTabs({
   const MIN_HEIGHT = 520;  // keep within site constraints
   const MAX_HEIGHT = 720;  // do not grow beyond this
   const clamp = (v:number, min:number, max:number) => Math.max(min, Math.min(max, v));
-  const targetHeight = clamp(activeTab ? measuredTextHeight : BASE_HEIGHT, MIN_HEIGHT, MAX_HEIGHT);
+  const targetHeight = clamp(measuredTextHeight, MIN_HEIGHT, MAX_HEIGHT);
 
   return (
     <div className={cn("grid gap-4 md:gap-6", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
