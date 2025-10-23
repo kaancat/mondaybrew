@@ -167,7 +167,7 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
 /**
  * Type guard to check if a section is a Hero Page section
  */
-export function isHeroPage(section: any): section is HeroPageData & { _type: "heroPage" } {
-    return section?._type === "heroPage";
+export function isHeroPage(section: unknown): section is HeroPageData & { _type: "heroPage" } {
+    return (section as { _type?: string })?._type === "heroPage";
 }
 
