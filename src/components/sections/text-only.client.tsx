@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 
 type TextOnlyClientProps = {
+    sectionId?: string;
     eyebrow?: string;
     title?: string;
     body?: string;
@@ -30,6 +31,7 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
  * Two-column layout with title and accent line above
  */
 export function TextOnlyClient({
+    sectionId,
     eyebrow,
     title,
     body,
@@ -59,6 +61,7 @@ export function TextOnlyClient({
     return (
         <motion.div
             ref={sectionRef}
+            id={sectionId || undefined}
             {...animateContent}
             className="relative"
         >

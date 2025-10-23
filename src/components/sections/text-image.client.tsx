@@ -16,6 +16,7 @@ export type TextImageResolvedImage = {
 };
 
 type TextImageClientProps = {
+    sectionId?: string;
     eyebrow?: string;
     title?: string;
     body?: string;
@@ -39,6 +40,7 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
  * Image always goes below text on mobile for better reading flow.
  */
 export function TextImageClient({
+    sectionId,
     eyebrow,
     title,
     body,
@@ -81,7 +83,11 @@ export function TextImageClient({
     };
 
     return (
-        <div ref={sectionRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center min-h-[500px]">
+        <div 
+            ref={sectionRef} 
+            id={sectionId || undefined}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center min-h-[500px]"
+        >
             {/* Text Content - All animated together as one block */}
             <motion.div
                 className={cn("flex flex-col h-full justify-center relative", textOrder)}

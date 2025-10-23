@@ -77,6 +77,7 @@ export default async function WebsitesPage() {
           return (
             <div className="vr-section" key={key}>
               <TextImageSection
+                sectionId={section.sectionId as { current?: string | null } | null | undefined}
                 eyebrow={section.eyebrow as string | undefined}
                 title={section.title as string | undefined}
                 body={section.body as string | undefined}
@@ -108,6 +109,7 @@ export default async function WebsitesPage() {
           return (
             <div className="vr-section" key={key}>
               <TextOnlySection
+                sectionId={section.sectionId as { current?: string | null } | null | undefined}
                 eyebrow={section.eyebrow as string | null | undefined}
                 title={section.title as string | null | undefined}
                 body={section.body as string | null | undefined}

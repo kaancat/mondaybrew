@@ -2,6 +2,7 @@ import { Section } from "@/components/layout/section";
 import { TextOnlyClient } from "./text-only.client";
 
 export type TextOnlySectionData = {
+    sectionId?: { current?: string | null } | null;
     eyebrow?: string | null;
     title?: string | null;
     body?: string | null;
@@ -27,15 +28,19 @@ const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "gho
  * Useful for mission statements, descriptions, or informational content
  */
 export function TextOnlySection({
+    sectionId,
     eyebrow,
     title,
     body,
     cta,
     cta2,
 }: TextOnlySectionData) {
+    const id = sectionId?.current?.trim() || undefined;
+
     return (
         <Section innerClassName="flex flex-col gap-[var(--flow-space)]">
             <TextOnlyClient
+                sectionId={id}
                 eyebrow={eyebrow?.trim()}
                 title={title?.trim()}
                 body={body?.trim()}

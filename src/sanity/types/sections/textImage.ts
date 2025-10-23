@@ -6,6 +6,16 @@ export default defineType({
     type: "object",
     fields: [
         defineField({
+            name: "sectionId",
+            title: "Section ID (for navigation)",
+            type: "slug",
+            description: "Optional ID for this section. Click 'Generate' to create from title. Used by breadcrumb navigation.",
+            options: {
+                source: "title",
+                maxLength: 50,
+            },
+        }),
+        defineField({
             name: "eyebrow",
             title: "Eyebrow",
             type: "string",
@@ -53,13 +63,18 @@ export default defineType({
     preview: {
         select: {
             title: "title",
-            subtitle: "eyebrow",
+            sectionId: "sectionId.current",
+            eyebrow: "eyebrow",
             media: "image.image",
         },
-        prepare({ title, subtitle, media }) {
+        prepare({ title, sectionId, eyebrow, media }) {
+            const parts = [];
+            if (eyebrow) parts.push(eyebrow);
+            if (sectionId) parts.push(`ID: ${sectionId}`);
+            
             return {
                 title: title || "Text & Image",
-                subtitle: subtitle ? `${subtitle}` : "No eyebrow",
+                subtitle: parts.length > 0 ? parts.join(" · ") : "No Section ID set",
                 media: media,
             };
         },

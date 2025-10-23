@@ -97,25 +97,25 @@ export const heroPage = defineType({
             name: "breadcrumbs",
             title: "Breadcrumbs / Page Navigation",
             type: "array",
-            description: "Page-specific navigation links. The anchor should match H2 IDs in content sections below (e.g., 'overview', 'process', 'tech').",
+            description: "Page-specific navigation links. WORKFLOW: 1) First add content sections below (Text+Image, Text Only, etc.), 2) Click 'Generate' on each section's 'Section ID' field, 3) Come back here and enter those same Section IDs in the breadcrumbs.",
             of: [
                 {
                     type: "object",
                     name: "breadcrumb",
-                    title: "Breadcrumb",
+                    title: "Breadcrumb Link",
                     fields: [
                         {
                             name: "label",
-                            title: "Label",
+                            title: "Link Text",
                             type: "string",
-                            description: "Display text for the link (e.g., 'Overblik', 'Proces')",
+                            description: "What visitors see (e.g., 'Overview', 'Process', 'Pricing')",
                             validation: (Rule) => Rule.required(),
                         },
                         {
                             name: "anchor",
-                            title: "Anchor / Section ID",
+                            title: "Target Section ID",
                             type: "string",
-                            description: "The ID of the section this links to (without #). Should match an H2 ID in a content block below.",
+                            description: "Copy the 'Section ID' from one of your content blocks below. For example: if your Text+Image section has ID 'test-tekstfelt-nr-1', paste that here.",
                             validation: (Rule) => Rule.required(),
                         },
                     ],
@@ -126,8 +126,8 @@ export const heroPage = defineType({
                         },
                         prepare({ title, subtitle }) {
                             return {
-                                title: title || "Untitled",
-                                subtitle: subtitle ? `#${subtitle}` : "",
+                                title: title || "Untitled link",
+                                subtitle: subtitle ? `→ Scrolls to: #${subtitle}` : "No target section",
                             };
                         },
                     },

@@ -16,6 +16,7 @@ type SanityImageAsset = {
 } | null;
 
 export type TextImageSectionData = {
+    sectionId?: { current?: string | null } | null;
     eyebrow?: string | null;
     title?: string | null;
     body?: string | null;
@@ -38,6 +39,7 @@ const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "gho
  * where text and visual content need equal emphasis
  */
 export function TextImageSection({
+    sectionId,
     eyebrow,
     title,
     body,
@@ -47,10 +49,12 @@ export function TextImageSection({
 }: TextImageSectionData) {
     const resolvedImage = resolveImage(image);
     const position = imagePosition === "right" ? "right" : "left"; // Default to left
+    const id = sectionId?.current?.trim() || undefined;
 
     return (
         <Section innerClassName="flex flex-col gap-[var(--flow-space)]">
             <TextImageClient
+                sectionId={id}
                 eyebrow={eyebrow?.trim()}
                 title={title?.trim()}
                 body={body?.trim()}
