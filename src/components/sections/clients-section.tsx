@@ -193,7 +193,7 @@ function LinedGrid({ items, more, forceBlackLogos }: { items: ClientLogo[]; more
   );
 }
 
-function Logo({ logo, forceBlackLogos: _forceBlackLogos }: { logo: ClientLogo; forceBlackLogos?: boolean }) {
+function Logo({ logo }: { logo: ClientLogo; forceBlackLogos?: boolean }) {
   const { title, image } = logo;
   const alt = image?.alt || title || "Logo";
 

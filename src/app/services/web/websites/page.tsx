@@ -8,10 +8,20 @@ import { Section } from "@/components/layout/section";
  * Add a Hero Page content block in Sanity Studio to display hero content
  */
 
+type PageSection = {
+  _type?: string;
+  _key?: string;
+  [key: string]: unknown;
+};
+
+type PagePayload = {
+  sections?: PageSection[];
+};
+
 export const revalidate = 60;
 
 export default async function WebsitesPage() {
-  const page = await fetchSanity<any>(pageBySlugQuery, {
+  const page = await fetchSanity<PagePayload>(pageBySlugQuery, {
     slug: "services/web/websites",
     locale: "da",
   });
@@ -36,7 +46,7 @@ export default async function WebsitesPage() {
 
   return (
     <main>
-      {sections.map((section: any, index: number) => {
+      {sections.map((section, index: number) => {
         const key = section?._key ?? `section-${index}`;
 
         if (isHeroPage(section)) {
