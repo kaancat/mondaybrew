@@ -81,57 +81,45 @@ export function TextImageClient({
     };
 
     return (
-        <div 
-            ref={sectionRef}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center min-h-[500px]"
-        >
-            {/* Text Content - All animated together as one block */}
-            <motion.div
-                className={cn("flex flex-col h-full justify-center relative", textOrder)}
-                {...animateText}
-            >
-                {/* Decorative gradient blur orb in background */}
-                <div className="absolute -left-20 top-20 w-64 h-64 bg-[color:var(--accent)] opacity-[0.03] blur-[80px] rounded-full pointer-events-none" />
-
-                {/* Text content - tightly spaced */}
-                <div className="flex flex-col gap-3">
-                    {/* Eyebrow - Small yellow label */}
+        <div ref={sectionRef} className="grid grid-cols-1 md:grid-cols-2 items-stretch gap-6 md:gap-10">
+            {/* Text panel box */}
+            <motion.div className={cn(textOrder)} {...animateText}>
+                <div
+                    className={cn(
+                        "h-full rounded-[5px] p-6 md:p-8",
+                        "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)]",
+                        "border md:border md:border-[color:color-mix(in_oklch,var(--services-ink-strong)_10%,white_90%)]"
+                    )}
+                    style={{ minHeight: 520 }}
+                >
                     {eyebrow && (
-                        <span className="eyebrow">
-                            {eyebrow}
-                        </span>
+                        <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:color-mix(in_oklch,var(--services-ink-strong)_65%,white_35%)]">{eyebrow}</span>
                     )}
-
-                    {/* Title - Large and Bold */}
-                    {title && (
-                        <h2 className="text-[color:var(--foreground)]">
-                            {title}
-                        </h2>
-                    )}
-
-                    {/* Body Text - Normal size and weight */}
+                    {title && (<h2 className="mt-2 text-[color:var(--services-ink-strong)]">{title}</h2>)}
+                    <div className="my-6 h-[1px] w-full bg-[color:color-mix(in_oklch,var(--services-ink-strong)_18%,white_82%)]" />
                     {body && (
-                        <p className="body-text">
-                            {body}
-                        </p>
+                        <p className="text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_82%,white_18%)]">{body}</p>
                     )}
-
-                    {/* CTA Button */}
                     {cta && (
-                        <Button asChild variant={cta.variant} size="lg" className="self-start">
-                            <Link href={cta.href}>{cta.label}</Link>
-                        </Button>
+                        <div className="mt-6">
+                            <Button asChild variant={cta.variant} size="lg" className="self-start">
+                                <Link href={cta.href}>{cta.label}</Link>
+                            </Button>
+                        </div>
                     )}
                 </div>
             </motion.div>
 
-            {/* Image */}
+            {/* Image panel */}
             {image?.url && (
-                <motion.div
-                    className={cn("relative w-full aspect-[4/3] md:aspect-auto md:h-[500px] lg:h-[600px]", imageOrder)}
-                    {...animateImage}
-                >
-                    <div className="relative w-full h-full overflow-hidden rounded-[5px] shadow-[0_20px_60px_rgb(0,0,0,0.4)]">
+                <motion.div className={cn(imageOrder)} {...animateImage}>
+                    <div
+                        className={cn(
+                            "relative h-full rounded-[5px] overflow-hidden shadow-[0_20px_60px_rgb(0,0,0,0.4)]",
+                            image ? "bg-black/5" : "bg-transparent",
+                        )}
+                        style={{ minHeight: 520 }}
+                    >
                         <Image
                             src={image.url}
                             alt={image.alt || ""}
@@ -148,4 +136,3 @@ export function TextImageClient({
         </div>
     );
 }
-
