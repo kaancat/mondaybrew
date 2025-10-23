@@ -127,7 +127,7 @@ export function TextImageTabs({
               );
             })}
           </ul>
-        </motion.div>
+        </div>
       </div>
 
       {/* Image panel */}
