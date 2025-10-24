@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -37,40 +37,7 @@ export function TextImageTabs({
 
   const leftFirst = imagePosition !== "left"; // text panel first when image is right
 
-  // Height sync between panels with smooth growth
-  const textCardRef = useRef<HTMLDivElement>(null);
-  const [measuredTextHeight, setMeasuredTextHeight] = useState<number>(520);
-
-  useLayoutEffect(() => {
-    const el = textCardRef.current;
-    if (!el) return;
-
-    const measure = () => {
-      const rectH = el.getBoundingClientRect().height;
-      const styles = window.getComputedStyle(el);
-      const borderY = parseFloat(styles.borderTopWidth || "0") + parseFloat(styles.borderBottomWidth || "0");
-      const scrollH = (el.scrollHeight || 0) + borderY;
-      const nextHeight = Math.max(rectH, scrollH);
-      setMeasuredTextHeight(Math.round(nextHeight));
-    };
-
-    const observer = new ResizeObserver(() => measure());
-    observer.observe(el);
-
-    // Initial measurements: next frame and after fonts load
-    requestAnimationFrame(measure);
-    // Some browsers update layout after fonts are ready
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if ((document as any).fonts?.ready) {
-      (document as any).fonts.ready.then(measure).catch(() => {});
-    }
-    window.addEventListener("load", measure, { once: true });
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("load", measure);
-    };
-  }, []);
+  // Grid stretch keeps both panels equal-height, so no JS sync required.
 
   const MIN_HEIGHT = 520; // baseline visual height used across sections
 
@@ -87,7 +54,6 @@ export function TextImageTabs({
             // Mirror Services card exactly
             "border md:border md:border-[color:var(--services-ink-strong)] dark:border-[#0a0a0a] shadow-[var(--shadow-elevated-md)]"
           )}
-          ref={textCardRef}
           style={{ minHeight: MIN_HEIGHT }}
         >
           {eyebrow ? (

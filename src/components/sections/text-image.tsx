@@ -1,6 +1,6 @@
 import { Section } from "@/components/layout/section";
 import { TextImageSwitch } from "./text-image.switch.client";
-import { TextImageClient, type TextImageResolvedImage } from "./text-image.client";
+import type { TextImageResolvedImage } from "./text-image.client";
 
 type SanityImageAsset = {
     alt?: string | null;
