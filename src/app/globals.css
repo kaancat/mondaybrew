@@ -804,6 +804,28 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
 }
 
 @layer utilities {
+  /* Shared Services card surface so components match 1:1 */
+  .services-card-surface {
+    background: var(--services-card-bg) !important;
+    color: var(--services-ink-strong) !important;
+    border: 1px solid var(--services-ink-strong) !important;
+    box-shadow: var(--shadow-elevated-md);
+  }
+  .services-card-surface h1,
+  .services-card-surface h2,
+  .services-card-surface h3,
+  .services-card-surface h4,
+  .services-card-surface h5,
+  .services-card-surface h6 {
+    color: var(--services-ink-strong) !important;
+    font-weight: 600; /* match Services detail card */
+  }
+  .services-card-divider {
+    background: color-mix(in oklch, var(--services-ink-strong) 85%, white 15%) !important;
+  }
+  .services-card-muted {
+    color: color-mix(in oklch, var(--services-ink-strong) 84%, white 16%) !important;
+  }
   /* Clients/Partners: primary theme uses page background color */
 html.light-primary .clients-hero-strip {
     /* Follow services card style on Primary (dark card) */
