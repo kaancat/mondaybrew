@@ -681,8 +681,8 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
       </div>
       {/* Mobile auto-marquee rows (slower, pause on touch) */}
       <div className="md:hidden flex flex-col gap-2 pb-2 justify-start bg-transparent" style={{ height: "auto", minHeight: "320px" }}>
-        <RowAutoMobile items={top} speed={Math.max(12, speedTop * 0.45)} direction={1} />
-        <RowAutoMobile items={bottom} speed={Math.max(9, speedBottom * 0.35)} direction={-1} />
+        <RowAutoMobile items={top} speed={Math.max(12, speedTop * 0.45)} />
+        <RowAutoMobile items={bottom} speed={Math.max(9, speedBottom * 0.35)} />
       </div>
     </div>
   );
