@@ -635,7 +635,10 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
   const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pointerIdRef = useRef<number | null>(null);
   const startXRef = useRef(0);
+  const startYRef = useRef(0);
   const startOffsetRef = useRef(0);
+  const hasCaptureRef = useRef(false);
+  const DRAG_THRESHOLD_PX = 8; // require a small horizontal intent before capturing
 
   const setRef = useCallback((node: HTMLDivElement | null) => {
     trackRef.current = node;
@@ -677,25 +680,42 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
   const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     if (prefersReducedMotion) return;
     pointerIdRef.current = e.pointerId;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    // Do NOT capture yet — wait until horizontal threshold is exceeded
     startXRef.current = e.clientX;
+    startYRef.current = e.clientY;
     startOffsetRef.current = dragOffset;
-    setIsInteracting(true);
+    hasCaptureRef.current = false;
   }, [prefersReducedMotion, dragOffset]);
   const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     if (prefersReducedMotion) return;
     if (pointerIdRef.current !== e.pointerId) return;
-    e.preventDefault();
     const dx = e.clientX - startXRef.current;
+    const dy = e.clientY - startYRef.current;
+    // If we haven't captured yet, decide based on movement intent
+    if (!hasCaptureRef.current) {
+      // vertical scroll intent — let the page scroll, do nothing
+      if (Math.abs(dy) > Math.abs(dx)) return;
+      // horizontal intent but below threshold — don't prevent scrolling yet
+      if (Math.abs(dx) < DRAG_THRESHOLD_PX) return;
+      // Horizontal drag confirmed — capture and start interacting
+      (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+      hasCaptureRef.current = true;
+      setIsInteracting(true);
+    }
+    // Only prevent default once dragging horizontally
+    e.preventDefault();
     setDragOffset(wrapTx(startOffsetRef.current + dx));
   }, [prefersReducedMotion, wrapTx]);
   const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     if (prefersReducedMotion) return;
     if (pointerIdRef.current !== e.pointerId) return;
     pointerIdRef.current = null;
-    e.currentTarget.releasePointerCapture(e.pointerId);
-    clearInteractionTimeout();
-    interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
+    if (hasCaptureRef.current) {
+      hasCaptureRef.current = false;
+      (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId);
+      clearInteractionTimeout();
+      interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
+    }
   }, [prefersReducedMotion, clearInteractionTimeout]);
 
   const wrapperStyle = useMemo(() => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }), [dragOffset]);
