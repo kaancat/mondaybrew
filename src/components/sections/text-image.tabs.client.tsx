@@ -47,12 +47,12 @@ export function TextImageTabs({
       <div className={cn(leftFirst ? "order-1" : "order-2", "relative")}> 
         <div
           className={cn(
-            // Height should follow content; avoid forcing full stretch here
-            "rounded-[5px] p-6 md:p-6",
-            // Tokens with dark fallbacks for perfect parity with Services card
+            // Mirror Services detail card classes exactly (spacing/shape)
+            "rounded-none p-0 md:rounded-[5px] md:p-6",
+            // Surface + ink tokens (with dark fallbacks to guarantee parity in dev)
             "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] dark:bg-[#f5f7fd] dark:text-[#0a0a0a]",
-            // Mirror Services card exactly
-            "border md:border md:border-[color:var(--services-ink-strong)] dark:border-[#0a0a0a] shadow-[var(--shadow-elevated-md)]"
+            // Border/shadow parity
+            "border border-[color:var(--services-ink-strong)] dark:border-[#0a0a0a] shadow-[var(--shadow-elevated-md)]"
           )}
           style={{ minHeight: MIN_HEIGHT }}
         >
@@ -65,12 +65,12 @@ export function TextImageTabs({
             <h2 className="mt-2 font-semibold text-[color:var(--services-ink-strong)] dark:text-[#0a0a0a]">{title}</h2>
           ) : null}
           {body ? (
-            <p className="mt-3 text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_84%,white_16%)]">{body}</p>
+            <p className="mt-3 text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_88%,white_12%)]">{body}</p>
           ) : null}
 
           <div className="mt-6 mb-0 h-[1px] w-full services-card-divider" />
 
-          <ul className="pt-2.5 divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_22%,white_78%)]">
+          <ul className="pt-2.5 divide-y divide-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)] border-b border-[color:color-mix(in_oklch,var(--services-ink-strong)_85%,white_15%)]">
             {tabs.map((t, i) => {
               const active = t.id === activeId;
               const num = String(i + 1).padStart(2, "0");

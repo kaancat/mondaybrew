@@ -86,11 +86,11 @@ export function TextImageClient({
             <motion.div className={cn(textOrder)} {...animateText}>
                 <div
                     className={cn(
-                        "h-full rounded-[5px] p-6 md:p-6",
-                        // Use tokens with dark-theme hard fallbacks to guarantee match with Services card
-                        "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)]",
-                        "dark:bg-[#f5f7fd] dark:text-[#0a0a0a]",
-                        // Mirror Services card exactly
+                        // Mirror Services detail card classes exactly (spacing/shape)
+                        "h-full rounded-none p-0 md:rounded-[5px] md:p-6",
+                        // Tokens with dark fallbacks for perfect parity
+                        "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] dark:bg-[#f5f7fd] dark:text-[#0a0a0a]",
+                        // Border/shadow parity
                         "border md:border md:border-[color:var(--services-ink-strong)] dark:border-[#0a0a0a] shadow-[var(--shadow-elevated-md)]"
                     )}
                     style={{ minHeight: 520 }}
@@ -101,7 +101,7 @@ export function TextImageClient({
                     {title && (<h2 className="mt-2 font-semibold text-[color:var(--services-ink-strong)] dark:text-[#0a0a0a]">{title}</h2>)}
                     <div className="my-6 h-[1px] w-full services-card-divider" />
                     {body && (
-                        <p className="text-[length:var(--font-body)] leading-relaxed services-card-muted">{body}</p>
+                        <p className="text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_88%,white_12%)]">{body}</p>
                     )}
                     {cta && (
                         <div className="mt-6">
