@@ -3,15 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  motion,
-  useAnimation,
-  useInView,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  animate,
-} from "framer-motion";
+import { motion, useAnimation, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -62,14 +54,7 @@ const headlineVariants = {
   },
 } as const;
 
-const statVariants = {
-  hidden: { opacity: 0, y: 22 },
-  visible: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.9, ease: EASE_OUT, delay: 0.5 + index * 0.18 },
-  }),
-} as const;
+// No per-stat entrance needed for the simplified static panel.
 
 export function AboutSectionClient({ eyebrow, headline, subheading, image, stats = [], cta }: AboutSectionClientProps) {
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -81,6 +66,10 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   const [isMobile, setIsMobile] = useState(true);
+  // Mobile stats scroller state (for pagination dots)
+  const mobileStatsRef = useRef<HTMLDivElement | null>(null);
+  const [activeStat, setActiveStat] = useState(0);
+  const rafId = useRef<number | null>(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -139,8 +128,9 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
       <div className={cn("relative isolate", isMobile ? "full-bleed" : undefined)}>
         <motion.div
           className={cn(
-            "relative overflow-hidden rounded-[5px] shadow-[var(--shadow-hero)]",
-            "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,color-mix(in_oklch,var(--accent)_15%,transparent)_0%,transparent_60%)]",
+            "relative overflow-hidden rounded-[5px]",
+            // Side/bottom-only depth to avoid top halo or colored edges
+            "drop-shadow-[0_36px_110px_rgba(8,6,20,0.28)]",
           )}
         >
           <div className="aspect-[4/3] md:aspect-[16/6]" />
@@ -181,52 +171,114 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
 
           {/* Overlay moved outside (see below) to allow covering both image and the spacer container */}
         </motion.div>
-        {/* Mobile-only spacer container that touches the image */}
-        <div className="md:hidden h-[84px] bg-[color:var(--background)]" />
-
+        {/* Stats glass bar anchored at image bottom (matches Media Showcase styling) */}
         {stats.length ? (
           <motion.div
             variants={overlayVariants}
             initial="hidden"
             animate={overlayControls}
-            className={cn(
-              "about-stats absolute z-10 inset-x-0 bottom-0 flex flex-col justify-end",
-              // Full-width bar spanning into the spacer container and ~lower third of image
-              "mx-0 w-full",
-              "overflow-hidden shadow-[0_-12px_60px_rgba(8,6,20,0.24)] backdrop-blur-[10px]",
-              // Rounded only on the top so it fuses with the spacer edge
-              "rounded-t-[14px] rounded-b-0",
-              // Glass gradient: stronger opacity near bottom, settles by ~2/3 height, then fades out
-              // Multi-stop gradient to avoid hard banding
-              "bg-[linear-gradient(to_top,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.9)_30%,rgba(255,255,255,0.74)_66%,rgba(255,255,255,0.45)_82%,rgba(255,255,255,0.0)_100%)]",
-              // Desktop keeps original recipe by reducing width/position via md: classes
-              "md:rounded-b-[5px] md:rounded-t-none md:inset-y-auto md:bottom-0 md:w-auto md:self-start md:bg-white/70",
-            )}
+            className="z-10"
           >
-            {/* Accent chip and micro-label for mobile only */}
-            <div className="md:hidden px-5 pt-2.5">
-              <div className="h-[2px] w-12 rounded-full bg-[color:var(--accent)]/85 drop-shadow-[0_0_6px_var(--accent)]" />
+            {/* Mobile: horizontal glass chips below image */}
+            <div className="about-stats-panel block md:hidden w-full pt-2">
+              <div className="relative -mx-5 px-5 overflow-hidden pb-3">
+                <div
+                  className={cn(
+                    "flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2",
+                    "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+                  )}
+                  aria-label="About stats"
+                  ref={mobileStatsRef}
+                  onScroll={() => {
+                    if (rafId.current) cancelAnimationFrame(rafId.current);
+                    rafId.current = requestAnimationFrame(() => {
+                      const scroller = mobileStatsRef.current;
+                      if (!scroller) return;
+                      const left = scroller.scrollLeft;
+                      let nearest = 0;
+                      let min = Infinity;
+                      const children = Array.from(scroller.children) as HTMLElement[];
+                      children.forEach((el, idx) => {
+                        const dist = Math.abs(el.offsetLeft - left);
+                        if (dist < min) {
+                          min = dist;
+                          nearest = idx;
+                        }
+                      });
+                      setActiveStat(nearest);
+                    });
+                  }}
+                >
+                  {stats.map((stat, i) => (
+                    <div
+                      key={`${stat.label || stat.value || i}`}
+                      className={cn(
+                        "min-w-[220px] snap-start rounded-[5px]",
+                        "bg-[color-mix(in_oklch,var(--nav-shell-bg)_60%,transparent)] border border-[color:var(--nav-shell-border)] backdrop-blur-[10px]",
+                        // Softer mobile shadow so it doesn't spill into next section
+                        "px-4 py-3 drop-shadow-[0_6px_18px_rgba(8,6,20,0.16)]",
+                      )}
+                      style={{ boxShadow: "var(--nav-shell-shadow)" }}
+                    >
+                      {stat.value ? (
+                        <div data-stat-value className="text-[length:var(--font-h3)] leading-none text-primary">{stat.value}</div>
+                      ) : null}
+                      {stat.label ? <div data-stat-label className="text-muted-foreground mt-1">{stat.label}</div> : null}
+                    </div>
+                  ))}
+                </div>
+                {/* Edge fade masks */}
+                <span aria-hidden className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-[linear-gradient(to_right,var(--background),transparent)]" />
+                <span aria-hidden className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-[linear-gradient(to_left,var(--background),transparent)]" />
+                {/* Pagination dots */}
+                <div className="mt-1.5 mb-1 flex justify-center gap-1.5">
+                  {stats.map((_, idx) => (
+                    <span
+                      key={`dot-${idx}`}
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full transition-colors",
+                        idx === activeStat
+                          ? "bg-[color:var(--nav-shell-border)]/90"
+                          : "bg-[color:var(--nav-shell-border)]/40",
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="px-5 pb-[max(env(safe-area-inset-bottom,8px),10px)] pt-1.5 md:px-[clamp(28px,5vw,60px)] md:py-[clamp(32px,5.5vh,52px)]">
-              <dl
+
+            {/* Desktop: full-width glass bar attached to image bottom */}
+            <div className="about-stats-panel hidden md:block md:absolute md:inset-x-0 md:bottom-0">
+              <div
                 className={cn(
-                  "grid w-full gap-y-2 gap-x-3 md:gap-y-[clamp(18px,3.2vh,26px)] md:gap-x-[clamp(16px,3vw,36px)]",
-                  "text-left place-items-start md:text-center md:place-items-center",
-                  gridCols,
-                  "md:[&>div]:px-[min(2.2vw,36px)]",
-                  "md:[&>div:not(:first-child)]:border-l md:[&>div:not(:first-child)]:border-l-white/20",
+                  "w-full rounded-t-0 rounded-b-[5px] border border-t md:border md:border-t border-[color:var(--nav-shell-border)]",
+                  "bg-[color-mix(in_oklch,var(--nav-shell-bg)_68%,transparent)] backdrop-blur-[12px]",
+                  "px-8 py-4 drop-shadow-[0_18px_38px_rgba(8,6,20,0.18)]",
                 )}
+                style={{ boxShadow: "var(--nav-shell-shadow)" }}
               >
-                {stats.map((stat, index) => (
-                  <AnimatedStat
-                    key={`${stat.label || stat.value || index}`}
-                    index={index}
-                    stat={stat}
-                    isActive={isInView}
-                    prefersReducedMotion={prefersReducedMotion}
-                  />
-                ))}
-              </dl>
+                <dl
+                  className={cn(
+                    "grid gap-x-6 gap-y-2",
+                    stats.length >= 4
+                      ? "grid-cols-4"
+                      : stats.length === 3
+                        ? "grid-cols-3"
+                        : stats.length === 2
+                          ? "grid-cols-2"
+                          : "grid-cols-1",
+                  )}
+                >
+                  {stats.map((stat, i) => (
+                    <div key={`${stat.label || stat.value || i}`} className="flex items-start gap-3 flex-col items-center text-center">
+                      {stat.value ? (
+                        <div data-stat-value className="text-[length:var(--font-h3)] leading-none text-primary">{stat.value}</div>
+                      ) : null}
+                      {stat.label ? <div data-stat-label className="text-muted-foreground">{stat.label}</div> : null}
+                    </div>
+                  ))}
+                </dl>
+              </div>
             </div>
           </motion.div>
         ) : null}
@@ -243,113 +295,4 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
   );
 }
 
-type AnimatedStatProps = {
-  stat: AboutSectionResolvedStat;
-  index: number;
-  isActive: boolean;
-  prefersReducedMotion: boolean;
-};
-
-function AnimatedStat({ stat, index, isActive, prefersReducedMotion }: AnimatedStatProps) {
-  const controls = useAnimation();
-  const [displayValue, setDisplayValue] = useState(() => stat.value?.trim() || "");
-  const [typedLabel, setTypedLabel] = useState<string>("");
-
-  useEffect(() => {
-    const raw = stat.value?.trim();
-    if (!raw) {
-      setDisplayValue("");
-      return;
-    }
-
-    const parsed = parseNumericValue(raw);
-    if (!parsed || prefersReducedMotion || !isActive) {
-      setDisplayValue(raw);
-      return;
-    }
-
-    const { number, suffix } = parsed;
-    const controls = animate(0, number, {
-      duration: 1.4,
-      ease: EASE_OUT,
-      onUpdate(latest) {
-        setDisplayValue(`${formatNumber(latest)}${suffix}`);
-      },
-    });
-    return () => controls.stop();
-  }, [stat.value, prefersReducedMotion, isActive]);
-
-  // Typewriter effect for the label on mobile; simple progressive reveal
-  useEffect(() => {
-    const label = stat.label?.trim() || "";
-    if (!label || prefersReducedMotion || !isActive) {
-      setTypedLabel(label);
-      return;
-    }
-    setTypedLabel("");
-    let idx = 0;
-    const interval = setInterval(() => {
-      idx += 1;
-      setTypedLabel(label.slice(0, idx));
-      if (idx >= label.length) clearInterval(interval);
-    }, 18);
-    return () => clearInterval(interval);
-  }, [stat.label, prefersReducedMotion, isActive]);
-
-  useEffect(() => {
-    if (isActive) {
-      controls.start("visible");
-    }
-  }, [isActive, controls]);
-
-  const icon = stat.icon;
-  const label = stat.label?.trim();
-
-  return (
-    <motion.div
-      variants={statVariants}
-      initial="hidden"
-      animate={controls}
-      custom={index}
-      className="flex w-full flex-col items-start md:items-center justify-center gap-1 md:gap-[10px] px-1 py-0.5 md:px-2 md:py-1 text-left md:text-center"
-    >
-      <dd className="text-balance text-[clamp(1.25rem,3.8vw,1.5rem)] md:text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[1.05] tracking-[-0.01em] text-[color:var(--foreground)] dark:text-gray-900">
-        {displayValue || "—"}
-      </dd>
-      <dt className="about-stats-label mt-0.5 md:mt-2 inline-flex items-center gap-1.5 text-[11px] md:text-[clamp(0.75rem,1.5vw,1rem)] uppercase tracking-[0.06em] text-[color:var(--foreground)]/70 dark:text-gray-700">
-        {icon?.url ? (
-          <Image
-            src={icon.url}
-            alt={icon.alt || ""}
-            width={icon.width ? Math.min(44, Math.round(icon.width)) : 36}
-            height={icon.height ? Math.min(44, Math.round(icon.height)) : 36}
-            className="h-3 w-3 md:h-7 md:w-7 shrink-0 object-contain opacity-80"
-            placeholder={icon.lqip ? "blur" : undefined}
-            blurDataURL={icon.lqip || undefined}
-            aria-hidden={icon.alt ? undefined : true}
-          />
-        ) : null}
-        <span>{typedLabel || label || "Stat"}</span>
-        {label && displayValue ? (
-          <span className="sr-only">{`${displayValue} ${label.toLowerCase()}`}</span>
-        ) : null}
-      </dt>
-    </motion.div>
-  );
-}
-
-type ParsedNumeric = { number: number; suffix: string } | null;
-
-function parseNumericValue(raw: string): ParsedNumeric {
-  const match = raw.match(/^(\d+\.?\d*)(.*)$/);
-  if (!match) return null;
-  const number = Number(match[1]);
-  if (Number.isNaN(number)) return null;
-  const suffix = match[2] || "";
-  return { number, suffix };
-}
-
-function formatNumber(value: number): string {
-  const rounded = Math.round(value * 100) / 100;
-  return new Intl.NumberFormat(undefined, { maximumFractionDigits: rounded % 1 === 0 ? 0 : 2 }).format(rounded);
-}
+// Removed animated/stat formatting utilities — values render static like Media Showcase
