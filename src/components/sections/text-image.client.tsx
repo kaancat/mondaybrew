@@ -87,10 +87,10 @@ export function TextImageClient({
                 <div
                     className={cn(
                         // Mirror Services detail card classes exactly (spacing/shape)
-                        "h-full rounded-none p-0 md:rounded-[5px] md:p-6",
-                        // Tokens with dark fallbacks for perfect parity
+                        "h-full rounded-none p-0 md:rounded-[5px] md:p-6 services-card-surface",
+                        // Tokens with dark fallbacks for perfect parity (belt & suspenders)
                         "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] dark:bg-[#f5f7fd] dark:text-[#0a0a0a]",
-                        // Border/shadow parity
+                        // Border/shadow parity (kept explicit for clarity)
                         "border md:border md:border-[color:var(--services-ink-strong)] dark:border-[#0a0a0a] shadow-[var(--shadow-elevated-md)]"
                     )}
                     style={{ minHeight: 520 }}

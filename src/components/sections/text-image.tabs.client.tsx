@@ -48,7 +48,7 @@ export function TextImageTabs({
         <div
           className={cn(
             // Mirror Services detail card classes exactly (spacing/shape)
-            "rounded-none p-0 md:rounded-[5px] md:p-6",
+            "rounded-none p-0 md:rounded-[5px] md:p-6 services-card-surface",
             // Surface + ink tokens (with dark fallbacks to guarantee parity in dev)
             "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] dark:bg-[#f5f7fd] dark:text-[#0a0a0a]",
             // Border/shadow parity
