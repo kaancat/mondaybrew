@@ -1037,6 +1037,56 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     }
   }
 
+  .marquee-mobile-drag {
+    will-change: transform;
+    transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .marquee-mobile-dragging {
+    transition: none;
+  }
+
+  .marquee-mobile-track {
+    display: flex;
+    will-change: transform;
+  }
+
+  .marquee-mobile-track-forward {
+    animation-name: marquee-mobile-forward;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .marquee-mobile-track-reverse {
+    animation-name: marquee-mobile-reverse;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .marquee-mobile-set {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem var(--container-gutter);
+  }
+
+  @keyframes marquee-mobile-forward {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes marquee-mobile-reverse {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
   /* Vertical rhythm helpers (margin-based; avoid double stacking) */
   /* Hero uses medium gap on all breakpoints */
   .vr-hero { margin-bottom: var(--section-gap-md); }

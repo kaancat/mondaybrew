@@ -212,8 +212,8 @@ function QuoteCardMobile({ card }: { card: TCard }) {
         className={cn(
           // Fixed height on mobile to keep all marquee rows identical
           "card-inner relative flex h-full flex-col rounded-[5px] p-5 overflow-hidden",
-          // lighter visual weight on mobile
-          "drop-shadow-[0_10px_24px_rgba(8,6,20,0.18)]",
+          // lightweight shadow on mobile (compositor-friendly)
+          "shadow-[0_4px_12px_rgba(0,0,0,0.12)]",
         )}
         style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT, background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
@@ -297,7 +297,7 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
         className={cn(
           // Fixed height on mobile
           "card-inner relative flex h-full overflow-hidden rounded-[5px]",
-          "drop-shadow-[0_10px_24px_rgba(8,6,20,0.18)]",
+          "shadow-[0_4px_12px_rgba(0,0,0,0.12)]",
         )}
         style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT, background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
@@ -392,7 +392,7 @@ function ImageOnlyCardMobile({ card }: { card: TCard }) {
         className={cn(
           // Fixed height on mobile
           "card-inner relative flex h-full overflow-hidden rounded-[5px]",
-          "drop-shadow-[0_10px_24px_rgba(8,6,20,0.18)]",
+          "shadow-[0_4px_12px_rgba(0,0,0,0.12)]",
         )}
         style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT }}
       >
@@ -593,121 +593,137 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     });
   }, [items]);
 
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const laneRef = useRef<HTMLDivElement | null>(null);
+  const dragWrapperRef = useRef<HTMLDivElement | null>(null);
   const firstSetRef = useRef<HTMLDivElement | null>(null);
   const [setWidth, setSetWidth] = useState(0);
-  const [isInteracting, setIsInteracting] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const idleTimeout = useRef<NodeJS.Timeout | null>(null);
+  const dragStateRef = useRef<{ pointerId: number | null; startX: number; startOffset: number; dragging: boolean }>({
+    pointerId: null,
+    startX: 0,
+    startOffset: 0,
+    dragging: false,
+  });
+  const resumeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useLayoutEffect(() => {
+    if (!firstSetRef.current) return;
     const measure = () => {
-      const node = firstSetRef.current;
-      if (!node) return;
-      const rect = node.getBoundingClientRect();
+      const rect = firstSetRef.current?.getBoundingClientRect();
+      if (!rect) return;
       setSetWidth(rect.width);
     };
     measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    const handle = () => measure();
+    window.addEventListener("resize", handle);
+    return () => window.removeEventListener("resize", handle);
   }, []);
 
   useLayoutEffect(() => {
-    const node = scrollerRef.current;
+    const node = laneRef.current;
     if (!node) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0];
-        setIsVisible(e.isIntersecting && e.intersectionRatio > 0.1);
-      },
-      { threshold: [0, 0.1, 0.25] },
-    );
+    const io = new IntersectionObserver((entries) => {
+      setIsVisible(entries[0].isIntersecting && entries[0].intersectionRatio > 0.05);
+    }, { threshold: [0, 0.05, 0.2] });
     io.observe(node);
     return () => io.disconnect();
   }, []);
 
-  // Initialize scroll position for reverse direction so there's room to scroll backwards
-  useLayoutEffect(() => {
-    if (direction !== -1) return;
-    const node = scrollerRef.current;
-    if (!node || !setWidth) return;
-    node.scrollLeft = setWidth;
-  }, [direction, setWidth]);
-
-  useEffect(() => {
-    const node = scrollerRef.current;
-    if (!node || !setWidth) return;
-    const handle = () => {
-      if (direction === 1 && node.scrollLeft >= setWidth) {
-        node.scrollLeft -= setWidth;
-      } else if (direction === -1 && node.scrollLeft <= 0) {
-        node.scrollLeft += setWidth;
-      }
-    };
-    node.addEventListener("scroll", handle);
-    return () => node.removeEventListener("scroll", handle);
-  }, [setWidth, direction]);
-
-  useEffect(() => {
-    if (prefersReducedMotion || !setWidth) return;
-    const node = scrollerRef.current;
-    if (!node) return;
-    let raf: number | null = null;
-    let last = performance.now();
-    const pxPerSec = speed * 12;
-    const step = (now: number) => {
-      const dt = Math.max(0, (now - last) / 1000);
-      last = now;
-      if (!isInteracting && isVisible) {
-        node.scrollLeft += direction * pxPerSec * dt;
-        if (direction === 1 && node.scrollLeft >= setWidth) {
-          node.scrollLeft -= setWidth;
-        } else if (direction === -1 && node.scrollLeft <= 0) {
-          node.scrollLeft += setWidth;
-        }
-      }
-      raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [prefersReducedMotion, setWidth, direction, isInteracting, isVisible, speed]);
-
-  const markInteraction = useCallback(() => {
-    setIsInteracting(true);
-    if (idleTimeout.current) clearTimeout(idleTimeout.current);
-    idleTimeout.current = setTimeout(() => setIsInteracting(false), 1200);
+  const requestResume = useCallback(() => {
+    if (resumeTimeout.current) clearTimeout(resumeTimeout.current);
+    resumeTimeout.current = setTimeout(() => setIsPaused(false), 250);
   }, []);
 
+  const clampOffset = useCallback((value: number) => {
+    if (!setWidth) return value;
+    if (value <= -setWidth) return -setWidth;
+    if (value >= setWidth) return setWidth;
+    return value;
+  }, [setWidth]);
+
+  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    dragStateRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startOffset: dragOffset,
+      dragging: true,
+    };
+    setIsPaused(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (resumeTimeout.current) {
+      clearTimeout(resumeTimeout.current);
+      resumeTimeout.current = null;
+    }
+  }, [dragOffset]);
+
+  const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    const state = dragStateRef.current;
+    if (!state.dragging || state.pointerId !== e.pointerId) return;
+    const dx = e.clientX - state.startX;
+    if (Math.abs(dx) > Math.abs(e.movementY) && Math.abs(dx) > 4) {
+      e.preventDefault();
+      setDragOffset(clampOffset(state.startOffset + dx));
+    }
+  }, [clampOffset]);
+
+  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    const state = dragStateRef.current;
+    if (state.pointerId !== e.pointerId) return;
+    dragStateRef.current = { pointerId: null, startX: 0, startOffset: 0, dragging: false };
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    setDragOffset((prev) => clampOffset(prev));
+    requestResume();
+  }, [clampOffset, requestResume]);
+
+  const animationDuration = useMemo(() => {
+    const base = Math.max(18, normalizedItems.length * 4);
+    return Math.max(12, base / Math.max(1, speed));
+  }, [normalizedItems.length, speed]);
+
+  const shouldAnimate = !prefersReducedMotion && isVisible && !isPaused;
+
+  // Normalize drag offset back to 0 smoothly when animation resumes
+  useEffect(() => {
+    if (!shouldAnimate && !dragStateRef.current.dragging) return;
+    if (shouldAnimate && dragOffset !== 0) {
+      setDragOffset(0);
+    }
+  }, [shouldAnimate, dragOffset]);
+
   return (
-    <div className="relative -mx-[var(--container-gutter)]">
-      <span className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background to-transparent" />
-      <span className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent" />
+    <div ref={laneRef} className="relative -mx-[var(--container-gutter)] overflow-hidden">
+      <span className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background to-transparent" />
+      <span className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent" />
+
       <div
-        ref={scrollerRef}
-        className="no-scrollbar overflow-x-auto snap-x snap-mandatory"
-        style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain", touchAction: "pan-x" }}
-        onPointerDown={markInteraction}
-        onPointerUp={markInteraction}
-        onTouchStart={markInteraction}
-        onTouchEnd={markInteraction}
-        onMouseDown={markInteraction}
-        onMouseUp={markInteraction}
+        ref={dragWrapperRef}
+        className={cn("marquee-mobile-drag", dragStateRef.current.dragging && "marquee-mobile-dragging")}
+        style={{ transform: `translateX(${dragOffset}px)` }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
       >
-        <div className="flex" style={{ width: "max-content" }}>
-          <div ref={firstSetRef} className="flex gap-3 py-2 px-[var(--container-gutter)]">
+        <div
+          className={cn(
+            "marquee-mobile-track",
+            direction === -1 ? "marquee-mobile-track-reverse" : "marquee-mobile-track-forward",
+          )}
+          style={{
+            animationDuration: `${animationDuration}s`,
+            animationPlayState: shouldAnimate ? "running" : "paused",
+          }}
+        >
+          <div ref={firstSetRef} className="marquee-mobile-set">
             {normalizedItems.map((card, i) => (
-              <div key={`set-a-${i}`} className="snap-start">
-                <CardMobile card={card} />
-              </div>
+              <CardMobile key={`set-a-${i}`} card={card} />
             ))}
           </div>
-          <div className="flex gap-3 py-2 px-[var(--container-gutter)]" aria-hidden>
+          <div className="marquee-mobile-set" aria-hidden>
             {normalizedItems.map((card, i) => (
-              <div key={`set-b-${i}`} className="snap-start">
-                <CardMobile card={card} />
-              </div>
+              <CardMobile key={`set-b-${i}`} card={card} />
             ))}
           </div>
         </div>
