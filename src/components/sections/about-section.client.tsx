@@ -92,13 +92,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
     }
   }, [isInView, overlayControls, headlineControls]);
 
-  const gridCols = useMemo(() => {
-    if (!stats?.length) return "";
-    if (stats.length >= 4) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
-    if (stats.length === 3) return "grid-cols-1 md:grid-cols-3";
-    if (stats.length === 2) return "grid-cols-1 md:grid-cols-2";
-    return "grid-cols-1";
-  }, [stats]);
+  // (removed) gridCols helper not used after mobile redesign
 
   return (
     <div ref={sectionRef} className="flex flex-col gap-[var(--flow-space)]">

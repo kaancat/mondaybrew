@@ -582,39 +582,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   );
 }
 
-function RowMobile({ items }: { items: TCard[] }) {
-  const normalizedItems = useMemo(() => {
-    return items.map((card, i) => {
-      const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
-      const preset = MODE_PRESETS[toneKey];
-      return { ...card, tone: toneKey, background: preset.background, colors: preset };
-    });
-  }, [items]);
-
-  return (
-    <div className="relative -mx-[var(--container-gutter)]">
-      {/* Fade overlays for scroll indication */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent" />
-      
-      <div 
-        className="no-scrollbar overflow-x-auto overscroll-x-contain snap-x snap-proximity touch-pan-x"
-        style={{
-          WebkitOverflowScrolling: "touch",
-          touchAction: "pan-x pan-y"
-        }}
-      >
-        <div className="flex gap-3 py-2 px-[var(--container-gutter)]" style={{ width: "max-content" }}>
-          {normalizedItems.map((card, i) => (
-            <div key={i} className="snap-start">
-              <CardMobile card={card} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+// (Removed) Alternate mobile row (manual scroll). Keeping codebase lean.
 
 // Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
 function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
@@ -760,7 +728,7 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
-      style={{ touchAction: "pan-y", overscrollBehaviorX: "contain", contain: "content", WebkitOverflowScrolling: "touch" as any }}
+      style={{ touchAction: "pan-y", overscrollBehaviorX: "contain", contain: "content" }}
     >
       <div className="flex py-2" style={wrapperStyle}>
         <div className="flex w-max">
@@ -796,18 +764,3 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
     </div>
   );
 }
-  const [isVisible, setIsVisible] = useState(true);
-  // Pause animation when row is out of view (saves work on mobile)
-  useLayoutEffect(() => {
-    const node = viewportRef.current;
-    if (!node) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0];
-        setIsVisible(e.isIntersecting && e.intersectionRatio > 0.1);
-      },
-      { root: null, threshold: [0, 0.1, 0.25] },
-    );
-    io.observe(node);
-    return () => io.disconnect();
-  }, []);
