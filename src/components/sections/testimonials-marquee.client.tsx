@@ -582,11 +582,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   );
 }
 
-// (Removed) Alternate mobile row (manual scroll). Keeping codebase lean.
-
-// Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
-function RowAutoMobile({ items, speed = 14 }: { items: TCard[]; speed?: number }) {
-  const prefersReducedMotion = useReducedMotion();
+function RowMobile({ items, reverse = false }: { items: TCard[]; reverse?: boolean }) {
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
@@ -595,70 +591,26 @@ function RowAutoMobile({ items, speed = 14 }: { items: TCard[]; speed?: number }
     });
   }, [items]);
 
-  const viewportRef = useRef<HTMLDivElement | null>(null);
-  const firstSetRef = useRef<HTMLDivElement | null>(null);
-  const [setWidth, setSetWidth] = useState<number>(0);
-  const [isVisible, setIsVisible] = useState(true);
-
-  useLayoutEffect(() => {
-    const measure = () => {
-      const node = firstSetRef.current;
-      if (!node) return;
-      const rect = node.getBoundingClientRect();
-      setSetWidth(rect.width);
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-
-  useLayoutEffect(() => {
-    const node = viewportRef.current;
-    if (!node) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0];
-        setIsVisible(e.isIntersecting && e.intersectionRatio > 0.1);
-      },
-      { threshold: [0, 0.1, 0.25] },
-    );
-    io.observe(node);
-    return () => io.disconnect();
-  }, []);
-
-  const durationSeconds = useMemo(() => {
-    if (!setWidth) return undefined;
-    const pxPerSec = Math.max(30, speed * 18); // tune so speed prop still matters but never stalls
-    return Math.max(16, setWidth / pxPerSec);
-  }, [setWidth, speed]);
-
-  const trackAnimationStyle = useMemo(() => {
-    if (prefersReducedMotion) return { animationPlayState: "paused" };
-    return {
-      animationDuration: durationSeconds ? `${durationSeconds}s` : undefined,
-      animationPlayState: isVisible ? "running" : "paused",
-    } as React.CSSProperties;
-  }, [durationSeconds, isVisible, prefersReducedMotion]);
-
-  const duplicatedItems = useMemo(() => {
-    return [0, 1].flatMap((cloneIdx) =>
-      normalizedItems.map((card, i) => ({ card, key: `${cloneIdx}-${i}` })),
-    );
-  }, [normalizedItems]);
-
   return (
-    <div
-      ref={viewportRef}
-      className="relative overflow-hidden"
-      style={{ touchAction: "pan-y", overscrollBehaviorY: "contain", contain: "content" }}
-    >
-      <div className="flex py-2">
+    <div className="relative -mx-[var(--container-gutter)]">
+      <span className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background to-transparent" />
+      <span className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent" />
+      <div
+        className={cn(
+          "no-scrollbar overflow-x-auto snap-x snap-mandatory touch-pan-x",
+          reverse && "[direction:rtl]",
+        )}
+        style={{ WebkitOverflowScrolling: "touch", scrollBehavior: "smooth" }}
+      >
         <div
-          className={cn("flex w-max", "marquee-mobile-track")}
-          style={trackAnimationStyle}
+          className={cn(
+            "flex gap-3 py-2 px-[var(--container-gutter)]", 
+            reverse && "flex-row-reverse",
+          )}
+          style={{ width: "max-content" }}
         >
-          {duplicatedItems.map(({ card, key }, idx) => (
-            <div key={key} ref={idx === 0 ? firstSetRef : undefined} className="flex">
+          {normalizedItems.map((card, i) => (
+            <div key={i} className="snap-start">
               <CardMobile card={card} />
             </div>
           ))}
@@ -668,6 +620,9 @@ function RowAutoMobile({ items, speed = 14 }: { items: TCard[]; speed?: number }
   );
 }
 
+// (Removed) Alternate mobile row (manual scroll). Keeping codebase lean.
+
+// Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
   return (
     // On mobile we want the rows to start right under the heading; keep bottom-aligned only on md+.
@@ -680,9 +635,9 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
       {/* Mobile auto-marquee rows (slower, pause on touch) */}
-      <div className="md:hidden flex flex-col gap-2 pb-2 justify-start bg-transparent" style={{ height: "auto", minHeight: "320px" }}>
-        <RowAutoMobile items={top} speed={Math.max(12, speedTop * 0.45)} />
-        <RowAutoMobile items={bottom} speed={Math.max(9, speedBottom * 0.35)} />
+      <div className="md:hidden flex flex-col gap-3 pb-3 justify-start bg-transparent" style={{ height: "auto", minHeight: "320px" }}>
+        <RowMobile items={top} />
+        <RowMobile items={bottom} reverse />
       </div>
     </div>
   );
