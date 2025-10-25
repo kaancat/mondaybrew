@@ -179,39 +179,71 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             animate={overlayControls}
             className="z-10"
           >
-            {/* Mobile: compact chips below image (max 4 per row) */}
+            {/* Mobile: horizontal glass chips below image */}
             <div className="about-stats-panel block md:hidden w-full pt-2">
-              <div className="px-5 pb-2">
-                <dl
+              <div className="relative -mx-5 px-5 overflow-hidden pb-3">
+                <div
                   className={cn(
-                    "grid gap-2",
-                    stats.length >= 4
-                      ? "grid-cols-4"
-                      : stats.length === 3
-                        ? "grid-cols-3"
-                        : stats.length === 2
-                          ? "grid-cols-2"
-                          : "grid-cols-1",
+                    "flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2",
+                    "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
                   )}
+                  aria-label="About stats"
+                  ref={mobileStatsRef}
+                  onScroll={() => {
+                    if (rafId.current) cancelAnimationFrame(rafId.current);
+                    rafId.current = requestAnimationFrame(() => {
+                      const scroller = mobileStatsRef.current;
+                      if (!scroller) return;
+                      const left = scroller.scrollLeft;
+                      let nearest = 0;
+                      let min = Infinity;
+                      const children = Array.from(scroller.children) as HTMLElement[];
+                      children.forEach((el, idx) => {
+                        const dist = Math.abs(el.offsetLeft - left);
+                        if (dist < min) {
+                          min = dist;
+                          nearest = idx;
+                        }
+                      });
+                      setActiveStat(nearest);
+                    });
+                  }}
                 >
                   {stats.map((stat, i) => (
                     <div
                       key={`${stat.label || stat.value || i}`}
                       className={cn(
-                        "rounded-[999px] border border-[color:var(--nav-shell-border)]",
-                        "bg-[color-mix(in_oklch,var(--nav-shell-bg)_70%,transparent)] backdrop-blur-[8px]",
-                        // Small, button-like chip sizing
-                        "px-3 py-1 flex items-center justify-center text-[11px] leading-none text-foreground/90 text-center",
+                        "min-w-[220px] snap-start rounded-[5px]",
+                        "bg-[color-mix(in_oklch,var(--nav-shell-bg)_60%,transparent)] border border-[color:var(--nav-shell-border)] backdrop-blur-[10px]",
+                        // Softer mobile shadow so it doesn't spill into next section
+                        "px-4 py-3 drop-shadow-[0_6px_18px_rgba(8,6,20,0.16)]",
                       )}
                       style={{ boxShadow: "var(--nav-shell-shadow)" }}
                     >
-                      <span className="truncate max-w-[96%]">
-                        {stat.value ? <strong className="mr-1 font-semibold">{stat.value}</strong> : null}
-                        {stat.label ?? ""}
-                      </span>
+                      {stat.value ? (
+                        <div data-stat-value className="text-[length:var(--font-h3)] leading-none text-primary">{stat.value}</div>
+                      ) : null}
+                      {stat.label ? <div data-stat-label className="text-muted-foreground mt-1">{stat.label}</div> : null}
                     </div>
                   ))}
-                </dl>
+                </div>
+                {/* Edge fade masks */}
+                <span aria-hidden className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-[linear-gradient(to_right,var(--background),transparent)]" />
+                <span aria-hidden className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-[linear-gradient(to_left,var(--background),transparent)]" />
+                {/* Pagination dots */}
+                <div className="mt-1.5 mb-1 flex justify-center gap-1.5">
+                  {stats.map((_, idx) => (
+                    <span
+                      key={`dot-${idx}`}
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full transition-colors",
+                        idx === activeStat
+                          ? "bg-[color:var(--nav-shell-border)]/90"
+                          : "bg-[color:var(--nav-shell-border)]/40",
+                      )}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
