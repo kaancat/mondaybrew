@@ -591,6 +591,13 @@ function RowMobile({ items, reverse = false }: { items: TCard[]; reverse?: boole
     });
   }, [items]);
 
+  const displayItems = useMemo(() => {
+    if (normalizedItems.length >= 4) return normalizedItems;
+    if (normalizedItems.length === 0) return normalizedItems;
+    const multiplier = Math.max(2, Math.ceil(4 / normalizedItems.length));
+    return Array.from({ length: normalizedItems.length * multiplier }, (_, idx) => normalizedItems[idx % normalizedItems.length]);
+  }, [normalizedItems]);
+
   return (
     <div className="relative -mx-[var(--container-gutter)]">
       <span className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background to-transparent" />
@@ -600,7 +607,8 @@ function RowMobile({ items, reverse = false }: { items: TCard[]; reverse?: boole
           "no-scrollbar overflow-x-auto snap-x snap-mandatory touch-pan-x",
           reverse && "[direction:rtl]",
         )}
-        style={{ WebkitOverflowScrolling: "touch", scrollBehavior: "smooth" }}
+        dir={reverse ? "rtl" : "ltr"}
+        style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain" }}
       >
         <div
           className={cn(
@@ -609,7 +617,7 @@ function RowMobile({ items, reverse = false }: { items: TCard[]; reverse?: boole
           )}
           style={{ width: "max-content" }}
         >
-          {normalizedItems.map((card, i) => (
+          {displayItems.map((card, i) => (
             <div key={i} className="snap-start">
               <CardMobile card={card} />
             </div>
