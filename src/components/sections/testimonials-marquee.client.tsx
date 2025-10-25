@@ -585,7 +585,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
 // (Removed) Alternate mobile row (manual scroll). Keeping codebase lean.
 
 // Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
-function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
+function RowAutoMobile({ items, speed = 14 }: { items: TCard[]; speed?: number }) {
   const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
@@ -595,29 +595,23 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
     });
   }, [items]);
 
-  const clones = [0, 1, 2];
   const viewportRef = useRef<HTMLDivElement | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
+  const firstSetRef = useRef<HTMLDivElement | null>(null);
   const [setWidth, setSetWidth] = useState<number>(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isInteracting, setIsInteracting] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pointerIdRef = useRef<number | null>(null);
-  const startXRef = useRef(0);
-  const startYRef = useRef(0);
-  const startOffsetRef = useRef(0);
-  const hasCaptureRef = useRef(false);
-  const DRAG_THRESHOLD_PX = 8; // require a small horizontal intent before capturing
 
-  const setRef = useCallback((node: HTMLDivElement | null) => {
-    trackRef.current = node;
-    if (!node) return;
-    const rect = node.getBoundingClientRect();
-    setSetWidth(rect.width);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const node = firstSetRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      setSetWidth(rect.width);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, []);
 
-  // Pause the RAF auto-scroll when the row is off-screen for smoother page scrolling
   useLayoutEffect(() => {
     const node = viewportRef.current;
     if (!node) return;
@@ -626,117 +620,46 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
         const e = entries[0];
         setIsVisible(e.isIntersecting && e.intersectionRatio > 0.1);
       },
-      { root: null, threshold: [0, 0.1, 0.25] },
+      { threshold: [0, 0.1, 0.25] },
     );
     io.observe(node);
     return () => io.disconnect();
   }, []);
 
-  const totalWidth = setWidth;
-  const wrapTx = useCallback((tx: number) => {
-    if (!totalWidth) return tx;
-    let v = tx;
-    const w = totalWidth;
-    while (v <= -w) v += w;
-    while (v > 0) v -= w;
-    return v;
-  }, [totalWidth]);
-  const directionFactor = direction === -1 ? -1 : 1;
+  const durationSeconds = useMemo(() => {
+    if (!setWidth) return undefined;
+    const pxPerSec = Math.max(30, speed * 18); // tune so speed prop still matters but never stalls
+    return Math.max(16, setWidth / pxPerSec);
+  }, [setWidth, speed]);
 
-  useLayoutEffect(() => {
-    const refresh = () => {
-      const node = trackRef.current;
-      if (!node) return;
-      const rect = node.getBoundingClientRect();
-      setSetWidth(rect.width);
-    };
-    refresh();
-    window.addEventListener("resize", refresh);
-    return () => window.removeEventListener("resize", refresh);
-  }, []);
+  const trackAnimationStyle = useMemo(() => {
+    if (prefersReducedMotion) return { animationPlayState: "paused" };
+    return {
+      animationDuration: durationSeconds ? `${durationSeconds}s` : undefined,
+      animationPlayState: isVisible ? "running" : "paused",
+    } as React.CSSProperties;
+  }, [durationSeconds, isVisible, prefersReducedMotion]);
 
-  const clearInteractionTimeout = useCallback(() => {
-    if (interactionTimeoutRef.current) {
-      clearTimeout(interactionTimeoutRef.current);
-      interactionTimeoutRef.current = null;
-    }
-  }, []);
-
-  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    pointerIdRef.current = e.pointerId;
-    // Do NOT capture yet — wait until horizontal threshold is exceeded
-    startXRef.current = e.clientX;
-    startYRef.current = e.clientY;
-    startOffsetRef.current = dragOffset;
-    hasCaptureRef.current = false;
-  }, [prefersReducedMotion, dragOffset]);
-  const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    if (pointerIdRef.current !== e.pointerId) return;
-    const dx = e.clientX - startXRef.current;
-    const dy = e.clientY - startYRef.current;
-    // If we haven't captured yet, decide based on movement intent
-    if (!hasCaptureRef.current) {
-      // vertical scroll intent — let the page scroll, do nothing
-      if (Math.abs(dy) > Math.abs(dx)) return;
-      // horizontal intent but below threshold — don't prevent scrolling yet
-      if (Math.abs(dx) < DRAG_THRESHOLD_PX) return;
-      // Horizontal drag confirmed — capture and start interacting
-      (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
-      hasCaptureRef.current = true;
-      setIsInteracting(true);
-    }
-    // Only prevent default once dragging horizontally
-    e.preventDefault();
-    setDragOffset(wrapTx(startOffsetRef.current + dx));
-  }, [prefersReducedMotion, wrapTx]);
-  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    if (pointerIdRef.current !== e.pointerId) return;
-    pointerIdRef.current = null;
-    if (hasCaptureRef.current) {
-      hasCaptureRef.current = false;
-      (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId);
-      clearInteractionTimeout();
-      interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
-    }
-  }, [prefersReducedMotion, clearInteractionTimeout]);
-
-  const wrapperStyle = useMemo(() => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }), [dragOffset]);
-
-  useLayoutEffect(() => {
-    if (prefersReducedMotion || !totalWidth || !isVisible) return;
-    let rafId: number | null = null;
-    let last = performance.now();
-    const pxPerSec = speed * 2; // keep same mapping as desktop, but speed is smaller on mobile
-    const step = (now: number) => {
-      const dt = Math.max(0, (now - last) / 1000);
-      last = now;
-      if (!isInteracting) setDragOffset((v) => wrapTx(v + directionFactor * pxPerSec * dt));
-      rafId = requestAnimationFrame(step);
-    };
-    rafId = requestAnimationFrame(step);
-    return () => { if (rafId) cancelAnimationFrame(rafId); };
-  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapTx, isVisible]);
+  const duplicatedItems = useMemo(() => {
+    return [0, 1].flatMap((cloneIdx) =>
+      normalizedItems.map((card, i) => ({ card, key: `${cloneIdx}-${i}` })),
+    );
+  }, [normalizedItems]);
 
   return (
     <div
       ref={viewportRef}
-      className="relative overflow-hidden touch-pan-y"
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-      style={{ touchAction: "pan-y", overscrollBehaviorX: "contain", contain: "content" }}
+      className="relative overflow-hidden"
+      style={{ touchAction: "pan-y", overscrollBehaviorY: "contain", contain: "content" }}
     >
-      <div className="flex py-2" style={wrapperStyle}>
-        <div className="flex w-max">
-          {clones.map((_, idx) => (
-            <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex" aria-hidden={idx > 0}>
-              {normalizedItems.map((card, i) => (
-                <CardMobile key={`${idx}-${i}`} card={card} />
-              ))}
+      <div className="flex py-2">
+        <div
+          className={cn("flex w-max", "marquee-mobile-track")}
+          style={trackAnimationStyle}
+        >
+          {duplicatedItems.map(({ card, key }, idx) => (
+            <div key={key} ref={idx === 0 ? firstSetRef : undefined} className="flex">
+              <CardMobile card={card} />
             </div>
           ))}
         </div>

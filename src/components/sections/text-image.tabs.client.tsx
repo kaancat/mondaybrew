@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -54,7 +54,7 @@ export function TextImageTabs({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const syncImageHeight = () => {
+  const syncImageHeight = useCallback(() => {
     // On mobile we don't force equal heights; use a compact fixed baseline
     if (isMobile) {
       setImgHeight(MOBILE_BASE_HEIGHT);
@@ -69,7 +69,7 @@ export function TextImageTabs({
     if (imageRef.current) {
       imageRef.current.style.height = `${clamped}px`;
     }
-  };
+  }, [isMobile, BASE_HEIGHT, MOBILE_BASE_HEIGHT, CAP_HEIGHT]);
 
   useEffect(() => {
     syncImageHeight();
@@ -87,7 +87,7 @@ export function TextImageTabs({
       if (ro) ro.disconnect();
       else (globalThis as unknown as Window).removeEventListener("resize", handle);
     };
-  }, []);
+  }, [syncImageHeight]);
 
   const toggle = (id: string) => {
     setOpenIds((prev) => {

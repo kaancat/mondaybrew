@@ -254,6 +254,12 @@ html.light-primary {
   --eyebrow-color: var(--mb-accent);
 }
 
+/* Primary theme: make About stats (value + label) off‑white for contrast */
+html.light-primary .about-stats-panel [data-stat-value],
+html.light-primary .about-stats-panel [data-stat-label] {
+  color: var(--brand-light) !important;
+}
+
 html.light-primary body[data-mobile-nav-open="true"] {
   /* Keep the site card in brand background instead of transparent tint */
   --nav-card-background: var(--background);
@@ -342,9 +348,9 @@ html.light-alt {
   /* Global eyebrow color on Light-Alt (brand orange) */
   --eyebrow-color: var(--mb-accent);
 
-  /* Header CTA (Light Alt): text-only, no orange */
+  /* Header CTA (Light Alt): text + solid black border */
   --nav-cta-bg: transparent;
-  --nav-cta-border: transparent;
+  --nav-cta-border: var(--brand-ink-strong);
   --nav-cta-text: var(--foreground);
   --nav-cta-hover-bg: transparent;
 
@@ -807,7 +813,6 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
   /* Shared Services card surface so components match 1:1 */
   .services-card-surface {
     background: var(--services-card-bg) !important;
-    color: var(--services-ink-strong) !important;
     border: 1px solid var(--services-ink-strong) !important;
     box-shadow: var(--shadow-elevated-md);
   }
@@ -825,6 +830,53 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
   }
   .services-card-muted {
     color: color-mix(in oklch, var(--services-ink-strong) 84%, white 16%) !important;
+  }
+
+  /* Tabs inside Text+Image (tabs variant) — theme-aware label color */
+  /* Non-active tab label color */
+  html.light-alt .services-card-tab { color: color-mix(in oklch, var(--services-ink-strong) 68%, white 32%) !important; }
+  html.light-alt .services-card-tab:hover { color: var(--services-ink-strong) !important; }
+  html.light-primary .services-card-tab,
+  html.dark .services-card-tab { color: color-mix(in oklch, var(--mb-bg) 85%, var(--mb-ink) 15%) !important; }
+  html.light-primary .services-card-tab:hover,
+  html.dark .services-card-tab:hover { color: var(--mb-bg) !important; }
+
+  /* Active tab label should be strong ink on Light-Alt and brand white-ish on Primary/Dark */
+  html.light-alt .services-card-tab-active { color: var(--services-ink-strong) !important; }
+  html.light-primary .services-card-tab-active,
+  html.dark .services-card-tab-active { color: var(--mb-bg) !important; }
+
+  /* Tab number tint per theme */
+  html.light-alt .services-card-tab-num { color: color-mix(in oklch, var(--services-ink-strong) 65%, white 35%) !important; }
+  html.light-primary .services-card-tab-num,
+  html.dark .services-card-tab-num { color: color-mix(in oklch, var(--mb-bg) 70%, var(--mb-ink) 30%) !important; }
+
+  /* Text inside Text+Image cards should mirror Services detail card tokens */
+  /* Eyebrow: brand orange in all color modes */
+  .services-card-eyebrow {
+    color: var(--mb-accent) !important;
+  }
+
+  /* Body copy tone matches Services card across themes */
+  html.light-alt .services-card-body {
+    color: color-mix(in oklch, var(--services-ink-strong) 85%, white 15%) !important;
+  }
+  html.light-primary .services-card-body,
+  html.dark .services-card-body {
+    color: color-mix(in oklch, var(--mb-bg) 82%, var(--mb-ink) 18%) !important;
+  }
+
+  /* Text+Image heading parity with Services card */
+  /* Light-Alt: Services card uses strict ink on white */
+  html.light-alt .text-image-card :is(h1,h2,h3,h4,h5,h6) {
+    color: var(--services-ink-strong) !important;
+    font-weight: 600;
+  }
+  /* Primary + Dark: Services card uses brand light on dark surface */
+  html.light-primary .text-image-card :is(h1,h2,h3,h4,h5,h6),
+  html.dark .text-image-card :is(h1,h2,h3,h4,h5,h6) {
+    color: var(--mb-bg) !important;
+    font-weight: 600;
   }
   /* Clients/Partners: primary theme uses page background color */
 html.light-primary .clients-hero-strip {
@@ -920,6 +972,22 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
 
   .layout-section-none {
     padding-block: 0;
+  }
+
+  @keyframes marquee-mobile {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .marquee-mobile-track {
+    animation-name: marquee-mobile;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
   }
 
   .full-bleed {
