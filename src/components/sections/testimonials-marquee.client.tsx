@@ -706,7 +706,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
 
   const requestResume = useCallback(() => {
     if (resumeTimeout.current) clearTimeout(resumeTimeout.current);
-    resumeTimeout.current = setTimeout(() => setIsPaused(false), 250);
+    resumeTimeout.current = setTimeout(() => setIsPaused(false), 500);
   }, []);
 
   const clampOffset = useCallback((value: number) => {
@@ -720,6 +720,9 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     const state = dragStateRef.current;
     if (!state.dragging) return;
     if (typeof pointerId === "number" && state.pointerId !== pointerId) return;
+    if (typeof pointerId === "number" && dragWrapperRef.current?.hasPointerCapture?.(pointerId)) {
+      dragWrapperRef.current.releasePointerCapture(pointerId);
+    }
     dragStateRef.current = { pointerId: null, startX: 0, startY: 0, startOffset: 0, dragging: false, intent: "pending" };
     setDragOffset((prev) => clampOffset(prev));
     if (shouldResume) {
@@ -738,6 +741,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
       dragging: true,
       intent: "pending",
     };
+    dragWrapperRef.current?.setPointerCapture?.(e.pointerId);
     if (resumeTimeout.current) {
       clearTimeout(resumeTimeout.current);
       resumeTimeout.current = null;
@@ -753,15 +757,14 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     const absDy = Math.abs(dy);
 
     if (state.intent === "pending") {
-      if (absDy > absDx && absDy > 6) {
+      if (absDy > absDx + 10 && absDy > 8) {
         dragStateRef.current.intent = "vertical";
         releasePointer(e.pointerId, false);
         return;
       }
-      if (absDx > absDy * 1.1 && absDx > 6) {
+      if (absDx > 8 && absDx > absDy * 0.7) {
         dragStateRef.current.intent = "horizontal";
         setIsPaused(true);
-        dragWrapperRef.current?.setPointerCapture?.(e.pointerId);
       } else {
         return;
       }
@@ -774,9 +777,6 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
 
   const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     if (dragStateRef.current.pointerId !== e.pointerId) return;
-    if (dragWrapperRef.current?.hasPointerCapture?.(e.pointerId)) {
-      dragWrapperRef.current.releasePointerCapture(e.pointerId);
-    }
     releasePointer(e.pointerId);
   }, [releasePointer]);
 
@@ -784,7 +784,6 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     if (typeof window === "undefined") return;
     const handlePointerEnd = (event: PointerEvent) => {
       if (dragStateRef.current.pointerId !== event.pointerId) return;
-      dragWrapperRef.current?.releasePointerCapture?.(event.pointerId);
       releasePointer(event.pointerId);
     };
     window.addEventListener("pointerup", handlePointerEnd);
@@ -805,24 +804,16 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
   }, [isPaused, isVisible]);
 
   const animationDuration = useMemo(() => {
-    const base = Math.max(32, normalizedItems.length * 6);
-    return Math.max(18, base / Math.max(1, speed));
+    const base = Math.max(40, normalizedItems.length * 8);
+    return Math.max(20, base / Math.max(1, speed));
   }, [normalizedItems.length, speed]);
 
   const shouldAnimate = !prefersReducedMotion && isVisible && !isPaused;
 
-  // Normalize drag offset back to 0 smoothly when animation resumes
-  useEffect(() => {
-    if (!shouldAnimate && !dragStateRef.current.dragging) return;
-    if (shouldAnimate && dragOffset !== 0) {
-      setDragOffset(0);
-    }
-  }, [shouldAnimate, dragOffset]);
-
   return (
     <div ref={laneRef} className="relative -mx-[var(--container-gutter)] overflow-hidden">
-      <span className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background to-transparent" />
-      <span className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent" />
+      <span className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background to-transparent hidden md:block" />
+      <span className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent hidden md:block" />
 
       <div
         ref={dragWrapperRef}
@@ -864,8 +855,8 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
 
 // Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
-  const mobileTopSpeed = Math.max(10, speedTop * 0.28);
-  const mobileBottomSpeed = Math.max(8, speedBottom * 0.22);
+  const mobileTopSpeed = Math.max(8, speedTop * 0.18);
+  const mobileBottomSpeed = Math.max(7, speedBottom * 0.16);
 
   return (
     // On mobile we want the rows to start right under the heading; keep bottom-aligned only on md+.
