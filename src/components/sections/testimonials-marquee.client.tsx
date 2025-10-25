@@ -600,35 +600,108 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
   const [dragOffset, setDragOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const dragStateRef = useRef<{ pointerId: number | null; startX: number; startOffset: number; dragging: boolean }>({
+  const dragStateRef = useRef<{
+    pointerId: number | null;
+    startX: number;
+    startY: number;
+    startOffset: number;
+    dragging: boolean;
+    intent: "pending" | "horizontal" | "vertical";
+  }>({
     pointerId: null,
     startX: 0,
+    startY: 0,
     startOffset: 0,
     dragging: false,
+    intent: "pending",
   });
   const resumeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useLayoutEffect(() => {
-    if (!firstSetRef.current) return;
+    const target = firstSetRef.current;
+    if (!target) return;
+
+    let rafId: number | null = null;
     const measure = () => {
-      const rect = firstSetRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      setSetWidth(rect.width);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const rect = target.getBoundingClientRect();
+        setSetWidth(rect.width);
+      });
     };
+
     measure();
-    const handle = () => measure();
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, []);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => measure());
+      resizeObserver.observe(target);
+    }
+
+    const handleResize = () => measure();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      if (resizeObserver) resizeObserver.disconnect();
+      window.removeEventListener("resize", handleResize);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [normalizedItems.length]);
 
   useLayoutEffect(() => {
     const node = laneRef.current;
     if (!node) return;
-    const io = new IntersectionObserver((entries) => {
-      setIsVisible(entries[0].isIntersecting && entries[0].intersectionRatio > 0.05);
-    }, { threshold: [0, 0.05, 0.2] });
-    io.observe(node);
-    return () => io.disconnect();
+    const updateVisibility = (next: boolean) => {
+      setIsVisible((prev) => (prev === next ? prev : next));
+    };
+
+    let rafId: number | null = null;
+    const fallbackCheck = () => {
+      const rect = node.getBoundingClientRect();
+      const viewport = window.innerHeight || document.documentElement.clientHeight;
+      const visible = rect.bottom > -viewport * 0.35 && rect.top < viewport * 1.35;
+      updateVisibility(visible);
+    };
+
+    const handleScroll = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(fallbackCheck);
+    };
+
+    let io: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          if (!entry) return;
+          const visible = entry.isIntersecting && entry.intersectionRatio > 0.02;
+          updateVisibility(visible);
+        },
+        { rootMargin: "35% 0px", threshold: [0, 0.01, 0.08, 0.2, 0.4] },
+      );
+      io.observe(node);
+    } else {
+      fallbackCheck();
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      if (io) io.disconnect();
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (resumeTimeout.current) {
+        clearTimeout(resumeTimeout.current);
+        resumeTimeout.current = null;
+      }
+    };
   }, []);
 
   const requestResume = useCallback(() => {
@@ -643,15 +716,28 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     return value;
   }, [setWidth]);
 
+  const releasePointer = useCallback((pointerId?: number, shouldResume = true) => {
+    const state = dragStateRef.current;
+    if (!state.dragging) return;
+    if (typeof pointerId === "number" && state.pointerId !== pointerId) return;
+    dragStateRef.current = { pointerId: null, startX: 0, startY: 0, startOffset: 0, dragging: false, intent: "pending" };
+    setDragOffset((prev) => clampOffset(prev));
+    if (shouldResume) {
+      requestResume();
+    } else {
+      setIsPaused(false);
+    }
+  }, [clampOffset, requestResume]);
+
   const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     dragStateRef.current = {
       pointerId: e.pointerId,
       startX: e.clientX,
+      startY: e.clientY,
       startOffset: dragOffset,
       dragging: true,
+      intent: "pending",
     };
-    setIsPaused(true);
-    e.currentTarget.setPointerCapture(e.pointerId);
     if (resumeTimeout.current) {
       clearTimeout(resumeTimeout.current);
       resumeTimeout.current = null;
@@ -662,24 +748,65 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     const state = dragStateRef.current;
     if (!state.dragging || state.pointerId !== e.pointerId) return;
     const dx = e.clientX - state.startX;
-    if (Math.abs(dx) > Math.abs(e.movementY) && Math.abs(dx) > 4) {
-      e.preventDefault();
-      setDragOffset(clampOffset(state.startOffset + dx));
+    const dy = e.clientY - state.startY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (state.intent === "pending") {
+      if (absDy > absDx && absDy > 6) {
+        dragStateRef.current.intent = "vertical";
+        releasePointer(e.pointerId, false);
+        return;
+      }
+      if (absDx > absDy * 1.1 && absDx > 6) {
+        dragStateRef.current.intent = "horizontal";
+        setIsPaused(true);
+        dragWrapperRef.current?.setPointerCapture?.(e.pointerId);
+      } else {
+        return;
+      }
     }
-  }, [clampOffset]);
+
+    if (dragStateRef.current.intent !== "horizontal") return;
+    e.preventDefault();
+    setDragOffset(clampOffset(state.startOffset + dx));
+  }, [clampOffset, releasePointer]);
 
   const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    const state = dragStateRef.current;
-    if (state.pointerId !== e.pointerId) return;
-    dragStateRef.current = { pointerId: null, startX: 0, startOffset: 0, dragging: false };
-    e.currentTarget.releasePointerCapture(e.pointerId);
-    setDragOffset((prev) => clampOffset(prev));
-    requestResume();
-  }, [clampOffset, requestResume]);
+    if (dragStateRef.current.pointerId !== e.pointerId) return;
+    if (dragWrapperRef.current?.hasPointerCapture?.(e.pointerId)) {
+      dragWrapperRef.current.releasePointerCapture(e.pointerId);
+    }
+    releasePointer(e.pointerId);
+  }, [releasePointer]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handlePointerEnd = (event: PointerEvent) => {
+      if (dragStateRef.current.pointerId !== event.pointerId) return;
+      dragWrapperRef.current?.releasePointerCapture?.(event.pointerId);
+      releasePointer(event.pointerId);
+    };
+    window.addEventListener("pointerup", handlePointerEnd);
+    window.addEventListener("pointercancel", handlePointerEnd);
+    return () => {
+      window.removeEventListener("pointerup", handlePointerEnd);
+      window.removeEventListener("pointercancel", handlePointerEnd);
+    };
+  }, [releasePointer]);
+
+  useEffect(() => {
+    if (!isPaused || dragStateRef.current.dragging || !isVisible) return;
+    const timeout = setTimeout(() => {
+      setIsPaused(false);
+      setDragOffset(0);
+    }, 1500);
+    return () => clearTimeout(timeout);
+  }, [isPaused, isVisible]);
 
   const animationDuration = useMemo(() => {
-    const base = Math.max(18, normalizedItems.length * 4);
-    return Math.max(12, base / Math.max(1, speed));
+    const base = Math.max(32, normalizedItems.length * 6);
+    return Math.max(18, base / Math.max(1, speed));
   }, [normalizedItems.length, speed]);
 
   const shouldAnimate = !prefersReducedMotion && isVisible && !isPaused;
@@ -700,11 +827,12 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
       <div
         ref={dragWrapperRef}
         className={cn("marquee-mobile-drag", dragStateRef.current.dragging && "marquee-mobile-dragging")}
-        style={{ transform: `translateX(${dragOffset}px)` }}
+        style={{ transform: `translateX(${dragOffset}px)`, touchAction: "pan-y pinch-zoom" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
+        onPointerLeave={onPointerUp}
       >
         <div
           className={cn(
@@ -736,6 +864,9 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
 
 // Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
+  const mobileTopSpeed = Math.max(10, speedTop * 0.28);
+  const mobileBottomSpeed = Math.max(8, speedBottom * 0.22);
+
   return (
     // On mobile we want the rows to start right under the heading; keep bottom-aligned only on md+.
     <div className="relative flex flex-1 flex-col justify-start md:justify-end bg-transparent">
@@ -748,8 +879,8 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
       </div>
       {/* Mobile auto-marquee rows (slower, pause on touch) */}
       <div className="md:hidden flex flex-col gap-3 pb-3 justify-start bg-transparent" style={{ height: "auto", minHeight: "320px" }}>
-        <RowMobile items={top} direction={1} speed={Math.max(12, speedTop * 0.45)} />
-        <RowMobile items={bottom} direction={-1} speed={Math.max(9, speedBottom * 0.35)} />
+        <RowMobile items={top} direction={1} speed={mobileTopSpeed} />
+        <RowMobile items={bottom} direction={-1} speed={mobileBottomSpeed} />
       </div>
     </div>
   );
