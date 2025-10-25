@@ -628,10 +628,12 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
   }, [items]);
 
   const clones = [0, 1, 2];
+  const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [setWidth, setSetWidth] = useState<number>(0);
   const [dragOffset, setDragOffset] = useState(0);
   const [isInteracting, setIsInteracting] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pointerIdRef = useRef<number | null>(null);
   const startXRef = useRef(0);
@@ -645,6 +647,21 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
     if (!node) return;
     const rect = node.getBoundingClientRect();
     setSetWidth(rect.width);
+  }, []);
+
+  // Pause the RAF auto-scroll when the row is off-screen for smoother page scrolling
+  useLayoutEffect(() => {
+    const node = viewportRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        setIsVisible(e.isIntersecting && e.intersectionRatio > 0.1);
+      },
+      { root: null, threshold: [0, 0.1, 0.25] },
+    );
+    io.observe(node);
+    return () => io.disconnect();
   }, []);
 
   const totalWidth = setWidth;
@@ -721,7 +738,7 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
   const wrapperStyle = useMemo(() => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }), [dragOffset]);
 
   useLayoutEffect(() => {
-    if (prefersReducedMotion || !totalWidth) return;
+    if (prefersReducedMotion || !totalWidth || !isVisible) return;
     let rafId: number | null = null;
     let last = performance.now();
     const pxPerSec = speed * 2; // keep same mapping as desktop, but speed is smaller on mobile
@@ -733,16 +750,17 @@ function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; s
     };
     rafId = requestAnimationFrame(step);
     return () => { if (rafId) cancelAnimationFrame(rafId); };
-  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapTx]);
+  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapTx, isVisible]);
 
   return (
     <div
+      ref={viewportRef}
       className="relative overflow-hidden touch-pan-y"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
-      style={{ touchAction: "pan-y" }}
+      style={{ touchAction: "pan-y", overscrollBehaviorX: "contain", contain: "content", WebkitOverflowScrolling: "touch" as any }}
     >
       <div className="flex py-2" style={wrapperStyle}>
         <div className="flex w-max">
@@ -778,3 +796,18 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
     </div>
   );
 }
+  const [isVisible, setIsVisible] = useState(true);
+  // Pause animation when row is out of view (saves work on mobile)
+  useLayoutEffect(() => {
+    const node = viewportRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        setIsVisible(e.isIntersecting && e.intersectionRatio > 0.1);
+      },
+      { root: null, threshold: [0, 0.1, 0.25] },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
