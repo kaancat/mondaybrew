@@ -2,6 +2,7 @@
 
 import {
   useCallback,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -582,7 +583,8 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   );
 }
 
-function RowMobile({ items, reverse = false }: { items: TCard[]; reverse?: boolean }) {
+function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direction?: 1 | -1; speed?: number }) {
+  const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
@@ -591,37 +593,123 @@ function RowMobile({ items, reverse = false }: { items: TCard[]; reverse?: boole
     });
   }, [items]);
 
-  const displayItems = useMemo(() => {
-    if (normalizedItems.length >= 4) return normalizedItems;
-    if (normalizedItems.length === 0) return normalizedItems;
-    const multiplier = Math.max(2, Math.ceil(4 / normalizedItems.length));
-    return Array.from({ length: normalizedItems.length * multiplier }, (_, idx) => normalizedItems[idx % normalizedItems.length]);
-  }, [normalizedItems]);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const firstSetRef = useRef<HTMLDivElement | null>(null);
+  const [setWidth, setSetWidth] = useState(0);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const idleTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const node = firstSetRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      setSetWidth(rect.width);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  useLayoutEffect(() => {
+    const node = scrollerRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        setIsVisible(e.isIntersecting && e.intersectionRatio > 0.1);
+      },
+      { threshold: [0, 0.1, 0.25] },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
+  // Initialize scroll position for reverse direction so there's room to scroll backwards
+  useLayoutEffect(() => {
+    if (direction !== -1) return;
+    const node = scrollerRef.current;
+    if (!node || !setWidth) return;
+    node.scrollLeft = setWidth;
+  }, [direction, setWidth]);
+
+  useEffect(() => {
+    const node = scrollerRef.current;
+    if (!node || !setWidth) return;
+    const handle = () => {
+      if (direction === 1 && node.scrollLeft >= setWidth) {
+        node.scrollLeft -= setWidth;
+      } else if (direction === -1 && node.scrollLeft <= 0) {
+        node.scrollLeft += setWidth;
+      }
+    };
+    node.addEventListener("scroll", handle);
+    return () => node.removeEventListener("scroll", handle);
+  }, [setWidth, direction]);
+
+  useEffect(() => {
+    if (prefersReducedMotion || !setWidth) return;
+    const node = scrollerRef.current;
+    if (!node) return;
+    let raf: number | null = null;
+    let last = performance.now();
+    const pxPerSec = speed * 12;
+    const step = (now: number) => {
+      const dt = Math.max(0, (now - last) / 1000);
+      last = now;
+      if (!isInteracting && isVisible) {
+        node.scrollLeft += direction * pxPerSec * dt;
+        if (direction === 1 && node.scrollLeft >= setWidth) {
+          node.scrollLeft -= setWidth;
+        } else if (direction === -1 && node.scrollLeft <= 0) {
+          node.scrollLeft += setWidth;
+        }
+      }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [prefersReducedMotion, setWidth, direction, isInteracting, isVisible, speed]);
+
+  const markInteraction = useCallback(() => {
+    setIsInteracting(true);
+    if (idleTimeout.current) clearTimeout(idleTimeout.current);
+    idleTimeout.current = setTimeout(() => setIsInteracting(false), 1200);
+  }, []);
 
   return (
     <div className="relative -mx-[var(--container-gutter)]">
       <span className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background to-transparent" />
       <span className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent" />
       <div
-        className={cn(
-          "no-scrollbar overflow-x-auto snap-x snap-mandatory touch-pan-x",
-          reverse && "[direction:rtl]",
-        )}
-        dir={reverse ? "rtl" : "ltr"}
-        style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain" }}
+        ref={scrollerRef}
+        className="no-scrollbar overflow-x-auto snap-x snap-mandatory"
+        style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain", touchAction: "pan-x" }}
+        onPointerDown={markInteraction}
+        onPointerUp={markInteraction}
+        onTouchStart={markInteraction}
+        onTouchEnd={markInteraction}
+        onMouseDown={markInteraction}
+        onMouseUp={markInteraction}
       >
-        <div
-          className={cn(
-            "flex gap-3 py-2 px-[var(--container-gutter)]", 
-            reverse && "flex-row-reverse",
-          )}
-          style={{ width: "max-content" }}
-        >
-          {displayItems.map((card, i) => (
-            <div key={i} className="snap-start">
-              <CardMobile card={card} />
-            </div>
-          ))}
+        <div className="flex" style={{ width: "max-content" }}>
+          <div ref={firstSetRef} className="flex gap-3 py-2 px-[var(--container-gutter)]">
+            {normalizedItems.map((card, i) => (
+              <div key={`set-a-${i}`} className="snap-start">
+                <CardMobile card={card} />
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-3 py-2 px-[var(--container-gutter)]" aria-hidden>
+            {normalizedItems.map((card, i) => (
+              <div key={`set-b-${i}`} className="snap-start">
+                <CardMobile card={card} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -644,8 +732,8 @@ export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, 
       </div>
       {/* Mobile auto-marquee rows (slower, pause on touch) */}
       <div className="md:hidden flex flex-col gap-3 pb-3 justify-start bg-transparent" style={{ height: "auto", minHeight: "320px" }}>
-        <RowMobile items={top} />
-        <RowMobile items={bottom} reverse />
+        <RowMobile items={top} direction={1} speed={Math.max(12, speedTop * 0.45)} />
+        <RowMobile items={bottom} direction={-1} speed={Math.max(9, speedBottom * 0.35)} />
       </div>
     </div>
   );
