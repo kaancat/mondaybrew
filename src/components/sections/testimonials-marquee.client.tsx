@@ -69,6 +69,9 @@ const CARD_WIDTHS: Record<TCard["variant"], number> = {
 
 const CARD_GAP = 32; // px spacing applied symmetrically around each card
 
+// Single source of truth for mobile card height so top/bottom rows match exactly
+const MOBILE_CARD_HEIGHT = "clamp(220px, 54vw, 300px)" as const;
+
 // Map Service card presets (Primary, Light Alt, Dark) to concrete tones
 const MODE_PRESETS: Record<ModeKey, ToneStyle> = {
   primary: {
@@ -136,9 +139,10 @@ function CardFrameMobile({ children }: { children: ReactNode }) {
     <div
       className="group/card relative shrink-0"
       style={{
-        width: "300px",
-        minWidth: "300px",
+        width: "clamp(240px, 82vw, 300px)",
+        minWidth: "clamp(240px, 82vw, 300px)",
         flex: "0 0 auto",
+        marginInline: 14,
       }}
     >
       {children}
@@ -205,15 +209,17 @@ function QuoteCardMobile({ card }: { card: TCard }) {
     <CardFrameMobile>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[360px] flex-col rounded-[8px] p-6",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          // Fixed height on mobile to keep all marquee rows identical
+          "card-inner relative flex h-full flex-col rounded-[5px] p-5 overflow-hidden",
+          // lighter visual weight on mobile
+          "drop-shadow-[0_10px_24px_rgba(8,6,20,0.18)]",
         )}
-        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
+        style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT, background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
         <CardLogo card={card} className="mb-6 self-start" />
         <div className="flex flex-1 flex-col gap-4">
           {card.quote ? (
-            <blockquote className="text-balance text-[clamp(18px,5vw,22px)] leading-snug" style={{ color: colors.ink }}>
+            <blockquote className="text-balance text-[clamp(16px,4.6vw,20px)] leading-snug" style={{ color: colors.ink }}>
               “{card.quote}”
             </blockquote>
           ) : null}
@@ -288,12 +294,13 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
     <CardFrameMobile>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[360px] overflow-hidden rounded-[8px]",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          // Fixed height on mobile
+          "card-inner relative flex h-full overflow-hidden rounded-[5px]",
+          "drop-shadow-[0_10px_24px_rgba(8,6,20,0.18)]",
         )}
-        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
+        style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT, background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
-        <div className="relative flex-[0_0_48%] min-w-[180px]">
+        <div className="relative flex-[0_0_42%] min-w-[150px]">
           <Image
             src={card.image.url}
             alt={card.image.alt || ""}
@@ -309,7 +316,7 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
           <CardLogo card={card} className="mb-6 self-start" />
           <div className="flex flex-col gap-4">
             {card.quote ? (
-              <blockquote className="text-balance text-[clamp(18px,5vw,22px)] leading-snug">
+              <blockquote className="text-balance text-[clamp(16px,4.6vw,20px)] leading-snug">
                 “{card.quote}”
               </blockquote>
             ) : null}
@@ -382,9 +389,11 @@ function ImageOnlyCardMobile({ card }: { card: TCard }) {
     <CardFrameMobile>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[360px] overflow-hidden rounded-[8px]",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          // Fixed height on mobile
+          "card-inner relative flex h-full overflow-hidden rounded-[5px]",
+          "drop-shadow-[0_10px_24px_rgba(8,6,20,0.18)]",
         )}
+        style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT }}
       >
         <Image
           src={card.image.url}
@@ -396,6 +405,23 @@ function ImageOnlyCardMobile({ card }: { card: TCard }) {
           blurDataURL={card.image.lqip || undefined}
           className="h-full w-full object-cover"
         />
+        {/* Bottom gradient for legibility */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24"
+          style={{ backgroundImage: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.42) 60%, transparent 100%)" }}
+        />
+        {/* Mobile CTA overlay (if provided) */}
+        {card.cta?.label && card.cta?.href ? (
+          <div
+            className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between border-t px-4 py-3 text-sm"
+            style={{ borderColor: "rgba(255,255,255,0.22)", background: "rgba(0,0,0,0.66)", color: "var(--mb-accent)" }}
+          >
+            <Link href={card.cta.href} className="pointer-events-auto font-medium underline-offset-4 hover:underline">
+              {card.cta.label}
+            </Link>
+            <span aria-hidden style={{ opacity: 0.95, color: "var(--mb-accent)" }}>→</span>
+          </div>
+        ) : null}
       </div>
     </CardFrameMobile>
   );
@@ -572,13 +598,13 @@ function RowMobile({ items }: { items: TCard[] }) {
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent" />
       
       <div 
-        className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory touch-pan-x"
+        className="no-scrollbar overflow-x-auto overscroll-x-contain snap-x snap-proximity touch-pan-x"
         style={{
           WebkitOverflowScrolling: "touch",
           touchAction: "pan-x pan-y"
         }}
       >
-        <div className="flex gap-4 py-2 px-[var(--container-gutter)]" style={{ width: "max-content" }}>
+        <div className="flex gap-3 py-2 px-[var(--container-gutter)]" style={{ width: "max-content" }}>
           {normalizedItems.map((card, i) => (
             <div key={i} className="snap-start">
               <CardMobile card={card} />
@@ -590,20 +616,144 @@ function RowMobile({ items }: { items: TCard[] }) {
   );
 }
 
+// Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
+function RowAutoMobile({ items, speed = 14, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
+  const prefersReducedMotion = useReducedMotion();
+  const normalizedItems = useMemo(() => {
+    return items.map((card, i) => {
+      const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
+      const preset = MODE_PRESETS[toneKey];
+      return { ...card, tone: toneKey, background: preset.background, colors: preset };
+    });
+  }, [items]);
+
+  const clones = [0, 1, 2];
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [setWidth, setSetWidth] = useState<number>(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pointerIdRef = useRef<number | null>(null);
+  const startXRef = useRef(0);
+  const startOffsetRef = useRef(0);
+
+  const setRef = useCallback((node: HTMLDivElement | null) => {
+    trackRef.current = node;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    setSetWidth(rect.width);
+  }, []);
+
+  const totalWidth = setWidth;
+  const wrapTx = useCallback((tx: number) => {
+    if (!totalWidth) return tx;
+    let v = tx;
+    const w = totalWidth;
+    while (v <= -w) v += w;
+    while (v > 0) v -= w;
+    return v;
+  }, [totalWidth]);
+  const directionFactor = direction === -1 ? -1 : 1;
+
+  useLayoutEffect(() => {
+    const refresh = () => {
+      const node = trackRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      setSetWidth(rect.width);
+    };
+    refresh();
+    window.addEventListener("resize", refresh);
+    return () => window.removeEventListener("resize", refresh);
+  }, []);
+
+  const clearInteractionTimeout = useCallback(() => {
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current);
+      interactionTimeoutRef.current = null;
+    }
+  }, []);
+
+  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return;
+    pointerIdRef.current = e.pointerId;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    startXRef.current = e.clientX;
+    startOffsetRef.current = dragOffset;
+    setIsInteracting(true);
+  }, [prefersReducedMotion, dragOffset]);
+  const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return;
+    if (pointerIdRef.current !== e.pointerId) return;
+    e.preventDefault();
+    const dx = e.clientX - startXRef.current;
+    setDragOffset(wrapTx(startOffsetRef.current + dx));
+  }, [prefersReducedMotion, wrapTx]);
+  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return;
+    if (pointerIdRef.current !== e.pointerId) return;
+    pointerIdRef.current = null;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    clearInteractionTimeout();
+    interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
+  }, [prefersReducedMotion, clearInteractionTimeout]);
+
+  const wrapperStyle = useMemo(() => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }), [dragOffset]);
+
+  useLayoutEffect(() => {
+    if (prefersReducedMotion || !totalWidth) return;
+    let rafId: number | null = null;
+    let last = performance.now();
+    const pxPerSec = speed * 2; // keep same mapping as desktop, but speed is smaller on mobile
+    const step = (now: number) => {
+      const dt = Math.max(0, (now - last) / 1000);
+      last = now;
+      if (!isInteracting) setDragOffset((v) => wrapTx(v + directionFactor * pxPerSec * dt));
+      rafId = requestAnimationFrame(step);
+    };
+    rafId = requestAnimationFrame(step);
+    return () => { if (rafId) cancelAnimationFrame(rafId); };
+  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapTx]);
+
+  return (
+    <div
+      className="relative overflow-hidden touch-pan-y"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      style={{ touchAction: "pan-y" }}
+    >
+      <div className="flex py-2" style={wrapperStyle}>
+        <div className="flex w-max">
+          {clones.map((_, idx) => (
+            <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex" aria-hidden={idx > 0}>
+              {normalizedItems.map((card, i) => (
+                <CardMobile key={`${idx}-${i}`} card={card} />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
   return (
-    <div className="relative flex flex-1 flex-col justify-end">
+    // On mobile we want the rows to start right under the heading; keep bottom-aligned only on md+.
+    <div className="relative flex flex-1 flex-col justify-start md:justify-end bg-transparent">
       {/* subtle peek of bottom row */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[12vh] bg-gradient-to-t from-background to-transparent hidden md:block" />
       {/* Desktop/original marquee */}
-      <div className="hidden md:flex flex-col gap-3 pb-3">
+      <div className="hidden md:flex flex-col gap-3 pb-3 bg-transparent">
         <Row items={top} speed={speedTop} direction={1} />
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
-      {/* Mobile scrollable rows */}
-      <div className="md:hidden flex flex-col gap-4 pb-2 justify-start" style={{ height: "auto", minHeight: "400px" }}>
-        <RowMobile items={top} />
-        <RowMobile items={bottom} />
+      {/* Mobile auto-marquee rows (slower, pause on touch) */}
+      <div className="md:hidden flex flex-col gap-2 pb-2 justify-start bg-transparent" style={{ height: "auto", minHeight: "320px" }}>
+        <RowAutoMobile items={top} speed={Math.max(12, speedTop * 0.45)} direction={1} />
+        <RowAutoMobile items={bottom} speed={Math.max(9, speedBottom * 0.35)} direction={-1} />
       </div>
     </div>
   );

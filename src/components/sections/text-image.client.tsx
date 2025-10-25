@@ -86,22 +86,18 @@ export function TextImageClient({
             <motion.div className={cn(textOrder)} {...animateText}>
                 <div
                     className={cn(
-                        // Mirror Services detail card classes exactly (spacing/shape)
-                        "h-full rounded-none p-0 md:rounded-[5px] md:p-6 services-card-surface",
-                        // Tokens with dark fallbacks for perfect parity (belt & suspenders)
-                        "bg-[color:var(--services-card-bg)] text-[color:var(--services-ink-strong)] dark:bg-[#f5f7fd] dark:text-[#0a0a0a]",
-                        // Border/shadow parity (kept explicit for clarity)
-                        "border md:border md:border-[color:var(--services-ink-strong)] dark:border-[#0a0a0a] shadow-[var(--shadow-elevated-md)]"
+                        // Add mobile inner padding so content isn't edge-to-edge
+                        "h-full rounded-none p-4 md:rounded-[5px] md:p-6 services-card-surface text-image-card shadow-[var(--shadow-elevated-md)]"
                     )}
                     style={{ minHeight: 520 }}
                 >
                     {eyebrow && (
-                        <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--services-ink-strong)]">{eyebrow}</span>
+                        <span className="text-xs font-semibold uppercase tracking-[0.22em] services-card-eyebrow">{eyebrow}</span>
                     )}
-                    {title && (<h2 className="mt-2 font-semibold text-[color:var(--services-ink-strong)] dark:text-[#0a0a0a]">{title}</h2>)}
+                    {title && (<h2 data-ti-headline className="mt-2 font-semibold">{title}</h2>)}
                     <div className="my-6 h-[1px] w-full services-card-divider" />
                     {body && (
-                        <p className="text-[length:var(--font-body)] leading-relaxed text-[color:color-mix(in_oklch,var(--services-ink-strong)_88%,white_12%)]">{body}</p>
+                        <p className="services-card-body text-[length:var(--font-body)] leading-relaxed">{body}</p>
                     )}
                     {cta && (
                         <div className="mt-6">
@@ -120,8 +116,9 @@ export function TextImageClient({
                         className={cn(
                             "relative h-full rounded-[5px] overflow-hidden shadow-[0_20px_60px_rgb(0,0,0,0.4)]",
                             image ? "bg-black/5" : "bg-transparent",
+                            // Mobile image height set to 500px, desktop taller
+                            "min-h-[500px] md:min-h-[520px]"
                         )}
-                        style={{ minHeight: 520 }}
                     >
                         <Image
                             src={image.url}

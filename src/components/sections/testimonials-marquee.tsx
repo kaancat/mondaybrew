@@ -54,7 +54,9 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
     <Section
       padding="none"
       width="full"
-      innerClassName="flex min-h-[100vh] flex-col gap-[calc(var(--flow-space)/1.6)]"
+      className="bg-transparent"
+      // Reduce vertical gap between header and marquee on mobile
+      innerClassName="flex min-h-[100vh] flex-col gap-2 md:gap-[calc(var(--flow-space)/1.6)] bg-transparent"
     >
       {/* Note: Section provides the padded Container already (width=full). Avoid nested Containers to prevent double gutters. */}
       <div className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]">
