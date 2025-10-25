@@ -599,7 +599,6 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
   const [setWidth, setSetWidth] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
   const dragStateRef = useRef<{
     pointerId: number | null;
     startX: number;
@@ -648,53 +647,6 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     };
   }, [normalizedItems.length]);
 
-  useLayoutEffect(() => {
-    const node = laneRef.current;
-    if (!node) return;
-    const updateVisibility = (next: boolean) => {
-      setIsVisible((prev) => (prev === next ? prev : next));
-    };
-
-    let rafId: number | null = null;
-    const fallbackCheck = () => {
-      const rect = node.getBoundingClientRect();
-      const viewport = window.innerHeight || document.documentElement.clientHeight;
-      const visible = rect.bottom > -viewport * 0.35 && rect.top < viewport * 1.35;
-      updateVisibility(visible);
-    };
-
-    const handleScroll = () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(fallbackCheck);
-    };
-
-    let io: IntersectionObserver | null = null;
-    if (typeof IntersectionObserver !== "undefined") {
-      io = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[0];
-          if (!entry) return;
-          const visible = entry.isIntersecting && entry.intersectionRatio > 0.02;
-          updateVisibility(visible);
-        },
-        { rootMargin: "35% 0px", threshold: [0, 0.01, 0.08, 0.2, 0.4] },
-      );
-      io.observe(node);
-    } else {
-      fallbackCheck();
-    }
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-
-    return () => {
-      if (io) io.disconnect();
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
-
   useEffect(() => {
     return () => {
       if (resumeTimeout.current) {
@@ -741,7 +693,6 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
       dragging: true,
       intent: "pending",
     };
-    dragWrapperRef.current?.setPointerCapture?.(e.pointerId);
     if (resumeTimeout.current) {
       clearTimeout(resumeTimeout.current);
       resumeTimeout.current = null;
@@ -757,13 +708,14 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     const absDy = Math.abs(dy);
 
     if (state.intent === "pending") {
-      if (absDy > absDx + 10 && absDy > 8) {
+      if (absDy > absDx + 8 && absDy > 8) {
         dragStateRef.current.intent = "vertical";
         releasePointer(e.pointerId, false);
         return;
       }
-      if (absDx > 8 && absDx > absDy * 0.7) {
+      if (absDx > 6 && absDx > absDy * 0.75) {
         dragStateRef.current.intent = "horizontal";
+        dragWrapperRef.current?.setPointerCapture?.(e.pointerId);
         setIsPaused(true);
       } else {
         return;
@@ -795,20 +747,20 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
   }, [releasePointer]);
 
   useEffect(() => {
-    if (!isPaused || dragStateRef.current.dragging || !isVisible) return;
+    if (!isPaused || dragStateRef.current.dragging) return;
     const timeout = setTimeout(() => {
       setIsPaused(false);
       setDragOffset(0);
     }, 1500);
     return () => clearTimeout(timeout);
-  }, [isPaused, isVisible]);
+  }, [isPaused]);
 
   const animationDuration = useMemo(() => {
     const base = Math.max(40, normalizedItems.length * 8);
     return Math.max(20, base / Math.max(1, speed));
   }, [normalizedItems.length, speed]);
 
-  const shouldAnimate = !prefersReducedMotion && isVisible && !isPaused;
+  const shouldAnimate = !prefersReducedMotion && !isPaused;
 
   return (
     <div ref={laneRef} className="relative -mx-[var(--container-gutter)] overflow-hidden">
