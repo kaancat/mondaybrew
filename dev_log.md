@@ -1,5 +1,107 @@
 # Dev Log
 
+## [2025-10-26] – Mobile Menu Scroll Position Preservation Fix
+**Goal**: Fix mobile menu to preserve scroll position instead of jumping to top when opened
+
+### Problem
+When opening the mobile menu from anywhere on the page (e.g., scrolled down 1500px), the content card in the menu would show the hero section (top of page) instead of the current scroll position. This was caused by `max-height: var(--nav-card-height)` constraining the `.site-shell` scroll container, forcing the browser to reset `window.scrollY` to 0.
+
+### Root Cause Analysis
+1. When menu opens, `.site-shell` received `max-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2))`
+2. This constrained the scroll container height from full page height (~4000px) to viewport height (~760px)
+3. Browser automatically clamped scroll position to fit within new constrained height
+4. Result: `window.scrollY` reset from 1500px → 0px, showing hero instead of current content
+
+### Investigation Process
+1. **CSS Specificity Conflict**: Initially suspected `body { position: relative }` was overriding `body[data-mobile-nav-open="true"] { position: fixed }`, but attribute selector had higher specificity
+2. **Scroll Lock Attempts**: Tried implementing `position: fixed` on body with `translateY` offset on shell, but positioning conflicts caused card to render off-screen
+3. **Width Override**: Discovered `mobile-nav-panel` was `width: 100vw` instead of `var(--mobile-nav-width)`, covering the entire viewport
+4. **Height Constraint Root Cause**: Realized `max-height` was the actual culprit, not positioning
+
+### Solution Implemented
+Replaced `max-height` constraint with `clip-path` for visual card effect:
+
+**globals.css (lines 660-687)**:
+```css
+body[data-mobile-nav-open="true"] .site-shell {
+  /* Apply horizontal slide and scale */
+  transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y), 0) scale(var(--site-shell-scale));
+  transform-origin: left calc(var(--nav-viewport-height) / 2);
+  
+  border-radius: var(--nav-card-border-radius);
+  box-shadow: var(--nav-card-box-shadow);
+  overflow: var(--nav-card-overflow);
+  
+  /* Visual card effect via clip-path instead of max-height to preserve scroll */
+  clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
+  -webkit-clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
+  
+  margin-block: var(--nav-card-margin-block);
+  /* ... */
+}
+```
+
+**Key Changes**:
+1. **Removed**: `max-height: var(--nav-card-height)` (was constraining scroll)
+2. **Added**: `clip-path: inset(...)` to visually crop top/bottom edges with rounded corners
+3. **Added**: `-webkit-clip-path` for Safari/WebKit compatibility
+4. **Updated**: Transition property from `max-height` to `clip-path` for smooth animations
+
+**Panel Width Fix**:
+```css
+[data-slot="sheet-content"].mobile-nav-panel {
+  width: var(--mobile-nav-width);  /* Was: 100vw */
+}
+```
+
+### How It Works
+- `clip-path: inset(top right bottom left round radius)` visually crops the element's edges
+- Top/bottom insets create the "floating card" effect with rounded corners
+- The actual scroll container height remains unchanged (full page height)
+- Browser maintains scroll position because container height is not constrained
+- Visual card effect achieved through clipping, not height manipulation
+
+### Testing Results
+**Test Case**: Scroll to 1500px → Open menu → Close menu
+
+**Before Fix**:
+- Opens at: 0px (hero section) ❌
+- Closes at: ~31px (reset) ❌
+
+**After Fix**:
+- Opens at: 1500px (correct content) ✅
+- Closes at: 1500px (preserved) ✅
+- Rounded corners visible ✅
+- Panel width correct ✅
+
+### Additional Fixes
+1. **`position: fixed` Specificity**: Added `!important` to ensure body scroll lock would apply if needed in future
+2. **Panel Width**: Changed from `100vw` to `var(--mobile-nav-width)` so content card is visible on right side
+3. **Simplified scroll approach**: Removed scroll capture/restore JavaScript logic since native scroll preservation now works
+
+### Technical Details
+- **CSS Property**: `clip-path` with `inset()` function
+- **Browser Support**: Modern browsers + WebKit prefix for Safari
+- **Performance**: No scroll capture/restore overhead, purely CSS-based
+- **Compatibility**: Works with existing nav phase system, no breaking changes
+
+### Files Modified
+- `web/src/app/globals.css`: Replaced `max-height` with `clip-path` on `.site-shell`
+- `web/src/app/globals.css`: Fixed panel width to `var(--mobile-nav-width)`
+- `web/src/app/globals.css`: Updated transition property to include `clip-path`
+- `web/src/components/shared/use-nav-phase.ts`: Removed scroll capture/restore logic (reverted to original)
+
+### Impact
+✅ Mobile menu shows current scroll position, not hero section
+✅ Scroll position preserved when closing menu
+✅ Rounded corners maintained via clip-path
+✅ No JavaScript overhead for scroll management
+✅ Works on Chrome, Safari (WebKit), and other modern browsers
+✅ No breaking changes to existing nav system
+✅ Maintains all animations and visual effects
+
+---
+
 ## [2025-10-23] – Hero Page Component: Hybrid Approach
 **Goal**: Make Hero Page available in Sanity Studio while keeping existing pages hardcoded
 

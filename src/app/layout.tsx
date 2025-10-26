@@ -59,8 +59,12 @@ export default function RootLayout({
           <GA />
           <Navbar />
           <div className="site-shell">
-            {children}
-            <Footer />
+            <div className="site-shell__viewport">
+              <div className="site-shell__content">
+                {children}
+                <Footer />
+              </div>
+            </div>
           </div>
         </ThemeProvider>
       </body>

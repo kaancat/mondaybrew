@@ -1,19 +1,46 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useNavPhase() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const EXIT_FALLBACK_MS = 480;
+  const scrollSnapshotRef = useRef<{ value: number; behavior: string }>({ value: 0, behavior: "" });
+
+  const captureScrollSnapshot = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const y = window.scrollY || window.pageYOffset || 0;
+    const docEl = document.documentElement;
+    scrollSnapshotRef.current = {
+      value: y,
+      behavior: docEl.style.scrollBehavior || "",
+    };
+    docEl.style.scrollBehavior = "auto";
+    document.body.style.setProperty("--nav-scroll-offset", `${y}px`);
+  }, []);
+
+  const clearScrollSnapshot = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const { behavior } = scrollSnapshotRef.current;
+    document.body.style.removeProperty("--nav-scroll-offset");
+    const docEl = document.documentElement;
+    if (behavior) {
+      docEl.style.scrollBehavior = behavior;
+    } else {
+      docEl.style.removeProperty("scroll-behavior");
+    }
+    scrollSnapshotRef.current = { value: 0, behavior: "" };
+  }, []);
 
   // Cleanup on unmount (defensive)
   useEffect(() => {
     return () => {
       if (typeof document === "undefined") return;
+      clearScrollSnapshot();
       document.body.removeAttribute("data-mobile-nav-open");
       document.body.removeAttribute("data-nav-phase");
     };
-  }, []);
+  }, [clearScrollSnapshot]);
 
   const finalizeClose = useCallback(() => {
     const body = document.body;
@@ -22,8 +49,9 @@ export function useNavPhase() {
     body.removeAttribute("data-mobile-nav-open");
     requestAnimationFrame(() => {
       body.removeAttribute("data-nav-phase");
+      clearScrollSnapshot();
     });
-  }, []);
+  }, [clearScrollSnapshot]);
 
   const onOpenChange = useCallback((open: boolean) => {
     if (typeof document === "undefined") return;
@@ -31,6 +59,7 @@ export function useNavPhase() {
 
     if (open) {
       setMobileOpen(true);
+      captureScrollSnapshot();
       body.setAttribute("data-mobile-nav-open", "true");
       body.removeAttribute("data-nav-phase");
       return;
@@ -40,7 +69,7 @@ export function useNavPhase() {
     body.setAttribute("data-nav-phase", "exiting");
     setMobileOpen(true);
 
-    const shell = document.querySelector<HTMLElement>(".site-shell");
+    const shell = document.querySelector<HTMLElement>(".site-shell__viewport");
     if (shell) {
       let settled = false;
       const settle = () => {
@@ -56,7 +85,7 @@ export function useNavPhase() {
     } else {
       finalizeClose();
     }
-  }, [EXIT_FALLBACK_MS, finalizeClose]);
+  }, [EXIT_FALLBACK_MS, captureScrollSnapshot, finalizeClose]);
 
   return { mobileOpen, onOpenChange } as const;
 }

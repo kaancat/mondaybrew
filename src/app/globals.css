@@ -62,6 +62,7 @@
   --nav-card-background: var(--background);
   --nav-card-height: var(--nav-viewport-height);
   --nav-card-margin-block: 0;
+  --nav-scroll-offset: 0px;
 
   --layout-max: 86.5rem; /* ~1384px */
   --layout-tight: 60rem; /* ~960px */
@@ -586,8 +587,7 @@ html.dark {
     font-family: var(--font-body);
   }
 
-  body[data-mobile-nav-open="true"] {
-    overflow: hidden;
+body[data-mobile-nav-open="true"] {
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 0.9;
     --nav-card-inset: clamp(14px, 4vw, 24px);
@@ -600,8 +600,8 @@ html.dark {
     --nav-card-pointer: none;
     --nav-card-background: transparent;
     --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
-    --nav-card-margin-block: 0;
-  }
+    --nav-card-margin-block: var(--nav-card-inset);
+}
 
   /* Body::before overlay removed — rely on Radix Sheet overlay only */
 
@@ -619,9 +619,9 @@ html.dark {
     --nav-card-height: var(--nav-viewport-height);
     --nav-card-margin-block: 0;
   }
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
+body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell__viewport {
     /* Ensure mirrored geometry: keep origin consistent while reversing */
-    transform-origin: left center !important;
+    transform-origin: left calc(var(--nav-viewport-height) / 2) !important;
   }
   /* Exiting: keep 'open' while reversing geometry and restoring presentation */
 
@@ -636,41 +636,63 @@ html.dark {
     opacity: 0;
   }
 
-  .site-shell {
+.site-shell {
     position: relative;
     z-index: 50;
+    background: var(--background);
+  }
+
+  /* Raise the shell stacking context above the panel while menu is open,
+     so the scaled page (viewport) visually sits on top, as designed. */
+  body[data-mobile-nav-open="true"] .site-shell {
+    z-index: 60;
+  }
+
+  .site-shell__viewport {
+    position: relative;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease), clip-path var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
-    /* Avoid creating a new containing block when nav is closed */
-    transform: none;
     border-radius: clamp(0px, var(--nav-card-radius), 0px);
     box-shadow: none;
     overflow: visible;
     pointer-events: auto;
-    background: var(--background);
-    /* Allow page to grow naturally while nav is closed to avoid dvh-driven jumps */
-    min-height: var(--nav-viewport-height);
-    height: auto;
     margin-block: 0;
+    contain: layout style paint;
   }
 
-  body[data-mobile-nav-open="true"] .site-shell {
-    transform-origin: left center !important;
-    /* Apply transform only while mobile nav is open */
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
-    border-radius: var(--nav-card-border-radius);
-    box-shadow: var(--nav-card-box-shadow);
-    overflow: var(--nav-card-overflow);
-    height: var(--nav-card-height);
-    margin-block: var(--nav-card-margin-block);
-    z-index: 60;
-    pointer-events: var(--nav-card-pointer);
-    background: var(--nav-card-background);
+  .site-shell__content {
+    position: relative;
+    min-height: var(--nav-viewport-height);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease);
+  }
 
-    /* Remove isolation to prevent stacking context issues */
-    contain: layout style paint;
+body[data-mobile-nav-open="true"] .site-shell__viewport {
+  position: fixed;
+  top: var(--nav-card-inset);
+  bottom: var(--nav-card-inset);
+  left: 0;
+  right: 0;
+  transform-origin: left calc(var(--nav-viewport-height) / 2);
+  transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
+  border-radius: var(--nav-card-border-radius);
+  box-shadow: var(--nav-card-box-shadow);
+  overflow: hidden;
+  height: auto;
+  margin-block: 0;
+  z-index: 60;
+  pointer-events: var(--nav-card-pointer);
+  background: var(--nav-card-background);
+}
+
+/* Visual caps (top/bottom) to guarantee rounded card silhouette regardless of
+   document scroll position. This overrides the earlier "no ::before overlay"
+   guardrail by request. These are purely visual and do not receive events. */
+/* Removed ::before/::after caps (caused faint overlay on some devices) */
+
+  body[data-mobile-nav-open="true"] .site-shell__content {
+    transform: translateY(calc(-1 * var(--nav-scroll-offset, 0px)));
   }
 
   body[data-nav-phase="cleanup"] {
@@ -1178,7 +1200,7 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     }
   }
   /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
-  body[data-nav-phase="cleanup"] .site-shell,
+body[data-nav-phase="cleanup"] .site-shell__viewport,
   body[data-nav-phase="cleanup"] header[class*="fixed"],
   body[data-nav-phase="cleanup"] .full-bleed,
   body[data-nav-phase="cleanup"] .vr-hero,
