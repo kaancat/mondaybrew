@@ -10,25 +10,16 @@ export function useNavPhase() {
   const captureScrollSnapshot = useCallback(() => {
     if (typeof window === "undefined") return;
     const y = window.scrollY || window.pageYOffset || 0;
-    const docEl = document.documentElement;
     scrollSnapshotRef.current = {
       value: y,
-      behavior: docEl.style.scrollBehavior || "",
+      behavior: "",
     };
-    docEl.style.scrollBehavior = "auto";
     document.body.style.setProperty("--nav-scroll-offset", `${y}px`);
   }, []);
 
   const clearScrollSnapshot = useCallback(() => {
     if (typeof window === "undefined") return;
-    const { behavior } = scrollSnapshotRef.current;
     document.body.style.removeProperty("--nav-scroll-offset");
-    const docEl = document.documentElement;
-    if (behavior) {
-      docEl.style.scrollBehavior = behavior;
-    } else {
-      docEl.style.removeProperty("scroll-behavior");
-    }
     scrollSnapshotRef.current = { value: 0, behavior: "" };
   }, []);
 

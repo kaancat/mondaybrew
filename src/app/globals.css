@@ -691,9 +691,16 @@ body[data-mobile-nav-open="true"] .site-shell__viewport {
    guardrail by request. These are purely visual and do not receive events. */
 /* Removed ::before/::after caps (caused faint overlay on some devices) */
 
-  body[data-mobile-nav-open="true"] .site-shell__content {
-    transform: translateY(calc(-1 * var(--nav-scroll-offset, 0px)));
-  }
+body[data-mobile-nav-open="true"] .site-shell__content {
+  /* Snap content to the captured scroll offset immediately to avoid the
+     brief "scrolling down" animation inside the sheet on open. */
+  transform: translateY(calc(-1 * var(--nav-scroll-offset, 0px)));
+  transition: none !important;
+}
+
+body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell__content {
+  transition: none !important;
+}
 
   body[data-nav-phase="cleanup"] {
     --nav-card-border-radius: clamp(0px, var(--nav-card-radius), 0px);
