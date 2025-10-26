@@ -35,10 +35,26 @@ export function useNavPhase() {
 
   const finalizeClose = useCallback(() => {
     const body = document.body;
+    // Micro-freeze the page at the current scroll position to avoid any
+    // browser relayout that might momentarily place the document at scrollTop=0
+    // as we remove the open attribute.
+    const y = window.scrollY || window.pageYOffset || 0;
+    body.style.position = "fixed";
+    body.style.top = `-${y}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
     setMobileOpen(false);
     body.setAttribute("data-nav-phase", "cleanup");
     body.removeAttribute("data-mobile-nav-open");
     requestAnimationFrame(() => {
+      // Unfreeze and restore exact scroll position before cleaning up phase.
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      window.scrollTo({ top: y, left: 0, behavior: "auto" });
       body.removeAttribute("data-nav-phase");
       clearScrollSnapshot();
     });
