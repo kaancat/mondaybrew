@@ -236,6 +236,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { mobileOpen, onOpenChange } = useNavPhase();
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
   const [megaMenuContent, setMegaMenuContent] = useState<React.ReactNode>(null);
   const desktopNavRef = useRef<HTMLDivElement>(null);
@@ -465,12 +466,24 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 })()}
               </Link>
 
-              <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
+              <Sheet
+                open={mobileOpen}
+                onOpenChange={handleOpenChange}
+                onCloseAutoFocus={(e) => {
+                  // Prevent Radix from scrolling the page to bring the trigger
+                  // into view. We restore focus ourselves without scrolling.
+                  e.preventDefault();
+                  requestAnimationFrame(() => {
+                    triggerRef.current?.focus({ preventScroll: true });
+                  });
+                }}
+              >
                 <SheetTrigger asChild>
                   <button
                     type="button"
                     aria-label="Open menu"
                     className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                    ref={triggerRef}
                   >
                     <Menu className="size-[18px]" aria-hidden="true" />
                   </button>
