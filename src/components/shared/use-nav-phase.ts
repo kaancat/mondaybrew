@@ -35,28 +35,38 @@ export function useNavPhase() {
 
   const finalizeClose = useCallback(() => {
     const body = document.body;
-    // Micro-freeze the page at the current scroll position to avoid any
-    // browser relayout that might momentarily place the document at scrollTop=0
-    // as we remove the open attribute.
-    const y = window.scrollY || window.pageYOffset || 0;
+    const html = document.documentElement;
+    // Use the captured scroll position from when menu was opened
+    const y = scrollSnapshotRef.current.value;
+
+    // Freeze page at current position before attribute removal
     body.style.position = "fixed";
     body.style.top = `-${y}px`;
     body.style.left = "0";
     body.style.right = "0";
     body.style.width = "100%";
+
+    // Close state + remove open attribute
     setMobileOpen(false);
     body.setAttribute("data-nav-phase", "cleanup");
     body.removeAttribute("data-mobile-nav-open");
+
+    // Allow layout to settle fully: two frames
     requestAnimationFrame(() => {
-      // Unfreeze and restore exact scroll position before cleaning up phase.
-      body.style.position = "";
-      body.style.top = "";
-      body.style.left = "";
-      body.style.right = "";
-      body.style.width = "";
-      window.scrollTo({ top: y, left: 0, behavior: "auto" });
-      body.removeAttribute("data-nav-phase");
-      clearScrollSnapshot();
+      requestAnimationFrame(() => {
+        const prev = html.style.scrollBehavior || "";
+        html.style.scrollBehavior = "auto";
+        // Unfreeze and restore exact scroll instantly
+        body.style.position = "";
+        body.style.top = "";
+        body.style.left = "";
+        body.style.right = "";
+        body.style.width = "";
+        window.scrollTo({ top: y, left: 0, behavior: "auto" });
+        if (prev) html.style.scrollBehavior = prev; else html.style.removeProperty("scroll-behavior");
+        body.removeAttribute("data-nav-phase");
+        clearScrollSnapshot();
+      });
     });
   }, [clearScrollSnapshot]);
 

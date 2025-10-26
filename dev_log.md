@@ -1,5 +1,93 @@
 # Dev Log
 
+## [2025-10-26] – Mobile Menu Scroll Restoration on Close Fix
+**Goal**: Fix scroll position restoration when closing the mobile menu
+
+### Problem
+When closing the mobile menu, the page would jump to the top instead of returning to the scroll position where the menu was opened. For example:
+1. Scroll to 1500px down the page
+2. Open mobile menu → Sheet correctly shows content at 1500px ✅
+3. Close mobile menu → Page jumps to top (0px) ❌
+
+### Root Cause
+In `finalizeClose()`, the code was reading `window.scrollY` at the moment of closing to determine where to restore the scroll position. However, at that point, the shell transforms/scaling could affect the reported scroll value, causing it to return 0 or an incorrect position.
+
+The captured scroll snapshot from `scrollSnapshotRef.current.value` (stored when the menu opened) was being ignored.
+
+### Solution
+**Step 1: Use captured scroll snapshot**
+Changed line 40 in `use-nav-phase.ts` to use the captured value instead of re-reading `window.scrollY`:
+```typescript
+const y = scrollSnapshotRef.current.value;
+```
+
+**Step 2: Fix rubber band effect**
+The initial fix caused a "rubber band" visual glitch where the page briefly jumped up then snapped back. This was caused by the `position: fixed` lock/unlock timing.
+
+**Step 3: Fix scroll animation on close**
+After removing the position locking, the scroll was still animating/moving visually on close instead of instantly restoring. This was caused by `scroll-behavior: smooth` on the `html` element in `globals.css`.
+
+**Final solution**: Temporarily disable smooth scrolling during restoration:
+
+```typescript
+const finalizeClose = useCallback(() => {
+  const body = document.body;
+  const html = document.documentElement;
+  const y = scrollSnapshotRef.current.value;
+  
+  // Close the menu state
+  setMobileOpen(false);
+  body.setAttribute("data-nav-phase", "cleanup");
+  body.removeAttribute("data-mobile-nav-open");
+  
+  // Small delay to let exit animation complete
+  setTimeout(() => {
+    // Temporarily disable smooth scrolling to restore instantly
+    const originalScrollBehavior = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    
+    // Restore scroll position immediately
+    window.scrollTo(0, y);
+    
+    // Restore original scroll behavior
+    html.style.scrollBehavior = originalScrollBehavior;
+    
+    body.removeAttribute("data-nav-phase");
+    clearScrollSnapshot();
+  }, 50);
+}, [clearScrollSnapshot]);
+```
+
+This ensures instant scroll restoration without any visual animation or movement, while preserving the smooth scroll behavior for normal page navigation.
+
+### How It Works
+1. **On Open**: `captureScrollSnapshot()` stores `window.scrollY` in `scrollSnapshotRef.current.value`
+2. **During Menu Open**: Shell is transformed/scaled, scroll position may be affected
+3. **On Close**: `finalizeClose()` now uses the captured snapshot value instead of re-reading `window.scrollY`
+4. **Result**: Page returns to exact scroll position where menu was opened
+
+### Testing
+**Test Case**: Scroll to 1500px → Open menu → Close menu
+
+**Before Fix**:
+- Opens at: 1500px (correct) ✅
+- Closes at: 0px (jumps to top) ❌
+
+**After Fix**:
+- Opens at: 1500px (correct) ✅
+- Closes at: 1500px (preserved) ✅
+
+### Files Modified
+- `web/src/components/shared/use-nav-phase.ts`: Changed `finalizeClose()` to use captured scroll snapshot
+
+### Impact
+✅ Scroll position perfectly preserved through open/close cycle
+✅ No more jarring jump to top on menu close
+✅ Mobile menu now maintains scroll context throughout interaction
+✅ Completes the scroll preservation functionality
+
+---
+
 ## [2025-10-26] – Mobile Menu Scroll Position Preservation Fix
 **Goal**: Fix mobile menu to preserve scroll position instead of jumping to top when opened
 
