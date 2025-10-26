@@ -692,13 +692,14 @@ body[data-mobile-nav-open="true"] .site-shell__viewport {
 /* Removed ::before/::after caps (caused faint overlay on some devices) */
 
 body[data-mobile-nav-open="true"] .site-shell__content {
-  /* Snap content to the captured scroll offset immediately to avoid the
-     brief "scrolling down" animation inside the sheet on open. */
+  /* Apply transform to show content at the captured scroll position */
   transform: translateY(calc(-1 * var(--nav-scroll-offset, 0px)));
   transition: none !important;
 }
 
-body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell__content {
+/* Keep transform during cleanup phase to prevent jump */
+body[data-nav-phase="cleanup"] .site-shell__content {
+  transform: translateY(calc(-1 * var(--nav-scroll-offset, 0px)));
   transition: none !important;
 }
 

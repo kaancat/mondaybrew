@@ -95,7 +95,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
   // (removed) gridCols helper not used after mobile redesign
 
   return (
-    <div ref={sectionRef} className="flex flex-col gap-[var(--flow-space)]">
+    <div ref={sectionRef} className="relative flex flex-col gap-[var(--flow-space)]">
       <motion.div
         variants={headlineVariants}
         initial="hidden"

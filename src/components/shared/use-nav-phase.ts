@@ -36,37 +36,35 @@ export function useNavPhase() {
   const finalizeClose = useCallback(() => {
     const body = document.body;
     const html = document.documentElement;
-    // Use the captured scroll position from when menu was opened
+    // Use ONLY the captured scroll position from when menu was opened
     const y = scrollSnapshotRef.current.value;
 
-    // Freeze page at current position before attribute removal
-    body.style.position = "fixed";
-    body.style.top = `-${y}px`;
-    body.style.left = "0";
-    body.style.right = "0";
-    body.style.width = "100%";
-
-    // Close state + remove open attribute
+    // Close the menu state
     setMobileOpen(false);
     body.setAttribute("data-nav-phase", "cleanup");
+    
+    // Remove the attribute but DON'T clear the CSS variable yet
+    // This keeps the transform on the content
     body.removeAttribute("data-mobile-nav-open");
-
-    // Allow layout to settle fully: two frames
+    
+    // Wait for the next frame, then restore scroll and clear transform together
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const prev = html.style.scrollBehavior || "";
-        html.style.scrollBehavior = "auto";
-        // Unfreeze and restore exact scroll instantly
-        body.style.position = "";
-        body.style.top = "";
-        body.style.left = "";
-        body.style.right = "";
-        body.style.width = "";
-        window.scrollTo({ top: y, left: 0, behavior: "auto" });
-        if (prev) html.style.scrollBehavior = prev; else html.style.removeProperty("scroll-behavior");
-        body.removeAttribute("data-nav-phase");
-        clearScrollSnapshot();
-      });
+      // Disable smooth scrolling
+      const prevBehavior = html.style.scrollBehavior || "";
+      html.style.scrollBehavior = "auto";
+      
+      // Clear the CSS variable (removes transform) and restore scroll in same operation
+      clearScrollSnapshot();
+      window.scrollTo(0, y);
+      
+      // Re-enable smooth scrolling
+      if (prevBehavior) {
+        html.style.scrollBehavior = prevBehavior;
+      } else {
+        html.style.removeProperty("scroll-behavior");
+      }
+      
+      body.removeAttribute("data-nav-phase");
     });
   }, [clearScrollSnapshot]);
 
