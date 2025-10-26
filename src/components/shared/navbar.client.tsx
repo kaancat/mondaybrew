@@ -466,18 +466,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 })()}
               </Link>
 
-              <Sheet
-                open={mobileOpen}
-                onOpenChange={handleOpenChange}
-                onCloseAutoFocus={(e) => {
-                  // Prevent Radix from scrolling the page to bring the trigger
-                  // into view. We restore focus ourselves without scrolling.
-                  e.preventDefault();
-                  requestAnimationFrame(() => {
-                    triggerRef.current?.focus({ preventScroll: true });
-                  });
-                }}
-              >
+              <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
                 <SheetTrigger asChild>
                   <button
                     type="button"
@@ -491,6 +480,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <SheetContent
                   side="left"
                   hideCloseButton
+                  onCloseAutoFocus={(e) => {
+                    // Prevent Radix from scrolling the trigger into view.
+                    e.preventDefault();
+                    requestAnimationFrame(() => {
+                      triggerRef.current?.focus({ preventScroll: true });
+                    });
+                  }}
                   className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
                 >
                   {/* Accessibility: satisfy Radix requirements without changing visuals */}
