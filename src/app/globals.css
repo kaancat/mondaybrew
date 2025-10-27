@@ -607,7 +607,7 @@ body[data-mobile-nav-open="true"] {
 
   /* Exiting phase: keep 'open' but return tokens to closed-state so removing
      the attribute does not trigger another width/margin transition */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
+body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
     --site-shell-offset-x: 0px;
     --site-shell-scale: 1;
     --nav-card-offset-y: 0px;
@@ -618,7 +618,9 @@ body[data-mobile-nav-open="true"] {
     --nav-card-background: var(--background);
     --nav-card-height: var(--nav-viewport-height);
     --nav-card-margin-block: 0;
-  }
+    /* Avoid visible top/bottom gap while reversing geometry */
+    --nav-card-inset: 0px;
+}
 body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell__viewport {
     /* Ensure mirrored geometry: keep origin consistent while reversing */
     transform-origin: left calc(var(--nav-viewport-height) / 2) !important;

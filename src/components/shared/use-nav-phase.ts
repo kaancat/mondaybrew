@@ -90,12 +90,18 @@ export function useNavPhase() {
       const settle = () => {
         if (settled) return;
         settled = true;
-        shell.removeEventListener("transitionend", settle);
-        shell.removeEventListener("transitioncancel", settle);
+        shell.removeEventListener("transitionend", onEnd);
         finalizeClose();
       };
-      shell.addEventListener("transitionend", settle);
-      shell.addEventListener("transitioncancel", settle);
+      // Only settle when the viewport shell's transform transition finishes
+      const onEnd = (e: Event) => {
+        const te = e as TransitionEvent;
+        if (te.target === shell && te.propertyName === "transform") {
+          settle();
+        }
+      };
+      shell.addEventListener("transitionend", onEnd);
+      // Fallback in case event is missed
       setTimeout(settle, EXIT_FALLBACK_MS);
     } else {
       finalizeClose();
