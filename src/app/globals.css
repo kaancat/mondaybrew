@@ -737,16 +737,19 @@ body[data-nav-phase="cleanup"] .site-shell__content {
     display: flex;
     align-items: stretch;
     height: var(--nav-viewport-height);
-    /* Keep panel to intended drawer width; prevents it from sitting invisibly
-       under the scaled viewport on some devices. */
-    width: var(--mobile-nav-width);
+    /* Ensure drawer does not span full width from Tailwind's inset-0 + w-screen */
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    width: var(--mobile-nav-width) !important;
     max-width: none;
     padding: 0;
     /* Disable exit animation by default; we add transitions only while open */
     transition: none;
     /* Panel below shell to show the rounded card */
     z-index: 55 !important;
-    position: relative;
     /* Default hidden so brief attribute gaps don't flash content */
     transform: translateX(-100%);
     opacity: 0;
