@@ -15,6 +15,7 @@ import TestimonialsMarquee, { type TestimonialsMarqueeData } from "@/components/
 import { TextImageSection, type TextImageSectionData } from "@/components/sections/text-image";
 import { TextOnlySection, type TextOnlySectionData } from "@/components/sections/text-only";
 import { Section } from "@/components/layout/section";
+import MediaShowcaseSection, { type MediaShowcaseSectionData } from "@/components/sections/media-showcase";
 
 type SiteSettings = { seo?: Seo };
 
@@ -66,6 +67,7 @@ type AboutSectionWithType = AboutSectionData & { _type: "aboutSection"; _key?: s
 type TestimonialsWithType = TestimonialsMarqueeData & { _type: "testimonialsMarquee"; _key?: string };
 type TextImageSectionWithType = TextImageSectionData & { _type: "textImage"; _key?: string };
 type TextOnlySectionWithType = TextOnlySectionData & { _type: "textOnly"; _key?: string };
+type MediaShowcaseWithType = MediaShowcaseSectionData & { _type: "mediaShowcase"; _key?: string };
 type HomePageSection =
   | HeroSectionWithType
   | ServicesSplitSectionWithType
@@ -75,6 +77,7 @@ type HomePageSection =
   | TestimonialsWithType
   | TextImageSectionWithType
   | TextOnlySectionWithType
+  | MediaShowcaseWithType
   | { _type?: string; _key?: string };
 
 type HomePagePayload = {
@@ -108,6 +111,10 @@ function isTextImageSection(section: HomePageSection | undefined): section is Te
 
 function isTextOnlySection(section: HomePageSection | undefined): section is TextOnlySectionWithType {
   return !!section && section._type === "textOnly";
+}
+
+function isMediaShowcase(section: HomePageSection | undefined): section is MediaShowcaseWithType {
+  return !!section && section._type === "mediaShowcase";
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -256,6 +263,22 @@ export default async function Home() {
                 speedBottom={section.speedBottom}
                 top={section.top}
                 bottom={section.bottom}
+              />
+            </div>
+          );
+        }
+
+        if (isMediaShowcase(section)) {
+          return (
+            <div className="vr-section" key={key}>
+              <MediaShowcaseSection
+                sectionId={section.sectionId}
+                eyebrow={section.eyebrow}
+                headline={section.headline}
+                alignment={section.alignment}
+                cta={section.cta}
+                media={section.media}
+                stats={section.stats}
               />
             </div>
           );
