@@ -67,9 +67,10 @@ export default function RootLayout({
           <GA />
           {/* Lightweight on-page nav debugger; only renders when URL contains ?navdebug=1 */}
           <NavDebug />
-          <Navbar />
           <div className="site-shell">
             <div className="site-shell__viewport">
+              {/* Move header inside the viewport so it travels with the card */}
+              <Navbar />
               <div className="site-shell__content">
                 {children}
                 <Footer />
