@@ -236,7 +236,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { mobileOpen, onOpenChange } = useNavPhase();
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
   const [megaMenuContent, setMegaMenuContent] = useState<React.ReactNode>(null);
   const desktopNavRef = useRef<HTMLDivElement>(null);
@@ -471,8 +470,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   <button
                     type="button"
                     aria-label="Open menu"
-                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                    ref={triggerRef}
+                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-link-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                   >
                     <Menu className="size-[18px]" aria-hidden="true" />
                   </button>
@@ -480,13 +478,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <SheetContent
                   side="left"
                   hideCloseButton
-                  onCloseAutoFocus={(e) => {
-                    // Prevent Radix from scrolling the trigger into view.
-                    e.preventDefault();
-                    requestAnimationFrame(() => {
-                      triggerRef.current?.focus({ preventScroll: true });
-                    });
-                  }}
                   className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
                 >
                   {/* Accessibility: satisfy Radix requirements without changing visuals */}
