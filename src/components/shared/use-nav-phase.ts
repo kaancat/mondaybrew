@@ -93,7 +93,7 @@ export function useNavPhase() {
         shell.removeEventListener("transitionend", onEnd);
         finalizeClose();
       };
-      // Only settle when the viewport shell's transform transition finishes
+      // Only treat the viewport shell transform ending as the close signal
       const onEnd = (e: Event) => {
         const te = e as TransitionEvent;
         if (te.target === shell && te.propertyName === "transform") {
@@ -101,7 +101,7 @@ export function useNavPhase() {
         }
       };
       shell.addEventListener("transitionend", onEnd);
-      // Fallback in case event is missed
+      // Fallback in case the transition event is missed
       setTimeout(settle, EXIT_FALLBACK_MS);
     } else {
       finalizeClose();
