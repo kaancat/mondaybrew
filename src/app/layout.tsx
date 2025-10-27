@@ -5,7 +5,6 @@ import { heywow, sailec } from "@/fonts";
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
 import { GA } from "@/components/shared/ga";
-import NavDebug from "@/components/dev/nav-debug.client";
 import { JsonLd } from "@/components/shared/json-ld";
 import { jsonLd } from "@/lib/jsonld";
 import { ThemeProvider } from "@/components/shared/theme-provider";
@@ -37,16 +36,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const buildSha = (process.env.VERCEL_GIT_COMMIT_SHA || "dev").slice(0, 7);
-  const vercelEnv = process.env.VERCEL_ENV || process.env.NODE_ENV || "development";
   return (
     <html lang="da" suppressHydrationWarning>
-      <body
-        className={`${sailec.variable} ${heywow.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning
-        data-build-sha={buildSha}
-        data-build-env={vercelEnv}
-      >
+      <body className={`${sailec.variable} ${heywow.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <ThemeProvider>
           {process.env.NEXT_PUBLIC_DUMP_TOKENS === "1" ? <TokenDump /> : null}
           <JsonLd
@@ -65,17 +57,10 @@ export default function RootLayout({
             })}
           />
           <GA />
-          {/* Lightweight on-page nav debugger; only renders when URL contains ?navdebug=1 */}
-          <NavDebug />
+          <Navbar />
           <div className="site-shell">
-            <div className="site-shell__viewport">
-              {/* Move header inside the viewport so it travels with the card */}
-              <Navbar />
-              <div className="site-shell__content">
-                {children}
-                <Footer />
-              </div>
-            </div>
+            {children}
+            <Footer />
           </div>
         </ThemeProvider>
       </body>

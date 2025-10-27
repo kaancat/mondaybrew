@@ -1,72 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useNavPhase() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const EXIT_FALLBACK_MS = 480;
-  const scrollSnapshotRef = useRef<{ value: number; behavior: string }>({ value: 0, behavior: "" });
-
-  const captureScrollSnapshot = useCallback(() => {
-    if (typeof window === "undefined") return;
-    const y = window.scrollY || window.pageYOffset || 0;
-    scrollSnapshotRef.current = {
-      value: y,
-      behavior: "",
-    };
-    document.body.style.setProperty("--nav-scroll-offset", `${y}px`);
-  }, []);
-
-  const clearScrollSnapshot = useCallback(() => {
-    if (typeof window === "undefined") return;
-    document.body.style.removeProperty("--nav-scroll-offset");
-    scrollSnapshotRef.current = { value: 0, behavior: "" };
-  }, []);
 
   // Cleanup on unmount (defensive)
   useEffect(() => {
     return () => {
       if (typeof document === "undefined") return;
-      clearScrollSnapshot();
       document.body.removeAttribute("data-mobile-nav-open");
       document.body.removeAttribute("data-nav-phase");
     };
-  }, [clearScrollSnapshot]);
+  }, []);
 
   const finalizeClose = useCallback(() => {
     const body = document.body;
-    const html = document.documentElement;
-    // Use ONLY the captured scroll position from when menu was opened
-    const y = scrollSnapshotRef.current.value;
-
-    // Close the menu state
     setMobileOpen(false);
     body.setAttribute("data-nav-phase", "cleanup");
-    
-    // Remove the attribute but DON'T clear the CSS variable yet
-    // This keeps the transform on the content
     body.removeAttribute("data-mobile-nav-open");
-    
-    // Wait for the next frame, then restore scroll and clear transform together
     requestAnimationFrame(() => {
-      // Disable smooth scrolling
-      const prevBehavior = html.style.scrollBehavior || "";
-      html.style.scrollBehavior = "auto";
-      
-      // Clear the CSS variable (removes transform) and restore scroll in same operation
-      clearScrollSnapshot();
-      window.scrollTo(0, y);
-      
-      // Re-enable smooth scrolling
-      if (prevBehavior) {
-        html.style.scrollBehavior = prevBehavior;
-      } else {
-        html.style.removeProperty("scroll-behavior");
-      }
-      
       body.removeAttribute("data-nav-phase");
     });
-  }, [clearScrollSnapshot]);
+  }, []);
 
   const onOpenChange = useCallback((open: boolean) => {
     if (typeof document === "undefined") return;
@@ -74,7 +31,6 @@ export function useNavPhase() {
 
     if (open) {
       setMobileOpen(true);
-      captureScrollSnapshot();
       body.setAttribute("data-mobile-nav-open", "true");
       body.removeAttribute("data-nav-phase");
       return;
@@ -84,29 +40,23 @@ export function useNavPhase() {
     body.setAttribute("data-nav-phase", "exiting");
     setMobileOpen(true);
 
-    const shell = document.querySelector<HTMLElement>(".site-shell__viewport");
+    const shell = document.querySelector<HTMLElement>(".site-shell");
     if (shell) {
       let settled = false;
       const settle = () => {
         if (settled) return;
         settled = true;
-        shell.removeEventListener("transitionend", onEnd);
+        shell.removeEventListener("transitionend", settle);
+        shell.removeEventListener("transitioncancel", settle);
         finalizeClose();
       };
-      // Only treat the viewport shell transform ending as the close signal
-      const onEnd = (e: Event) => {
-        const te = e as TransitionEvent;
-        if (te.target === shell && te.propertyName === "transform") {
-          settle();
-        }
-      };
-      shell.addEventListener("transitionend", onEnd);
-      // Fallback in case the transition event is missed
+      shell.addEventListener("transitionend", settle);
+      shell.addEventListener("transitioncancel", settle);
       setTimeout(settle, EXIT_FALLBACK_MS);
     } else {
       finalizeClose();
     }
-  }, [EXIT_FALLBACK_MS, captureScrollSnapshot, finalizeClose]);
+  }, [EXIT_FALLBACK_MS, finalizeClose]);
 
   return { mobileOpen, onOpenChange } as const;
 }

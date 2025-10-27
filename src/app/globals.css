@@ -62,7 +62,6 @@
   --nav-card-background: var(--background);
   --nav-card-height: var(--nav-viewport-height);
   --nav-card-margin-block: 0;
-  --nav-scroll-offset: 0px;
 
   --layout-max: 86.5rem; /* ~1384px */
   --layout-tight: 60rem; /* ~960px */
@@ -587,7 +586,8 @@ html.dark {
     font-family: var(--font-body);
   }
 
-body[data-mobile-nav-open="true"] {
+  body[data-mobile-nav-open="true"] {
+    overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 0.9;
     --nav-card-inset: clamp(14px, 4vw, 24px);
@@ -600,14 +600,14 @@ body[data-mobile-nav-open="true"] {
     --nav-card-pointer: none;
     --nav-card-background: transparent;
     --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
-    --nav-card-margin-block: var(--nav-card-inset);
-}
+    --nav-card-margin-block: 0;
+  }
 
   /* Body::before overlay removed — rely on Radix Sheet overlay only */
 
   /* Exiting phase: keep 'open' but return tokens to closed-state so removing
      the attribute does not trigger another width/margin transition */
-body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
     --site-shell-offset-x: 0px;
     --site-shell-scale: 1;
     --nav-card-offset-y: 0px;
@@ -618,13 +618,10 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
     --nav-card-background: var(--background);
     --nav-card-height: var(--nav-viewport-height);
     --nav-card-margin-block: 0;
-    /* Remove the fixed inset during the exit transition to avoid a visible top gap
-       and ensure the viewport snaps back without a jump when attributes clear. */
-    --nav-card-inset: 0px;
-}
-body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell__viewport {
+  }
+  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
     /* Ensure mirrored geometry: keep origin consistent while reversing */
-    transform-origin: left calc(var(--nav-viewport-height) / 2) !important;
+    transform-origin: left center !important;
   }
   /* Exiting: keep 'open' while reversing geometry and restoring presentation */
 
@@ -639,77 +636,42 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell__viewpor
     opacity: 0;
   }
 
-.site-shell {
+  .site-shell {
     position: relative;
     z-index: 50;
-    background: var(--background);
-  }
-
-  /* Raise the shell stacking context above the panel while menu is open,
-     so the scaled page (viewport) visually sits on top, as designed. */
-  body[data-mobile-nav-open="true"] .site-shell {
-    z-index: 60;
-  }
-
-  .site-shell__viewport {
-    position: relative;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease), clip-path var(--nav-anim-duration) var(--nav-anim-ease);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
+    /* Avoid creating a new containing block when nav is closed */
+    transform: none;
     border-radius: clamp(0px, var(--nav-card-radius), 0px);
     box-shadow: none;
     overflow: visible;
     pointer-events: auto;
-    margin-block: 0;
-    /* Removing contain avoids WebKit paint/stacking quirks on iOS when combined
-       with fixed positioning + transforms. Keep transitions smooth via will-change. */
-    will-change: transform;
-  }
-
-  .site-shell__content {
-    position: relative;
+    background: var(--background);
+    /* Allow page to grow naturally while nav is closed to avoid dvh-driven jumps */
     min-height: var(--nav-viewport-height);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease);
+    height: auto;
+    margin-block: 0;
   }
 
-body[data-mobile-nav-open="true"] .site-shell__viewport {
-  position: fixed;
-  top: var(--nav-card-inset);
-  bottom: var(--nav-card-inset);
-  left: 0;
-  right: 0;
-  transform-origin: left calc(var(--nav-viewport-height) / 2);
-  transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
-  border-radius: var(--nav-card-border-radius);
-  /* Visually crop top/bottom to create the floating card silhouette (Safari-safe) */
-  -webkit-clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
-  clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
-  box-shadow: var(--nav-card-box-shadow);
-  overflow: hidden;
-  height: auto;
-  margin-block: 0;
-  z-index: 60;
-  pointer-events: var(--nav-card-pointer);
-  background: var(--nav-card-background);
-}
+  body[data-mobile-nav-open="true"] .site-shell {
+    transform-origin: left center !important;
+    /* Apply transform only while mobile nav is open */
+    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
+    border-radius: var(--nav-card-border-radius);
+    box-shadow: var(--nav-card-box-shadow);
+    overflow: var(--nav-card-overflow);
+    height: var(--nav-card-height);
+    margin-block: var(--nav-card-margin-block);
+    z-index: 60;
+    pointer-events: var(--nav-card-pointer);
+    background: var(--nav-card-background);
 
-/* Visual caps (top/bottom) to guarantee rounded card silhouette regardless of
-   document scroll position. This overrides the earlier "no ::before overlay"
-   guardrail by request. These are purely visual and do not receive events. */
-/* Removed ::before/::after caps (caused faint overlay on some devices) */
-
-body[data-mobile-nav-open="true"] .site-shell__content {
-  /* Apply transform to show content at the captured scroll position */
-  transform: translateY(calc(-1 * var(--nav-scroll-offset, 0px)));
-  transition: none !important;
-}
-
-/* Keep transform during cleanup phase to prevent jump */
-body[data-nav-phase="cleanup"] .site-shell__content {
-  transform: translateY(calc(-1 * var(--nav-scroll-offset, 0px)));
-  transition: none !important;
-}
+    /* Remove isolation to prevent stacking context issues */
+    contain: layout style paint;
+  }
 
   body[data-nav-phase="cleanup"] {
     --nav-card-border-radius: clamp(0px, var(--nav-card-radius), 0px);
@@ -740,19 +702,14 @@ body[data-nav-phase="cleanup"] .site-shell__content {
     display: flex;
     align-items: stretch;
     height: var(--nav-viewport-height);
-    /* Ensure drawer does not span full width from Tailwind's inset-0 + w-screen */
-    position: fixed !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: auto !important;
-    width: var(--mobile-nav-width) !important;
+    width: 100vw;
     max-width: none;
     padding: 0;
     /* Disable exit animation by default; we add transitions only while open */
     transition: none;
     /* Panel below shell to show the rounded card */
     z-index: 55 !important;
+    position: relative;
     /* Default hidden so brief attribute gaps don't flash content */
     transform: translateX(-100%);
     opacity: 0;
@@ -786,9 +743,7 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
   }
 
   [data-slot="sheet-overlay"] {
-    /* Use the design token so interactions don’t bleed through during animation
-       and to avoid brief ‘blink’ artifacts on some engines. */
-    background: var(--mobile-nav-overlay) !important;
+    background: transparent !important;
     pointer-events: auto;
     /* Disable exit animation by default */
     transition: none;
@@ -1210,14 +1165,20 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     margin-block-start: var(--flow-space);
   }
 }
-  /* Keep header stationary and visible while menu is open (matches local sheet look) */
+  /* Keep header stationary; do not add extra transform on open */
   body[data-mobile-nav-open="true"] header[class*="fixed"] {
     transform: none !important;
     transition: none !important;
-    display: block !important;
+  }
+
+  /* Mobile only: hide header only while menu is fully open; show it during exiting for instant return */
+  @media (max-width: 767px) {
+    body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) header[class*="fixed"] {
+      display: none !important;
+    }
   }
   /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
-body[data-nav-phase="cleanup"] .site-shell__viewport,
+  body[data-nav-phase="cleanup"] .site-shell,
   body[data-nav-phase="cleanup"] header[class*="fixed"],
   body[data-nav-phase="cleanup"] .full-bleed,
   body[data-nav-phase="cleanup"] .vr-hero,
