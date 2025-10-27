@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // Ensure dev and Vercel use the same project root for file tracing
+  outputFileTracingRoot: path.resolve(__dirname),
   images: {
     remotePatterns: [
       {
