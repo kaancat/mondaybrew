@@ -682,6 +682,9 @@ body[data-mobile-nav-open="true"] .site-shell__viewport {
   transform-origin: left calc(var(--nav-viewport-height) / 2);
   transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
   border-radius: var(--nav-card-border-radius);
+  /* Visually crop top/bottom to create the floating card silhouette (Safari-safe) */
+  -webkit-clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
+  clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
   box-shadow: var(--nav-card-box-shadow);
   overflow: hidden;
   height: auto;
@@ -1207,17 +1210,11 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     margin-block-start: var(--flow-space);
   }
 }
-  /* Keep header stationary; do not add extra transform on open */
+  /* Keep header stationary and visible while menu is open (matches local sheet look) */
   body[data-mobile-nav-open="true"] header[class*="fixed"] {
     transform: none !important;
     transition: none !important;
-  }
-
-  /* Mobile only: hide header only while menu is fully open; show it during exiting for instant return */
-  @media (max-width: 767px) {
-    body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) header[class*="fixed"] {
-      display: none !important;
-    }
+    display: block !important;
   }
   /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
 body[data-nav-phase="cleanup"] .site-shell__viewport,
