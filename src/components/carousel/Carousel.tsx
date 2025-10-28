@@ -6,11 +6,17 @@ import type { EmblaOptionsType, EmblaCarouselType } from "embla-carousel";
 
 type CarouselProps = React.PropsWithChildren<{
   options?: EmblaOptionsType;
-  className?: string;
+  className?: string; // viewport wrapper
   onReady?: (api: EmblaCarouselType) => void;
   /** Pause drag/autoplay when mobile drawer is open (reads body[data-mobile-nav-open]) */
   pauseOnDrawer?: boolean;
-}>;
+  /** Optional extra class for the inner container (track) */
+  containerClassName?: string;
+  /** Optional styles to apply to viewport wrapper */
+  viewportStyle?: React.CSSProperties;
+  /** Optional styles to apply to the inner track container */
+  containerStyle?: React.CSSProperties;
+}>; 
 
 type Ctx = {
   api: EmblaCarouselType | null;
@@ -22,7 +28,7 @@ export function useCarouselApi() {
   return useContext(CarouselCtx).api;
 }
 
-export function Carousel({ options, className, children, onReady, pauseOnDrawer = true }: CarouselProps) {
+export function Carousel({ options, className, viewportStyle, containerClassName, containerStyle, children, onReady, pauseOnDrawer = true }: CarouselProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const mergedOptions = useMemo<EmblaOptionsType>(() => ({ loop: true, align: "start", containScroll: "trimSnaps", ...(options || {}) }), [options]);
   const [emblaRef, emblaApi] = useEmblaCarousel(mergedOptions);
@@ -56,8 +62,8 @@ export function Carousel({ options, className, children, onReady, pauseOnDrawer 
 
   return (
     <CarouselCtx.Provider value={{ api: emblaApi ?? null }}>
-      <div ref={(node) => { viewportRef.current = node; emblaRef(node as HTMLDivElement); }} className={className}>
-        <div className="embla__container flex">
+      <div ref={(node) => { viewportRef.current = node; emblaRef(node as HTMLDivElement); }} className={className} style={viewportStyle}>
+        <div className={"embla__container flex " + (containerClassName ?? "")} style={containerStyle}>
           {children}
         </div>
       </div>

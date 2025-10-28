@@ -85,6 +85,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         <Carousel
           options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
           className="overflow-hidden"
+          // Peek pattern: viewport gets right padding, container gets negative right margin
+          viewportStyle={{ paddingRight: "var(--peek, 0px)" }}
+          containerStyle={{ marginRight: "calc(var(--peek, 0px) * -1)", gap: "var(--gap, 24px)" }}
           onReady={(embla) => {
             // Scroll to initial index on mount
             const snap = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
@@ -97,6 +100,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
               setCanNext(embla.canScrollNext());
             };
             embla.on("select", onSelect);
+            embla.on("scroll", onSelect);
             embla.on("reInit", onSelect);
             // Initial edge states
             setCanPrev(embla.canScrollPrev());
