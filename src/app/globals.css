@@ -621,7 +621,7 @@ html.dark {
   }
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
     /* Ensure mirrored geometry: keep origin consistent while reversing */
-    transform-origin: left center !important;
+    transform-origin: left top !important;
   }
   /* Exiting: keep 'open' while reversing geometry and restoring presentation */
 
@@ -642,7 +642,7 @@ html.dark {
     min-height: var(--nav-viewport-height);
     background: var(--background);
     transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
-    transform-origin: left center;
+    transform-origin: left top;
     /* Avoid creating a new containing block when nav is closed */
     transform: none;
     border-radius: clamp(0px, var(--nav-card-radius), 0px);
@@ -657,7 +657,7 @@ html.dark {
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
-    transform-origin: left center !important;
+    transform-origin: left top !important;
     /* Apply transform only while mobile nav is open */
     transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
     border-radius: var(--nav-card-border-radius);
@@ -667,6 +667,9 @@ html.dark {
     z-index: 60;
     pointer-events: var(--nav-card-pointer);
     background: var(--nav-card-background);
+    /* Static visual mask for card silhouette (no animation) */
+    -webkit-clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-radius));
+    clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-radius));
 
     /* Remove isolation to prevent stacking context issues */
     contain: layout style paint;
