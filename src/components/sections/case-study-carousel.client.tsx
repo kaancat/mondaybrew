@@ -85,9 +85,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         <Carousel
           options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
           className="overflow-hidden"
-          // Peek pattern: viewport gets right padding, container gets negative right margin
-          viewportStyle={{ paddingRight: "var(--peek, 0px)" }}
-          containerStyle={{ marginRight: "calc(var(--peek, 0px) * -1)", gap: "var(--gap, 24px)" }}
+          // Full-width layout, but allow box-shadow breathing room on the right
+          viewportStyle={{ paddingRight: "36px" }}
+          containerStyle={{ marginRight: "-36px", gap: "var(--gap, 24px)" }}
           onReady={(embla) => {
             // Scroll to initial index on mount
             const snap = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
@@ -108,7 +108,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           }}
         >
           {items.map((item, i) => {
-            const widthExpr = "calc((100% - var(--peek, 0px) - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
+            const widthExpr = "calc((100% - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
             return (
             <Slide key={item._id || i}
               className="px-0"
@@ -128,11 +128,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       <div className="mt-6 flex items-center justify-end gap-2">
         <button
           type="button"
-          onClick={() => {
-            const api = apiRef.current; if (!api) return;
-            const sel = api.selectedScrollSnap();
-            api.scrollTo(Math.max(0, sel - perView));
-          }}
+          onClick={() => apiRef.current?.scrollPrev()}
           disabled={!canPrev}
           aria-label="Scroll left"
           className={cn(
@@ -146,11 +142,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         </button>
         <button
           type="button"
-          onClick={() => {
-            const api = apiRef.current; if (!api) return;
-            const sel = api.selectedScrollSnap();
-            api.scrollTo(Math.min(api.scrollSnapList().length - 1, sel + perView));
-          }}
+          onClick={() => apiRef.current?.scrollNext()}
           disabled={!canNext}
           aria-label="Scroll right"
           className={cn(
