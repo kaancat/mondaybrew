@@ -11,11 +11,14 @@ export function useNavPhase() {
     if (typeof window === "undefined") return;
     const y = window.scrollY || window.pageYOffset || 0;
     scrollSnapshotRef.current = { value: y };
+    // Set CSS variable so the card shows current scroll position
+    document.body.style.setProperty("--nav-scroll-offset", `${y}px`);
   }, []);
 
   const clearScrollSnapshot = useCallback(() => {
     if (typeof window === "undefined") return;
     scrollSnapshotRef.current = { value: 0 };
+    document.body.style.removeProperty("--nav-scroll-offset");
   }, []);
 
   // Cleanup on unmount (defensive)
@@ -30,29 +33,31 @@ export function useNavPhase() {
 
   const finalizeClose = useCallback(() => {
     const body = document.body;
-    const html = document.documentElement;
     // Use the captured scroll position from when menu was opened
     const y = scrollSnapshotRef.current.value;
+    
+    // Micro-freeze: Lock the page at current position to prevent any flash
+    body.style.position = "fixed";
+    body.style.top = `-${y}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
     
     setMobileOpen(false);
     body.setAttribute("data-nav-phase", "cleanup");
     body.removeAttribute("data-mobile-nav-open");
     
-    // Small delay to let exit animation complete
-    setTimeout(() => {
-      // Temporarily disable smooth scrolling to restore instantly
-      const originalScrollBehavior = html.style.scrollBehavior;
-      html.style.scrollBehavior = 'auto';
-      
-      // Restore scroll position immediately
-      window.scrollTo(0, y);
-      
-      // Restore original scroll behavior
-      html.style.scrollBehavior = originalScrollBehavior;
-      
+    requestAnimationFrame(() => {
+      // Unfreeze and restore exact scroll position
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      window.scrollTo({ top: y, left: 0, behavior: "auto" });
       body.removeAttribute("data-nav-phase");
       clearScrollSnapshot();
-    }, 50);
+    });
   }, [clearScrollSnapshot]);
 
   const onOpenChange = useCallback((open: boolean) => {
