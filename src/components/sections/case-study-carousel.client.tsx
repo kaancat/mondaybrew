@@ -105,6 +105,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             // Initial edge states
             setCanPrev(embla.canScrollPrev());
             setCanNext(embla.canScrollNext());
+            // Dev aid: expose for quick console testing (cleared on unmount)
+            (window as unknown as { __emblaCase?: typeof embla }).__emblaCase = embla;
           }}
         >
           {items.map((item, i) => {
@@ -128,7 +130,10 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       <div className="mt-6 flex items-center justify-end gap-2">
         <button
           type="button"
-          onClick={() => apiRef.current?.scrollPrev()}
+          onClick={() => {
+            const api = apiRef.current; if (!api) return;
+            api.scrollTo(Math.max(0, api.selectedScrollSnap() - 1));
+          }}
           disabled={!canPrev}
           aria-label="Scroll left"
           className={cn(
@@ -142,7 +147,11 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         </button>
         <button
           type="button"
-          onClick={() => apiRef.current?.scrollNext()}
+          onClick={() => {
+            const api = apiRef.current; if (!api) return;
+            const last = api.scrollSnapList().length - 1;
+            api.scrollTo(Math.min(last, api.selectedScrollSnap() + 1));
+          }}
           disabled={!canNext}
           aria-label="Scroll right"
           className={cn(
