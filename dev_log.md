@@ -117,6 +117,96 @@ window.panelTest = {
 
 ---
 
+## [2025-10-28] – CRITICAL: Fix Page Scroll Jump on Menu Open (Regression)
+**Goal**: Fix page scrolling to top when opening the mobile menu (regression from Oct 27 baseline restore)
+
+### Problem Discovery
+After deploying the panel scroll fix, testing revealed the PAGE itself was still scrolling to top when opening the menu. This was a SEPARATE issue from the panel scroll preservation.
+
+**What's happening:**
+1. User scrolls down page to "Case Studies" section (e.g., scrollY = 1500px)
+2. Opens mobile menu
+3. **Page jumps to top** (scrollY → 0), showing hero instead of Case Studies ❌
+4. The content "card" in the menu shows the top of the page, not current position
+
+### Root Cause (Regression)
+The October 27 "restore from baseline" (commit `21e19c0`) reintroduced a **height constraint** on the scroll container that had previously been fixed:
+
+**Problematic CSS (lines 666 in globals.css):**
+```css
+body[data-mobile-nav-open="true"] .site-shell {
+  height: var(--nav-card-height);  /* ← Constrains scroll container! */
+}
+```
+
+This forces the page's scroll container to shrink from full height (~4000px) to viewport height (~760px), causing the browser to automatically clamp `window.scrollY` to fit within the new constrained height → resets to 0.
+
+**Historical Context:**
+- October 26: Fixed this exact issue by replacing `max-height` with `clip-path` (see dev_log entry below)
+- October 27: Baseline restore (`21e19c0`) brought back old code with `height:` constraint
+- October 28: Panel scroll fix deployed, but page scroll regression still present
+- **This is why testing kept failing** - we fixed ONE issue but the restore had re-broken ANOTHER
+
+### Solution Implemented
+Restore the proven `clip-path` approach from the October 26 fix:
+
+**Replace height constraint with visual clipping:**
+```css
+body[data-mobile-nav-open="true"] .site-shell {
+  /* Visual card effect via clip-path instead of height to preserve scroll position */
+  clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
+  -webkit-clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
+  
+  /* REMOVED: height: var(--nav-card-height); */
+}
+```
+
+**Also cleaned up:**
+1. Removed `--nav-card-height` variable definition (line 602) - no longer needed
+2. Removed height references from exiting phase (line 621)
+3. Removed height references from cleanup phase (line 689)
+4. Added `clip-path` to transition property for smooth animation
+
+### How clip-path Works
+- `clip-path: inset(top right bottom left round radius)` visually crops the element's edges
+- Top/bottom insets create the "floating card" effect with rounded corners
+- The actual scroll container height remains **unchanged** (full page height)
+- Browser maintains scroll position because container geometry is not constrained
+- Visual card effect achieved through clipping, not height manipulation
+
+### Why This Is Critical
+This regression explains why all previous testing showed the page jumping to top. We were chasing TWO separate bugs:
+1. **Panel scroll reset** (fixed first) - drawer content resetting to top
+2. **Page scroll jump on OPEN** (fixed now) - main page content jumping to hero
+
+The baseline restore inadvertently re-broke #2 while we were focused on #1.
+
+### Files Modified
+- `web/src/app/globals.css`: 
+  - Replaced `height: var(--nav-card-height)` with `clip-path` in open state
+  - Removed all `--nav-card-height` variable references
+  - Added `clip-path` to transition property
+
+### Testing Verification
+**Before fix:**
+- Scroll page to 1500px → Open menu → Page at 0px (hero visible) ❌
+
+**After fix:**
+- Scroll page to 1500px → Open menu → Page at 1500px (current content visible) ✅
+
+**Expected behavior now:**
+1. ✅ Page scroll preserved on open (this fix)
+2. ✅ Page scroll preserved on close (October 26 fix, still working)
+3. ✅ Panel scroll preserved on reopen (earlier fix today)
+
+### Impact
+✅ Page scroll position preserved when opening menu  
+✅ No more jarring jump to top on menu open  
+✅ Combined with panel fix: complete scroll preservation system  
+✅ Restores the proven October 26 solution that was overwritten  
+
+---
+
 ## [2025-10-26] – Mobile Menu Scroll Restoration on Close Fix
 **Goal**: Fix scroll position restoration when closing the mobile menu
 

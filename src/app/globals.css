@@ -599,7 +599,6 @@ html.dark {
     --nav-card-overflow: hidden;
     --nav-card-pointer: none;
     --nav-card-background: transparent;
-    --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
     --nav-card-margin-block: 0;
   }
 
@@ -616,7 +615,6 @@ html.dark {
     --nav-card-overflow: visible;
     --nav-card-pointer: auto;
     --nav-card-background: var(--background);
-    --nav-card-height: var(--nav-viewport-height);
     --nav-card-margin-block: 0;
   }
   body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
@@ -641,7 +639,7 @@ html.dark {
     z-index: 50;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease), clip-path var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
     /* Avoid creating a new containing block when nav is closed */
     transform: none;
@@ -663,7 +661,11 @@ html.dark {
     border-radius: var(--nav-card-border-radius);
     box-shadow: var(--nav-card-box-shadow);
     overflow: var(--nav-card-overflow);
-    height: var(--nav-card-height);
+    
+    /* Visual card effect via clip-path instead of height to preserve scroll position */
+    clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
+    -webkit-clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-border-radius));
+    
     margin-block: var(--nav-card-margin-block);
     z-index: 60;
     pointer-events: var(--nav-card-pointer);
@@ -679,7 +681,6 @@ html.dark {
     --nav-card-overflow: visible;
     --nav-card-pointer: auto;
     --nav-card-background: var(--background);
-    --nav-card-height: var(--nav-viewport-height);
     --nav-card-margin-block: 0;
     --site-shell-offset-x: 0px;
     --site-shell-scale: 1;
