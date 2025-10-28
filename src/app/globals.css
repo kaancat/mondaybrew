@@ -659,7 +659,11 @@ html.dark {
   body[data-mobile-nav-open="true"] .site-shell {
     transform-origin: left center !important;
     /* Apply transform only while mobile nav is open */
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
+    /* Add translateY to show current scroll position */
+    transform: 
+      translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) 
+      translateY(calc(-1 * var(--nav-scroll-offset, 0px)))
+      scale(var(--site-shell-scale));
     border-radius: var(--nav-card-border-radius);
     box-shadow: var(--nav-card-box-shadow);
     overflow: var(--nav-card-overflow);
