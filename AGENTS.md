@@ -1,5 +1,20 @@
 # Agents Guide — Mobile Navigation Guardrails
 
+IMPORTANT: Repo topology and deployment
+
+- This app lives in its own Git repository under `web/`. Only this repo is deployed to Vercel.
+- Do all deployable work (commits, tags, branches, previews) from `web/`.
+- The outer workspace repository is non‑deployable and must not be used for rollbacks or previews.
+
+Operational checklist (web/ only)
+
+- Before nav work: `git fetch origin --prune && git checkout -b nav/<task>`
+- Create a checkpoint tag before changes: `git tag -a safety/<date-label> -m "checkpoint" && git push --tags`
+- Preview: `vercel deploy`
+- Rollback preview: `git reset --hard <tag-or-hash> && vercel deploy`
+- Production (only with approval): `vercel --prod`
+
+
 Scope: everything under `web/`. These rules are binding for any changes that can affect the mobile menu.
 
 Last updated: 2025-10-19

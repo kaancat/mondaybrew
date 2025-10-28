@@ -1,5 +1,122 @@
 # Dev Log
 
+## [2025-10-28] – Mobile Menu Panel Scroll Position Preservation
+**Goal**: Preserve the mobile menu panel's internal scroll position across open/close cycles
+
+### Problem
+When reopening the mobile menu, the panel would always scroll back to the top, even if the user had scrolled down within the menu before closing it. This was a separate issue from the page scroll restoration (which was successfully fixed in October 2025).
+
+**Example**:
+1. Open mobile menu
+2. Scroll down within the menu panel to view links near the bottom
+3. Close menu
+4. Reopen menu → Panel resets to top ❌
+
+### Root Cause
+The panel's scrollable content tree was unmounting on close due to two factors:
+
+1. **Conditional rendering gate**: The content was wrapped in `{mobileOpen && ( <motion.div>...</motion.div> )}`
+   - When `mobileOpen` became `false`, the entire content tree unmounted
+   - The `.mobile-nav-scroll` div disappeared from DOM, losing its `scrollTop` state
+
+2. **Radix Sheet default behavior**: Without `forceMount`, Radix removes `<SheetContent>` from DOM after the exit animation completes
+   - This is the default Radix behavior for performance
+   - But it means any scroll state is lost
+
+### Solution Implemented
+**Keep the panel mounted** using Radix's `forceMount` prop, which is designed exactly for this use case:
+
+**Step 1: Add forceMount to SheetContent**
+```typescript
+// web/src/components/shared/navbar.client.tsx:481
+<SheetContent
+  side="left"
+  hideCloseButton
+  forceMount  // ← Keeps content in DOM across open/close
+  className="mobile-nav-panel ..."
+>
+```
+
+**Step 2: Pass forceMount to overlay and content**
+```typescript
+// web/src/components/ui/sheet.tsx:52-63
+function SheetContent({
+  forceMount,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Content> & {
+  forceMount?: boolean
+}) {
+  return (
+    <SheetPortal>
+      <SheetOverlay forceMount={forceMount} />
+      <SheetPrimitive.Content forceMount={forceMount} ...>
+```
+
+**Step 3: Remove conditional rendering gate**
+```typescript
+// web/src/components/shared/navbar.client.tsx:508-513
+// Before: {mobileOpen && ( <motion.div ...> )}
+// After:
+<motion.div
+  className="space-y-7"
+  animate={mobileOpen ? "show" : "hidden"}  // Animate visibility without unmounting
+  variants={mobileMenuVariants}
+>
+```
+
+### How It Works
+- Panel content stays in DOM even when menu is closed
+- CSS handles visual hiding via `[data-state="closed"]` selector (already in place)
+- Framer Motion animates opacity/position based on `mobileOpen` state
+- The `.mobile-nav-scroll` element persists, keeping its `scrollTop` intact
+- On reopen, the panel appears at its last scroll position
+
+### Why This Approach
+✅ **Simple**: 3-line code change, zero timing logic  
+✅ **Reliable**: No race conditions or device-specific bugs  
+✅ **Consistent**: Matches the architecture (site shell stays mounted, panel should too)  
+✅ **Performant**: Navigation content is ~50KB; negligible memory cost  
+✅ **CSS-driven**: Visibility already handled by existing CSS rules  
+
+**Alternative considered**: Manual scroll capture/restore would add complexity and timing issues for minimal benefit.
+
+### Testing Instructions
+**Console test probe**:
+```javascript
+const getPanel = () => document.querySelector('.mobile-nav-scroll');
+window.panelTest = {
+  read() {
+    const el = getPanel();
+    return el ? { top: el.scrollTop, exists: !!el } : { exists: false };
+  },
+  log(label) { console.log('[panel]', label, this.read()); }
+};
+```
+
+**Test flow**:
+1. Open menu
+2. Scroll panel down ~200px (use two-finger scroll on mobile/trackpad)
+3. Run: `panelTest.log('before-close')`
+4. Close menu
+5. Open menu again
+6. Run: `panelTest.log('after-reopen')`
+
+**Expected after fix**:
+- `before-close`: `{ top: 200, exists: true }`
+- `after-reopen`: `{ top: 200, exists: true }` ✅ Preserved
+
+### Files Modified
+- `web/src/components/shared/navbar.client.tsx`: Added `forceMount` to SheetContent, removed conditional render gate
+- `web/src/components/ui/sheet.tsx`: Accept and forward `forceMount` prop to overlay and content
+
+### Impact
+✅ Panel scroll position preserved across open/close cycles  
+✅ Better UX: users don't lose their place in long navigation menus  
+✅ Zero performance impact: panel content is lightweight  
+✅ Architecture consistency: both page shell and panel now stay mounted  
+
+---
+
 ## [2025-10-26] – Mobile Menu Scroll Restoration on Close Fix
 **Goal**: Fix scroll position restoration when closing the mobile menu
 

@@ -49,15 +49,18 @@ function SheetContent({
   children,
   side = "right",
   hideCloseButton = false,
+  forceMount,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: "top" | "right" | "bottom" | "left"
   hideCloseButton?: boolean
+  forceMount?: boolean
 }) {
   return (
     <SheetPortal>
-      <SheetOverlay />
+      <SheetOverlay forceMount={forceMount} />
       <SheetPrimitive.Content
+        forceMount={forceMount}
         data-slot="sheet-content"
         className={cn(
           "bg-background fixed z-50 flex flex-col gap-4 shadow-lg",

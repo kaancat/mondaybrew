@@ -478,6 +478,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <SheetContent
                   side="left"
                   hideCloseButton
+                  forceMount
                   className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
                 >
                   {/* Accessibility: satisfy Radix requirements without changing visuals */}
@@ -504,14 +505,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
                       {/* Scrollable menu content */}
                       <div className="mobile-nav-scroll no-scrollbar flex-1 min-h-0 overflow-y-auto pt-2">
-                        {mobileOpen && (
-                          <motion.div
-                            className="space-y-7"
-                            initial="hidden"
-                            animate="show"
-                            variants={mobileMenuVariants}
-                          >
-                            {megaSections.map((section) => (
+                        <motion.div
+                          className="space-y-7"
+                          initial="hidden"
+                          animate={mobileOpen ? "show" : "hidden"}
+                          variants={mobileMenuVariants}
+                        >
+                          {megaSections.map((section) => (
                               <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
                                 <motion.h2 variants={mobileItemVariants} className="text-sm font-normal uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
                                   {section.label}
@@ -570,8 +570,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                                 </motion.ul>
                               </motion.section>
                             ) : null}
-                          </motion.div>
-                        )}
+                        </motion.div>
                       </div>
 
                       {/* Fixed bottom action buttons */}
