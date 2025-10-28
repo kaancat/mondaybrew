@@ -663,7 +663,6 @@ html.dark {
     border-radius: var(--nav-card-border-radius);
     box-shadow: var(--nav-card-box-shadow);
     overflow: var(--nav-card-overflow);
-    height: var(--nav-card-height);
     margin-block: var(--nav-card-margin-block);
     z-index: 60;
     pointer-events: var(--nav-card-pointer);
