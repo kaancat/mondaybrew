@@ -1,20 +1,11 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-  type WheelEvent as ReactWheelEvent,
-  type ReactNode,
-} from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "framer-motion";
+import TickerCarousel from "@/components/carousel/TickerCarousel.client";
 
 export type TImage = {
   url?: string | null;
@@ -584,7 +575,6 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
 }
 
 function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direction?: 1 | -1; speed?: number }) {
-  const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
@@ -593,212 +583,15 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     });
   }, [items]);
 
-  const laneRef = useRef<HTMLDivElement | null>(null);
-  const dragWrapperRef = useRef<HTMLDivElement | null>(null);
-  const firstSetRef = useRef<HTMLDivElement | null>(null);
-  const [setWidth, setSetWidth] = useState(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const dragStateRef = useRef<{
-    pointerId: number | null;
-    startX: number;
-    startY: number;
-    startOffset: number;
-    dragging: boolean;
-    intent: "pending" | "horizontal" | "vertical";
-  }>({
-    pointerId: null,
-    startX: 0,
-    startY: 0,
-    startOffset: 0,
-    dragging: false,
-    intent: "pending",
-  });
-  const resumeTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  useLayoutEffect(() => {
-    const target = firstSetRef.current;
-    if (!target) return;
-
-    let rafId: number | null = null;
-    const measure = () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        const rect = target.getBoundingClientRect();
-        setSetWidth(rect.width);
-      });
-    };
-
-    measure();
-
-    let resizeObserver: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver(() => measure());
-      resizeObserver.observe(target);
-    }
-
-    const handleResize = () => measure();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      if (resizeObserver) resizeObserver.disconnect();
-      window.removeEventListener("resize", handleResize);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [normalizedItems.length]);
-
-  useEffect(() => {
-    return () => {
-      if (resumeTimeout.current) {
-        clearTimeout(resumeTimeout.current);
-        resumeTimeout.current = null;
-      }
-    };
-  }, []);
-
-  const requestResume = useCallback(() => {
-    if (resumeTimeout.current) clearTimeout(resumeTimeout.current);
-    resumeTimeout.current = setTimeout(() => setIsPaused(false), 500);
-  }, []);
-
-  const clampOffset = useCallback((value: number) => {
-    if (!setWidth) return value;
-    if (value <= -setWidth) return -setWidth;
-    if (value >= setWidth) return setWidth;
-    return value;
-  }, [setWidth]);
-
-  const releasePointer = useCallback((pointerId?: number, shouldResume = true) => {
-    const state = dragStateRef.current;
-    if (!state.dragging) return;
-    if (typeof pointerId === "number" && state.pointerId !== pointerId) return;
-    if (typeof pointerId === "number" && dragWrapperRef.current?.hasPointerCapture?.(pointerId)) {
-      dragWrapperRef.current.releasePointerCapture(pointerId);
-    }
-    dragStateRef.current = { pointerId: null, startX: 0, startY: 0, startOffset: 0, dragging: false, intent: "pending" };
-    setDragOffset((prev) => clampOffset(prev));
-    if (shouldResume) {
-      requestResume();
-    } else {
-      setIsPaused(false);
-    }
-  }, [clampOffset, requestResume]);
-
-  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    dragStateRef.current = {
-      pointerId: e.pointerId,
-      startX: e.clientX,
-      startY: e.clientY,
-      startOffset: dragOffset,
-      dragging: true,
-      intent: "pending",
-    };
-    if (resumeTimeout.current) {
-      clearTimeout(resumeTimeout.current);
-      resumeTimeout.current = null;
-    }
-  }, [dragOffset]);
-
-  const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    const state = dragStateRef.current;
-    if (!state.dragging || state.pointerId !== e.pointerId) return;
-    const dx = e.clientX - state.startX;
-    const dy = e.clientY - state.startY;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-
-    if (state.intent === "pending") {
-      if (absDy > absDx + 8 && absDy > 8) {
-        dragStateRef.current.intent = "vertical";
-        releasePointer(e.pointerId, false);
-        return;
-      }
-      if (absDx > 6 && absDx > absDy * 0.75) {
-        dragStateRef.current.intent = "horizontal";
-        dragWrapperRef.current?.setPointerCapture?.(e.pointerId);
-        setIsPaused(true);
-      } else {
-        return;
-      }
-    }
-
-    if (dragStateRef.current.intent !== "horizontal") return;
-    e.preventDefault();
-    setDragOffset(clampOffset(state.startOffset + dx));
-  }, [clampOffset, releasePointer]);
-
-  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (dragStateRef.current.pointerId !== e.pointerId) return;
-    releasePointer(e.pointerId);
-  }, [releasePointer]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handlePointerEnd = (event: PointerEvent) => {
-      if (dragStateRef.current.pointerId !== event.pointerId) return;
-      releasePointer(event.pointerId);
-    };
-    window.addEventListener("pointerup", handlePointerEnd);
-    window.addEventListener("pointercancel", handlePointerEnd);
-    return () => {
-      window.removeEventListener("pointerup", handlePointerEnd);
-      window.removeEventListener("pointercancel", handlePointerEnd);
-    };
-  }, [releasePointer]);
-
-  useEffect(() => {
-    if (!isPaused || dragStateRef.current.dragging) return;
-    const timeout = setTimeout(() => {
-      setIsPaused(false);
-      setDragOffset(0);
-    }, 1500);
-    return () => clearTimeout(timeout);
-  }, [isPaused]);
-
-  const animationDuration = useMemo(() => {
-    const base = Math.max(40, normalizedItems.length * 8);
-    return Math.max(20, base / Math.max(1, speed));
-  }, [normalizedItems.length, speed]);
-
-  const shouldAnimate = !prefersReducedMotion && !isPaused;
-
   return (
-    <div ref={laneRef} className="relative -mx-[var(--container-gutter)] overflow-hidden">
-      <span className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background to-transparent hidden md:block" />
-      <span className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent hidden md:block" />
-
-      <div
-        ref={dragWrapperRef}
-        className={cn("marquee-mobile-drag", dragStateRef.current.dragging && "marquee-mobile-dragging")}
-        style={{ transform: `translateX(${dragOffset}px)`, touchAction: "pan-y pinch-zoom" }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-        onPointerLeave={onPointerUp}
-      >
-        <div
-          className={cn(
-            "marquee-mobile-track",
-            direction === -1 ? "marquee-mobile-track-reverse" : "marquee-mobile-track-forward",
-          )}
-          style={{
-            animationDuration: `${animationDuration}s`,
-            animationPlayState: shouldAnimate ? "running" : "paused",
-          }}
-        >
-          <div ref={firstSetRef} className="marquee-mobile-set">
-            {normalizedItems.map((card, i) => (
-              <CardMobile key={`set-a-${i}`} card={card} />
-            ))}
+    <div className="-mx-[var(--container-gutter)]">
+      <TickerCarousel className="overflow-hidden">
+        {(direction === -1 ? [...normalizedItems].reverse() : normalizedItems).map((card, i) => (
+          <div key={`slide-${i}`} className="shrink-0 px-[14px]">
+            <CardMobile card={card} />
           </div>
-          <div className="marquee-mobile-set" aria-hidden>
-            {normalizedItems.map((card, i) => (
-              <CardMobile key={`set-b-${i}`} card={card} />
-            ))}
-          </div>
-        </div>
-      </div>
+        ))}
+      </TickerCarousel>
     </div>
   );
 }
