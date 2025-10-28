@@ -11,7 +11,7 @@ import Image from "next/image";
 export function Footer() {
   return (
     <footer className="relative overflow-hidden" style={{
-      backgroundColor: "#49444B",
+      backgroundColor: "var(--mb-ink)",
       height: "100vh",
     } as React.CSSProperties}>
       {/* Footer content */}
@@ -46,8 +46,8 @@ export function Footer() {
                   href="/kontakt"
                   className="inline-flex items-center justify-center rounded-md font-medium transition-colors h-12 px-8"
                   style={{
-                    backgroundColor: "#F97844",
-                    color: "#FFFFFF",
+                    backgroundColor: "var(--mb-accent)",
+                    color: "var(--brand-light)",
                   } as React.CSSProperties}
                 >
                   Start et projekt
@@ -56,8 +56,8 @@ export function Footer() {
                   href="/services"
                   className="inline-flex items-center justify-center rounded-md font-medium transition-colors h-12 px-8"
                   style={{
-                    backgroundColor: "#FFFFFF",
-                    color: "#4A4458",
+                    backgroundColor: "var(--brand-light)",
+                    color: "var(--mb-ink)",
                   } as React.CSSProperties}
                 >
                   Se vores services
@@ -74,22 +74,22 @@ export function Footer() {
                 </h3>
                 <ul className="space-y-3">
                   <li>
-                    <Link href="/services/web/websites" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <Link href="/services/web/websites" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       Websites
                     </Link>
                   </li>
                   <li>
-                    <Link href="/services/web/ecommerce" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <Link href="/services/web/ecommerce" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       eCommerce
                     </Link>
                   </li>
                   <li>
-                    <Link href="/services/marketing/paid-social" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <Link href="/services/marketing/paid-social" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       Paid Social
                     </Link>
                   </li>
                   <li>
-                    <Link href="/services/marketing/paid-search" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <Link href="/services/marketing/paid-search" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       Paid Search
                     </Link>
                   </li>
@@ -102,22 +102,22 @@ export function Footer() {
                 </h3>
                 <ul className="space-y-3">
                   <li>
-                    <Link href="/om-os" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <Link href="/om-os" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       Om os
                     </Link>
                   </li>
                   <li>
-                    <Link href="/cases" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <Link href="/cases" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       Cases
                     </Link>
                   </li>
                   <li>
-                    <Link href="/blog" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <Link href="/blog" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       Blog
                     </Link>
                   </li>
                   <li>
-                    <Link href="/kontakt" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <Link href="/kontakt" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       Kontakt
                     </Link>
                   </li>
@@ -131,12 +131,12 @@ export function Footer() {
                 </h3>
                 <ul className="space-y-3">
                   <li>
-                    <a href="mailto:hej@mondaybrew.dk" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <a href="mailto:hej@mondaybrew.dk" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       hej@mondaybrew.dk
                     </a>
                   </li>
                   <li>
-                    <a href="tel:+4512345678" className="text-white/80 hover:text-[#F97844] transition-colors text-sm">
+                    <a href="tel:+4512345678" className="text-white/80 hover:text-[color:var(--mb-accent)] transition-colors text-sm">
                       +45 12 34 56 78
                     </a>
                   </li>
@@ -157,7 +157,7 @@ export function Footer() {
                 </p>
                 <Link
                   href="/privacy-policy"
-                  className="text-xs text-white/40 hover:text-[#F97844] transition-colors"
+                  className="text-xs text-white/40 hover:text-[color:var(--mb-accent)] transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -167,7 +167,7 @@ export function Footer() {
                   href="https://www.linkedin.com/company/mondaybrew"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white/40 hover:text-[#F97844] transition-colors"
+                  className="text-white/40 hover:text-[color:var(--mb-accent)] transition-colors"
                   aria-label="LinkedIn"
                 >
                   <svg
@@ -183,7 +183,7 @@ export function Footer() {
                   href="https://www.instagram.com/mondaybrew"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white/40 hover:text-[#F97844] transition-colors"
+                  className="text-white/40 hover:text-[color:var(--mb-accent)] transition-colors"
                   aria-label="Instagram"
                 >
                   <svg

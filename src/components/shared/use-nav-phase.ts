@@ -4,21 +4,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useNavPhase() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const EXIT_FALLBACK_MS = 480;
+  const EXIT_FALLBACK_MS = 360;
   const scrollSnapshotRef = useRef<{ value: number }>({ value: 0 });
 
   const captureScrollSnapshot = useCallback(() => {
     if (typeof window === "undefined") return;
     const y = window.scrollY || window.pageYOffset || 0;
     scrollSnapshotRef.current = { value: y };
-    // Set CSS variable so the card shows current scroll position
-    document.body.style.setProperty("--nav-scroll-offset", `${y}px`);
   }, []);
 
   const clearScrollSnapshot = useCallback(() => {
     if (typeof window === "undefined") return;
     scrollSnapshotRef.current = { value: 0 };
-    document.body.style.removeProperty("--nav-scroll-offset");
   }, []);
 
   // Cleanup on unmount (defensive)
@@ -27,7 +24,6 @@ export function useNavPhase() {
       if (typeof document === "undefined") return;
       clearScrollSnapshot();
       document.body.removeAttribute("data-mobile-nav-open");
-      document.body.removeAttribute("data-nav-phase");
     };
   }, [clearScrollSnapshot]);
 
@@ -44,9 +40,8 @@ export function useNavPhase() {
     body.style.width = "100%";
     
     setMobileOpen(false);
-    body.setAttribute("data-nav-phase", "cleanup");
     body.removeAttribute("data-mobile-nav-open");
-    
+
     requestAnimationFrame(() => {
       // Unfreeze and restore exact scroll position
       body.style.position = "";
@@ -55,7 +50,6 @@ export function useNavPhase() {
       body.style.right = "";
       body.style.width = "";
       window.scrollTo({ top: y, left: 0, behavior: "auto" });
-      body.removeAttribute("data-nav-phase");
       clearScrollSnapshot();
     });
   }, [clearScrollSnapshot]);
@@ -68,12 +62,10 @@ export function useNavPhase() {
       setMobileOpen(true);
       captureScrollSnapshot();
       body.setAttribute("data-mobile-nav-open", "true");
-      body.removeAttribute("data-nav-phase");
       return;
     }
 
     // Controlled exit: keep open while reversing shell geometry via CSS
-    body.setAttribute("data-nav-phase", "exiting");
     setMobileOpen(true);
 
     const shell = document.querySelector<HTMLElement>(".site-shell");

@@ -85,11 +85,11 @@ const MODE_PRESETS: Record<ModeKey, ToneStyle> = {
   },
   lightAlt: {
     background: "var(--services-card-bg, oklch(1 0 0))",
-    ink: "var(--services-ink-strong, #0a0a0a)",
-    sub: "color-mix(in oklch, var(--services-ink-strong, #0a0a0a) 65%, transparent 35%)",
-    divider: "color-mix(in oklch, var(--services-ink-strong, #0a0a0a) 18%, transparent 82%)",
+    ink: "var(--services-ink-strong, var(--brand-ink-strong))",
+    sub: "color-mix(in oklch, var(--services-ink-strong, var(--brand-ink-strong)) 65%, transparent 35%)",
+    divider: "color-mix(in oklch, var(--services-ink-strong, var(--brand-ink-strong)) 18%, transparent 82%)",
     border: "var(--nav-shell-border, oklch(0.922 0 0))",
-    ctaInk: "var(--services-ink-strong, #0a0a0a)",
+    ctaInk: "var(--services-ink-strong, var(--brand-ink-strong))",
   },
   dark: {
     background: "var(--services-card-bg, var(--brand-light))",

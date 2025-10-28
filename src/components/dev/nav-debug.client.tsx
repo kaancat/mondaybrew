@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 type Snapshot = {
   buildSha?: string | null;
   buildEnv?: string | null;
-  body?: { mobileNavOpen?: string | null; navPhase?: string | null };
+  body?: { mobileNavOpen?: string | null };
   viewportTransform?: string | null;
   contentTransform?: string | null;
   panel?: { width?: string; opacity?: string; visibility?: string; transform?: string; z?: string } | null;
@@ -22,7 +22,6 @@ function readSnapshot(): Snapshot {
     buildEnv: body?.getAttribute("data-build-env"),
     body: {
       mobileNavOpen: body?.getAttribute("data-mobile-nav-open"),
-      navPhase: body?.getAttribute("data-nav-phase"),
     },
     viewportTransform: viewport ? getComputedStyle(viewport).transform : null,
     contentTransform: content ? getComputedStyle(content).transform : null,
@@ -52,7 +51,7 @@ export default function NavDebug() {
     const update = () => setSnap(readSnapshot());
     update();
     const mo = new MutationObserver(update);
-    mo.observe(document.body, { attributes: true, attributeFilter: ["data-mobile-nav-open", "data-nav-phase"] });
+    mo.observe(document.body, { attributes: true, attributeFilter: ["data-mobile-nav-open"] });
     const interval = window.setInterval(update, 200);
     return () => {
       mo.disconnect();
@@ -70,19 +69,19 @@ export default function NavDebug() {
         zIndex: 99999,
         fontSize: 11,
         lineHeight: 1.25,
-        color: "#111",
-        background: "rgba(255,255,255,0.9)",
-        border: "1px solid rgba(0,0,0,0.2)",
+        color: "var(--mb-ink)",
+        background: "color-mix(in oklch, var(--brand-light) 92%, transparent)",
+        border: "1px solid color-mix(in oklch, var(--mb-ink) 20%, transparent)",
         borderRadius: 6,
         padding: "8px 10px",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+        boxShadow: "var(--shadow-elevated-md)",
         maxWidth: 320,
         fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
       }}
     >
       <div style={{ fontWeight: 600, marginBottom: 4 }}>Nav Debug</div>
       <div>build: {snap?.buildEnv || "n/a"} • {snap?.buildSha || "n/a"}</div>
-      <div>body: open={String(snap?.body?.mobileNavOpen || null)} phase={String(snap?.body?.navPhase || null)}</div>
+      <div>body: open={String(snap?.body?.mobileNavOpen || null)}</div>
       <div>viewport: {snap?.viewportTransform || "none"}</div>
       <div>content: {snap?.contentTransform || "none"}</div>
       <div>panel: {snap?.panel ? `${snap.panel.width}, ${snap.panel.visibility}, op=${snap.panel.opacity}, z=${snap.panel.z}` : "none"}</div>
@@ -91,4 +90,3 @@ export default function NavDebug() {
     </div>
   );
 }
-

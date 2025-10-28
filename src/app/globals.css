@@ -47,21 +47,11 @@
   --radius: 0.625rem;
 
   /* Nav animation tokens (single source of truth) */
-  --nav-anim-duration: 420ms;
+  --nav-anim-duration: 280ms;
   --nav-anim-ease: cubic-bezier(0.25, 0.62, 0.32, 1);
-  --nav-overlay-duration: 500ms;
+  --nav-overlay-duration: 280ms;
   --nav-overlay-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --nav-viewport-height: 100vh;
-  --nav-card-inset: 0px;
-  --nav-card-radius: 0px;
-  --nav-card-offset-y: 0px;
-  --nav-card-border-radius: 0px;
-  --nav-card-box-shadow: none;
-  --nav-card-overflow: visible;
-  --nav-card-pointer: auto;
-  --nav-card-background: var(--background);
-  --nav-card-height: var(--nav-viewport-height);
-  --nav-card-margin-block: 0;
 
   --layout-max: 86.5rem; /* ~1384px */
   --layout-tight: 60rem; /* ~960px */
@@ -112,7 +102,6 @@
 
   --site-shell-offset-x: 0px;
   --site-shell-scale: 1;
-  --site-shell-inset: 0px;
   --full-bleed-inline-start: calc(50% - 50vw);
   --full-bleed-inline-end: calc(50% - 50vw);
   --full-bleed-width: 100vw;
@@ -261,9 +250,6 @@ html.light-primary .about-stats-panel [data-stat-label] {
 }
 
 html.light-primary body[data-mobile-nav-open="true"] {
-  /* Keep the site card in brand background instead of transparent tint */
-  --nav-card-background: var(--background);
-  --nav-card-box-shadow: 0 48px 120px rgba(73, 68, 75, 0.24);
   --mobile-nav-overlay: rgba(73, 68, 75, 0.08);
   /* Brand the mobile menu section headings and top eyebrow in primary theme */
   --mobile-nav-heading: var(--mb-accent);
@@ -590,110 +576,61 @@ html.dark {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 1;
-    /* Increase vertical inset so panel visibly wraps the card on small phones */
-    --nav-card-inset: clamp(22px, 5.5vw, 36px);
-    --nav-card-radius: clamp(20px, 6vw, 32px);
-    --nav-card-offset-y: 0px;
-    --site-shell-inset: var(--nav-card-inset);
-    --nav-card-border-radius: var(--nav-card-radius);
-    --nav-card-box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
-    --nav-card-overflow: hidden;
-    --nav-card-pointer: none;
-    --nav-card-background: transparent;
-    --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
-    --nav-card-margin-block: 0;
   }
 
   /* Body::before overlay removed — rely on Radix Sheet overlay only */
-
-  /* Exiting phase: keep 'open' but return tokens to closed-state so removing
-     the attribute does not trigger another width/margin transition */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
-    --site-shell-offset-x: 0px;
-    --site-shell-scale: 1;
-    --nav-card-offset-y: 0px;
-    --nav-card-border-radius: 0px;
-    --nav-card-box-shadow: none;
-    --nav-card-overflow: visible;
-    --nav-card-pointer: auto;
-    --nav-card-background: var(--background);
-    --nav-card-height: var(--nav-viewport-height);
-    --nav-card-margin-block: 0;
-  }
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
-    /* Ensure mirrored geometry: keep origin consistent while reversing */
-    transform-origin: left top !important;
-  }
-  /* Exiting: keep 'open' while reversing geometry and restoring presentation */
-
-  /* Exiting: keep open flag but drive vars back to rest so transition mirrors enter */
-  body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"],
-  html[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"] {
-    --site-shell-offset-x: 0px;
-    --site-shell-scale: 1;
-  }
-  body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"]::before,
-  html[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"]::before {
-    opacity: 0;
-  }
 
   .site-shell {
     position: relative;
     z-index: 50;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
+    transition:
+      transform var(--nav-anim-duration) var(--nav-anim-ease),
+      background var(--nav-anim-duration) var(--nav-anim-ease),
+      box-shadow var(--nav-anim-duration) var(--nav-anim-ease),
+      filter var(--nav-anim-duration) var(--nav-anim-ease),
+      opacity var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left top;
-    /* Avoid creating a new containing block when nav is closed */
     transform: none;
-    border-radius: clamp(0px, var(--nav-card-radius), 0px);
     box-shadow: none;
+    filter: none;
     overflow: visible;
     pointer-events: auto;
-    background: var(--background);
-    /* Allow page to grow naturally while nav is closed to avoid dvh-driven jumps */
-    min-height: var(--nav-viewport-height);
     height: auto;
     margin-block: 0;
   }
 
+  .site-shell::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: clamp(10px, 3vw, 24px);
+    pointer-events: none;
+    background: linear-gradient(90deg, color-mix(in oklch, var(--mb-accent) 38%, transparent) 0%, transparent 72%);
+    opacity: 0;
+    transform: translateX(-40%);
+    transition: opacity var(--nav-anim-duration) var(--nav-anim-ease), transform var(--nav-anim-duration) var(--nav-anim-ease);
+  }
+
   body[data-mobile-nav-open="true"] .site-shell {
     transform-origin: left top !important;
-    /* Apply transform only while mobile nav is open */
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
-    border-radius: var(--nav-card-border-radius);
-    box-shadow: var(--nav-card-box-shadow);
-    overflow: var(--nav-card-overflow);
-    margin-block: var(--nav-card-margin-block);
+    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
     z-index: 60;
-    pointer-events: var(--nav-card-pointer);
-    background: var(--nav-card-background);
-    /* Static visual mask for card silhouette (no animation) */
-    -webkit-clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-radius));
-    clip-path: inset(var(--nav-card-inset) 0 var(--nav-card-inset) 0 round var(--nav-card-radius));
-
-    /* Remove isolation to prevent stacking context issues */
+    pointer-events: none;
+    background: var(--background);
+    box-shadow:
+      -18px 0 64px color-mix(in oklch, var(--mb-accent) 18%, transparent),
+      0 20px 60px rgba(8, 6, 20, 0.24);
+    filter: brightness(0.985);
     contain: layout style paint;
   }
 
-  body[data-nav-phase="cleanup"] {
-    --nav-card-border-radius: clamp(0px, var(--nav-card-radius), 0px);
-    --nav-card-box-shadow: none;
-    --nav-card-overflow: visible;
-    --nav-card-pointer: auto;
-    --nav-card-background: var(--background);
-    --nav-card-height: var(--nav-viewport-height);
-    --nav-card-margin-block: 0;
-    --site-shell-offset-x: 0px;
-    --site-shell-scale: 1;
-    --nav-card-offset-y: 0px;
-  }
-
-  body[data-nav-phase="cleanup"] [data-slot="sheet-content"].mobile-nav-panel {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transform: translateX(-100%) !important;
-    pointer-events: none !important;
+  body[data-mobile-nav-open="true"] .site-shell::before {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */
@@ -704,13 +641,14 @@ html.dark {
   [data-slot="sheet-content"].mobile-nav-panel {
     display: flex;
     align-items: stretch;
-    height: var(--nav-viewport-height);
+    min-height: var(--nav-viewport-height);
+    height: auto;
     width: 100vw;
     max-width: none;
     padding: 0;
     /* Disable exit animation by default; we add transitions only while open */
     transition: none;
-    /* Panel below shell to show the rounded card */
+    /* Panel stays beneath the translated page */
     z-index: 55 !important;
     position: relative;
     /* Default hidden so brief attribute gaps don't flash content */
@@ -733,23 +671,8 @@ html.dark {
     visibility: visible;
     pointer-events: auto;
     transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
-    /* Visual wrap on right edge so panel frames the card */
-    border-top-right-radius: var(--nav-card-radius);
-    border-bottom-right-radius: var(--nav-card-radius);
-    overflow: hidden;
     background: var(--mobile-nav-surface);
   }
-
-
-
-  /* During exiting, keep the panel in DOM for Radix state but hide it immediately
-     to prevent menu items shining through the semi-transparent shell */
-body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-content"].mobile-nav-panel {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: none !important;
-  }
-
   [data-slot="sheet-overlay"] {
     background: transparent !important;
     pointer-events: auto;
@@ -766,14 +689,6 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
   body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
     opacity: 1;
     transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
-  }
-  /* Fade overlay during exiting while still open */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"] {
-    opacity: 0;
-  }
-  /* Add a slight delay so overlay masks color changes while shell begins to close */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"][data-state="open"] {
-    transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease) 120ms !important;
   }
 
   /* Remove old snapping guard (no longer used) */
@@ -1009,16 +924,6 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     border-radius: 0;
   }
 
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {
-    border-radius: clamp(20px, 6vw, 32px);
-    box-shadow: 0 56px 160px rgba(8, 6, 20, 0.45);
-    overflow: hidden;
-  }
-
-  /* When mobile menu is open, prevent full-bleed from escaping the transformed container
-     Do NOT apply during exiting to avoid post-close snap */
-  /* Removed open-only full-bleed width/margin overrides; rely on shell clipping */
-
   /* Hide native scrollbars but keep scrolling accessible */
   .no-scrollbar {
     -ms-overflow-style: none; /* IE/Edge */
@@ -1181,17 +1086,9 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
 
   /* Mobile only: hide header only while menu is fully open; show it during exiting for instant return */
   @media (max-width: 767px) {
-    body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) header[class*="fixed"] {
+    body[data-mobile-nav-open="true"] header[class*="fixed"] {
       display: none !important;
     }
-  }
-  /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
-  body[data-nav-phase="cleanup"] .site-shell,
-  body[data-nav-phase="cleanup"] header[class*="fixed"],
-  body[data-nav-phase="cleanup"] .full-bleed,
-  body[data-nav-phase="cleanup"] .vr-hero,
-  body[data-nav-phase="cleanup"] .vr-hero .layout-container {
-    transition: none !important;
   }
 /* Light Alt: when mobile menu is open, make Contact CTA clearly outlined */
 html.light-alt body[data-mobile-nav-open="true"] {

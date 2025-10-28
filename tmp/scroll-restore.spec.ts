@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
-async function openMenu(page: any) {
+async function openMenu(page: Page) {
   await page.getByRole('button', { name: 'Open menu' }).click();
   await expect(page.locator('[data-slot="sheet-content"]').first()).toHaveAttribute('data-state', 'open');
 }
 
-async function closeMenu(page: any) {
+async function closeMenu(page: Page) {
   await page.getByRole('button', { name: 'Luk menu' }).click();
   await expect(page.locator('[data-slot="sheet-content"]').first()).toHaveAttribute('data-state', 'closed');
 }
@@ -42,4 +43,3 @@ test('scroll position restores exactly (kontakt)', async ({ page }) => {
   const after = await page.evaluate(() => window.scrollY);
   expect(Math.abs(after - before)).toBeLessThan(1);
 });
-

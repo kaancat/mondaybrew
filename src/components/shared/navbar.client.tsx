@@ -485,7 +485,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   <SheetTitle className="sr-only">Menu</SheetTitle>
                   <SheetDescription className="sr-only">Site navigation</SheetDescription>
                   <div className="flex h-full w-full items-stretch">
-                    <div className="mobile-nav-inner flex h-full min-h-0 w-[var(--mobile-nav-width)] flex-col px-6 py-8">
+                    <div className="mobile-nav-inner flex w-[var(--mobile-nav-width)] flex-col px-6 py-8">
                       {/* Header with close button */}
                       <div className="flex items-center justify-between pb-5 shrink-0">
                         <div className="flex flex-col">
@@ -504,7 +504,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       </div>
 
                       {/* Scrollable menu content */}
-                      <div className="mobile-nav-scroll no-scrollbar flex-1 min-h-0 overflow-y-auto pt-2">
+                      <div className="mobile-nav-scroll pt-2">
                         <motion.div
                           className="space-y-7"
                           initial="hidden"
