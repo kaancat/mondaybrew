@@ -98,6 +98,18 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
               setSelected(embla.selectedScrollSnap());
               setCanPrev(embla.canScrollPrev());
               setCanNext(embla.canScrollNext());
+              // Fallback translate when Embla doesn't update transform (edge case we observed)
+              // Align selected slide with viewport left edge
+              const viewport = document.querySelector('.embla__container')?.parentElement as HTMLElement | null;
+              const container = document.querySelector('.embla__container') as HTMLElement | null;
+              if (viewport && container) {
+                const i = embla.selectedScrollSnap();
+                const slide = container.children[i] as HTMLElement | undefined;
+                if (slide) {
+                  const delta = slide.getBoundingClientRect().left - viewport.getBoundingClientRect().left;
+                  container.style.transform = `translate3d(${-Math.round(delta)}px,0,0)`;
+                }
+              }
             };
             embla.on("select", onSelect);
             embla.on("scroll", onSelect);
