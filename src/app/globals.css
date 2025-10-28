@@ -599,7 +599,7 @@ html.dark {
     --nav-card-overflow: hidden;
     --nav-card-pointer: none;
     --nav-card-background: transparent;
-    --nav-card-margin-block: 0;
+    --nav-card-margin-block: var(--nav-card-inset);
   }
 
   /* Body::before overlay removed — rely on Radix Sheet overlay only */
@@ -639,7 +639,7 @@ html.dark {
     z-index: 50;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease), clip-path var(--nav-anim-duration) var(--nav-anim-ease);
+    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease), clip-path var(--nav-anim-duration) var(--nav-anim-ease), margin-block var(--nav-anim-duration) var(--nav-anim-ease);
     transform-origin: left center;
     /* Avoid creating a new containing block when nav is closed */
     transform: none;
