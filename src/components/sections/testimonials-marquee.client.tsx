@@ -585,7 +585,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
 
   return (
     <div className="-mx-[var(--container-gutter)]">
-      <TickerCarousel className="overflow-hidden">
+      <TickerCarousel className="overflow-hidden" speed={Math.max(24, speed)} direction={direction}>
         {(direction === -1 ? [...normalizedItems].reverse() : normalizedItems).map((card, i) => (
           <div key={`slide-${i}`} className="shrink-0 px-[14px]">
             <CardMobile card={card} />
@@ -600,8 +600,9 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
 
 // Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
-  const mobileTopSpeed = Math.max(8, speedTop * 0.18);
-  const mobileBottomSpeed = Math.max(7, speedBottom * 0.16);
+  // Faster autoplay on mobile; ignore legacy percentages to achieve a snappier feel
+  const mobileTopSpeed = 50;   // px/s
+  const mobileBottomSpeed = 46; // px/s
 
   return (
     // On mobile we want the rows to start right under the heading; keep bottom-aligned only on md+.
