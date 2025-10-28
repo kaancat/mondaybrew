@@ -1,22 +1,77 @@
 "use client";
 
-import React, { useMemo } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import type { EmblaOptionsType } from "embla-carousel";
+import React, { useEffect, useMemo, useRef } from "react";
 
-type TickerProps = React.PropsWithChildren<{ options?: EmblaOptionsType; className?: string }>;
+type TickerProps = React.PropsWithChildren<{ speed?: number; direction?: 1 | -1; className?: string }>;
 
-export default function TickerCarousel({ children, options, className }: TickerProps) {
-  const [emblaRef] = useEmblaCarousel(
-    useMemo(() => ({ loop: true, dragFree: true, align: "start", containScroll: false, ...options }), [options])
-  );
+export default function TickerCarousel({ children, speed = 28, direction = 1, className }: TickerProps) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const setRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const setEl = setRef.current;
+    if (!wrap || !setEl) return;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const apply = () => {
+      const span = setEl.scrollWidth;
+      const duration = Math.max(10, span / Math.max(8, speed));
+      wrap.style.setProperty('--ticker-span-px', `${span}px`);
+      wrap.style.setProperty('--ticker-duration', `${duration}s`);
+      wrap.style.setProperty('--ticker-direction', direction === -1 ? 'reverse' : 'normal');
+      wrap.style.animationPlayState = prefersReduced ? 'paused' : 'running';
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(setEl);
+
+    const body = document.body;
+    const onAttr = () => {
+      const open = body.getAttribute('data-mobile-nav-open') === 'true';
+      wrap.style.animationPlayState = open || prefersReduced ? 'paused' : 'running';
+    };
+    const mo = new MutationObserver(onAttr);
+    mo.observe(body, { attributes: true, attributeFilter: ['data-mobile-nav-open'] });
+    onAttr();
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        wrap.style.animationPlayState = e.isIntersecting && !prefersReduced ? 'running' : 'paused';
+      });
+    }, { rootMargin: '50px' });
+    io.observe(wrap);
+
+    const pause = () => (wrap.style.animationPlayState = 'paused');
+    const resume = () => onAttr();
+    wrap.addEventListener('pointerdown', pause, { passive: true });
+    wrap.addEventListener('pointerenter', pause, { passive: true });
+    wrap.addEventListener('pointerleave', resume, { passive: true });
+    wrap.addEventListener('pointerup', resume, { passive: true });
+
+    return () => {
+      ro.disconnect();
+      mo.disconnect();
+      io.disconnect();
+      wrap.removeEventListener('pointerdown', pause);
+      wrap.removeEventListener('pointerenter', pause);
+      wrap.removeEventListener('pointerleave', resume);
+      wrap.removeEventListener('pointerup', resume);
+    };
+  }, [speed, direction]);
+
+  const kids = useMemo(() => React.Children.toArray(children), [children]);
 
   return (
-    <div ref={emblaRef} className={className} style={{ touchAction: 'pan-y pinch-zoom' }}>
-      <div className="embla__container flex">
-        {/* Duplicate children to ensure gapless loop */}
-        {children}
-        {children}
+    <div className={className} style={{ touchAction: 'pan-y pinch-zoom' }}>
+      <div className="ticker-wrap overflow-hidden">
+        <div ref={wrapRef} className="ticker-track flex will-change-transform" style={{ animationName: 'ticker-left', animationDuration: 'var(--ticker-duration)', animationTimingFunction: 'linear', animationIterationCount: 'infinite', animationDirection: 'var(--ticker-direction, normal)' }}>
+          <div ref={setRef} className="ticker-set flex">
+            {kids}
+          </div>
+          <div className="ticker-set flex" aria-hidden>
+            {kids}
+          </div>
+        </div>
       </div>
     </div>
   );

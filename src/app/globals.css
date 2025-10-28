@@ -1105,3 +1105,12 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
 html.light-alt body[data-mobile-nav-open="true"] {
   --nav-cta-border: var(--brand-ink-strong);
 }
+/* Ticker marquee animation for mobile testimonials */
+@keyframes ticker-left {
+  from { transform: translate3d(0,0,0); }
+  to { transform: translate3d(calc(-1 * var(--ticker-span-px, 50%)), 0, 0); }
+}
+
+.ticker-track { animation-play-state: running; }
+.ticker-wrap { position: relative; }
+.ticker-set > * { flex: 0 0 auto; }
