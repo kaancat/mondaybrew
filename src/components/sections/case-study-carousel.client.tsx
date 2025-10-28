@@ -103,18 +103,21 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             setCanNext(embla.canScrollNext());
           }}
         >
-          {items.map((item, i) => (
+          {items.map((item, i) => {
+            const widthExpr = "calc((100% - var(--peek, 0px) - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
+            return (
             <Slide key={item._id || i}
               className="px-0"
-              // width calc: (100% - (C-1)*gap - peek)/C
               style={{
-                width: `calc((100% - var(--peek) - (var(--per-view) - 1) * var(--gap)) / var(--per-view))`,
-                marginRight: "var(--gap)",
+                width: widthExpr,
+                minWidth: widthExpr,
+                flex: `0 0 ${widthExpr}`,
+                marginRight: "var(--gap, 24px)",
               } as React.CSSProperties}
             >
               <CaseCard item={item} />
             </Slide>
-          ))}
+          );})}
         </Carousel>
       </div>
       {/* Controls bar below, fixed (not inside scroller) */}
