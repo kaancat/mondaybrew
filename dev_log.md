@@ -1,5 +1,48 @@
 # Dev Log
 
+## [2025-10-28] – Mobile Menu Panel Scroll Fix (Minimal, From Stable Baseline)
+**Goal**: Preserve panel scroll position without breaking the working visual card effect
+
+### Context
+After multiple attempts that broke the visual card positioning, we identified the stable baseline at `safety/2025-10-28-panel-scroll` (commit `40416c9`) where:
+- ✅ Open/close is smooth, no blink
+- ✅ Visual card effect works (rounded corners, proper positioning)  
+- ✅ Page scroll preserved on open/close
+- ❌ **Only bug**: Panel scroll resets to top on reopen
+
+### Root Cause
+Panel content was gated with `{mobileOpen && ( <motion.div> )}`, causing the entire content tree (including `.mobile-nav-scroll`) to unmount on close. When reopened, scrollTop resets to 0.
+
+### Solution Implemented (React Only, Zero CSS Changes)
+Starting from stable baseline, applied ONLY the minimal DOM persistence fix:
+
+**Changes:**
+1. `sheet.tsx`: Added `forceMount` prop support, pass to Radix primitives
+2. `navbar.client.tsx`: 
+   - Added `forceMount` to SheetContent
+   - Changed `{mobileOpen && ...}` to `animate={mobileOpen ? "show" : "hidden"}`
+   - Removed conditional unmount gate
+
+**Zero CSS modifications** - stable baseline geometry untouched.
+
+### Expected Behavior
+1. ✅ Page scroll preserved on open (stable baseline)
+2. ✅ Page scroll preserved on close (stable baseline)
+3. ✅ Visual card effect works correctly (stable baseline unchanged)
+4. ✅ Panel scroll preserved on reopen (new fix)
+
+### Files Modified
+- `web/src/components/ui/sheet.tsx`: Add forceMount prop support
+- `web/src/components/shared/navbar.client.tsx`: Use forceMount, remove unmount gate
+
+### Why This Approach Succeeds
+- **Surgical**: Only touches React component logic
+- **Preserves working state**: Stable baseline CSS untouched
+- **Single concern**: Fixes panel scroll only
+- **Minimal risk**: No visual card geometry changes
+
+---
+
 ## [2025-10-26] – Mobile Menu Scroll Restoration on Close Fix
 **Goal**: Fix scroll position restoration when closing the mobile menu
 
