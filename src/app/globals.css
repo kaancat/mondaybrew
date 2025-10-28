@@ -590,7 +590,8 @@ html.dark {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
     --site-shell-scale: 1;
-    --nav-card-inset: clamp(14px, 4vw, 24px);
+    /* Increase vertical inset so panel visibly wraps the card on small phones */
+    --nav-card-inset: clamp(22px, 5.5vw, 36px);
     --nav-card-radius: clamp(20px, 6vw, 32px);
     --nav-card-offset-y: 0px;
     --site-shell-inset: var(--nav-card-inset);
