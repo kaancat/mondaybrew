@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CaseStudy } from "@/types/caseStudy";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Carousel, { Slide } from "@/components/carousel/Carousel";
 
 export interface CaseStudyCarouselProps {
   items: CaseStudy[];
@@ -17,104 +18,38 @@ export interface CaseStudyCarouselProps {
 
 export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, exploreLabel = "Explore all cases", eyebrow, headlineText, intro }: CaseStudyCarouselProps) {
   const clampedInitial = Math.min(Math.max(initialIndex, 0), Math.max(items.length - 1, 0));
-  const frameRef = useRef<HTMLDivElement>(null); // non-scrolling frame
-  const scrollerRef = useRef<HTMLDivElement>(null); // scrollable track
-  const [index, setIndex] = useState(clampedInitial);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const apiRef = useRef<import("embla-carousel").EmblaCarouselType | null>(null);
   const [perView, setPerView] = useState(1);
   const [containerWidth, setContainerWidth] = useState(0);
-  const rafRef = useRef<number | null>(null);
 
-  // Responsive items per view
+  // Responsive items per view (1 / 2 / 3) and dynamic peek & gaps
   useEffect(() => {
     const el = frameRef.current;
     if (!el) return;
     const ro = new ResizeObserver(([entry]) => {
       const w = entry.contentRect.width;
-      // Align with site breakpoints and enforce larger cards:
-      // 1 on mobile (< 768), 2 on tablet (>= 768), 3 on desktop (>= 1200)
-      const next = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
-      setPerView(next);
+      const pv = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
+      setPerView(pv);
       setContainerWidth(Math.floor(w));
+      el.style.setProperty("--per-view", String(pv));
+      const gap = w >= 1200 ? 32 : 24;
+      el.style.setProperty("--gap", `${gap}px`);
+      const peek = Math.min(Math.round(w * 0.1), 120);
+      el.style.setProperty("--peek", `${peek}px`);
     });
     ro.observe(el);
-    // Fallback for browsers where RO may not fire as expected
-    const update = () => {
-      const w = el.getBoundingClientRect().width;
-      const next = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
-      setPerView(next);
-      setContainerWidth(Math.floor(w));
-    };
-    window.addEventListener("resize", update);
-    update();
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", update);
-    };
+    return () => ro.disconnect();
   }, []);
 
-  // Layout constants derived from container width
-  const gapPx = useMemo(() => (containerWidth >= 1200 ? 32 : 24), [containerWidth]); // lg:gap-8, base:gap-6
-  const peekPx = useMemo(() => {
-    if (!containerWidth) return 0;
-    const pct = Math.round(containerWidth * 0.1); // 10% of visible width
-    return Math.min(pct, 120); // cap at 120px
-  }, [containerWidth]);
-
-  // Derived card width and paging math
-  const cardWidth = useMemo(() => {
-    if (!containerWidth || perView < 1) return 0;
-    // cardW = (Wv - P - (C-1)*G) / C
-    const w = (containerWidth - peekPx - (perView - 1) * gapPx) / perView;
-    return Math.max(0, Math.floor(w));
-  }, [containerWidth, perView, gapPx, peekPx]);
-
-  const totalWidth = useMemo(() => (items.length * cardWidth) + Math.max(0, items.length - 1) * gapPx, [items.length, cardWidth, gapPx]);
-  const maxOffset = useMemo(() => Math.max(0, totalWidth - containerWidth), [totalWidth, containerWidth]);
-
-  // Keep index clamped if layout changes
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const approx = Math.round((el.scrollLeft || 0) / Math.max(cardWidth + gapPx, 1));
-    setIndex(approx);
-  }, [cardWidth, gapPx]);
-
-  // Arrows use scrollToIndex; no standalone prev/next needed
-
-  const prefersReduced = useMemo(() =>
-    typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    []);
-
-  // Arrow chunk scroll (nudge)
+  const [selected, setSelected] = useState(0);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
-  const updateEdges = useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    const sl = el.scrollLeft;
-    const eps = 1;
-    setCanPrev(sl > eps);
-    setCanNext(max - sl > eps);
-    const approx = Math.round(sl / Math.max(cardWidth + gapPx, 1));
-    setIndex((prev) => (approx === prev ? prev : approx));
-  }, [cardWidth, gapPx]);
-
-  const scrollByChunk = useCallback((dir: -1 | 1) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const one = cardWidth + gapPx;
-    const chunk = Math.max(one, containerWidth - one);
-    const next = Math.min(Math.max(0, Math.round(el.scrollLeft + dir * chunk)), Math.round(maxOffset));
-    el.scrollTo({ left: next, behavior: prefersReduced ? "auto" : "smooth" });
-  }, [cardWidth, gapPx, containerWidth, maxOffset, prefersReduced]);
-
   const announcement = useMemo(() => {
-    const clamped = Math.min(Math.max(index, 0), Math.max(items.length - 1, 0));
-    const current = items[clamped];
-    if (!current) return "";
-    return `Showing ${current.title}`;
-  }, [index, items]);
+    const idx = Math.min(Math.max(selected, 0), Math.max(items.length - 1, 0));
+    const current = items[idx];
+    return current ? `Showing ${current.title}` : "";
+  }, [selected, items]);
 
   return (
     <div className="group/section">
@@ -137,42 +72,60 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         )}
       </div>
 
-      <div
-        ref={frameRef}
-        className="relative"
+      <div ref={frameRef} className="relative" aria-roledescription="carousel" tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === "ArrowLeft") scrollByChunk(-1);
-          if (e.key === "ArrowRight") scrollByChunk(1);
+          const api = apiRef.current;
+          if (!api) return;
+          const sel = api.selectedScrollSnap();
+          if (e.key === "ArrowLeft") api.scrollTo(Math.max(0, sel - perView));
+          if (e.key === "ArrowRight") api.scrollTo(Math.min(api.scrollSnapList().length - 1, sel + perView));
         }}
-        aria-roledescription="carousel"
-        tabIndex={0}
+        style={{ paddingRight: "var(--peek)" }}
       >
-        <div
-          ref={scrollerRef}
-          className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x"
-          onScroll={() => {
-            if (rafRef.current) cancelAnimationFrame(rafRef.current);
-            rafRef.current = requestAnimationFrame(() => updateEdges());
+        <Carousel
+          options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
+          className="overflow-hidden"
+          onReady={(embla) => {
+            // Scroll to initial index on mount
+            const snap = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
+            embla.scrollTo(snap, false);
+            apiRef.current = embla;
+            setSelected(embla.selectedScrollSnap());
+            const onSelect = () => {
+              setSelected(embla.selectedScrollSnap());
+              setCanPrev(embla.canScrollPrev());
+              setCanNext(embla.canScrollNext());
+            };
+            embla.on("select", onSelect);
+            embla.on("reInit", onSelect);
+            // Initial edge states
+            setCanPrev(embla.canScrollPrev());
+            setCanNext(embla.canScrollNext());
           }}
         >
-          <ul
-            className="flex"
-            style={{ gap: `${gapPx}px`, width: `${Math.max(totalWidth, containerWidth)}px` }}
-            aria-live="polite"
-          >
-            {items.map((item, i) => (
-              <li key={item._id || i} className="shrink-0" style={{ width: `${cardWidth}px` }}>
-                <CaseCard item={item} />
-              </li>
-            ))}
-          </ul>
-        </div>
+          {items.map((item, i) => (
+            <Slide key={item._id || i}
+              className="px-0"
+              // width calc: (100% - (C-1)*gap - peek)/C
+              style={{
+                width: `calc((100% - var(--peek) - (var(--per-view) - 1) * var(--gap)) / var(--per-view))`,
+                marginRight: "var(--gap)",
+              } as React.CSSProperties}
+            >
+              <CaseCard item={item} />
+            </Slide>
+          ))}
+        </Carousel>
       </div>
       {/* Controls bar below, fixed (not inside scroller) */}
       <div className="mt-6 flex items-center justify-end gap-2">
         <button
           type="button"
-          onClick={() => scrollByChunk(-1)}
+          onClick={() => {
+            const api = apiRef.current; if (!api) return;
+            const sel = api.selectedScrollSnap();
+            api.scrollTo(Math.max(0, sel - perView));
+          }}
           disabled={!canPrev}
           aria-label="Scroll left"
           className={cn(
@@ -186,7 +139,11 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         </button>
         <button
           type="button"
-          onClick={() => scrollByChunk(1)}
+          onClick={() => {
+            const api = apiRef.current; if (!api) return;
+            const sel = api.selectedScrollSnap();
+            api.scrollTo(Math.min(api.scrollSnapList().length - 1, sel + perView));
+          }}
           disabled={!canNext}
           aria-label="Scroll right"
           className={cn(

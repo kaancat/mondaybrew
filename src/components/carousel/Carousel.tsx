@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, createContext, useContext } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import type { EmblaOptionsType, EmblaCarouselType } from "embla-carousel";
 
@@ -11,6 +11,16 @@ type CarouselProps = React.PropsWithChildren<{
   /** Pause drag/autoplay when mobile drawer is open (reads body[data-mobile-nav-open]) */
   pauseOnDrawer?: boolean;
 }>;
+
+type Ctx = {
+  api: EmblaCarouselType | null;
+};
+
+const CarouselCtx = createContext<Ctx>({ api: null });
+
+export function useCarouselApi() {
+  return useContext(CarouselCtx).api;
+}
 
 export function Carousel({ options, className, children, onReady, pauseOnDrawer = true }: CarouselProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -32,7 +42,6 @@ export function Carousel({ options, className, children, onReady, pauseOnDrawer 
   // Pause when the mobile drawer is open to avoid interaction conflicts.
   useEffect(() => {
     if (!pauseOnDrawer) return;
-    if (!emblaApi) return;
     const body = document.body;
     const handle = () => {
       const open = body.getAttribute("data-mobile-nav-open") === "true";
@@ -43,14 +52,16 @@ export function Carousel({ options, className, children, onReady, pauseOnDrawer 
     mo.observe(body, { attributes: true, attributeFilter: ["data-mobile-nav-open"] });
     handle();
     return () => mo.disconnect();
-  }, [emblaApi, pauseOnDrawer, mergedOptions]);
+  }, [pauseOnDrawer]);
 
   return (
-    <div ref={(node) => { viewportRef.current = node; emblaRef(node as HTMLDivElement); }} className={className}>
-      <div className="embla__container flex">
-        {children}
+    <CarouselCtx.Provider value={{ api: emblaApi ?? null }}>
+      <div ref={(node) => { viewportRef.current = node; emblaRef(node as HTMLDivElement); }} className={className}>
+        <div className="embla__container flex">
+          {children}
+        </div>
       </div>
-    </div>
+    </CarouselCtx.Provider>
   );
 }
 
@@ -58,6 +69,109 @@ export function Slide({ className, children }: React.PropsWithChildren<{ classNa
   return (
     <div className={"embla__slide shrink-0 " + (className ?? "")}>
       {children}
+    </div>
+  );
+}
+
+export function PrevButton({ by = 1, className, children, ariaLabel = "Previous" }: { by?: number; className?: string; children?: React.ReactNode; ariaLabel?: string }) {
+  const api = useCarouselApi();
+  const [disabled, setDisabled] = useState(true);
+  const update = useCallback(() => {
+    if (!api) return;
+    setDisabled(!api.canScrollPrev());
+  }, [api]);
+  useEffect(() => {
+    if (!api) return;
+    update();
+    api.on("select", update);
+    api.on("reInit", update);
+    return () => {
+      api.off("select", update);
+      api.off("reInit", update);
+    };
+  }, [api, update]);
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      onClick={() => {
+        if (!api) return;
+        const next = Math.max(0, api.selectedScrollSnap() - by);
+        api.scrollTo(next);
+      }}
+      disabled={disabled}
+      className={className}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function NextButton({ by = 1, className, children, ariaLabel = "Next" }: { by?: number; className?: string; children?: React.ReactNode; ariaLabel?: string }) {
+  const api = useCarouselApi();
+  const [disabled, setDisabled] = useState(true);
+  const update = useCallback(() => {
+    if (!api) return;
+    setDisabled(!api.canScrollNext());
+  }, [api]);
+  useEffect(() => {
+    if (!api) return;
+    update();
+    api.on("select", update);
+    api.on("reInit", update);
+    return () => {
+      api.off("select", update);
+      api.off("reInit", update);
+    };
+  }, [api, update]);
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      onClick={() => {
+        if (!api) return;
+        const next = Math.min(api.scrollSnapList().length - 1, api.selectedScrollSnap() + by);
+        api.scrollTo(next);
+      }}
+      disabled={disabled}
+      className={className}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function Dots({ className }: { className?: string }) {
+  const api = useCarouselApi();
+  const [snaps, setSnaps] = useState<number[]>([]);
+  const [selected, setSelected] = useState(0);
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setSelected(api.selectedScrollSnap());
+    setSnaps(api.scrollSnapList());
+    onSelect();
+    api.on("select", onSelect);
+    api.on("reInit", () => {
+      setSnaps(api.scrollSnapList());
+      onSelect();
+    });
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
+  if (!api || snaps.length <= 1) return null;
+  return (
+    <div className={className} role="tablist" aria-label="Carousel Pagination">
+      {snaps.map((_, i) => (
+        <button
+          key={i}
+          role="tab"
+          aria-selected={i === selected}
+          aria-label={`Go to slide ${i + 1}`}
+          className={"mx-1 h-2 w-2 rounded-full " + (i === selected ? "bg-foreground" : "bg-muted")}
+          onClick={() => api.scrollTo(i)}
+        />
+      ))}
     </div>
   );
 }
