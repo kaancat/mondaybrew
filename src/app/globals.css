@@ -589,7 +589,7 @@ html.dark {
   body[data-mobile-nav-open="true"] {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
-    --site-shell-scale: 0.9;
+    --site-shell-scale: 1;
     --nav-card-inset: clamp(14px, 4vw, 24px);
     --nav-card-radius: clamp(20px, 6vw, 32px);
     --nav-card-offset-y: 0px;
@@ -732,6 +732,11 @@ html.dark {
     visibility: visible;
     pointer-events: auto;
     transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
+    /* Visual wrap on right edge so panel frames the card */
+    border-top-right-radius: var(--nav-card-radius);
+    border-bottom-right-radius: var(--nav-card-radius);
+    overflow: hidden;
+    background: var(--mobile-nav-surface);
   }
 
 
