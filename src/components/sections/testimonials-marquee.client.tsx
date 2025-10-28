@@ -601,8 +601,8 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
 // Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
   // Faster autoplay on mobile; ignore legacy percentages to achieve a snappier feel
-  const mobileTopSpeed = 50;   // px/s
-  const mobileBottomSpeed = 46; // px/s
+  const mobileTopSpeed = 52.5;   // px/s (+5%)
+  const mobileBottomSpeed = 48.3; // px/s (+5%)
 
   return (
     // On mobile we want the rows to start right under the heading; keep bottom-aligned only on md+.

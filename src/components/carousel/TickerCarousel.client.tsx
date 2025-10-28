@@ -13,6 +13,8 @@ export default function TickerCarousel({ children, speed = 42, direction = 1, cl
     const setEl = setRef.current;
     if (!wrap || !setEl) return;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const supportsHover = window.matchMedia('(hover: hover)').matches;
+    let resumeTimer: number | null = null;
     const apply = () => {
       const span = setEl.scrollWidth;
       const duration = Math.max(10, span / Math.max(8, speed));
@@ -41,11 +43,36 @@ export default function TickerCarousel({ children, speed = 42, direction = 1, cl
     }, { rootMargin: '50px' });
     io.observe(wrap);
 
-    const pause = () => (wrap.style.animationPlayState = 'paused');
-    const resume = () => onAttr();
-    wrap.addEventListener('pointerenter', pause, { passive: true });
-    wrap.addEventListener('pointerleave', resume, { passive: true });
-    wrap.addEventListener('pointerup', resume, { passive: true });
+    const pause = () => { wrap.style.animationPlayState = 'paused'; };
+    const resume = () => { onAttr(); };
+
+    // Desktop (hover-capable): pause on hover, resume on leave
+    if (supportsHover) {
+      wrap.addEventListener('pointerenter', pause, { passive: true });
+      wrap.addEventListener('pointerleave', resume, { passive: true });
+    } else {
+      // Mobile: pause on tap, resume on release OR after a short delay
+      const onDown = () => {
+        pause();
+        if (resumeTimer) window.clearTimeout(resumeTimer);
+        resumeTimer = window.setTimeout(resume, 1200);
+      };
+      const onUp = () => {
+        if (resumeTimer) { window.clearTimeout(resumeTimer); resumeTimer = null; }
+        resume();
+      };
+      wrap.addEventListener('pointerdown', onDown, { passive: true });
+      wrap.addEventListener('pointerup', onUp, { passive: true });
+      wrap.addEventListener('pointercancel', onUp, { passive: true });
+      // cleanup mobile listeners
+      const cleanupMobile = () => {
+        wrap.removeEventListener('pointerdown', onDown);
+        wrap.removeEventListener('pointerup', onUp);
+        wrap.removeEventListener('pointercancel', onUp);
+      };
+      // attach to return for proper cleanup without using `any`
+      (wrap as unknown as Record<string, unknown>).__tickerCleanupMobile = cleanupMobile as unknown as () => void;
+    }
 
     return () => {
       ro.disconnect();
@@ -53,7 +80,8 @@ export default function TickerCarousel({ children, speed = 42, direction = 1, cl
       io.disconnect();
       wrap.removeEventListener('pointerenter', pause);
       wrap.removeEventListener('pointerleave', resume);
-      wrap.removeEventListener('pointerup', resume);
+      const clean = (wrap as unknown as Record<string, unknown>).__tickerCleanupMobile as undefined | (() => void);
+      if (typeof clean === 'function') clean();
     };
   }, [speed, direction]);
 
