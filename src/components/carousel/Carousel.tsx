@@ -65,9 +65,9 @@ export function Carousel({ options, className, children, onReady, pauseOnDrawer 
   );
 }
 
-export function Slide({ className, children }: React.PropsWithChildren<{ className?: string }>) {
+export function Slide({ className, style, children }: React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>) {
   return (
-    <div className={"embla__slide shrink-0 " + (className ?? "")}>
+    <div className={"embla__slide shrink-0 " + (className ?? "")} style={style}>
       {children}
     </div>
   );
