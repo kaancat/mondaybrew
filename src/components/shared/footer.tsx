@@ -80,7 +80,7 @@ export function Footer() {
           <div className={`pt-4 border-t ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] gap-3 sm:gap-0 w-full items-start md:justify-items-center">
               {/* Column 1: Privacy Policy + Copyright */}
-              <div className={`flex flex-col gap-2 items-start w-full pt-4 md:pt-0 border-t md:border-t-0 ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
+              <div className={`flex flex-col gap-2 items-start w-full pt-4 md:pt-0 border-t md:border-t-0 first:pt-0 first:border-t-0 ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
                 <Link
                   href="/privacy-policy"
                   className={`text-sm transition-colors block ${isLightAlt
@@ -99,7 +99,7 @@ export function Footer() {
               <div className={`hidden sm:block w-px self-stretch -mt-4 -mb-6 ${isLightAlt ? "bg-black/10" : "bg-white/10"}`} aria-hidden="true"></div>
 
               {/* Column 2: Social Media */}
-              <div className={`flex flex-col gap-2 items-start w-full pt-4 md:pt-0 border-t md:border-t-0 ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
+              <div className={`flex flex-col gap-2 items-start w-full pt-4 md:pt-0 border-t md:border-t-0 first:pt-0 first:border-t-0 ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
                 <a
                   href="https://www.linkedin.com/company/mondaybrew"
                   target="_blank"
@@ -128,7 +128,7 @@ export function Footer() {
               <div className={`hidden sm:block w-px self-stretch -mt-4 -mb-6 ${isLightAlt ? "bg-black/10" : "bg-white/10"}`} aria-hidden="true"></div>
 
               {/* Column 3: Email + Phone */}
-              <div className={`flex flex-col gap-2 items-start w-full pt-4 md:pt-0 border-t md:border-t-0 ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
+              <div className={`flex flex-col gap-2 items-start w-full pt-4 md:pt-0 border-t md:border-t-0 first:pt-0 first:border-t-0 ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
                 <a
                   href="mailto:hej@mondaybrew.dk"
                   className={`text-sm transition-colors block ${isLightAlt
@@ -153,7 +153,7 @@ export function Footer() {
               <div className={`hidden sm:block w-px self-stretch -mt-4 -mb-6 ${isLightAlt ? "bg-black/10" : "bg-white/10"}`} aria-hidden="true"></div>
 
               {/* Column 4: Address */}
-              <div className={`flex flex-col gap-2 items-start w-full pt-4 md:pt-0 border-t md:border-t-0 ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
+              <div className={`flex flex-col gap-2 items-start w-full pt-4 md:pt-0 border-t md:border-t-0 first:pt-0 first:border-t-0 ${isLightAlt ? "border-black/10" : "border-white/10"}`}>
                 <p className={`text-sm ${isLightAlt ? "text-black/80" : "text-white/80"}`}>
                   Vesterbrogade 74, 4. sal
                 </p>
