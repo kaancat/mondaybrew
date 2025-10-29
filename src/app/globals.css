@@ -534,7 +534,7 @@ html.dark {
   .background-dots {
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
     background-color: transparent;
     background-image: radial-gradient(circle, var(--site-dot-color) var(--site-dot-size), transparent calc(var(--site-dot-size) + 1px));
