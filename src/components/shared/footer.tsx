@@ -67,14 +67,11 @@ export function Footer() {
 
           {/* Logo */}
           <div className="mb-4">
-            <Image
+            <img
               src={isLightAlt ? "/brand/mondaybrew_footer_logo.svg" : "/brand/mondaybrew_footer_orange.svg"}
               alt="MondayBrew"
-              width={1000}
-              height={200}
               className="w-full h-auto opacity-15"
-              priority
-              unoptimized
+              loading="lazy"
             />
           </div>
 
