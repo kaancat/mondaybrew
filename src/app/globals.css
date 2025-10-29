@@ -106,6 +106,10 @@
   --full-bleed-inline-end: calc(50% - 50vw);
   --full-bleed-width: 100vw;
 
+  --site-dot-size: 1.25px;
+  --site-dot-spacing: 28px;
+  --site-dot-opacity: 0.28;
+
   --mobile-nav-surface: color-mix(in oklch, var(--mb-bg) 92%, white 8%);
   --mobile-nav-text: color-mix(in oklch, var(--mb-ink) 92%, black 8%);
   --mobile-nav-muted: color-mix(in oklch, var(--mb-ink) 60%, white 40%);
@@ -160,6 +164,9 @@ html.light-primary {
   --mb-ink: #49444b;
   --mb-accent: #ff914d;
   --mb-bg: #f5f7fd;
+
+  --site-dot-color: color-mix(in oklch, var(--foreground) 16%, transparent);
+  --site-dot-opacity: 0.22;
 
   --surface-base: var(--mb-bg);
   --surface-elevated: color-mix(in oklch, white 30%, var(--mb-bg));
@@ -305,6 +312,9 @@ html.light-alt {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
+  --site-dot-color: color-mix(in oklch, var(--foreground) 14%, transparent);
+  --site-dot-opacity: 0.18;
+
   /* Navbar tokens tuned for Light Alt white/glass + black ink */
   /* Light Alt: nudge more see-through */
   /* Make header shell more transparent and subtle on Light Alt */
@@ -422,6 +432,9 @@ html.dark {
   --sidebar-border: color-mix(in oklch, var(--brand-light) 18%, var(--mb-bg) 82%);
   --sidebar-ring: color-mix(in oklch, var(--mb-accent) 52%, var(--mb-bg) 48%);
 
+  --site-dot-color: color-mix(in oklch, var(--foreground) 28%, transparent);
+  --site-dot-opacity: 0.36;
+
   /* Dark glass header over #49444B */
   /* Dark: nudge more see-through */
   --nav-shell-bg: color-mix(in oklch, var(--background) 52%, transparent);
@@ -516,6 +529,18 @@ html.dark {
     /* Changed from hidden to clip to allow horizontal scroll in child containers */
     overflow-x: clip;
     position: relative;
+  }
+
+  .background-dots {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: transparent;
+    background-image: radial-gradient(circle, var(--site-dot-color) var(--site-dot-size), transparent calc(var(--site-dot-size) + 1px));
+    background-size: var(--site-dot-spacing) var(--site-dot-spacing);
+    background-position: calc(var(--site-dot-spacing) / 2) calc(var(--site-dot-spacing) / 2);
+    opacity: var(--site-dot-opacity);
   }
 
   /* Global Typography System */

@@ -40,6 +40,7 @@ export default function RootLayout({
     <html lang="da" suppressHydrationWarning>
       <body className={`${sailec.variable} ${heywow.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <ThemeProvider>
+          <div aria-hidden="true" className="background-dots" />
           {process.env.NEXT_PUBLIC_DUMP_TOKENS === "1" ? <TokenDump /> : null}
           <JsonLd
             id="org-jsonld"
