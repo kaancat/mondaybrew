@@ -74,6 +74,7 @@ export function Footer() {
               height={200}
               className="w-full h-auto opacity-15"
               priority
+              unoptimized
             />
           </div>
 
