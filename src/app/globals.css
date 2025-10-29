@@ -108,7 +108,7 @@
 
   --site-dot-size: 1.25px;
   --site-dot-spacing: 28px;
-  --site-dot-opacity: 0.28;
+  --site-dot-opacity: 1;
 
   --mobile-nav-surface: color-mix(in oklch, var(--mb-bg) 92%, white 8%);
   --mobile-nav-text: color-mix(in oklch, var(--mb-ink) 92%, black 8%);
@@ -165,8 +165,8 @@ html.light-primary {
   --mb-accent: #ff914d;
   --mb-bg: #f5f7fd;
 
-  --site-dot-color: color-mix(in oklch, var(--foreground) 16%, transparent);
-  --site-dot-opacity: 0.22;
+  --site-dot-color: color-mix(in oklch, var(--foreground) 22%, transparent);
+  --site-dot-opacity: 1;
 
   --surface-base: var(--mb-bg);
   --surface-elevated: color-mix(in oklch, white 30%, var(--mb-bg));
@@ -312,8 +312,8 @@ html.light-alt {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  --site-dot-color: color-mix(in oklch, var(--foreground) 14%, transparent);
-  --site-dot-opacity: 0.18;
+  --site-dot-color: color-mix(in oklch, var(--foreground) 18%, transparent);
+  --site-dot-opacity: 1;
 
   /* Navbar tokens tuned for Light Alt white/glass + black ink */
   /* Light Alt: nudge more see-through */
@@ -432,8 +432,8 @@ html.dark {
   --sidebar-border: color-mix(in oklch, var(--brand-light) 18%, var(--mb-bg) 82%);
   --sidebar-ring: color-mix(in oklch, var(--mb-accent) 52%, var(--mb-bg) 48%);
 
-  --site-dot-color: color-mix(in oklch, var(--foreground) 28%, transparent);
-  --site-dot-opacity: 0.36;
+  --site-dot-color: color-mix(in oklch, var(--foreground) 32%, transparent);
+  --site-dot-opacity: 1;
 
   /* Dark glass header over #49444B */
   /* Dark: nudge more see-through */
