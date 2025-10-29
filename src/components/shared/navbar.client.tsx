@@ -240,6 +240,8 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const [megaMenuContent, setMegaMenuContent] = useState<React.ReactNode>(null);
   const desktopNavRef = useRef<HTMLDivElement>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isOverFooter, setIsOverFooter] = useState(false);
+  const [shouldFadeHeader, setShouldFadeHeader] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -425,6 +427,48 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     };
   }, []);
 
+  // Detect when header intersects with footer CTA heading
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const header = headerRef.current;
+    const footer = document.querySelector("footer");
+    const ctaHeading = document.getElementById("footer-cta-heading");
+    if (!header || !footer || !ctaHeading) return;
+
+    const checkIntersection = () => {
+      const headerRect = header.getBoundingClientRect();
+      const footerRect = footer.getBoundingClientRect();
+      const ctaHeadingRect = ctaHeading.getBoundingClientRect();
+
+      const fadeOffset = 100; // Start fading 100px before intersection
+
+      // Check if header and footer rectangles overlap (for icon color change)
+      const isIntersecting = !(
+        headerRect.bottom < footerRect.top ||
+        headerRect.top > footerRect.bottom ||
+        headerRect.right < footerRect.left ||
+        headerRect.left > footerRect.right
+      );
+
+      // Only fade if header would actually overlap with CTA heading (not just get close)
+      // Check if header's bottom edge is past the CTA heading's top edge
+      const shouldFade = headerRect.bottom > ctaHeadingRect.top;
+
+      setIsOverFooter(isIntersecting);
+      setShouldFadeHeader(shouldFade);
+    };
+
+    checkIntersection();
+    window.addEventListener("scroll", checkIntersection, { passive: true });
+    window.addEventListener("resize", checkIntersection);
+
+    return () => {
+      window.removeEventListener("scroll", checkIntersection);
+      window.removeEventListener("resize", checkIntersection);
+    };
+  }, []);
+
   const handleOpenChange = onOpenChange;
 
   // Note: Avoid VisualViewport translations on iOS — they can cause the header
@@ -435,7 +479,10 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     <>
       <header
         ref={headerRef}
-        className="fixed inset-x-0 top-0 z-[9999]"
+        className={cn(
+          "fixed inset-x-0 top-0 z-[9999] transition-opacity duration-300",
+          shouldFadeHeader ? "opacity-0 pointer-events-none" : "opacity-100"
+        )}
         style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}
       >
         <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
@@ -697,7 +744,12 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   <button
                     type="button"
                     onClick={() => setTheme(nextThemeId)}
-                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent px-2 py-1.5 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                    className={cn(
+                      "inline-flex items-center justify-center rounded-[5px] border bg-transparent px-2 py-1.5 transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]",
+                      isOverFooter && currentThemeId === "light-primary"
+                        ? "border-transparent text-white"
+                        : "border-[color:var(--nav-toggle-border)] text-[color:var(--nav-toggle-text)]"
+                    )}
                     aria-label={`Switch to ${nextTheme.label}`}
                   >
                     {themeIcon}
@@ -713,7 +765,12 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
               </Link>
               <Link
                 href={localeConfig.href}
-                className="inline-flex items-center justify-center gap-2 rounded-[5px] border border-[color:var(--nav-locale-border)] bg-transparent px-3 py-1.5 text-xs font-normal text-[color:var(--nav-locale-text)] transition-colors hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 rounded-[5px] border bg-transparent px-3 py-1.5 text-xs font-normal transition-colors hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]",
+                  isOverFooter && currentThemeId === "light-primary"
+                    ? "border-transparent text-white"
+                    : "border-[color:var(--nav-locale-border)] text-[color:var(--nav-locale-text)]"
+                )}
               >
                 <Globe className="size-[16px]" aria-hidden="true" />
                 <span>{localeConfig.active}</span>

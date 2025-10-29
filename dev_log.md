@@ -1,5 +1,45 @@
 # Dev Log
 
+## [2025-10-29] – Footer Contact Info Layout & Header Fade Targeting
+**Goal**: Restore large gaps in contact section and make header fade smarter
+
+### Contact Info Layout Fix (Revision 3)
+**Problem**: Contact columns kept bunching together instead of spreading across full viewport width
+**Solution**: 
+- Used explicit grid column template: `grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr]`
+- 7 columns total: 4 flexible (1fr) for content, 3 auto-width for separators
+- Grid forces content columns to expand and fill available space equally
+- Separators (`auto` width) sit naturally centered between expanding columns
+- Made separators edge-to-edge: `self-stretch -mt-4 -mb-6` to touch top border and bottom of container
+**Impact**: Contact info properly spreads across almost entire viewport width with centered, full-height separators
+
+### Targeted Header Fade (Revision 2)
+**Problem**: Header was fading out prematurely on large screens due to 100px fadeOffset buffer
+**Solution**:
+- Added `id="footer-cta-heading"` to the "Lad os bygge noget fedt sammen" heading
+- Removed fadeOffset buffer - now only fades when actual intersection occurs
+- Logic: `headerRect.bottom > ctaHeadingRect.top` (no premature triggering)
+- Removed debug logging for cleaner console
+**Reasoning**: Large screens have more vertical space - CTA heading never reaches header, so it should never fade
+**Behavior**: 
+- Large screens: Header always visible (CTA heading stays far below)
+- Small screens: Header fades only when it actually starts overlapping CTA text
+- Icon color change still uses full footer intersection for background matching
+**Impact**: Header now only fades when truly necessary (actual overlap), not preemptively
+
+### Files Modified
+- `src/components/shared/footer.tsx`: Grid layout restoration and CTA heading ID
+- `src/components/shared/navbar.client.tsx`: Targeted intersection detection
+
+---
+
+## [2025-10-29] – Fade Footer Logo Color Slightly
+Goal: Subtly reduce the intensity of the footer SVG logo color.
+
+- Action: Updated `src/components/shared/footer.tsx` to add Tailwind `opacity-80` on the footer `<Image>` displaying `mondaybrew_footer_orange.svg`. Follow-ups: Increased fade strength to `opacity-60`, then to `opacity-30` per request.
+- Impact: Footer logo appears less intense (≈80% opacity) for a softer look against the dark background. No functional changes. Lint clean.
+- NOTE: If the asset filename uses different casing on disk (e.g., `MondayBrew_footer_orange.svg`), update the path accordingly.
+
 ## [2025-10-23] – Hero Page Component: Hybrid Approach
 **Goal**: Make Hero Page available in Sanity Studio while keeping existing pages hardcoded
 
