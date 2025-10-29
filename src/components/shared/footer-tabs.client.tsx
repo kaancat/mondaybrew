@@ -17,7 +17,7 @@ export function FooterTabs() {
     const isLightAlt = resolvedTheme === "light-alt";
 
     return (
-        <div className="flex flex-col md:flex-row gap-40">
+        <div className="flex flex-col md:flex-row gap-10 md:gap-24">
             {/* Column 1: Marketing */}
             <nav className="flex flex-col" aria-label="Marketing services">
                 <h3 className={`text-lg font-bold uppercase tracking-wider mb-6 ${isLightAlt ? "text-black" : "text-white"}`}>
@@ -135,4 +135,3 @@ export function FooterTabs() {
         </div>
     );
 }
-

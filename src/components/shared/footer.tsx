@@ -21,31 +21,30 @@ export function Footer() {
       className="relative overflow-hidden"
       style={{
         backgroundColor: isLightAlt ? "#ffffff" : "#49444B",
-        height: "100vh",
       } as React.CSSProperties}>
       {/* Footer content */}
-      <div className="relative z-10 h-full flex flex-col justify-between">
-        {/* Main content - centered in the upper space */}
-        <div className="flex-1 flex items-center px-[var(--container-gutter)]">
-          <div className="w-full flex flex-col lg:flex-row gap-12 lg:gap-24 items-center lg:items-start">
+      <div className="relative z-10 flex flex-col justify-between">
+        {/* Main content */}
+        <div className="px-[var(--container-gutter)] pt-12 pb-10 md:pt-16 lg:pt-24">
+          <div className="w-full flex flex-col lg:flex-row gap-10 lg:gap-24 items-start">
             {/* Left side - CTA */}
             <div className="flex-1">
-              <h2 id="footer-cta-heading" className={`text-4xl md:text-5xl font-bold mb-6 ${isLightAlt ? "text-black" : "text-white"}`}>
+              <h2 id="footer-cta-heading" className={`text-[clamp(28px,5.2vw,42px)] md:text-5xl font-bold mb-4 md:mb-6 ${isLightAlt ? "text-black" : "text-white"}`}>
                 Lad os bygge noget fedt sammen
               </h2>
-              <p className={`text-lg mb-8 ${isLightAlt ? "text-black/70" : "text-white/70"}`}>
+              <p className={`text-base md:text-lg mb-6 md:mb-8 ${isLightAlt ? "text-black/70" : "text-white/70"}`}>
                 Vi hjælper ambitiøse brands med at vokse gennem moderne web og performance marketing.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
                 <Link
                   href="/kontakt"
-                  className="inline-flex items-center justify-center gap-2 rounded-[5px] bg-[#F97844] px-6 py-3 text-base font-medium text-white transition-colors hover:bg-[#e8693a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F97844] focus-visible:ring-offset-2"
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-[5px] bg-[#F97844] px-6 py-3 text-base font-medium text-white transition-colors hover:bg-[#e8693a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F97844] focus-visible:ring-offset-2"
                 >
                   Start et projekt
                 </Link>
                 <Link
                   href="/services"
-                  className={`inline-flex items-center justify-center gap-2 rounded-[5px] border px-6 py-3 text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${isLightAlt
+                  className={`inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-[5px] border px-6 py-3 text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${isLightAlt
                     ? "border-black/20 text-black hover:bg-black/5"
                     : "border-white/20 text-white hover:bg-white/5"
                     }`}
@@ -56,7 +55,7 @@ export function Footer() {
             </div>
 
             {/* Right side - Navigation */}
-            <div className="lg:w-1/2 lg:pr-16">
+            <div className="lg:w-1/2 lg:pr-16 w-full">
               <FooterTabs />
             </div>
           </div>
@@ -66,11 +65,11 @@ export function Footer() {
         <div className="w-full px-[var(--container-gutter)] pb-6">
 
           {/* Logo */}
-          <div className="mb-4">
+          <div className="mb-6 md:mb-4">
             <Image
               src={isLightAlt ? "/brand/mondaybrew_footer_logo.svg" : "/brand/MondayBrew_footer_orange.svg"}
               alt="MondayBrew"
-              className="w-full h-auto opacity-15"
+              className="w-full h-auto opacity-10 md:opacity-15"
               width={1000}
               height={200}
               priority={false}
