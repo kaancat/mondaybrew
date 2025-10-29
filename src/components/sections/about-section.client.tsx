@@ -155,7 +155,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
               className="pointer-events-none absolute inset-0 opacity-0 md:opacity-100"
               style={{
                 backgroundImage:
-                  "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_26%, var(--accent)_12%) 47%, transparent 55%)",
+                  "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_55%, white 45%) 47%, transparent 55%)",
                 backgroundSize: "250% 250%",
               }}
               animate={{ backgroundPosition: ["-180% 50%", "120% 50%", "-180% 50%"] }}

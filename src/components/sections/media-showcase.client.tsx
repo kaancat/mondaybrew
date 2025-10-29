@@ -164,7 +164,7 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
             className="pointer-events-none absolute inset-0 opacity-0 md:opacity-100"
             style={{
               backgroundImage:
-                "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_26%, var(--accent)_12%) 47%, transparent 55%)",
+                "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_55%, white 45%) 47%, transparent 55%)",
               backgroundSize: "250% 250%",
             }}
           />
