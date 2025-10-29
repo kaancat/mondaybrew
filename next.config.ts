@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
     ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 3600,
   },
   i18n: {
     locales: ["da", "en"],

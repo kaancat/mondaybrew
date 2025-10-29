@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { buildSanityImage } from "@/lib/sanity-image";
 import type { ClientLogo } from "./clients-section";
 
 function usePrefersReducedMotion() {
@@ -69,17 +70,31 @@ function Logo({ logo }: { logo: ClientLogo }) {
   const href = logo.url?.trim();
   const asset = logo.image?.image?.asset;
   const alt = logo.image?.alt?.trim() || title;
-  const url = asset?.url;
-  const w = Math.max(1, asset?.metadata?.dimensions?.width || 400);
-  const h = Math.max(1, asset?.metadata?.dimensions?.height || 200);
-  const inner = url ? (
+  const built = buildSanityImage(
+    asset
+      ? {
+        alt,
+        image: logo.image?.image ?? undefined,
+      }
+      : undefined,
+    { width: 320, quality: 75 },
+  );
+  const fallbackUrl = asset?.url;
+  const src = built.src || fallbackUrl;
+  const naturalWidth = built.width ?? asset?.metadata?.dimensions?.width ?? 200;
+  const naturalHeight = built.height ?? asset?.metadata?.dimensions?.height ?? 80;
+  const maxHeight = 36;
+  const safeHeight = naturalHeight <= 0 ? maxHeight : naturalHeight;
+  const aspectRatio = naturalWidth / safeHeight;
+  const displayWidth = Math.max(24, Math.round(maxHeight * aspectRatio));
+  const inner = src ? (
     <Image
-      src={url}
+      src={src}
       alt={alt}
-      width={Math.round(w)}
-      height={Math.round(h)}
-      placeholder={logo.image?.image?.asset?.metadata?.lqip ? "blur" : undefined}
-      blurDataURL={logo.image?.image?.asset?.metadata?.lqip}
+      width={displayWidth}
+      height={maxHeight}
+      placeholder={undefined}
+      blurDataURL={undefined}
       className="max-h-[40px] w-auto opacity-90 [filter:var(--clients-logo-filter,grayscale(100%))] group-hover:[filter:var(--clients-logo-hover-filter,none)]"
       style={{ mixBlendMode: "multiply" }}
     />

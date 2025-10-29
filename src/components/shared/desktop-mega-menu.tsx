@@ -170,7 +170,7 @@ function MegaMenuFeatureCarousel({ items }: { items: HeroFeatureDisplayItem[] })
           ...item,
           href: item.href?.trim() || undefined,
         }))
-        .filter((item) => item.href || item.title || item.excerpt || item.image?.url),
+        .filter((item) => item.href || item.title || item.excerpt || item.image?.src),
     [items],
   );
   const [index, setIndex] = useState(0);
@@ -210,15 +210,15 @@ function MegaMenuFeatureCarousel({ items }: { items: HeroFeatureDisplayItem[] })
                         )}
                       >
                       {/* Image section */}
-                      {item.image?.url && (
+                      {item.image?.src && (
                         <div className="relative aspect-[4/3] overflow-hidden rounded-[5px]">
                           <Image
-                            src={item.image.url}
+                            src={item.image.src}
                             alt={item.image.alt || item.title || ""}
                             fill
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
-                            placeholder={item.image.lqip ? "blur" : "empty"}
-                            blurDataURL={item.image.lqip}
+                            placeholder={item.image.blurDataURL ? "blur" : "empty"}
+                            blurDataURL={item.image.blurDataURL || undefined}
                           />
                           {/* Pagination indicator */}
                           {normalized.length > 1 && (
@@ -260,15 +260,15 @@ function MegaMenuFeatureCarousel({ items }: { items: HeroFeatureDisplayItem[] })
                         )}
                       >
                       {/* Image section */}
-                      {item.image?.url && (
+                      {item.image?.src && (
                         <div className="relative aspect-[4/3] overflow-hidden rounded-[5px]">
                           <Image
-                            src={item.image.url}
+                            src={item.image.src}
                             alt={item.image.alt || item.title || ""}
                             fill
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
-                            placeholder={item.image.lqip ? "blur" : "empty"}
-                            blurDataURL={item.image.lqip}
+                            placeholder={item.image.blurDataURL ? "blur" : "empty"}
+                            blurDataURL={item.image.blurDataURL || undefined}
                           />
                           {/* Pagination indicator */}
                           {normalized.length > 1 && (

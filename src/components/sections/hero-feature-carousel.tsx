@@ -13,9 +13,9 @@ export type HeroFeatureDisplayItem = {
   href: string;
   metaLabel?: string | null;
   image?: {
-    url?: string;
+    src?: string;
     alt?: string;
-    lqip?: string;
+    blurDataURL?: string;
   } | null;
 };
 
@@ -32,7 +32,7 @@ export function HeroFeatureCarousel({ items }: Props) {
           ...item,
           href: item.href?.trim() || undefined,
         }))
-        .filter((item) => item.href || item.title || item.excerpt || item.image?.url),
+        .filter((item) => item.href || item.title || item.excerpt || item.image?.src),
     [items],
   );
   const [index, setIndex] = useState(0);
@@ -75,15 +75,15 @@ export function HeroFeatureCarousel({ items }: Props) {
                       )}
                     >
                       {/* Image - left side on mobile, top on desktop */}
-                      {item.image?.url ? (
+                      {item.image?.src ? (
                         <div className="relative w-[42%] md:w-full aspect-square md:aspect-[4/3] shrink-0 overflow-hidden rounded-[5px]">
                           <Image
-                            src={item.image.url}
+                            src={item.image.src}
                             alt={item.image.alt || item.title || "Hero feature"}
                             fill
                             sizes="(max-width: 768px) 42vw, 600px"
-                            placeholder={item.image.lqip ? "blur" : undefined}
-                            blurDataURL={item.image.lqip}
+                            placeholder={item.image.blurDataURL ? "blur" : undefined}
+                            blurDataURL={item.image.blurDataURL}
                             className="object-cover"
                           />
                           <div className="pointer-events-none absolute inset-0 rounded-[5px] bg-gradient-to-b from-white/12 via-transparent to-black/42" />

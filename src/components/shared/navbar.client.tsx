@@ -20,6 +20,7 @@ import { defaultThemeId, getThemeDefinition, themeOrder, ThemeId } from "@/theme
 import { useNavPhase } from "@/components/shared/use-nav-phase";
 import { DesktopMegaMenu } from "@/components/shared/desktop-mega-menu";
 import type { HeroFeatureDisplayItem } from "@/components/sections/hero-feature-carousel";
+import { buildSanityImage } from "@/lib/sanity-image";
 
 export type NavbarLink = {
   label: string;
@@ -77,6 +78,54 @@ export type NavbarBrand = {
     height?: number;
   } | null;
 };
+
+type NavLogoAsset = {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+};
+
+const NAV_LOGO_LIGHT_SRC = "/brand/mondaybrew_footer_logo.svg";
+const NAV_LOGO_DARK_SRC = "/brand/MondayBrew_footer_orange.svg";
+
+function resolveBrandLogo(
+  source: NavbarBrand["logoLight"],
+  fallbackSrc: string,
+  alt: string,
+): NavLogoAsset {
+  if (source?.url) {
+    const built = buildSanityImage(
+      {
+        alt: source.alt ?? alt,
+        asset: {
+          url: source.url,
+          metadata: {
+            dimensions: {
+              width: source.width ?? undefined,
+              height: source.height ?? undefined,
+            },
+          },
+        },
+      },
+      { width: source.width ?? 220, quality: 80 },
+    );
+
+    return {
+      src: built.src ?? source.url,
+      alt: built.alt ?? source.alt ?? alt,
+      width: source.width ?? built.width ?? 1000,
+      height: source.height ?? built.height ?? 200,
+    } satisfies NavLogoAsset;
+  }
+
+  return {
+    src: fallbackSrc,
+    alt,
+    width: 1000,
+    height: 200,
+  } satisfies NavLogoAsset;
+}
 
 export type NavbarCta = {
   label: string;
@@ -242,6 +291,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isOverFooter, setIsOverFooter] = useState(false);
   const [shouldFadeHeader, setShouldFadeHeader] = useState(false);
+  const brandTitle = brand.title || "MondayBrew";
+  const logos = useMemo(() => {
+    const base = resolveBrandLogo(brand.logo ?? null, NAV_LOGO_DARK_SRC, brandTitle);
+    const light = resolveBrandLogo(brand.logoLight ?? null, NAV_LOGO_LIGHT_SRC, brandTitle) || base;
+    const dark = resolveBrandLogo(brand.logoDark ?? null, NAV_LOGO_DARK_SRC, brandTitle) || base;
+    return { light, dark } as const;
+  }, [brand.logo, brand.logoDark, brand.logoLight, brandTitle]);
 
   useEffect(() => {
     setMounted(true);
@@ -491,14 +547,12 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             >
               <Link href="/" className="inline-flex items-center">
                 {(() => {
-                  const chosen = isLightAlt
-                    ? brand.logoLight ?? brand.logo ?? brand.logoDark
-                    : brand.logoDark ?? brand.logo ?? brand.logoLight;
-                  if (chosen?.url) {
+                  const chosen = isLightAlt ? logos.light : logos.dark;
+                  if (chosen?.src) {
                     return (
                       <Image
-                        src={chosen.url}
-                        alt={chosen.alt || brand.title}
+                        src={chosen.src}
+                        alt={chosen.alt}
                         width={chosen.width ?? 150}
                         height={chosen.height ?? 32}
                         className="h-6 w-auto"
@@ -506,7 +560,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       />
                     );
                   }
-                  return <span className="text-sm font-normal">{brand.title}</span>;
+                  return <span className="text-sm font-normal">{brandTitle}</span>;
                 })()}
               </Link>
 
@@ -661,14 +715,12 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             >
               <Link href="/" className="inline-flex items-center shrink-0">
                 {(() => {
-                  const chosen = isLightAlt
-                    ? brand.logoLight ?? brand.logo ?? brand.logoDark
-                    : brand.logoDark ?? brand.logo ?? brand.logoLight;
-                  if (chosen?.url) {
+                  const chosen = isLightAlt ? logos.light : logos.dark;
+                  if (chosen?.src) {
                     return (
                       <Image
-                        src={chosen.url}
-                        alt={chosen.alt || brand.title}
+                        src={chosen.src}
+                        alt={chosen.alt}
                         width={chosen.width ?? 150}
                         height={chosen.height ?? 32}
                         className="h-6 w-auto"
@@ -676,7 +728,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       />
                     );
                   }
-                  return <span className="text-sm font-normal">{brand.title}</span>;
+                  return <span className="text-sm font-normal">{brandTitle}</span>;
                 })()}
               </Link>
               <NavigationMenu

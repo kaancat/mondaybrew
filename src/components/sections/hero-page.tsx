@@ -1,6 +1,7 @@
 import React from "react";
 import { Section } from "@/components/layout/section";
 import Image from "next/image";
+import { buildSanityImage } from "@/lib/sanity-image";
 
 export type HeroPageData = {
     eyebrow?: string;
@@ -21,8 +22,21 @@ export type HeroPageData = {
         };
         videoUrl?: string;
         poster?: {
+            alt?: string;
             asset?: {
                 url?: string;
+            };
+            image?: {
+                asset?: {
+                    url?: string;
+                    metadata?: {
+                        lqip?: string;
+                        dimensions?: {
+                            width?: number;
+                            height?: number;
+                        };
+                    };
+                };
             };
         };
     };
@@ -47,9 +61,28 @@ type Props = HeroPageData;
  */
 export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: Props) {
     const videoSrc = media?.videoFile?.asset?.url || media?.videoUrl;
-    const imageSrc = media?.image?.asset?.url;
-    const posterSrc = media?.poster?.asset?.url;
-    const imageAlt = media?.image?.alt || "Hero image";
+    const posterMeta = buildSanityImage(
+        media?.poster
+            ? {
+                alt: media.poster.alt ?? undefined,
+                image: media.poster.image ?? undefined,
+                asset: media.poster.asset ?? undefined,
+            }
+            : undefined,
+        { width: 2000, quality: 75 },
+    );
+    const imageMeta = buildSanityImage(
+        media?.image
+            ? {
+                alt: media.image.alt ?? "Hero image",
+                asset: media.image.asset ?? undefined,
+            }
+            : undefined,
+        { width: 2200, quality: 80 },
+    );
+    const imageSrc = imageMeta.src;
+    const posterSrc = posterMeta.src;
+    const imageAlt = imageMeta.alt || media?.image?.alt || "Hero image";
 
     // Breadcrumbs component to avoid duplication
     const BreadcrumbsNav = ({ className = "" }: { className?: string }) => (
@@ -142,6 +175,8 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
                             fill
                             className="object-cover"
                             priority
+                            placeholder={imageMeta.blurDataURL ? "blur" : undefined}
+                            blurDataURL={imageMeta.blurDataURL}
                         />
                     ) : (
                         <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground">
@@ -163,4 +198,3 @@ export function HeroPage({ eyebrow, heading, subheading, media, breadcrumbs }: P
 export function isHeroPage(section: unknown): section is HeroPageData & { _type: "heroPage" } {
     return (section as { _type?: string })?._type === "heroPage";
 }
-

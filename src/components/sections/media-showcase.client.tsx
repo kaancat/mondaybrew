@@ -7,9 +7,9 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export type ShowcaseResolvedImage = {
-  url?: string | null;
+  src?: string | null;
   alt?: string | null;
-  lqip?: string | null;
+  blurDataURL?: string | null;
   width?: number;
   height?: number;
 } | null;
@@ -36,7 +36,7 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
   const [isPlaying, setIsPlaying] = useState(false);
 
   const hasVideo = !!video?.url;
-  const hasImage = !!image?.url && !hasVideo;
+  const hasImage = !!image?.src && !hasVideo;
 
   const onTogglePlay = useCallback(() => {
     const el = videoRef.current;
@@ -117,12 +117,12 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
 
           {hasImage ? (
             <Image
-              src={image!.url!}
+              src={image!.src!}
               alt={image!.alt || "Media image"}
               fill
               sizes="(min-width: 1280px) 1100px, (min-width: 1024px) 960px, (min-width: 768px) 720px, 92vw"
-              placeholder={image?.lqip ? "blur" : undefined}
-              blurDataURL={image?.lqip || undefined}
+              placeholder={image?.blurDataURL ? "blur" : undefined}
+              blurDataURL={image?.blurDataURL || undefined}
               className="absolute inset-0 object-cover"
               priority={false}
             />
@@ -133,7 +133,7 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
                 ref={videoRef}
                 playsInline
                 controls
-                poster={video?.poster?.url || undefined}
+                poster={video?.poster?.src || undefined}
                 className="size-full object-cover"
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
@@ -181,9 +181,9 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
         <div className={cn("grid gap-x-8 gap-y-3 md:gap-y-2", gridCols)}>
           {stats.map((s, i) => (
             <div key={`${s.label || s.value || i}`} className="flex items-start gap-3 md:flex-col md:items-center md:text-center">
-              {s.icon?.url ? (
+              {s.icon?.src ? (
                 <Image
-                  src={s.icon.url}
+                  src={s.icon.src}
                   alt={s.icon.alt || ""}
                   width={24}
                   height={24}

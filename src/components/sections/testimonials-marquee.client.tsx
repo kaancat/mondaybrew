@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 import { useReducedMotion } from "framer-motion";
 
 export type TImage = {
-  url?: string | null;
+  src?: string | null;
   alt?: string | null;
-  lqip?: string | null;
+  blurDataURL?: string | null;
   width?: number;
   height?: number;
 } | null;
@@ -142,10 +142,10 @@ function useAutoScrollPlugin(
 }
 
 function CardLogo({ card, className }: { card: TCard; className?: string }) {
-  if (!card.logo?.url) return null;
+  if (!card.logo?.src) return null;
   return (
     <div className={cn("relative h-6 w-24 opacity-90", className)}>
-      <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain" sizes="96px" />
+      <Image src={card.logo.src} alt={card.logo.alt || ""} fill className="object-contain" sizes="96px" />
     </div>
   );
 }
@@ -275,7 +275,7 @@ function QuoteCardMobile({ card }: { card: TCard }) {
 }
 
 function ImageQuoteCard({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
   const colors = card.colors ?? MODE_PRESETS[tone];
 
@@ -291,13 +291,13 @@ function ImageQuoteCard({ card }: { card: TCard }) {
       >
         <div className="relative flex-[0_0_44%] min-w-[210px]">
           <Image
-            src={card.image.url}
+            src={card.image.src!}
             alt={card.image.alt || ""}
             draggable={false}
             fill
             sizes="(max-width: 768px) 70vw, 360px"
-            placeholder={card.image.lqip ? "blur" : undefined}
-            blurDataURL={card.image.lqip || undefined}
+            placeholder={card.image.blurDataURL ? "blur" : undefined}
+            blurDataURL={card.image.blurDataURL || undefined}
             className="h-full w-full object-cover"
           />
         </div>
@@ -326,7 +326,7 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 }
 
 function ImageQuoteCardMobile({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
   const colors = card.colors ?? MODE_PRESETS[tone];
   return (
@@ -341,13 +341,13 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
       >
         <div className="relative flex-[0_0_42%] min-w-[150px]">
           <Image
-            src={card.image.url}
+            src={card.image.src!}
             alt={card.image.alt || ""}
             draggable={false}
             fill
             sizes="70vw"
-            placeholder={card.image.lqip ? "blur" : undefined}
-            blurDataURL={card.image.lqip || undefined}
+            placeholder={card.image.blurDataURL ? "blur" : undefined}
+            blurDataURL={card.image.blurDataURL || undefined}
             className="h-full w-full object-cover"
           />
         </div>
@@ -373,7 +373,7 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
 }
 
 function ImageOnlyCard({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   return (
     <CardFrame card={card}>
       <div
@@ -384,13 +384,13 @@ function ImageOnlyCard({ card }: { card: TCard }) {
         )}
       >
         <Image
-          src={card.image.url}
+          src={card.image.src!}
           alt={card.image.alt || ""}
           draggable={false}
           fill
           sizes="(max-width: 768px) 80vw, 480px"
-          placeholder={card.image.lqip ? "blur" : undefined}
-          blurDataURL={card.image.lqip || undefined}
+          placeholder={card.image.blurDataURL ? "blur" : undefined}
+          blurDataURL={card.image.blurDataURL || undefined}
           className="h-full w-full object-cover"
         />
         <CardLogo card={card} className="absolute left-6 top-6 z-20" />
@@ -423,7 +423,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
 }
 
 function ImageOnlyCardMobile({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   return (
     <CardFrameMobile>
       <div
@@ -435,13 +435,13 @@ function ImageOnlyCardMobile({ card }: { card: TCard }) {
         style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT }}
       >
         <Image
-          src={card.image.url}
+          src={card.image.src!}
           alt={card.image.alt || ""}
           draggable={false}
           fill
           sizes="80vw"
-          placeholder={card.image.lqip ? "blur" : undefined}
-          blurDataURL={card.image.lqip || undefined}
+          placeholder={card.image.blurDataURL ? "blur" : undefined}
+          blurDataURL={card.image.blurDataURL || undefined}
           className="h-full w-full object-cover"
         />
         {/* Bottom gradient for legibility */}
