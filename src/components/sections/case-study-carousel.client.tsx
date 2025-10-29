@@ -100,6 +100,12 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     setIndex((prev) => (approx === prev ? prev : approx));
   }, [cardWidth, gapPx]);
 
+  useEffect(() => {
+    if (!scrollerRef.current) return;
+    const id = requestAnimationFrame(() => updateEdges());
+    return () => cancelAnimationFrame(id);
+  }, [updateEdges, cardWidth, gapPx, containerWidth, items.length]);
+
   const scrollByChunk = useCallback((dir: -1 | 1) => {
     const el = scrollerRef.current;
     if (!el) return;
