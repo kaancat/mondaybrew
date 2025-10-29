@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import type { CaseStudy } from "@/types/caseStudy";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -20,8 +21,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const clampedInitial = Math.min(Math.max(initialIndex, 0), Math.max(items.length - 1, 0));
   const frameRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<import("embla-carousel").EmblaCarouselType | null>(null);
+  const [emblaInstance, setEmblaInstance] = useState<import("embla-carousel").EmblaCarouselType | null>(null);
   const [perView, setPerView] = useState(1);
-  const [containerWidth, setContainerWidth] = useState(0);
 
   // Responsive items per view (1 / 2 / 3) and dynamic peek & gaps
   useEffect(() => {
@@ -31,11 +32,12 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       const w = entry.contentRect.width;
       const pv = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
       setPerView(pv);
-      setContainerWidth(Math.floor(w));
       el.style.setProperty("--per-view", String(pv));
-      const gap = w >= 1200 ? 32 : 24;
+      const gap = w >= 1200 ? 32 : w >= 768 ? 24 : 12;
       el.style.setProperty("--gap", `${gap}px`);
-      const peek = Math.min(Math.round(w * 0.1), 120);
+      const peek = pv === 1
+        ? Math.min(Math.round(w * 0.18), 80)
+        : Math.min(Math.round(w * 0.08), 120);
       el.style.setProperty("--peek", `${peek}px`);
     });
     ro.observe(el);
@@ -50,6 +52,46 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     const current = items[idx];
     return current ? `Showing ${current.title}` : "";
   }, [selected, items]);
+
+  useEffect(() => {
+    const api = emblaInstance;
+    if (!api) return;
+
+    const updateState = () => {
+      setSelected(api.selectedScrollSnap());
+      setCanPrev(api.canScrollPrev());
+      setCanNext(api.canScrollNext());
+    };
+
+    updateState();
+    api.on("select", updateState);
+    api.on("reInit", updateState);
+
+    (window as unknown as { __emblaCase?: typeof api }).__emblaCase = api;
+
+    return () => {
+      api.off("select", updateState);
+      api.off("reInit", updateState);
+      const handle = window as unknown as { __emblaCase?: typeof api };
+      if (handle.__emblaCase === api) {
+        delete handle.__emblaCase;
+      }
+    };
+  }, [emblaInstance]);
+
+  useEffect(() => {
+    if (!emblaInstance) return;
+    const safeIndex = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
+    emblaInstance.scrollTo(safeIndex, false);
+    setSelected(emblaInstance.selectedScrollSnap());
+    setCanPrev(emblaInstance.canScrollPrev());
+    setCanNext(emblaInstance.canScrollNext());
+  }, [emblaInstance, clampedInitial, items.length]);
+
+  const handleReady = useCallback((embla: import("embla-carousel").EmblaCarouselType) => {
+    apiRef.current = embla;
+    setEmblaInstance(embla);
+  }, []);
 
   return (
     <div className="group/section">
@@ -72,57 +114,39 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         )}
       </div>
 
-      <div ref={frameRef} className="relative" aria-roledescription="carousel" tabIndex={0}
+      <div
+        ref={frameRef}
+        className="relative bleed-right"
+        aria-roledescription="carousel"
+        tabIndex={0}
         onKeyDown={(e) => {
           const api = apiRef.current;
           if (!api) return;
-          const sel = api.selectedScrollSnap();
-          if (e.key === "ArrowLeft") api.scrollTo(Math.max(0, sel - perView));
-          if (e.key === "ArrowRight") api.scrollTo(Math.min(api.scrollSnapList().length - 1, sel + perView));
+          if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            api.scrollPrev();
+          }
+          if (e.key === "ArrowRight") {
+            e.preventDefault();
+            api.scrollNext();
+          }
         }}
-        style={{ paddingRight: "var(--peek)" }}
       >
         <Carousel
-          options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
+          options={{ loop: false, align: "start", containScroll: false }}
           className="overflow-hidden"
           // Full-width layout, but allow box-shadow breathing room on the right
-          viewportStyle={{ paddingRight: "36px" }}
-          containerStyle={{ marginRight: "-36px", gap: "var(--gap, 24px)" }}
-          onReady={(embla) => {
-            // Scroll to initial index on mount
-            const snap = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
-            embla.scrollTo(snap, false);
-            apiRef.current = embla;
-            setSelected(embla.selectedScrollSnap());
-            const onSelect = () => {
-              setSelected(embla.selectedScrollSnap());
-              setCanPrev(embla.canScrollPrev());
-              setCanNext(embla.canScrollNext());
-              // Fallback translate when Embla doesn't update transform (edge case we observed)
-              // Align selected slide with viewport left edge
-              const viewport = document.querySelector('.embla__container')?.parentElement as HTMLElement | null;
-              const container = document.querySelector('.embla__container') as HTMLElement | null;
-              if (viewport && container) {
-                const i = embla.selectedScrollSnap();
-                const slide = container.children[i] as HTMLElement | undefined;
-                if (slide) {
-                  const delta = slide.getBoundingClientRect().left - viewport.getBoundingClientRect().left;
-                  container.style.transform = `translate3d(${-Math.round(delta)}px,0,0)`;
-                }
-              }
-            };
-            embla.on("select", onSelect);
-            embla.on("scroll", onSelect);
-            embla.on("reInit", onSelect);
-            // Initial edge states
-            setCanPrev(embla.canScrollPrev());
-            setCanNext(embla.canScrollNext());
-            // Dev aid: expose for quick console testing (cleared on unmount)
-            (window as unknown as { __emblaCase?: typeof embla }).__emblaCase = embla;
+          viewportStyle={{ paddingRight: "var(--peek)" }}
+          containerStyle={{
+            gap: "var(--gap, 24px)",
+            marginRight: "calc((var(--container-gutter, 0px) + var(--peek)) * -1)",
           }}
+          onReady={handleReady}
         >
           {items.map((item, i) => {
-            const widthExpr = "calc((100% - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
+            const widthExpr = perView <= 1
+              ? "calc(100% - var(--peek, 0px) - var(--gap, 24px))"
+              : "calc((100% - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
             return (
             <Slide key={item._id || i}
               className="px-0"
@@ -130,8 +154,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
                 width: widthExpr,
                 minWidth: widthExpr,
                 flex: `0 0 ${widthExpr}`,
-                marginRight: "var(--gap, 24px)",
-              } as React.CSSProperties}
+              } as CSSProperties}
             >
               <CaseCard item={item} />
             </Slide>

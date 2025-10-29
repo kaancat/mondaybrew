@@ -14,6 +14,7 @@ import clientsSection from "./types/sections/clientsSection";
 import testimonialsMarquee from "./types/sections/testimonialsMarquee";
 import textImage from "./types/sections/textImage";
 import textOnly from "./types/sections/textOnly";
+import contentBillboard from "./types/sections/contentBillboard";
 
 import seo from "./types/objects/seo";
 import cta from "./types/objects/cta";
@@ -50,6 +51,7 @@ const schemas = [
   testimonialsMarquee,
   textImage,
   textOnly,
+  contentBillboard,
   // objects
   seo,
   cta,

@@ -3,6 +3,7 @@ import { pageBySlugQuery } from "@/lib/sanity.queries";
 import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
 import { TextImageSection } from "@/components/sections/text-image";
 import { TextOnlySection } from "@/components/sections/text-only";
+import { ContentBillboard, isContentBillboard } from "@/components/sections/content-billboard";
 import { Section } from "@/components/layout/section";
 
 /**
@@ -133,6 +134,14 @@ export async function DynamicPage({
                     );
                 }
 
+                if (isContentBillboard(section)) {
+                    return (
+                        <div className="vr-section" key={key} id={key}>
+                            <ContentBillboard {...section} />
+                        </div>
+                    );
+                }
+
                 // Unknown section type - skip silently
                 return null;
             })}
@@ -141,4 +150,3 @@ export async function DynamicPage({
 }
 
 export const revalidate = 60;
-

@@ -930,6 +930,11 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     margin-right: var(--full-bleed-inline-end) !important;
     transition: margin var(--nav-anim-duration) var(--nav-anim-ease), width var(--nav-anim-duration) var(--nav-anim-ease);
   }
+  /* Right-only bleed helper: break container on the inline end (RTL-safe via variables) */
+  .bleed-right {
+    margin-right: calc(var(--full-bleed-inline-end) - var(--container-gutter)) !important;
+    transition: margin var(--nav-anim-duration) var(--nav-anim-ease);
+  }
   /* Allow full-bleed children to have rounded corners individually */
   .full-bleed > * {
     border-radius: 0;
