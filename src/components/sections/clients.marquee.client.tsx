@@ -49,8 +49,14 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
   const cleaned = useMemo(() => items.filter((l) => l?.title || l?.image?.image?.asset?.url), [items]);
   const [repeatCount, setRepeatCount] = useState(3);
   const displayItems = useMemo(() => {
-    const seq: ClientLogo[] = [];
-    for (let i = 0; i < repeatCount; i += 1) seq.push(...(direction === -1 ? [...cleaned].reverse() : cleaned));
+    const seq: { logo: ClientLogo; key: string }[] = [];
+    for (let setIndex = 0; setIndex < repeatCount; setIndex += 1) {
+      const source = direction === -1 ? [...cleaned].reverse() : cleaned;
+      source.forEach((logo, idx) => {
+        const id = logo.title || logo.image?.image?.asset?.url || `${idx}`;
+        seq.push({ logo, key: `${setIndex}-${id}-${idx}` });
+      });
+    }
     return seq;
   }, [cleaned, repeatCount, direction]);
 
@@ -62,8 +68,10 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
       direction: direction === -1 ? "backward" : "forward",
       stopOnInteraction: false,
       stopOnMouseEnter: true,
+      stopOnFocusIn: false,
       playOnInit: true,
       startDelay: 0,
+      rootNode: (root) => root,
     });
   }, [direction, speed]);
 
@@ -84,6 +92,22 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
     emblaApi.reInit();
   }, [emblaApi, displayItems.length]);
 
+  // Pause while dragging, resume immediately after to avoid stalling
+  useEffect(() => {
+    if (!emblaApi) return;
+    const plugins = emblaApi.plugins() as unknown as { autoScroll?: { play: (d?: number) => void; stop: () => void } };
+    const onDown = () => plugins.autoScroll?.stop();
+    const onUp = () => plugins.autoScroll?.play(0);
+    emblaApi.on("pointerDown", onDown);
+    emblaApi.on("pointerUp", onUp);
+    emblaApi.on("settle", onUp);
+    return () => {
+      emblaApi.off("pointerDown", onDown);
+      emblaApi.off("pointerUp", onUp);
+      emblaApi.off("settle", onUp);
+    };
+  }, [emblaApi]);
+
   useEffect(() => {
     const node = viewportRef.current;
     if (!node) return;
@@ -101,10 +125,10 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
 
   return (
     <div className="clients-marquee-row relative border-t border-[color:var(--color-border)] first:border-t-0">
-      <div ref={setViewportNode} className="overflow-hidden">
-        <div className="flex gap-8 py-6">
-          {displayItems.map((logo, i) => (
-            <Logo key={i} logo={logo} />
+      <div ref={setViewportNode} className="overflow-hidden" style={{ touchAction: "pan-y" }}>
+        <div className="flex gap-8 py-6" style={{ willChange: "transform" }}>
+          {displayItems.map(({ logo, key }) => (
+            <Logo key={key} logo={logo} />
           ))}
         </div>
       </div>
