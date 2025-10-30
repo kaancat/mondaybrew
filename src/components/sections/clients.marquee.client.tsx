@@ -67,7 +67,7 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
       speed: pxPerFrame,
       direction: direction === -1 ? "backward" : "forward",
       stopOnInteraction: false,
-      stopOnMouseEnter: true,
+      stopOnMouseEnter: false, // reduce frequent stop/resume on tiny pointer moves
       stopOnFocusIn: false,
       playOnInit: true,
       startDelay: 0,
@@ -102,6 +102,29 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
     emblaApi.on("pointerUp", onUp);
     emblaApi.on("settle", onUp);
     return () => {
+      emblaApi.off("pointerDown", onDown);
+      emblaApi.off("pointerUp", onUp);
+      emblaApi.off("settle", onUp);
+    };
+  }, [emblaApi]);
+
+  // While autoScroll plays, disable grayscale filter to reduce per-frame raster cost
+  useEffect(() => {
+    const node = viewportRef.current;
+    if (!emblaApi || !node) return;
+    const setPlaying = () => node.style.setProperty("--clients-logo-filter", "none");
+    const setStopped = () => node.style.setProperty("--clients-logo-filter", "grayscale(100%)");
+    setPlaying();
+    emblaApi.on("autoScroll:play", setPlaying as any);
+    emblaApi.on("autoScroll:stop", setStopped as any);
+    const onDown = () => setStopped();
+    const onUp = () => setPlaying();
+    emblaApi.on("pointerDown", onDown);
+    emblaApi.on("pointerUp", onUp);
+    emblaApi.on("settle", onUp);
+    return () => {
+      emblaApi.off("autoScroll:play", setPlaying as any);
+      emblaApi.off("autoScroll:stop", setStopped as any);
       emblaApi.off("pointerDown", onDown);
       emblaApi.off("pointerUp", onUp);
       emblaApi.off("settle", onUp);
