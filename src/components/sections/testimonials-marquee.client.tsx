@@ -132,20 +132,30 @@ function useIdlePrefetch(urls: string[], enabled = true) {
       urls.slice(0, 4).forEach((u) => {
         if (!u) return;
         const img = new Image();
-        img.decoding = "async" as any;
-        img.loading = "eager" as any;
+        // These properties are widely supported in modern browsers
+        // and help hint the decoder, but are optional.
+        try { img.decoding = "async"; } catch {}
+        try { (img as HTMLImageElement).loading = "eager"; } catch {}
         img.src = u;
       });
     };
-    // Prefer idle callback; fall back to timeout
-    const id = (window as any).requestIdleCallback
-      ? (window as any).requestIdleCallback(prefetch, { timeout: 1200 })
-      : window.setTimeout(prefetch, 400);
-    return () => {
-      if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(id);
-      else clearTimeout(id);
-    };
-  }, [enabled, urls.join("|")]);
+
+    type IdleDeadline = { didTimeout: boolean; timeRemaining: () => number };
+    type RequestIdle = (cb: (deadline: IdleDeadline) => void, opts?: { timeout?: number }) => number;
+    type CancelIdle = (id: number) => void;
+
+    const w = window as unknown as { requestIdleCallback?: RequestIdle; cancelIdleCallback?: CancelIdle };
+
+    let cancel: (() => void) | undefined;
+    if (typeof w.requestIdleCallback === "function") {
+      const handle = w.requestIdleCallback(prefetch, { timeout: 1200 });
+      cancel = () => { w.cancelIdleCallback?.(handle); };
+    } else {
+      const handle = window.setTimeout(prefetch, 400);
+      cancel = () => { clearTimeout(handle); };
+    }
+    return cancel;
+  }, [enabled, urls]);
 }
 
 function useAutoScrollPlugin(
