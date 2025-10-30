@@ -3,6 +3,7 @@ import { pageBySlugQuery } from "@/lib/sanity.queries";
 import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
 import { TextImageSection } from "@/components/sections/text-image";
 import { TextOnlySection } from "@/components/sections/text-only";
+import { FAQSection, type FAQSectionProps } from "@/components/sections/faq";
 import { Section } from "@/components/layout/section";
 
 /**
@@ -39,6 +40,10 @@ function isTextImageSection(section: PageSection): boolean {
 
 function isTextOnlySection(section: PageSection): boolean {
     return section?._type === "textOnly";
+}
+
+function isFAQSection(section: PageSection): boolean {
+    return section?._type === "faq";
 }
 
 export async function DynamicPage({
@@ -128,6 +133,19 @@ export async function DynamicPage({
                                 eyebrow={section.eyebrow as string | null | undefined}
                                 title={section.title as string | null | undefined}
                                 body={section.body as string | null | undefined}
+                            />
+                        </div>
+                    );
+                }
+
+                if (isFAQSection(section)) {
+                    return (
+                        <div className="vr-section" key={key} id={key}>
+                            <FAQSection
+                                title={section.title as string | undefined}
+                                subheading={section.subheading as string | undefined}
+                                titleAlignment={section.titleAlignment as "left" | "center" | "right" | undefined}
+                                categories={section.categories as FAQSectionProps["categories"]}
                             />
                         </div>
                     );

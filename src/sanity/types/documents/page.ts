@@ -30,6 +30,7 @@ export default defineType({
         { type: "aboutSection" },
         { type: "textImage" },
         { type: "textOnly" },
+        { type: "faq" },
       ],
     }),
     defineField({ name: "seo", type: "seo" }),

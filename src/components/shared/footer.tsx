@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FooterTabs } from "./footer-tabs.client";
@@ -14,13 +14,20 @@ import { useTheme } from "next-themes";
  */
 export function Footer() {
   const { resolvedTheme } = useTheme();
-  const isLightAlt = resolvedTheme === "light-alt";
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only applying theme classes after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLightAlt = mounted && resolvedTheme === "light-alt";
 
   return (
     <footer
       className="relative overflow-hidden"
       style={{
-        backgroundColor: isLightAlt ? "#ffffff" : "#49444B",
+        backgroundColor: mounted && isLightAlt ? "#ffffff" : "#49444B",
       } as React.CSSProperties}>
       {/* Footer content */}
       <div className="relative z-10 flex flex-col justify-between">

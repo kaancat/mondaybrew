@@ -16,6 +16,7 @@ import { TextImageSection, type TextImageSectionData } from "@/components/sectio
 import { TextOnlySection, type TextOnlySectionData } from "@/components/sections/text-only";
 import { Section } from "@/components/layout/section";
 import MediaShowcaseSection, { type MediaShowcaseSectionData } from "@/components/sections/media-showcase";
+import { FAQSection, type FAQSectionProps } from "@/components/sections/faq";
 
 type SiteSettings = { seo?: Seo };
 
@@ -68,6 +69,7 @@ type TestimonialsWithType = TestimonialsMarqueeData & { _type: "testimonialsMarq
 type TextImageSectionWithType = TextImageSectionData & { _type: "textImage"; _key?: string };
 type TextOnlySectionWithType = TextOnlySectionData & { _type: "textOnly"; _key?: string };
 type MediaShowcaseWithType = MediaShowcaseSectionData & { _type: "mediaShowcase"; _key?: string };
+type FAQSectionWithType = FAQSectionProps & { _type: "faq"; _key?: string };
 type HomePageSection =
   | HeroSectionWithType
   | ServicesSplitSectionWithType
@@ -78,6 +80,7 @@ type HomePageSection =
   | TextImageSectionWithType
   | TextOnlySectionWithType
   | MediaShowcaseWithType
+  | FAQSectionWithType
   | { _type?: string; _key?: string };
 
 type HomePagePayload = {
@@ -115,6 +118,10 @@ function isTextOnlySection(section: HomePageSection | undefined): section is Tex
 
 function isMediaShowcase(section: HomePageSection | undefined): section is MediaShowcaseWithType {
   return !!section && section._type === "mediaShowcase";
+}
+
+function isFAQSection(section: HomePageSection | undefined): section is FAQSectionWithType {
+  return !!section && section._type === "faq";
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -279,6 +286,19 @@ export default async function Home() {
                 cta={section.cta}
                 media={section.media}
                 stats={section.stats}
+              />
+            </div>
+          );
+        }
+
+        if (isFAQSection(section)) {
+          return (
+            <div className="vr-section" key={key}>
+              <FAQSection
+                title={section.title}
+                subheading={section.subheading}
+                titleAlignment={section.titleAlignment}
+                categories={section.categories}
               />
             </div>
           );
