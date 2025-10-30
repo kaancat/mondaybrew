@@ -666,7 +666,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     });
   }, [items]);
 
-  const { ref: containerRef, inView } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.08 });
+  const { ref: containerRef } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.08 });
 
   // Idle prefetch near viewport to avoid late decodes
   useIdlePrefetch(
@@ -715,7 +715,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     };
   }, [emblaApi]);
 
-  const autoScrollDisabled = prefersReducedMotion || normalizedItems.length <= 1 || !inView;
+  const autoScrollDisabled = prefersReducedMotion || normalizedItems.length <= 1;
   useAutoScrollPlugin(emblaApi, autoScrollPlugin, { paused: pointerActive, disabled: autoScrollDisabled }, normalizedItems.length);
 
   // Re-init only on hard resizes/orientation changes to recalc slide sizes
@@ -736,7 +736,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
   return (
     <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
       <div ref={viewportRef} className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")} style={{ touchAction: "pan-y" }}>
-        <div className="flex py-3">
+        <div className="flex py-3" style={{ willChange: "transform" }}>
           {normalizedItems.map((card, idx) => (
             <CardMobile key={`mobile-${idx}`} card={card} priority={idx < 2 && !!card.image?.src} />
           ))}
