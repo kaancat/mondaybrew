@@ -110,6 +110,12 @@
     transparent 85%
   );
   --about-stats-mobile-border: color-mix(in oklch, var(--nav-shell-border) 72%, transparent);
+  --about-stats-card-radius: 5px;
+  --about-stats-card-bg: color-mix(in oklch, var(--surface-base) 94%, white 6%);
+  --about-stats-card-border: color-mix(in oklch, var(--nav-shell-border, var(--border)) 65%, transparent);
+  --about-stats-card-shadow: 0 12px 28px -18px rgba(21, 18, 36, 0.24);
+  --about-stats-card-value: var(--foreground);
+  --about-stats-card-label: color-mix(in oklch, var(--foreground) 65%, transparent);
 
   --site-shell-offset-x: 0px;
   --site-shell-scale: 1;
@@ -211,6 +217,11 @@ html.light-primary {
   --input: color-mix(in oklch, var(--mb-ink) 10%, white 90%);
   --ring: color-mix(in oklch, var(--mb-ink) 40%, white 60%);
 
+  --about-stats-card-bg: color-mix(in oklch, var(--card) 88%, white 12%);
+  --about-stats-card-border: color-mix(in oklch, var(--nav-shell-border, var(--border)) 70%, transparent);
+  --about-stats-card-value: color-mix(in oklch, var(--foreground) 96%, white 4%);
+  --about-stats-card-label: color-mix(in oklch, var(--foreground) 68%, transparent);
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -275,6 +286,21 @@ html.light-primary .about-stats-panel [data-stat-label] {
   color: var(--brand-light) !important;
 }
 
+.about-stats-card {
+  border-radius: var(--about-stats-card-radius);
+  background: var(--about-stats-card-bg);
+  border: 1px solid var(--about-stats-card-border);
+  box-shadow: var(--about-stats-card-shadow);
+}
+
+.about-stats-card [data-stat-value] {
+  color: var(--about-stats-card-value);
+}
+
+.about-stats-card [data-stat-label] {
+  color: var(--about-stats-card-label);
+}
+
 html.light-primary body[data-mobile-nav-open="true"] {
   --mobile-nav-overlay: rgba(73, 68, 75, 0.08);
   /* Brand the mobile menu section headings and top eyebrow in primary theme */
@@ -315,6 +341,10 @@ html.light-alt {
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+  --about-stats-card-bg: #ffffff;
+  --about-stats-card-border: color-mix(in oklch, #0a0a0a 10%, transparent);
+  --about-stats-card-value: #0a0a0a;
+  --about-stats-card-label: color-mix(in oklch, #0a0a0a 65%, transparent);
 
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -431,6 +461,11 @@ html.dark {
   --border: color-mix(in oklch, var(--brand-light) 16%, var(--mb-bg) 84%);
   --input: color-mix(in oklch, var(--brand-light) 18%, var(--mb-bg) 82%);
   --ring: color-mix(in oklch, var(--mb-accent) 55%, var(--mb-bg) 45%);
+
+  --about-stats-card-bg: color-mix(in oklch, var(--surface-dark) 78%, var(--surface-base) 22%);
+  --about-stats-card-border: color-mix(in oklch, var(--brand-light) 18%, transparent);
+  --about-stats-card-value: color-mix(in oklch, var(--brand-light) 92%, transparent 8%);
+  --about-stats-card-label: color-mix(in oklch, var(--brand-light) 70%, transparent 30%);
 
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);

@@ -189,7 +189,7 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
       {stats.length ? (
         <div className={cn("grid gap-x-8 gap-y-3 md:gap-y-2", gridCols)}>
           {stats.map((s, i) => (
-            <div key={`${s.label || s.value || i}`} className="flex items-start gap-3 md:flex-col md:items-center md:text-center">
+            <div key={`${s.label || s.value || i}`} className="about-stats-card flex items-start gap-3 px-4 py-3 md:flex-col md:items-center md:text-center">
               {s.icon?.src ? (
                 <Image
                   src={s.icon.src}
@@ -199,9 +199,9 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
                   className="mt-[2px] size-6 object-contain opacity-80 md:mt-0"
                 />
               ) : null}
-              <div>
-                {s.value ? <div className="text-[length:var(--font-h3)] leading-none text-primary">{s.value}</div> : null}
-                {s.label ? <div className="text-muted-foreground">{s.label}</div> : null}
+              <div className="text-left md:text-center">
+                {s.value ? <div data-stat-value className="text-[length:var(--font-h3)] leading-none">{s.value}</div> : null}
+                {s.label ? <div data-stat-label className="mt-1 text-sm leading-relaxed">{s.label}</div> : null}
               </div>
             </div>
           ))}

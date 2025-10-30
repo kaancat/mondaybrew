@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useAnimation, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -34,37 +33,10 @@ type AboutSectionClientProps = {
   } | null;
 };
 
-const EASE_OUT = [0.16, 1, 0.3, 1] as const;
-
-const overlayVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 1.35, ease: EASE_OUT },
-  },
-} as const;
-
-const headlineVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: EASE_OUT },
-  },
-} as const;
-
 // No per-stat entrance needed for the simplified static panel.
 
 export function AboutSectionClient({ eyebrow, headline, subheading, image, stats = [], cta }: AboutSectionClientProps) {
   const sectionRef = useRef<HTMLDivElement | null>(null);
-  const overlayControls = useAnimation();
-  const headlineControls = useAnimation();
-  const prefersReducedMotionSetting = useReducedMotion();
-  const prefersReducedMotion = prefersReducedMotionSetting ?? false;
-  const isInView = useInView(sectionRef, { once: true, amount: 0.55 });
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
-  const parallaxY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   const [isMobile, setIsMobile] = useState(true);
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -73,30 +45,11 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Parallax should affect the image only – not the overlay/content.
-  // We therefore apply the mask + transform to an inner image layer instead of the container.
-  // Disabled on mobile for better performance and to prevent gaps
-  const imageLayerMotionStyle = prefersReducedMotion || isMobile
-    ? undefined
-    : ({ y: parallaxY } as const);
-
-  useEffect(() => {
-    if (isInView) {
-      overlayControls.start("visible");
-      headlineControls.start("visible");
-    }
-  }, [isInView, overlayControls, headlineControls]);
-
   // (removed) gridCols helper not used after mobile redesign
 
   return (
     <div ref={sectionRef} className="relative flex flex-col gap-[var(--flow-space)]">
-      <motion.div
-        variants={headlineVariants}
-        initial="hidden"
-        animate={headlineControls}
-        className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]"
-      >
+      <div className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]">
         {eyebrow ? (
           <p className="eyebrow text-[length:var(--font-tight)] uppercase tracking-[0.3em] text-[color:var(--eyebrow-color,var(--accent))]">
             {eyebrow}
@@ -112,13 +65,12 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             {subheading}
           </p>
         ) : null}
-      </motion.div>
+      </div>
 
       <div className={cn("relative isolate", isMobile ? "full-bleed" : undefined)}>
-        <motion.div
+        <div
           className={cn(
             "relative overflow-hidden rounded-[5px]",
-            // Side/bottom-only depth to avoid top halo or colored edges
             "drop-shadow-[0_36px_110px_rgba(8,6,20,0.28)]",
           )}
         >
@@ -126,9 +78,8 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
 
           {/* Image layer with its own mask and parallax (prevents the bottom fade from affecting overlay text) */}
           {image?.src ? (
-            <motion.div
+            <div
               aria-hidden
-              style={imageLayerMotionStyle}
               className="absolute inset-0 w-full h-full md:[mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)] md:[-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)]"
             >
               <Image
@@ -142,10 +93,10 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
                 className="object-cover md:object-center object-[55%_center] scale-100 md:scale-100"
                 priority={false}
               />
-            </motion.div>
+            </div>
           ) : null}
-          {!prefersReducedMotion && !isMobile ? (
-            <motion.span
+          {!isMobile ? (
+            <span
               aria-hidden
               className="pointer-events-none absolute inset-0 opacity-0 md:opacity-100"
               style={{
@@ -153,33 +104,26 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
                   "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_55%, white 45%) 47%, transparent 55%)",
                 backgroundSize: "250% 250%",
               }}
-              animate={{ backgroundPosition: ["-180% 50%", "120% 50%", "-180% 50%"] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             />
           ) : null}
 
           {/* Overlay moved outside (see below) to allow covering both image and the spacer container */}
-        </motion.div>
+        </div>
         {/* Stats glass bar anchored at image bottom (matches Media Showcase styling) */}
         {stats.length ? (
-          <motion.div
-            variants={overlayVariants}
-            initial="hidden"
-            animate={overlayControls}
-            className="z-10"
-          >
+          <div className="z-10">
             {/* Mobile: stack stats in responsive grid (matches media showcase) */}
             <div className="block md:hidden w-full pt-4">
               <div className="grid grid-cols-1 gap-3 px-5 sm:grid-cols-2">
                 {stats.map((stat, i) => (
                   <div
                     key={`${stat.label || stat.value || i}`}
-                    className="rounded-[10px] bg-[color:var(--about-stats-mobile-surface)] px-4 py-3 backdrop-blur-[14px]"
+                    className="about-stats-card px-4 py-3"
                   >
                     {stat.value ? (
-                      <div data-stat-value className="text-[length:var(--font-h3)] font-bold leading-none text-primary">{stat.value}</div>
+                      <div data-stat-value className="text-[length:var(--font-h3)] font-bold leading-none">{stat.value}</div>
                     ) : null}
-                    {stat.label ? <div data-stat-label className="text-muted-foreground mt-1">{stat.label}</div> : null}
+                    {stat.label ? <div data-stat-label className="mt-1 text-sm leading-relaxed">{stat.label}</div> : null}
                   </div>
                 ))}
               </div>
@@ -218,7 +162,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
                 </dl>
               </div>
             </div>
-          </motion.div>
+          </div>
         ) : null}
       </div>
 
