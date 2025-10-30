@@ -115,16 +115,18 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
     const setPlaying = () => node.style.setProperty("--clients-logo-filter", "none");
     const setStopped = () => node.style.setProperty("--clients-logo-filter", "grayscale(100%)");
     setPlaying();
-    emblaApi.on("autoScroll:play", setPlaying as any);
-    emblaApi.on("autoScroll:stop", setStopped as any);
+    const onPlay = () => setPlaying();
+    const onStop = () => setStopped();
+    emblaApi.on("autoScroll:play", onPlay);
+    emblaApi.on("autoScroll:stop", onStop);
     const onDown = () => setStopped();
     const onUp = () => setPlaying();
     emblaApi.on("pointerDown", onDown);
     emblaApi.on("pointerUp", onUp);
     emblaApi.on("settle", onUp);
     return () => {
-      emblaApi.off("autoScroll:play", setPlaying as any);
-      emblaApi.off("autoScroll:stop", setStopped as any);
+      emblaApi.off("autoScroll:play", onPlay);
+      emblaApi.off("autoScroll:stop", onStop);
       emblaApi.off("pointerDown", onDown);
       emblaApi.off("pointerUp", onUp);
       emblaApi.off("settle", onUp);
