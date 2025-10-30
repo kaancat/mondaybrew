@@ -722,8 +722,25 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     emblaApi.reInit();
   }, [emblaApi, displayItems.length]);
 
+  const [pointerActive, setPointerActive] = useState(false);
   const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1;
-  useAutoScrollPlugin(emblaApi, autoScrollPlugin, { paused: false, disabled: autoScrollDisabled }, displayItems.length);
+  useAutoScrollPlugin(emblaApi, autoScrollPlugin, { paused: pointerActive, disabled: autoScrollDisabled }, displayItems.length);
+
+  // Ensure instant resume after drag end without delay
+  useEffect(() => {
+    if (!emblaApi) return;
+    const pluginApi = (emblaApi.plugins() as unknown as { autoScroll?: { play: (d?: number) => void; stop: () => void } }).autoScroll;
+    const onDown = () => { setPointerActive(true); pluginApi?.stop(); };
+    const onRelease = () => { setPointerActive(false); pluginApi?.play(0); };
+    emblaApi.on("pointerDown", onDown);
+    emblaApi.on("pointerUp", onRelease);
+    emblaApi.on("settle", onRelease);
+    return () => {
+      emblaApi.off("pointerDown", onDown);
+      emblaApi.off("pointerUp", onRelease);
+      emblaApi.off("settle", onRelease);
+    };
+  }, [emblaApi]);
 
   // Measure and increase repeats until track width comfortably exceeds viewport
   useEffect(() => {
