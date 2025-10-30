@@ -86,9 +86,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         <Carousel
           options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
           className="overflow-hidden"
-          // Full-width layout, but allow box-shadow breathing room on the right
-          viewportStyle={{ paddingRight: "36px" }}
-          containerStyle={{ marginRight: "-36px", gap: "var(--gap, 24px)" }}
+          // Right-side peek equals measured `--peek`; cancel it on the track so slides can extend fully
+          viewportStyle={{ paddingRight: "var(--peek)" }}
+          containerStyle={{ marginRight: "calc(-1 * var(--peek))", gap: "var(--gap, 24px)" }}
           onReady={(embla) => {
             // Scroll to initial index on mount
             const snap = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
