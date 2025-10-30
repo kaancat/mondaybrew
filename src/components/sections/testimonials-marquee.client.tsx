@@ -655,7 +655,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   );
 }
 
-// Ultra-light mobile marquee: CSS-only animation, no carousel runtime
+// Mobile marquee with Embla (drag + infinite loop + stable autoplay)
 function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direction?: 1 | -1; speed?: number }) {
   const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
@@ -665,52 +665,81 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
       return { ...card, tone: toneKey, colors: preset };
     });
   }, [items]);
-  const { ref: containerRef, inView } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.1 });
-  // Eager-load the first few unique images to avoid initial blank cards
-  const eagerImageIndexes = useMemo(() => {
-    const eager: number[] = [];
-    for (let i = 0; i < normalizedItems.length && eager.length < 2; i += 1) {
-      if (normalizedItems[i]?.image?.src) eager.push(i);
-    }
-    return new Set(eager);
-  }, [normalizedItems]);
 
-  // Background prefetch when section is near view
+  const { ref: containerRef, inView } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.08 });
+
+  // Idle prefetch near viewport to avoid late decodes
   useIdlePrefetch(
     normalizedItems.map((c) => c.image?.src || "").filter(Boolean) as string[],
     inView && !prefersReducedMotion,
   );
 
-  // Choose duration based on provided speed (lower = faster)
-  const durationMs = Math.max(12000, Math.min(48000, Math.round(26000 / Math.max(1, speed)))) ;
-  const trackClass = direction === -1 ? "marquee-mobile-track-reverse" : "marquee-mobile-track-forward";
+  // Configure Embla with looping + drag-free for marquee feel
+  const autoScrollPlugin = useMemo(() => {
+    const pxPerFrame = Math.max(0.28, (speed * 2) / 60);
+    return AutoScroll({
+      speed: pxPerFrame,
+      direction: direction === -1 ? "backward" : "forward",
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      playOnInit: true,
+      startDelay: 0,
+    });
+  }, [direction, speed]);
 
-  // Track ref for play-state control
-  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [viewportRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: normalizedItems.length > 1,
+      align: "start",
+      dragFree: true,
+      skipSnaps: true,
+    },
+    [autoScrollPlugin],
+  );
 
-  const mobileContainerStyle: React.CSSProperties = {};
+  // Keep autoplay stable: pause when not in view or when user dragging; never reInit on visibility
+  const [pointerActive, setPointerActive] = useState(false);
+  useEffect(() => {
+    if (!emblaApi) return;
+    const down = () => setPointerActive(true);
+    const release = () => setPointerActive(false);
+    emblaApi.on("pointerDown", down);
+    emblaApi.on("pointerUp", release);
+    emblaApi.on("settle", release);
+    emblaApi.on("scroll", release);
+    return () => {
+      emblaApi.off("pointerDown", down);
+      emblaApi.off("pointerUp", release);
+      emblaApi.off("settle", release);
+      emblaApi.off("scroll", release);
+    };
+  }, [emblaApi]);
+
+  const autoScrollDisabled = prefersReducedMotion || normalizedItems.length <= 1 || !inView;
+  useAutoScrollPlugin(emblaApi, autoScrollPlugin, { paused: pointerActive, disabled: autoScrollDisabled }, normalizedItems.length);
+
+  // Re-init only on hard resizes/orientation changes to recalc slide sizes
+  useEffect(() => {
+    if (!emblaApi) return;
+    let raf = 0;
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => emblaApi.reInit());
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [emblaApi]);
+
   return (
-    <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={mobileContainerStyle}>
-      <div className={cn("w-full", prefersReducedMotion && "no-scrollbar")} style={{ touchAction: "pan-y" }}>
-        <div
-          ref={trackRef}
-          className={cn("marquee-mobile-track flex py-3", trackClass)}
-          style={{
-            animationDuration: `${Math.round(durationMs / 1000)}s`,
-            animationPlayState: inView && !prefersReducedMotion ? "running" : "paused",
-          }}
-        >
-          {/* Two identical sets enable seamless -50% translate looping */}
-          <div className="marquee-mobile-set flex">
-            {normalizedItems.map((card, idx) => (
-              <CardMobile key={`mobile-a-${idx}`} card={card} priority={eagerImageIndexes.has(idx)} />
-            ))}
-          </div>
-          <div className="marquee-mobile-set flex" aria-hidden>
-            {normalizedItems.map((card, idx) => (
-              <CardMobile key={`mobile-b-${idx}`} card={card} />
-            ))}
-          </div>
+    <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
+      <div ref={viewportRef} className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")} style={{ touchAction: "pan-y" }}>
+        <div className="flex py-3">
+          {normalizedItems.map((card, idx) => (
+            <CardMobile key={`mobile-${idx}`} card={card} priority={idx < 2 && !!card.image?.src} />
+          ))}
         </div>
       </div>
     </div>
