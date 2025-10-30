@@ -28,27 +28,42 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     const el = frameRef.current;
     if (!el) return;
     const update = () => {
-      const w = el.getBoundingClientRect().width;
-      const pv = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
+      // Measure the actual carousel frame width (includes break-out margins)
+      const frameWidth = el.getBoundingClientRect().width;
+      const pv = frameWidth >= 1200 ? 3 : frameWidth >= 768 ? 2 : 1;
       setPerView(pv);
-      const gapSize = w >= 1200 ? 32 : 24;
+      const gapSize = frameWidth >= 1200 ? 32 : 24;
       setGap(gapSize);
-      const peekSize = Math.min(Math.round(w * 0.1), 120);
+      // Peek should be visible portion of 4th card (10% of frame width, max 120px)
+      const peekSize = Math.min(Math.round(frameWidth * 0.1), 120);
       setPeek(peekSize);
     };
+    // Initial update
     update();
+    // Observe frame resizes
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    // Also listen to window resize for viewport changes
+    window.addEventListener('resize', update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+    };
   }, []);
 
-  // Calculate slide width
+  // Calculate slide width - ensure 4th card peeks
   const slideWidth = useMemo(() => {
     const el = frameRef.current;
     if (!el) return 300;
-    const vpWidth = el.getBoundingClientRect().width;
-    // Width = (viewport - peek - gaps) / perView
-    return (vpWidth - peek - (perView - 1) * gap) / perView;
+    // Get the viewport element (the overflow-hidden div)
+    const viewportEl = el.querySelector('[class*="overflow-hidden"]') as HTMLElement;
+    if (!viewportEl) return 300;
+    // Use clientWidth to exclude padding (getBoundingClientRect includes padding)
+    const viewportInnerWidth = viewportEl.clientWidth;
+    // The container has negative margins (-24px left, -peek right) that extend slides
+    // So total slide area = viewportInnerWidth + peek
+    // Formula: (viewportInnerWidth + peek - gaps) / perView
+    return (viewportInnerWidth + peek - (perView - 1) * gap) / perView;
   }, [peek, gap, perView]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -87,11 +102,14 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     };
   }, [emblaApi, clampedInitial]);
 
-  // ReInit when dimensions change
+  // Reinitialize Embla when dimensions change to ensure proper slide sizing
   useEffect(() => {
-    if (!emblaApi) return;
-    emblaApi.reInit();
-  }, [emblaApi, slideWidth, peek, gap]);
+    if (!emblaApi || !slideWidth) return;
+    // Use requestAnimationFrame to ensure DOM has updated
+    requestAnimationFrame(() => {
+      emblaApi.reInit();
+    });
+  }, [emblaApi, slideWidth, peek, gap, perView]);
 
   const announcement = useMemo(() => {
     const idx = Math.min(Math.max(selected, 0), Math.max(items.length - 1, 0));
@@ -140,8 +158,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         ref={frameRef}
         className="relative"
         style={{
-          marginLeft: 'calc(var(--container-gutter) * -1)', // Break out to viewport edge (not beyond)
+          marginLeft: 'calc(var(--container-gutter) * -1)',
           marginRight: 'calc(var(--container-gutter) * -1)',
+          width: 'calc(100% + var(--container-gutter) * 2)',
         }}
         aria-roledescription="carousel"
         tabIndex={0}
@@ -153,7 +172,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         <div
           className="relative"
           style={{
-            paddingLeft: 'var(--container-gutter)', // Shadow space comes from viewport edge naturally
+            paddingLeft: 'var(--container-gutter)',
             paddingRight: 'var(--container-gutter)',
           }}
         >
