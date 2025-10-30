@@ -253,7 +253,7 @@ function AccordionItemWithAnimation({ item, index, isLightAlt, isDark }: Accordi
                 ? "bg-[#F5F7FD]"
                 : "bg-[#49444b]/80",
           )}
-          forceMount={shouldRender}
+          forceMount={shouldRender ? true : undefined}
         >
           {shouldRender && (
             <motion.div
