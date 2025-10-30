@@ -122,18 +122,13 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
 
   const scrollPrev = useCallback(() => {
     if (!emblaApi) return;
-    const current = emblaApi.selectedScrollSnap();
-    const target = Math.max(0, current - perView);
-    emblaApi.scrollTo(target);
-  }, [emblaApi, perView]);
+    emblaApi.scrollPrev();
+  }, [emblaApi]);
 
   const scrollNext = useCallback(() => {
     if (!emblaApi) return;
-    const current = emblaApi.selectedScrollSnap();
-    const maxIndex = emblaApi.scrollSnapList().length - 1;
-    const target = Math.min(maxIndex, current + perView);
-    emblaApi.scrollTo(target);
-  }, [emblaApi, perView]);
+    emblaApi.scrollNext();
+  }, [emblaApi]);
 
   return (
     <div className="group/section">
