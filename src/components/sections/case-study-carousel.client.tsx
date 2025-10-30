@@ -21,32 +21,34 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const frameRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<import("embla-carousel").EmblaCarouselType | null>(null);
   const [perView, setPerView] = useState(1);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [gapPx, setGapPx] = useState(24);
+  const [peekPx, setPeekPx] = useState(80);
+  const [slideWidthPx, setSlideWidthPx] = useState<number | null>(null);
 
-  // Responsive items per view (1 / 2 / 3) and dynamic peek & gaps
+  // Compute sizing in JS for robustness (no CSS var dependency)
   useEffect(() => {
     const el = frameRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      const w = entry.contentRect.width;
+    const compute = (w: number) => {
       const pv = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
-      setPerView(pv);
-      setContainerWidth(Math.floor(w));
-      el.style.setProperty("--per-view", String(pv));
       const gap = w >= 1200 ? 32 : 24;
-      el.style.setProperty("--gap", `${gap}px`);
       const peek = Math.min(Math.round(w * 0.1), 120);
-      el.style.setProperty("--peek", `${peek}px`);
-      // Recompute Embla snaps when layout variables change
+      const usable = Math.max(0, w - peek - (pv - 1) * gap);
+      const slideW = Math.floor(usable / pv);
+      setPerView(pv);
+      setGapPx(gap);
+      setPeekPx(peek);
+      setSlideWidthPx(slideW);
       apiRef.current?.reInit();
-    });
+    };
+    const ro = new ResizeObserver(([entry]) => compute(entry.contentRect.width));
     ro.observe(el);
+    // initial
+    compute(el.getBoundingClientRect().width);
     return () => ro.disconnect();
   }, []);
 
   const [selected, setSelected] = useState(0);
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(false);
   const announcement = useMemo(() => {
     const idx = Math.min(Math.max(selected, 0), Math.max(items.length - 1, 0));
     const current = items[idx];
@@ -82,32 +84,32 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           if (e.key === "ArrowLeft") api.scrollTo(Math.max(0, sel - perView));
           if (e.key === "ArrowRight") api.scrollTo(Math.min(api.scrollSnapList().length - 1, sel + perView));
         }}
-        style={{ paddingRight: "var(--peek)" }}
+        style={{ paddingRight: `${peekPx}px` }}
       >
         <Carousel
           options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
           className="overflow-hidden"
           pauseOnDrawer={false}
           // Peek pattern: viewport gets right padding, container gets negative right margin
-          viewportStyle={{ paddingRight: "var(--peek, 0px)" }}
-          containerStyle={{ marginRight: "calc(var(--peek, 0px) * -1)", gap: "var(--gap, 24px)" }}
+          viewportStyle={{ paddingRight: `${peekPx}px` }}
+          containerStyle={{ marginRight: `-${peekPx}px`, gap: `${gapPx}px` }}
           onReady={(embla) => {
             // Scroll to initial index on mount
             const snap = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
             embla.scrollTo(snap, false);
             apiRef.current = embla;
+            // no-op in production; devs can inspect via __emblaCase if needed
+            try {
+              // @ts-expect-error debug handle only in dev
+              if (typeof window !== "undefined") (window).__emblaCase = embla;
+            } catch {}
             setSelected(embla.selectedScrollSnap());
             const onSelect = () => {
               setSelected(embla.selectedScrollSnap());
-              setCanPrev(embla.canScrollPrev());
-              setCanNext(embla.canScrollNext());
             };
             embla.on("select", onSelect);
             embla.on("scroll", onSelect);
             embla.on("reInit", onSelect);
-            // Initial edge states
-            setCanPrev(embla.canScrollPrev());
-            setCanNext(embla.canScrollNext());
             // Ensure snaps match final layout after initial paint
             if (typeof window !== "undefined") {
               requestAnimationFrame(() => embla.reInit());
@@ -142,21 +144,20 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             </div>
           }
         >
-          {items.map((item, i) => {
-            const widthExpr = "calc((100% - var(--peek, 0px) - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
-            return (
-            <Slide key={item._id || i}
+          {items.map((item, i) => (
+            <Slide
+              key={item._id || i}
               className="px-0"
               style={{
-                width: widthExpr,
-                minWidth: widthExpr,
-                flex: `0 0 ${widthExpr}`,
-                marginRight: "var(--gap, 24px)",
-              } as React.CSSProperties}
+                width: slideWidthPx ? `${slideWidthPx}px` : undefined,
+                minWidth: slideWidthPx ? `${slideWidthPx}px` : undefined,
+                flex: slideWidthPx ? `0 0 ${slideWidthPx}px` : undefined,
+                marginRight: `${gapPx}px`,
+              }}
             >
               <CaseCard item={item} />
             </Slide>
-          );})}
+          ))}
         </Carousel>
       </div>
       {/* Controls now rendered via Carousel overlay inside provider */}
