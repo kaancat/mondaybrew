@@ -1076,19 +1076,19 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
 
   @keyframes marquee-mobile-forward {
     from {
-      transform: translateX(0);
+      transform: translate3d(0, 0, 0);
     }
     to {
-      transform: translateX(-50%);
+      transform: translate3d(-50%, 0, 0);
     }
   }
 
   @keyframes marquee-mobile-reverse {
     from {
-      transform: translateX(-50%);
+      transform: translate3d(-50%, 0, 0);
     }
     to {
-      transform: translateX(0);
+      transform: translate3d(0, 0, 0);
     }
   }
 

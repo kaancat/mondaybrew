@@ -685,25 +685,10 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
   const durationMs = Math.max(12000, Math.min(48000, Math.round(26000 / Math.max(1, speed)))) ;
   const trackClass = direction === -1 ? "marquee-mobile-track-reverse" : "marquee-mobile-track-forward";
 
-  // Pause-on-touch handlers to avoid "fighting" with finger while inspecting a card
+  // Track ref for play-state control
   const trackRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const node = trackRef.current;
-    if (!node) return;
-    const down = () => { node.style.animationPlayState = "paused"; };
-    const up = () => { node.style.animationPlayState = "running"; };
-    node.addEventListener("pointerdown", down, { passive: true });
-    window.addEventListener("pointerup", up, { passive: true });
-    return () => {
-      node.removeEventListener("pointerdown", down);
-      window.removeEventListener("pointerup", up);
-    };
-  }, []);
 
-  const mobileContainerStyle: React.CSSProperties = {
-    contentVisibility: inView ? "visible" : "auto",
-    containIntrinsicSize: "320px",
-  };
+  const mobileContainerStyle: React.CSSProperties = {};
   return (
     <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={mobileContainerStyle}>
       <div className={cn("w-full", prefersReducedMotion && "no-scrollbar")} style={{ touchAction: "pan-y" }}>
@@ -711,7 +696,8 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
           ref={trackRef}
           className={cn("marquee-mobile-track flex py-3", trackClass)}
           style={{
-            animationDuration: prefersReducedMotion || !inView ? "0s" : `${Math.round(durationMs / 1000)}s`,
+            animationDuration: `${Math.round(durationMs / 1000)}s`,
+            animationPlayState: inView && !prefersReducedMotion ? "running" : "paused",
           }}
         >
           {/* Two identical sets enable seamless -50% translate looping */}
