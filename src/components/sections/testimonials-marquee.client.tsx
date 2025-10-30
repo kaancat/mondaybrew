@@ -100,6 +100,30 @@ type AutoScrollPluginApi = ReturnType<typeof AutoScroll>;
 
 // (removed) manual RAF auto-scroll in favour of official AutoScroll plugin
 
+// Lightweight in-view detection (IntersectionObserver)
+function useInView<T extends Element>(
+  options: IntersectionObserverInit = { rootMargin: "200px 0px", threshold: 0.2 },
+) {
+  const ref = useRef<T | null>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const obs = new IntersectionObserver((entries) => {
+      const e = entries[0];
+      const threshold = Array.isArray(options.threshold)
+        ? Number(options.threshold[0] ?? 0)
+        : Number(options.threshold ?? 0);
+      setInView(e.isIntersecting && (e.intersectionRatio ?? 0) > threshold);
+    }, options);
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, [options.root, options.rootMargin, options.threshold]);
+
+  return { ref, inView } as const;
+}
+
 function useAutoScrollPlugin(
   emblaApi: EmblaCarouselType | undefined,
   plugin: AutoScrollPluginApi | undefined,
@@ -167,9 +191,9 @@ function CardFrame({ card, children }: { card: TCard; children: ReactNode }) {
   );
 }
 
-function CardMobile({ card }: { card: TCard }) {
-  if (card.variant === "image") return <ImageOnlyCardMobile card={card} />;
-  if (card.variant === "imageQuote") return <ImageQuoteCardMobile card={card} />;
+function CardMobile({ card, priority }: { card: TCard; priority?: boolean }) {
+  if (card.variant === "image") return <ImageOnlyCardMobile card={card} priority={priority} />;
+  if (card.variant === "imageQuote") return <ImageQuoteCardMobile card={card} priority={priority} />;
   return <QuoteCardMobile card={card} />;
 }
 
@@ -325,7 +349,7 @@ function ImageQuoteCard({ card }: { card: TCard }) {
   );
 }
 
-function ImageQuoteCardMobile({ card }: { card: TCard }) {
+function ImageQuoteCardMobile({ card, priority }: { card: TCard; priority?: boolean }) {
   if (!card.image?.src) return null;
   const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
   const colors = card.colors ?? MODE_PRESETS[tone];
@@ -345,10 +369,11 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
             alt={card.image.alt || ""}
             draggable={false}
             fill
-            sizes="70vw"
+            sizes="(max-width: 767px) 42vw, 360px"
             placeholder={card.image.blurDataURL ? "blur" : undefined}
             blurDataURL={card.image.blurDataURL || undefined}
             className="h-full w-full object-cover"
+            priority={!!priority}
           />
         </div>
         <div className="flex flex-1 flex-col p-5">
@@ -422,7 +447,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
   );
 }
 
-function ImageOnlyCardMobile({ card }: { card: TCard }) {
+function ImageOnlyCardMobile({ card, priority }: { card: TCard; priority?: boolean }) {
   if (!card.image?.src) return null;
   return (
     <CardFrameMobile>
@@ -432,17 +457,18 @@ function ImageOnlyCardMobile({ card }: { card: TCard }) {
           "card-inner relative flex h-full overflow-hidden rounded-[5px]",
           "shadow-[0_4px_12px_rgba(0,0,0,0.12)]",
         )}
-        style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT }}
+        style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT, background: "color-mix(in oklch, var(--foreground) 6%, transparent)" }}
       >
         <Image
           src={card.image.src!}
           alt={card.image.alt || ""}
           draggable={false}
           fill
-          sizes="80vw"
+          sizes="(max-width: 767px) 82vw, 480px"
           placeholder={card.image.blurDataURL ? "blur" : undefined}
           blurDataURL={card.image.blurDataURL || undefined}
           className="h-full w-full object-cover"
+          priority={!!priority}
         />
         {/* Bottom gradient for legibility */}
         <div
@@ -498,6 +524,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   }, [normalizedItems, repeatCount]);
 
   const innerViewportRef = useRef<HTMLDivElement | null>(null);
+  const { ref: containerRef, inView } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.15 });
   const autoScrollPlugin = useMemo(() => {
     const pxPerFrame = Math.max(0.35, (speed * 2) / 60);
     return AutoScroll({
@@ -549,7 +576,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     };
   }, [emblaApi]);
 
-  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1;
+  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1 || !inView;
   useAutoScrollPlugin(emblaApi, autoScrollPlugin, {
     paused: hovering || pointerActive,
     disabled: autoScrollDisabled,
@@ -572,7 +599,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   }, [repeatCount, displayItems.length]);
 
   return (
-    <div className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
+    <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={{ contentVisibility: inView ? "visible" : "auto", containIntrinsicSize: "420px" } as any}>
       <div
         ref={setViewportNode}
         className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
@@ -580,7 +607,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
         onMouseLeave={() => setHovering(false)}
         style={{ touchAction: "pan-y" }}
       >
-        <div className="flex py-2">
+        <div className="flex py-2" style={{ willChange: inView ? "transform" : undefined }}>
           {displayItems.map(({ card, key }) => (
             <Card key={`desktop-${key}`} card={card} />
           ))}
@@ -614,6 +641,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
   }, [normalizedItems, repeatCount]);
 
   const innerViewportRef = useRef<HTMLDivElement | null>(null);
+  const { ref: containerRef, inView } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.1 });
   const autoScrollPlugin = useMemo(() => {
     const pxPerFrame = Math.max(0.3, (speed * 2) / 60);
     return AutoScroll({
@@ -664,7 +692,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     };
   }, [emblaApi]);
 
-  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1;
+  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1 || !inView;
   useAutoScrollPlugin(emblaApi, autoScrollPlugin, {
     paused: pointerActive,
     disabled: autoScrollDisabled,
@@ -680,21 +708,30 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     if (!vp || !trackWidth || repeatCount > 12) return;
     const perSet = trackWidth / Math.max(1, repeatCount);
     if (!perSet) return;
-    const target = vp * 2.5;
+    const target = vp * 1.8; // reduce DOM size on mobile
     const needed = Math.max(2, Math.ceil(target / perSet));
     if (needed > repeatCount) setRepeatCount(needed);
   }, [repeatCount, displayItems.length]);
 
+  // Eager-load the first few unique images to avoid initial blank cards
+  const eagerImageIndexes = useMemo(() => {
+    const eager: number[] = [];
+    for (let i = 0; i < normalizedItems.length && eager.length < 2; i += 1) {
+      if (normalizedItems[i]?.image?.src) eager.push(i);
+    }
+    return new Set(eager);
+  }, [normalizedItems]);
+
   return (
-    <div className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
+    <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={{ contentVisibility: inView ? "visible" : "auto", containIntrinsicSize: "320px" } as any}>
       <div
         ref={setViewportNode}
         className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
         style={{ touchAction: "pan-y" }}
       >
-        <div className="flex py-3">
-          {displayItems.map(({ card, key }) => (
-            <CardMobile key={`mobile-${key}`} card={card} />
+        <div className="flex py-3" style={{ willChange: inView ? "transform" : undefined }}>
+          {displayItems.map(({ card, key }, idx) => (
+            <CardMobile key={`mobile-${key}`} card={card} priority={eagerImageIndexes.has(idx % Math.max(1, normalizedItems.length))} />
           ))}
         </div>
       </div>

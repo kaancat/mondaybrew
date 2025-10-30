@@ -30,7 +30,15 @@ export function Footer() {
         backgroundColor: mounted && isLightAlt ? "#ffffff" : "#49444B",
       } as React.CSSProperties}>
       {/* Footer content */}
-      <div className="relative z-10 flex flex-col justify-between">
+      {/*
+        Ensure the footer occupies at least the full viewport height.
+        Uses the shared --nav-viewport-height token which upgrades to 100dvh
+        where supported, keeping behavior consistent with the site shell.
+      */}
+      <div
+        className="relative z-10 flex flex-col justify-between"
+        style={{ minHeight: "var(--nav-viewport-height)" }}
+      >
         {/* Main content */}
         <div className="px-[var(--container-gutter)] pt-12 pb-10 md:pt-16 lg:pt-24">
           <div className="w-full flex flex-col lg:flex-row gap-10 lg:gap-24 items-start">
