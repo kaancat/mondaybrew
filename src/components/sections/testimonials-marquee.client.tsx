@@ -592,6 +592,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
 }
 
 function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direction?: 1 | -1; speed?: number }) {
+  const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;

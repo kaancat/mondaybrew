@@ -129,39 +129,6 @@ export function HeroFeatureCarousel({ items }: Props) {
                         </div>
                       ) : null}
                     </div>
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
-
-                    <div className="flex flex-1 flex-col justify-between gap-1.5 px-2.5 py-2.5 md:gap-3 md:px-6 md:pb-6 md:pt-4">
-                      <div className="flex flex-col gap-0.5 md:gap-2">
-                        {item.title ? (
-                          <h3 className="text-[0.85rem] sm:text-[0.95rem] md:text-[1.5rem] font-semibold leading-tight tracking-tight text-white line-clamp-2">
-                            {item.title}
-                          </h3>
-                        ) : null}
-                        {item.excerpt ? (
-                          <p className="text-[0.7rem] sm:text-[0.8rem] md:text-[1.08rem] text-white/78 line-clamp-2 md:line-clamp-3 leading-snug">{item.excerpt}</p>
-                        ) : null}
-                      </div>
-
-                      {normalized.length > 1 && isActive ? (
-                        <div className="flex justify-end md:hidden">
-                          <div className="flex items-center gap-0 rounded-full border border-white/22 bg-white/12 p-[3px] backdrop-blur-sm">
-                            <div className="flex items-center overflow-hidden rounded-full bg-black/24">
-                              <PrevButton ariaLabel="Previous hero feature" className="inline-flex h-[18px] w-6 items-center justify-center text-white/70 transition hover:text-white">
-                                <ArrowLeft className="size-[10px]" aria-hidden="true" />
-                              </PrevButton>
-                              <div className="h-3 w-px bg-white/18" aria-hidden="true" />
-                              <NextButton ariaLabel="Next hero feature" className="inline-flex h-[18px] w-6 items-center justify-center text-white transition hover:text-white">
-                                <ArrowRight className="size-[10px]" aria-hidden="true" />
-                              </NextButton>
-                            </div>
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
                   </CardWrapper>
                 </Slide>
               );
