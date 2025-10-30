@@ -119,7 +119,7 @@ function useInView<T extends Element>(
     }, options);
     obs.observe(node);
     return () => obs.disconnect();
-  }, [options.root, options.rootMargin, options.threshold]);
+  }, [options]);
 
   return { ref, inView } as const;
 }
@@ -598,8 +598,12 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     if (needed > repeatCount) setRepeatCount(needed);
   }, [repeatCount, displayItems.length]);
 
+  const desktopContainerStyle: React.CSSProperties = {
+    contentVisibility: inView ? "visible" : "auto",
+    containIntrinsicSize: "420px",
+  };
   return (
-    <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={{ contentVisibility: inView ? "visible" : "auto", containIntrinsicSize: "420px" } as any}>
+    <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={desktopContainerStyle}>
       <div
         ref={setViewportNode}
         className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
@@ -722,8 +726,12 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     return new Set(eager);
   }, [normalizedItems]);
 
+  const mobileContainerStyle: React.CSSProperties = {
+    contentVisibility: inView ? "visible" : "auto",
+    containIntrinsicSize: "320px",
+  };
   return (
-    <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={{ contentVisibility: inView ? "visible" : "auto", containIntrinsicSize: "320px" } as any}>
+    <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={mobileContainerStyle}>
       <div
         ref={setViewportNode}
         className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
