@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { CaseStudy } from "@/types/caseStudy";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import Carousel, { Slide } from "@/components/carousel/Carousel";
+import Carousel, { Slide, PrevButton, NextButton } from "@/components/carousel/Carousel";
 
 export interface CaseStudyCarouselProps {
   items: CaseStudy[];
@@ -37,6 +37,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
       el.style.setProperty("--gap", `${gap}px`);
       const peek = Math.min(Math.round(w * 0.1), 120);
       el.style.setProperty("--peek", `${peek}px`);
+      // Recompute Embla snaps when layout variables change
+      apiRef.current?.reInit();
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -85,6 +87,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         <Carousel
           options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
           className="overflow-hidden"
+          pauseOnDrawer={false}
           // Peek pattern: viewport gets right padding, container gets negative right margin
           viewportStyle={{ paddingRight: "var(--peek, 0px)" }}
           containerStyle={{ marginRight: "calc(var(--peek, 0px) * -1)", gap: "var(--gap, 24px)" }}
@@ -105,7 +108,39 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             // Initial edge states
             setCanPrev(embla.canScrollPrev());
             setCanNext(embla.canScrollNext());
+            // Ensure snaps match final layout after initial paint
+            if (typeof window !== "undefined") {
+              requestAnimationFrame(() => embla.reInit());
+            }
           }}
+          overlay={
+            <div className="mt-6 flex items-center justify-end gap-2">
+              <PrevButton
+                by={perView}
+                ariaLabel="Scroll left"
+                className={cn(
+                  "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+                  "dark:text-[color:var(--brand-ink-strong)]",
+                  "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                )}
+              >
+                <ArrowLeftIcon />
+              </PrevButton>
+              <NextButton
+                by={perView}
+                ariaLabel="Scroll right"
+                className={cn(
+                  "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+                  "dark:text-[color:var(--brand-ink-strong)]",
+                  "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                )}
+              >
+                <ArrowRightIcon />
+              </NextButton>
+            </div>
+          }
         >
           {items.map((item, i) => {
             const widthExpr = "calc((100% - var(--peek, 0px) - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
@@ -124,45 +159,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           );})}
         </Carousel>
       </div>
-      {/* Controls bar below, fixed (not inside scroller) */}
-      <div className="mt-6 flex items-center justify-end gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            const api = apiRef.current; if (!api) return;
-            const sel = api.selectedScrollSnap();
-            api.scrollTo(Math.max(0, sel - perView));
-          }}
-          disabled={!canPrev}
-          aria-label="Scroll left"
-          className={cn(
-            "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
-            "dark:text-[color:var(--brand-ink-strong)]",
-            "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
-          )}
-        >
-          <ArrowLeftIcon />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            const api = apiRef.current; if (!api) return;
-            const sel = api.selectedScrollSnap();
-            api.scrollTo(Math.min(api.scrollSnapList().length - 1, sel + perView));
-          }}
-          disabled={!canNext}
-          aria-label="Scroll right"
-          className={cn(
-            "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
-            "dark:text-[color:var(--brand-ink-strong)]",
-            "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
-          )}
-        >
-          <ArrowRightIcon />
-        </button>
-      </div>
+      {/* Controls now rendered via Carousel overlay inside provider */}
       {/* polite announcement for screen readers */}
       <div aria-live="polite" className="sr-only" role="status">{announcement}</div>
     </div>

@@ -62,6 +62,23 @@ export function HeroFeatureCarousel({ items }: Props) {
               api.on("select", onSelect);
               api.on("reInit", onSelect);
             }}
+            overlay={
+              normalized.length > 1 ? (
+                <div className="hidden md:flex justify-end px-6 pb-6">
+                  <div className="flex items-center gap-0 rounded-full border border-white/22 bg-white/12 p-[4px] backdrop-blur-sm">
+                    <div className="flex items-center overflow-hidden rounded-full bg-black/24">
+                      <PrevButton ariaLabel="Previous hero feature" className="inline-flex h-6 w-8 items-center justify-center text-white/70 transition hover:text-white">
+                        <ArrowLeft className="size-[12px]" aria-hidden="true" />
+                      </PrevButton>
+                      <div className="h-5 w-px bg-white/18" aria-hidden="true" />
+                      <NextButton ariaLabel="Next hero feature" className="inline-flex h-6 w-8 items-center justify-center text-white transition hover:text-white">
+                        <ArrowRight className="size-[12px]" aria-hidden="true" />
+                      </NextButton>
+                    </div>
+                  </div>
+                </div>
+              ) : null
+            }
           >
             {normalized.map((item, itemIndex) => {
               const cardHref = item.href?.trim();
@@ -135,21 +152,7 @@ export function HeroFeatureCarousel({ items }: Props) {
             })}
           </Carousel>
 
-          {normalized.length > 1 ? (
-            <div className="hidden md:flex justify-end px-6 pb-6">
-              <div className="flex items-center gap-0 rounded-full border border-white/22 bg-white/12 p-[4px] backdrop-blur-sm">
-                <div className="flex items-center overflow-hidden rounded-full bg-black/24">
-                  <PrevButton ariaLabel="Previous hero feature" className="inline-flex h-6 w-8 items-center justify-center text-white/70 transition hover:text-white">
-                    <ArrowLeft className="size-[12px]" aria-hidden="true" />
-                  </PrevButton>
-                  <div className="h-5 w-px bg-white/18" aria-hidden="true" />
-                  <NextButton ariaLabel="Next hero feature" className="inline-flex h-6 w-8 items-center justify-center text-white transition hover:text-white">
-                    <ArrowRight className="size-[12px]" aria-hidden="true" />
-                  </NextButton>
-                </div>
-              </div>
-            </div>
-          ) : null}
+          {/* Desktop controls now rendered via Carousel overlay inside provider */}
         </div>
       </div>
     </div>

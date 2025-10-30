@@ -16,6 +16,8 @@ type CarouselProps = React.PropsWithChildren<{
   viewportStyle?: React.CSSProperties;
   /** Optional styles to apply to the inner track container */
   containerStyle?: React.CSSProperties;
+  /** Optional overlay content rendered inside the Embla provider and viewport wrapper */
+  overlay?: React.ReactNode;
 }>; 
 
 type Ctx = {
@@ -28,7 +30,7 @@ export function useCarouselApi() {
   return useContext(CarouselCtx).api;
 }
 
-export function Carousel({ options, className, viewportStyle, containerClassName, containerStyle, children, onReady, pauseOnDrawer = true }: CarouselProps) {
+export function Carousel({ options, className, viewportStyle, containerClassName, containerStyle, children, onReady, pauseOnDrawer = true, overlay }: CarouselProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const mergedOptions = useMemo<EmblaOptionsType>(() => ({ loop: true, align: "start", containScroll: "trimSnaps", ...(options || {}) }), [options]);
   const [emblaRef, emblaApi] = useEmblaCarousel(mergedOptions);
@@ -66,14 +68,18 @@ export function Carousel({ options, className, viewportStyle, containerClassName
         <div className={"embla__container flex " + (containerClassName ?? "")} style={containerStyle}>
           {children}
         </div>
+        {overlay}
       </div>
     </CarouselCtx.Provider>
   );
 }
 
 export function Slide({ className, style, children }: React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>) {
+  // Provide a sane default so each slide occupies the viewport width.
+  const fallbackStyle: React.CSSProperties = { flex: "0 0 100%" };
+  const mergedStyle = { ...fallbackStyle, ...(style || {}) } as React.CSSProperties;
   return (
-    <div className={"embla__slide shrink-0 " + (className ?? "")} style={style}>
+    <div className={"embla__slide shrink-0 " + (className ?? "")} style={mergedStyle}>
       {children}
     </div>
   );
