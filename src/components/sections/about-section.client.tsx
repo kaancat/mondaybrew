@@ -169,7 +169,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             className="z-10"
           >
             {/* Mobile: stack stats in responsive grid (matches media showcase) */}
-            <div className="about-stats-panel block md:hidden w-full pt-4">
+            <div className="block md:hidden w-full pt-4">
               <div className="grid grid-cols-1 gap-3 px-5 sm:grid-cols-2">
                 {stats.map((stat, i) => (
                   <div
