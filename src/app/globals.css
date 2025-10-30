@@ -117,6 +117,18 @@
   --full-bleed-inline-end: calc(50% - 50vw);
   --full-bleed-width: 100vw;
 
+  --site-dot-size: 0.85px;
+  --site-dot-spacing: 12px;
+  --site-dot-opacity: 0.14;
+  /* Surface pattern defaults; override these to test new overlays */
+  --surface-pattern-image: url("/patterns/bg-dots.png");
+  --surface-pattern-size: auto;
+  --surface-pattern-position: top left;
+  --surface-pattern-opacity: var(--site-dot-opacity);
+  --surface-pattern-blend-mode: normal;
+  --surface-pattern-transform: none;
+  --surface-pattern-color: var(--site-dot-color);
+
   --mobile-nav-surface: color-mix(in oklch, var(--mb-bg) 92%, white 8%);
   --mobile-nav-text: color-mix(in oklch, var(--mb-ink) 92%, black 8%);
   --mobile-nav-muted: color-mix(in oklch, var(--mb-ink) 60%, white 40%);
@@ -171,6 +183,9 @@ html.light-primary {
   --mb-ink: #49444b;
   --mb-accent: #ff914d;
   --mb-bg: #f5f7fd;
+
+  --site-dot-color: color-mix(in oklch, var(--foreground) 56%, transparent);
+  --site-dot-opacity: 0.42;
 
   --surface-base: var(--mb-bg);
   --surface-elevated: color-mix(in oklch, white 30%, var(--mb-bg));
@@ -316,6 +331,9 @@ html.light-alt {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
+  --site-dot-color: color-mix(in oklch, var(--foreground) 54%, transparent);
+  --site-dot-opacity: 0.38;
+
   /* Navbar tokens tuned for Light Alt white/glass + black ink */
   /* Light Alt: nudge more see-through */
   /* Make header shell more transparent and subtle on Light Alt */
@@ -433,6 +451,9 @@ html.dark {
   --sidebar-border: color-mix(in oklch, var(--brand-light) 18%, var(--mb-bg) 82%);
   --sidebar-ring: color-mix(in oklch, var(--mb-accent) 52%, var(--mb-bg) 48%);
 
+  --site-dot-color: color-mix(in oklch, var(--foreground) 38%, transparent);
+  --site-dot-opacity: 0.38;
+
   /* Dark glass header over #49444B */
   /* Dark: nudge more see-through */
   --nav-shell-bg: color-mix(in oklch, var(--background) 52%, transparent);
@@ -529,6 +550,37 @@ html.dark {
     position: relative;
   }
 
+  .background-dots,
+  .background-dots-surface {
+    pointer-events: none;
+    background-color: var(--surface-pattern-color, transparent);
+    background-image: none;
+    mask-image: var(--surface-pattern-image);
+    mask-size: var(--surface-pattern-size);
+    mask-position: var(--surface-pattern-position);
+    mask-repeat: repeat;
+    -webkit-mask-image: var(--surface-pattern-image);
+    -webkit-mask-size: var(--surface-pattern-size);
+    -webkit-mask-position: var(--surface-pattern-position);
+    -webkit-mask-repeat: repeat;
+    opacity: var(--surface-pattern-opacity);
+    mix-blend-mode: var(--surface-pattern-blend-mode, normal);
+    transform: var(--surface-pattern-transform, none);
+    transform-origin: center;
+  }
+
+  .background-dots {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .background-dots-surface {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
   /* Global Typography System */
 
   /* H1 - Hero style (largest, semibold) */
@@ -610,20 +662,44 @@ html.dark {
     pointer-events: auto;
     height: auto;
     margin-block: 0;
+    isolation: isolate;
   }
 
   .site-shell::before {
     content: "";
     position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-color: var(--surface-pattern-color, transparent);
+    mask-image: var(--surface-pattern-image);
+    mask-size: var(--surface-pattern-size);
+    mask-position: var(--surface-pattern-position);
+    mask-repeat: repeat;
+    -webkit-mask-image: var(--surface-pattern-image);
+    -webkit-mask-size: var(--surface-pattern-size);
+    -webkit-mask-position: var(--surface-pattern-position);
+    -webkit-mask-repeat: repeat;
+    opacity: var(--surface-pattern-opacity);
+    mix-blend-mode: var(--surface-pattern-blend-mode, normal);
+    transform: var(--surface-pattern-transform, none);
+    transform-origin: center;
+  }
+
+  .site-shell::after {
+    content: "";
+    position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
-    width: clamp(10px, 3vw, 24px);
+    width: clamp(6px, 2vw, 18px);
     pointer-events: none;
-    background: linear-gradient(90deg, color-mix(in oklch, var(--mb-accent) 38%, transparent) 0%, transparent 72%);
-    opacity: 0;
-    transform: translateX(-40%);
-    transition: opacity var(--nav-anim-duration) var(--nav-anim-ease), transform var(--nav-anim-duration) var(--nav-anim-ease);
+    background: linear-gradient(90deg, color-mix(in oklch, var(--mb-accent) 18%, transparent) 0%, transparent 80%);
+    opacity: 0.08;
+    transform: translateX(-30%);
+    transition:
+      opacity var(--nav-anim-duration) var(--nav-anim-ease),
+      transform var(--nav-anim-duration) var(--nav-anim-ease);
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
@@ -639,9 +715,9 @@ html.dark {
     contain: layout style paint;
   }
 
-  body[data-mobile-nav-open="true"] .site-shell::before {
-    opacity: 1;
-    transform: translateX(0);
+  body[data-mobile-nav-open="true"] .site-shell::after {
+    opacity: 0.22;
+    transform: translateX(-6%);
   }
 
   /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */

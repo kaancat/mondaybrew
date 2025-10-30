@@ -14,9 +14,9 @@ export type HeroFeatureDisplayItem = {
   href: string;
   metaLabel?: string | null;
   image?: {
-    url?: string;
+    src?: string;
     alt?: string;
-    lqip?: string;
+    blurDataURL?: string;
   } | null;
 };
 
@@ -33,7 +33,7 @@ export function HeroFeatureCarousel({ items }: Props) {
           ...item,
           href: item.href?.trim() || undefined,
         }))
-        .filter((item) => item.href || item.title || item.excerpt || item.image?.url),
+        .filter((item) => item.href || item.title || item.excerpt || item.image?.src),
     [items],
   );
   const [index, setIndex] = useState(0);
@@ -77,23 +77,58 @@ export function HeroFeatureCarousel({ items }: Props) {
                       "flex-row md:flex-col",
                       isLink &&
                         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
+                      isLink &&
+                        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
                     )}
                   >
-                    {item.image?.url ? (
+                    {item.image?.src ? (
                       <div className="relative w-[42%] md:w-full aspect-square md:aspect-[4/3] shrink-0 overflow-hidden rounded-[5px]">
                         <Image
-                          src={item.image.url}
+                          src={item.image.src}
                           alt={item.image.alt || item.title || "Hero feature"}
                           fill
                           sizes="(max-width: 768px) 42vw, 600px"
-                          placeholder={item.image.lqip ? "blur" : undefined}
-                          blurDataURL={item.image.lqip}
+                          placeholder={item.image.blurDataURL ? "blur" : undefined}
+                          blurDataURL={item.image.blurDataURL}
                           className="object-cover"
                         />
                         <div className="pointer-events-none absolute inset-0 rounded-[5px] bg-gradient-to-b from-white/12 via-transparent to-black/42" />
                         {isActive ? (
                           <div className="absolute right-1.5 top-1.5 md:right-3 md:top-3 flex h-5 md:h-7 min-w-[2.6rem] md:min-w-[3.2rem] items-center justify-center rounded-full bg-black/35 px-1.5 md:px-3 text-[0.6rem] md:text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-white/85 leading-none">
                             {String(index + 1).padStart(2, "0")} / {String((length || normalized.length)).padStart(2, "0")}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    <div className="flex flex-1 flex-col justify-between gap-1.5 px-2.5 py-2.5 md:gap-3 md:px-6 md:pb-6 md:pt-4">
+                      <div className="flex flex-col gap-0.5 md:gap-2">
+                        {item.title ? (
+                          <h3 className="text-[0.85rem] sm:text-[0.95rem] md:text-[1.5rem] font-semibold leading-tight tracking-tight text-white line-clamp-2">
+                            {item.title}
+                          </h3>
+                        ) : null}
+                        {item.excerpt ? (
+                          <p className="text-[0.7rem] sm:text-[0.8rem] md:text-[1.08rem] text-white/78 line-clamp-2 md:line-clamp-3 leading-snug">{item.excerpt}</p>
+                        ) : null}
+                      </div>
+
+                      {normalized.length > 1 && isActive ? (
+                        <div className="flex justify-end md:hidden">
+                          <div className="flex items-center gap-0 rounded-full border border-white/22 bg-white/12 p-[3px] backdrop-blur-sm">
+                            <div className="flex items-center overflow-hidden rounded-full bg-black/24">
+                              <PrevButton ariaLabel="Previous hero feature" className="inline-flex h-[18px] w-6 items-center justify-center text-white/70 transition hover:text-white">
+                                <ArrowLeft className="size-[10px]" aria-hidden="true" />
+                              </PrevButton>
+                              <div className="h-3 w-px bg-white/18" aria-hidden="true" />
+                              <NextButton ariaLabel="Next hero feature" className="inline-flex h-[18px] w-6 items-center justify-center text-white transition hover:text-white">
+                                <ArrowRight className="size-[10px]" aria-hidden="true" />
+                              </NextButton>
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
                           </div>
                         ) : null}
                       </div>

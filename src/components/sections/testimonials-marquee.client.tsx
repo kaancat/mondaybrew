@@ -1,16 +1,19 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import useEmblaCarousel from "embla-carousel-react";
+import AutoScroll from "embla-carousel-auto-scroll";
+import type { EmblaCarouselType } from "embla-carousel";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "framer-motion";
-import TickerCarousel from "@/components/carousel/TickerCarousel.client";
+// Mobile autoplay handled by Embla AutoScroll; ticker component not used here
 
 export type TImage = {
-  url?: string | null;
+  src?: string | null;
   alt?: string | null;
-  lqip?: string | null;
+  blurDataURL?: string | null;
   width?: number;
   height?: number;
 } | null;
@@ -94,11 +97,56 @@ const MODE_PRESETS: Record<ModeKey, ToneStyle> = {
 
 const MODE_SEQUENCE: ModeKey[] = ["primary", "lightAlt", "dark"];
 
+type AutoScrollPluginApi = ReturnType<typeof AutoScroll>;
+
+// (removed) manual RAF auto-scroll in favour of official AutoScroll plugin
+
+function useAutoScrollPlugin(
+  emblaApi: EmblaCarouselType | undefined,
+  plugin: AutoScrollPluginApi | undefined,
+  { paused, disabled }: { paused: boolean; disabled: boolean },
+  watch?: unknown,
+) {
+  useEffect(() => {
+    if (!emblaApi || !plugin) return;
+
+    const syncState = () => {
+      if (disabled) {
+        plugin.stop();
+        return;
+      }
+      if (paused) {
+        plugin.stop();
+        return;
+      }
+      plugin.play();
+    };
+
+    syncState();
+
+    const handleReInit = () => {
+      syncState();
+    };
+    const handleAutoScrollStop = () => {
+      if (!disabled && !paused) plugin.play();
+    };
+
+    emblaApi.on("reInit", handleReInit);
+    emblaApi.on("autoScroll:stop", handleAutoScrollStop);
+
+    return () => {
+      emblaApi.off("reInit", handleReInit);
+      emblaApi.off("autoScroll:stop", handleAutoScrollStop);
+      plugin.stop();
+    };
+  }, [emblaApi, plugin, paused, disabled, watch]);
+}
+
 function CardLogo({ card, className }: { card: TCard; className?: string }) {
-  if (!card.logo?.url) return null;
+  if (!card.logo?.src) return null;
   return (
     <div className={cn("relative h-6 w-24 opacity-90", className)}>
-      <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain" sizes="96px" />
+      <Image src={card.logo.src} alt={card.logo.alt || ""} fill className="object-contain" sizes="96px" />
     </div>
   );
 }
@@ -166,7 +214,7 @@ function QuoteCard({ card }: { card: TCard }) {
       <div
         className={cn(
           "card-inner relative flex h-full min-h=[400px] flex-col rounded-[5px] p-8",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          "ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
         style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
@@ -228,7 +276,7 @@ function QuoteCardMobile({ card }: { card: TCard }) {
 }
 
 function ImageQuoteCard({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
   const colors = card.colors ?? MODE_PRESETS[tone];
 
@@ -237,20 +285,20 @@ function ImageQuoteCard({ card }: { card: TCard }) {
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[400px] overflow-hidden rounded-[5px]",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          "ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
         style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
         <div className="relative flex-[0_0_44%] min-w-[210px]">
           <Image
-            src={card.image.url}
+            src={card.image.src!}
             alt={card.image.alt || ""}
             draggable={false}
             fill
             sizes="(max-width: 768px) 70vw, 360px"
-            placeholder={card.image.lqip ? "blur" : undefined}
-            blurDataURL={card.image.lqip || undefined}
+            placeholder={card.image.blurDataURL ? "blur" : undefined}
+            blurDataURL={card.image.blurDataURL || undefined}
             className="h-full w-full object-cover"
           />
         </div>
@@ -279,7 +327,7 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 }
 
 function ImageQuoteCardMobile({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
   const colors = card.colors ?? MODE_PRESETS[tone];
   return (
@@ -294,13 +342,13 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
       >
         <div className="relative flex-[0_0_42%] min-w-[150px]">
           <Image
-            src={card.image.url}
+            src={card.image.src!}
             alt={card.image.alt || ""}
             draggable={false}
             fill
             sizes="70vw"
-            placeholder={card.image.lqip ? "blur" : undefined}
-            blurDataURL={card.image.lqip || undefined}
+            placeholder={card.image.blurDataURL ? "blur" : undefined}
+            blurDataURL={card.image.blurDataURL || undefined}
             className="h-full w-full object-cover"
           />
         </div>
@@ -326,24 +374,24 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
 }
 
 function ImageOnlyCard({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   return (
     <CardFrame card={card}>
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[400px] overflow-hidden rounded-[5px]",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          "ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
       >
         <Image
-          src={card.image.url}
+          src={card.image.src!}
           alt={card.image.alt || ""}
           draggable={false}
           fill
           sizes="(max-width: 768px) 80vw, 480px"
-          placeholder={card.image.lqip ? "blur" : undefined}
-          blurDataURL={card.image.lqip || undefined}
+          placeholder={card.image.blurDataURL ? "blur" : undefined}
+          blurDataURL={card.image.blurDataURL || undefined}
           className="h-full w-full object-cover"
         />
         <CardLogo card={card} className="absolute left-6 top-6 z-20" />
@@ -376,7 +424,7 @@ function ImageOnlyCard({ card }: { card: TCard }) {
 }
 
 function ImageOnlyCardMobile({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   return (
     <CardFrameMobile>
       <div
@@ -388,13 +436,13 @@ function ImageOnlyCardMobile({ card }: { card: TCard }) {
         style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT }}
       >
         <Image
-          src={card.image.url}
+          src={card.image.src!}
           alt={card.image.alt || ""}
           draggable={false}
           fill
           sizes="80vw"
-          placeholder={card.image.lqip ? "blur" : undefined}
-          blurDataURL={card.image.lqip || undefined}
+          placeholder={card.image.blurDataURL ? "blur" : undefined}
+          blurDataURL={card.image.blurDataURL || undefined}
           className="h-full w-full object-cover"
         />
         {/* Bottom gradient for legibility */}
@@ -426,147 +474,116 @@ function Card({ card }: { card: TCard }) {
   return <QuoteCard card={card} />;
 }
 
-// Desktop marquee row with auto animation, drag and wheel support
+// Desktop marquee row powered by Embla
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
   const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
       const preset = MODE_PRESETS[toneKey];
-      return { ...card, tone: toneKey, background: preset.background, colors: preset };
+      return { ...card, tone: toneKey, colors: preset };
     });
   }, [items]);
 
-  const clones = [0, 1, 2]; // 3 repeats ensures seamless wrap on large screens
-  const viewportRef = useRef<HTMLDivElement | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const [setWidth, setSetWidth] = useState<number>(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isInteracting, setIsInteracting] = useState(false);
-  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pointerIdRef = useRef<number | null>(null);
-  const startXRef = useRef(0);
-  const startOffsetRef = useRef(0);
-
-  const setRef = useCallback((node: HTMLDivElement | null) => {
-    trackRef.current = node;
-    if (!node) return;
-    const rect = node.getBoundingClientRect();
-    setSetWidth(rect.width);
-  }, []);
-
-  // Use exact measured width of one set (including margins) for wrap distance
-  const totalWidth = setWidth;
-
-  const wrapTx = useCallback((tx: number) => {
-    if (!totalWidth) return tx;
-    let v = tx;
-    const w = totalWidth;
-    while (v <= -w) v += w;
-    while (v > 0) v -= w;
-    return v;
-  }, [totalWidth]);
-
-  const directionFactor = direction === -1 ? -1 : 1;
-
-  useLayoutEffect(() => {
-    const refresh = () => {
-      const node = trackRef.current;
-      if (!node) return;
-      const rect = node.getBoundingClientRect();
-      setSetWidth(rect.width);
-    };
-    refresh();
-    window.addEventListener("resize", refresh);
-    return () => window.removeEventListener("resize", refresh);
-  }, []);
-
-  const clearInteractionTimeout = useCallback(() => {
-    if (interactionTimeoutRef.current) {
-      clearTimeout(interactionTimeoutRef.current);
-      interactionTimeoutRef.current = null;
+  const [repeatCount, setRepeatCount] = useState(3);
+  const displayItems = useMemo(() => {
+    if (!normalizedItems.length) return [] as { card: TCard; key: string }[];
+    const repeats = Math.max(1, repeatCount);
+    const sequence: { card: TCard; key: string }[] = [];
+    for (let setIndex = 0; setIndex < repeats; setIndex += 1) {
+      normalizedItems.forEach((card, cardIndex) => {
+        sequence.push({ card, key: `${setIndex}-${card.variant}-${cardIndex}` });
+      });
     }
-  }, []);
+    return sequence;
+  }, [normalizedItems, repeatCount]);
 
-  const onWheel = useCallback((e: ReactWheelEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return; // native scroll
-    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-    e.preventDefault();
-    setIsInteracting(true);
-    setDragOffset((v) => wrapTx(v - e.deltaX));
-    clearInteractionTimeout();
-    interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 200);
-  }, [prefersReducedMotion, wrapTx, clearInteractionTimeout]);
+  const innerViewportRef = useRef<HTMLDivElement | null>(null);
+  const autoScrollPlugin = useMemo(() => {
+    const pxPerFrame = Math.max(0.35, (speed * 2) / 60);
+    return AutoScroll({
+      speed: pxPerFrame,
+      direction: direction === -1 ? "backward" : "forward",
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      playOnInit: true,
+      startDelay: 0,
+    });
+  }, [direction, speed]);
 
-  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    pointerIdRef.current = e.pointerId;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    startXRef.current = e.clientX;
-    startOffsetRef.current = dragOffset;
-    setIsInteracting(true);
-  }, [prefersReducedMotion, dragOffset]);
-
-  const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    if (pointerIdRef.current !== e.pointerId) return;
-    e.preventDefault();
-    const dx = e.clientX - startXRef.current;
-    // Intuitive drag: translate equals dx
-    setDragOffset(wrapTx(startOffsetRef.current + dx));
-  }, [prefersReducedMotion, wrapTx]);
-
-  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    if (pointerIdRef.current !== e.pointerId) return;
-    pointerIdRef.current = null;
-    e.currentTarget.releasePointerCapture(e.pointerId);
-    clearInteractionTimeout();
-    interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
-  }, [prefersReducedMotion, clearInteractionTimeout]);
-
-  const wrapperStyle = useMemo(
-    () => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }),
-    [dragOffset],
+  const [viewportRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: displayItems.length > 1,
+      align: "start",
+      dragFree: true,
+      skipSnaps: true,
+    },
+    [autoScrollPlugin],
   );
 
-  // Drive marquee with requestAnimationFrame for robust infinite loop (no CSS keyframe drift)
-  useLayoutEffect(() => {
-    if (prefersReducedMotion || !totalWidth) return;
-    let rafId: number | null = null;
-    let last = performance.now();
-    const pxPerSec = speed * 2; // match legacy CSS-driven speed mapping
-    const step = (now: number) => {
-      const dt = Math.max(0, (now - last) / 1000);
-      last = now;
-      if (!isInteracting) {
-        setDragOffset((v) => wrapTx(v + directionFactor * pxPerSec * dt));
-      }
-      rafId = requestAnimationFrame(step);
-    };
-    rafId = requestAnimationFrame(step);
+  const setViewportNode = useCallback((node: HTMLDivElement | null) => {
+    innerViewportRef.current = node;
+    viewportRef(node);
+  }, [viewportRef]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit();
+  }, [emblaApi, displayItems.length]);
+
+  const [hovering, setHovering] = useState(false);
+  const [pointerActive, setPointerActive] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const handlePointerDown = () => setPointerActive(true);
+    const handlePointerRelease = () => setPointerActive(false);
+    emblaApi.on("pointerDown", handlePointerDown);
+    emblaApi.on("pointerUp", handlePointerRelease);
+    emblaApi.on("settle", handlePointerRelease);
+    emblaApi.on("scroll", handlePointerRelease);
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
+      emblaApi.off("pointerDown", handlePointerDown);
+      emblaApi.off("pointerUp", handlePointerRelease);
+      emblaApi.off("settle", handlePointerRelease);
+      emblaApi.off("scroll", handlePointerRelease);
     };
-  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapTx]);
+  }, [emblaApi]);
+
+  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1;
+  useAutoScrollPlugin(emblaApi, autoScrollPlugin, {
+    paused: hovering || pointerActive,
+    disabled: autoScrollDisabled,
+  }, displayItems.length);
+
+  useEffect(() => {
+    // Auto-measure and increase repeats until track width comfortably exceeds viewport
+    const node = innerViewportRef.current;
+    if (!node) return;
+    const track = node.firstElementChild as HTMLElement | null;
+    if (!track) return;
+    const vp = node.getBoundingClientRect().width;
+    const trackWidth = track.scrollWidth;
+    if (!vp || !trackWidth || repeatCount > 12) return;
+    const perSet = trackWidth / Math.max(1, repeatCount);
+    if (!perSet) return;
+    const target = vp * 2.5; // ensure plenty of headroom to loop seamlessly
+    const needed = Math.max(2, Math.ceil(target / perSet));
+    if (needed > repeatCount) setRepeatCount(needed);
+  }, [repeatCount, displayItems.length]);
 
   return (
-    <div ref={viewportRef} className={cn("relative overflow-hidden", prefersReducedMotion && "no-scrollbar overflow-x-auto")}
-      onWheel={onWheel}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-      style={{ touchAction: "pan-y" }}
-    >
-      <div className="flex py-2" style={wrapperStyle}>
-        <div className={cn("flex w-max")}> 
-          {clones.map((_, idx) => (
-            <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex" aria-hidden={idx > 0}>
-              {normalizedItems.map((card, i) => (
-                <Card key={`${idx}-${i}`} card={card} />
-              ))}
-            </div>
+    <div className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
+      <div
+        ref={setViewportNode}
+        className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+        style={{ touchAction: "pan-y" }}
+      >
+        <div className="flex py-2">
+          {displayItems.map(({ card, key }) => (
+            <Card key={`desktop-${key}`} card={card} />
           ))}
         </div>
       </div>
@@ -579,43 +596,126 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
       const preset = MODE_PRESETS[toneKey];
-      return { ...card, tone: toneKey, background: preset.background, colors: preset };
+      return { ...card, tone: toneKey, colors: preset };
     });
   }, [items]);
 
+  const [repeatCount, setRepeatCount] = useState(3);
+  const displayItems = useMemo(() => {
+    if (!normalizedItems.length) return [] as { card: TCard; key: string }[];
+    const repeats = Math.max(1, repeatCount);
+    const sequence: { card: TCard; key: string }[] = [];
+    for (let setIndex = 0; setIndex < repeats; setIndex += 1) {
+      normalizedItems.forEach((card, cardIndex) => {
+        sequence.push({ card, key: `${setIndex}-${card.variant}-${cardIndex}` });
+      });
+    }
+    return sequence;
+  }, [normalizedItems, repeatCount]);
+
+  const innerViewportRef = useRef<HTMLDivElement | null>(null);
+  const autoScrollPlugin = useMemo(() => {
+    const pxPerFrame = Math.max(0.3, (speed * 2) / 60);
+    return AutoScroll({
+      speed: pxPerFrame,
+      direction: direction === -1 ? "backward" : "forward",
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      playOnInit: true,
+      startDelay: 0,
+    });
+  }, [direction, speed]);
+
+  const [viewportRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: displayItems.length > 1,
+      align: "start",
+      dragFree: true,
+      skipSnaps: true,
+    },
+    [autoScrollPlugin],
+  );
+
+  const setViewportNode = useCallback((node: HTMLDivElement | null) => {
+    innerViewportRef.current = node;
+    viewportRef(node);
+  }, [viewportRef]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit();
+  }, [emblaApi, displayItems.length]);
+
+  const [pointerActive, setPointerActive] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const handlePointerDown = () => setPointerActive(true);
+    const handlePointerRelease = () => setPointerActive(false);
+    emblaApi.on("pointerDown", handlePointerDown);
+    emblaApi.on("pointerUp", handlePointerRelease);
+    emblaApi.on("settle", handlePointerRelease);
+    emblaApi.on("scroll", handlePointerRelease);
+    return () => {
+      emblaApi.off("pointerDown", handlePointerDown);
+      emblaApi.off("pointerUp", handlePointerRelease);
+      emblaApi.off("settle", handlePointerRelease);
+      emblaApi.off("scroll", handlePointerRelease);
+    };
+  }, [emblaApi]);
+
+  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1;
+  useAutoScrollPlugin(emblaApi, autoScrollPlugin, {
+    paused: pointerActive,
+    disabled: autoScrollDisabled,
+  }, displayItems.length);
+
+  useEffect(() => {
+    const node = innerViewportRef.current;
+    if (!node) return;
+    const track = node.firstElementChild as HTMLElement | null;
+    if (!track) return;
+    const vp = node.getBoundingClientRect().width;
+    const trackWidth = track.scrollWidth;
+    if (!vp || !trackWidth || repeatCount > 12) return;
+    const perSet = trackWidth / Math.max(1, repeatCount);
+    if (!perSet) return;
+    const target = vp * 2.5;
+    const needed = Math.max(2, Math.ceil(target / perSet));
+    if (needed > repeatCount) setRepeatCount(needed);
+  }, [repeatCount, displayItems.length]);
+
   return (
-    <div className="-mx-[var(--container-gutter)]">
-      <TickerCarousel className="overflow-hidden" speed={Math.max(24, speed)} direction={direction}>
-        {(direction === -1 ? [...normalizedItems].reverse() : normalizedItems).map((card, i) => (
-          <div key={`slide-${i}`} className="shrink-0 px-[14px]">
-            <CardMobile card={card} />
-          </div>
-        ))}
-      </TickerCarousel>
+    <div className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
+      <div
+        ref={setViewportNode}
+        className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
+        style={{ touchAction: "pan-y" }}
+      >
+        <div className="flex py-3">
+          {displayItems.map(({ card, key }) => (
+            <CardMobile key={`mobile-${key}`} card={card} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
 // (Removed) Alternate mobile row (manual scroll). Keeping codebase lean.
 
-// Mobile auto-marquee using the same RAF engine as desktop, but with mobile cards and lower speeds
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
   // Faster autoplay on mobile; ignore legacy percentages to achieve a snappier feel
   const mobileTopSpeed = 63;   // px/s (+~20%)
   const mobileBottomSpeed = 58; // px/s (+~20%)
 
   return (
-    // On mobile we want the rows to start right under the heading; keep bottom-aligned only on md+.
-    <div className="relative flex flex-1 flex-col justify-start md:justify-end bg-transparent">
-      {/* subtle peek of bottom row */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[12vh] bg-gradient-to-t from-background to-transparent hidden md:block" />
-      {/* Desktop/original marquee */}
-      <div className="hidden md:flex flex-col gap-3 pb-3 bg-transparent">
+    <div className="relative flex flex-1 flex-col justify-start md:justify-end bg-transparent min-w-0">
+      <div className="hidden md:flex flex-col gap-3 pb-3 bg-transparent min-w-0">
         <Row items={top} speed={speedTop} direction={1} />
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
-      {/* Mobile auto-marquee rows (slower, pause on touch) */}
-      <div className="md:hidden flex flex-col gap-3 pb-3 justify-start bg-transparent" style={{ height: "auto", minHeight: "320px" }}>
+      <div className="md:hidden flex flex-col gap-3 pb-3 justify-start bg-transparent min-w-0" style={{ minHeight: "320px" }}>
         <RowMobile items={top} direction={1} speed={mobileTopSpeed} />
         <RowMobile items={bottom} direction={-1} speed={mobileBottomSpeed} />
       </div>

@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type AboutSectionResolvedImage = {
-  url?: string | null;
+  src?: string | null;
   alt?: string | null;
-  lqip?: string | null;
+  blurDataURL?: string | null;
   width?: number;
   height?: number;
 };
@@ -130,19 +130,19 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
           <div className="aspect-[4/3] md:aspect-[16/6]" />
 
           {/* Image layer with its own mask and parallax (prevents the bottom fade from affecting overlay text) */}
-          {image?.url ? (
+          {image?.src ? (
             <motion.div
               aria-hidden
               style={imageLayerMotionStyle}
               className="absolute inset-0 w-full h-full md:[mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)] md:[-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_100%)]"
             >
               <Image
-                src={image.url}
+                src={image.src!}
                 alt={image.alt || "About us hero"}
                 fill
                 loading="lazy"
-                placeholder={image.lqip ? "blur" : undefined}
-                blurDataURL={image.lqip || undefined}
+                placeholder={image.blurDataURL ? "blur" : undefined}
+                blurDataURL={image.blurDataURL || undefined}
                 sizes="(min-width: 1280px) 1100px, (min-width: 1024px) 960px, (min-width: 768px) 720px, 92vw"
                 className="object-cover md:object-center object-[55%_center] scale-100 md:scale-100"
                 priority={false}
@@ -155,7 +155,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
               className="pointer-events-none absolute inset-0 opacity-0 md:opacity-100"
               style={{
                 backgroundImage:
-                  "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_26%, var(--accent)_12%) 47%, transparent 55%)",
+                  "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_55%, white 45%) 47%, transparent 55%)",
                 backgroundSize: "250% 250%",
               }}
               animate={{ backgroundPosition: ["-180% 50%", "120% 50%", "-180% 50%"] }}

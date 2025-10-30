@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type TextImageResolvedImage = {
-    url: string;
+    src: string;
     alt: string | null;
-    lqip: string | null;
+    blurDataURL: string | null;
     width?: number;
     height?: number;
 };
@@ -110,7 +110,7 @@ export function TextImageClient({
             </motion.div>
 
             {/* Image panel */}
-            {image?.url && (
+            {image?.src && (
                 <motion.div className={cn(imageOrder)} {...animateImage}>
                     <div
                         className={cn(
@@ -119,18 +119,18 @@ export function TextImageClient({
                             // Mobile image height set to 500px, desktop taller
                             "min-h-[500px] md:min-h-[520px]"
                         )}
-                    >
-                        <Image
-                            src={image.url}
-                            alt={image.alt || ""}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            placeholder={image.lqip ? "blur" : "empty"}
-                            blurDataURL={image.lqip || undefined}
-                            priority={false}
-                        />
-                    </div>
+                        >
+                            <Image
+                                src={image.src}
+                                alt={image.alt || ""}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                                placeholder={image.blurDataURL ? "blur" : "empty"}
+                                blurDataURL={image.blurDataURL || undefined}
+                                priority={false}
+                            />
+                        </div>
                 </motion.div>
             )}
         </div>

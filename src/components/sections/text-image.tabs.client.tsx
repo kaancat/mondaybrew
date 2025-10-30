@@ -4,14 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-export type TabsImage = {
-  url: string;
-  alt: string | null;
-  lqip: string | null;
-  width?: number;
-  height?: number;
-} | null;
+import type { TextImageResolvedImage } from "./text-image.client";
 
 type Tab = { id: string; label: string; title?: string; body?: string };
 
@@ -27,7 +20,7 @@ export function TextImageTabs({
   eyebrow?: string;
   title?: string;
   body?: string;
-  image: TabsImage;
+  image: TextImageResolvedImage | null;
   imagePosition: "left" | "right";
   tabs: Tab[];
   cta?: { label: string; href: string; variant: "default" | "secondary" | "outline" | "ghost" | "link" } | null;
@@ -192,16 +185,16 @@ export function TextImageTabs({
           ref={imageRef}
           style={{ height: isMobile ? undefined : imgHeight, transition: "height 240ms cubic-bezier(0.22, 0.61, 0.36, 1)", willChange: "height" }}
         >
-          {image?.url ? (
+          {image?.src ? (
             <div className="absolute inset-0">
               <Image
-                src={image.url}
+                src={image.src}
                 alt={image.alt || ""}
                 fill
                 className="object-cover scale-[1.06] md:scale-[1.08] will-change-transform"
                 sizes="(min-width: 768px) 50vw, 100vw"
-                placeholder={image.lqip ? "blur" : "empty"}
-                blurDataURL={image.lqip || undefined}
+                placeholder={image.blurDataURL ? "blur" : "empty"}
+                blurDataURL={image.blurDataURL || undefined}
               />
             </div>
           ) : null}

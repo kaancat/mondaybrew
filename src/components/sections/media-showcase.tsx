@@ -1,5 +1,6 @@
 import { Section } from "@/components/layout/section";
 import MediaShowcaseClient, { type ShowcaseResolvedImage, type ShowcaseResolvedVideo, type ShowcaseStat } from "@/components/sections/media-showcase.client";
+import { buildSanityImage } from "@/lib/sanity-image";
 
 type SanityImageAsset = {
   alt?: string | null;
@@ -25,22 +26,36 @@ export type MediaShowcaseSectionData = {
   stats?: Array<{ value?: string | null; label?: string | null; icon?: SanityImageAsset } | null> | null;
 };
 
-function resolveImage(input?: SanityImageAsset | null): ShowcaseResolvedImage | null {
-  const asset = input?.image?.asset || input?.asset;
-  const url = asset?.url?.trim() || null;
-  const alt = input?.alt?.trim?.() || null;
-  const lqip = asset?.metadata?.lqip || null;
-  const width = asset?.metadata?.dimensions?.width || undefined;
-  const height = asset?.metadata?.dimensions?.height || undefined;
-  if (!url && !alt) return null;
-  return { url, alt, lqip, width, height };
+function resolveImage(input?: SanityImageAsset | null, options: { width?: number; quality?: number } = {}): ShowcaseResolvedImage | null {
+  if (!input) return null;
+  const built = buildSanityImage(
+    {
+      alt: input.alt ?? undefined,
+      asset: input.asset ?? undefined,
+      image: input.image ?? undefined,
+    },
+    {
+      width: options.width,
+      quality: options.quality,
+      fit: "max",
+    },
+  );
+
+  if (!built.src && !built.alt) return null;
+  return {
+    src: built.src || null,
+    alt: built.alt || null,
+    blurDataURL: built.blurDataURL || null,
+    width: built.width,
+    height: built.height,
+  } satisfies ShowcaseResolvedImage;
 }
 
 function resolveVideo(input?: SanityMedia | null): ShowcaseResolvedVideo | null {
   if (!input || input.mode !== "video") return null;
   const url = input.videoFile?.asset?.url?.trim() || input.videoUrl?.trim() || null;
   if (!url) return null;
-  const poster = resolveImage(input.poster ?? null);
+  const poster = resolveImage(input.poster ?? null, { width: 1600, quality: 70 });
   return { url, poster };
 }
 
@@ -63,13 +78,13 @@ function resolveButtonVariant(variant?: string | null): "default" | "secondary" 
 
 export default function MediaShowcaseSection({ sectionId, eyebrow, headline, alignment, cta, media, stats }: MediaShowcaseSectionData) {
   const id = sectionId?.current?.trim() || undefined;
-  const image = media?.mode !== "video" ? resolveImage(media?.image ?? null) : null;
+  const image = media?.mode !== "video" ? resolveImage(media?.image ?? null, { width: 1600, quality: 80 }) : null;
   const video = resolveVideo(media);
   const resolvedStats: ShowcaseStat[] = (stats ?? []).flatMap((s) => {
     const value = s?.value?.trim();
     const label = s?.label?.trim();
-    const icon = s?.icon ? resolveImage(s.icon) : null;
-    if (!value && !label && !icon?.url) return [];
+    const icon = s?.icon ? resolveImage(s.icon, { width: 96, quality: 70 }) : null;
+    if (!value && !label && !icon?.src) return [];
     return [{ value, label, icon }];
   });
 

@@ -1,3 +1,4 @@
+import { buildSanityImage } from "@/lib/sanity-image";
 import { ServicesSplit } from "./services-split.client";
 import type {
   ServicesSplitCta,
@@ -174,7 +175,7 @@ function mapServiceMedia(media?: SanityServicesSplitMedia | null): ServicesSplit
     const fileSrc = media.videoFile?.asset?.url?.trim();
     const src = fileSrc || media.videoUrl?.trim();
     if (!src) return undefined;
-    const poster = resolveImageWithAlt(media.poster);
+    const poster = resolveImageWithAlt(media.poster, { width: 1200, quality: 70 });
     return {
       type: "video",
       src,
@@ -183,7 +184,7 @@ function mapServiceMedia(media?: SanityServicesSplitMedia | null): ServicesSplit
     } satisfies ServicesSplitMedia;
   }
 
-  const image = resolveImageWithAlt(media.image);
+  const image = resolveImageWithAlt(media.image, { width: 1400, quality: 80 });
   if (image.url) {
     return {
       type: "image",
@@ -195,7 +196,7 @@ function mapServiceMedia(media?: SanityServicesSplitMedia | null): ServicesSplit
 
   const fallbackVideo = media.videoUrl?.trim();
   if (fallbackVideo) {
-    const poster = resolveImageWithAlt(media.poster);
+    const poster = resolveImageWithAlt(media.poster, { width: 1200, quality: 70 });
     return {
       type: "video",
       src: fallbackVideo,
@@ -206,11 +207,26 @@ function mapServiceMedia(media?: SanityServicesSplitMedia | null): ServicesSplit
   return undefined;
 }
 
-function resolveImageWithAlt(image?: SanityImageWithAlt | null) {
+function resolveImageWithAlt(image?: SanityImageWithAlt | null, opts?: { width?: number; quality?: number }) {
+  if (!image) {
+    return { url: undefined, alt: undefined, lqip: undefined };
+  }
+  const built = buildSanityImage(
+    {
+      alt: image.alt ?? undefined,
+      image: image.image ?? undefined,
+    },
+    {
+      width: opts?.width,
+      quality: opts?.quality,
+      fit: "max",
+    },
+  );
+
   return {
-    url: image?.image?.asset?.url || undefined,
-    alt: image?.alt || undefined,
-    lqip: image?.image?.asset?.metadata?.lqip || undefined,
+    url: built.src,
+    alt: built.alt,
+    lqip: built.blurDataURL,
   };
 }
 

@@ -1,6 +1,7 @@
 import { Section } from "@/components/layout/section";
 import { TextImageSwitch } from "./text-image.switch.client";
 import type { TextImageResolvedImage } from "./text-image.client";
+import { buildSanityImage } from "@/lib/sanity-image";
 
 type SanityImageAsset = {
     alt?: string | null;
@@ -105,17 +106,26 @@ export function TextImageSection({
  * Extracts URL, alt text, LQIP blur, and dimensions
  */
 function resolveImage(image?: SanityImageAsset | null): TextImageResolvedImage | null {
-    const url = image?.asset?.url?.trim() || null;
-    const alt = image?.alt?.trim() || null;
-    const lqip = image?.asset?.metadata?.lqip?.trim() || null;
-    const width = image?.asset?.metadata?.dimensions?.width || undefined;
-    const height = image?.asset?.metadata?.dimensions?.height || undefined;
+    if (!image) return null;
+    const built = buildSanityImage(
+        {
+            alt: image.alt ?? undefined,
+            asset: image.asset ?? undefined,
+        },
+        { width: 1400, quality: 80 },
+    );
 
-    if (!url) {
+    if (!built.src) {
         return null;
     }
 
-    return { url, alt, lqip, width, height };
+    return {
+        src: built.src,
+        alt: built.alt ?? null,
+        blurDataURL: built.blurDataURL ?? null,
+        width: built.width,
+        height: built.height,
+    };
 }
 
 /**
