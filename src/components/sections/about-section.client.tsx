@@ -66,11 +66,6 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   const [isMobile, setIsMobile] = useState(true);
-  // Mobile stats scroller state (for pagination dots)
-  const mobileStatsRef = useRef<HTMLDivElement | null>(null);
-  const [activeStat, setActiveStat] = useState(0);
-  const rafId = useRef<number | null>(null);
-
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -173,84 +168,20 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
             animate={overlayControls}
             className="z-10"
           >
-            {/* Mobile: horizontal glass chips below image */}
-            <div className="about-stats-panel block md:hidden w-full pt-2">
-              <div className={cn("relative -mx-5 px-5 overflow-hidden pb-10")}> 
-                {/* Bottom overlay to blend cards into page background (no hard line) */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-5 bottom-0 h-16 z-[2]"
-                  style={{
-                    background: "linear-gradient(to_bottom, transparent 0%, var(--background) 85%)",
-                  }}
-                />
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-5 bottom-0 h-16 rounded-b-[12px]"
-                  style={{ background: "var(--about-stats-mobile-fade)" }}
-                />
-                <div
-                  className={cn(
-                    "relative z-[1] flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2",
-                    "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-                  )}
-                  aria-label="About stats"
-                  ref={mobileStatsRef}
-                  onScroll={() => {
-                    if (rafId.current) cancelAnimationFrame(rafId.current);
-                    rafId.current = requestAnimationFrame(() => {
-                      const scroller = mobileStatsRef.current;
-                      if (!scroller) return;
-                      const left = scroller.scrollLeft;
-                      let nearest = 0;
-                      let min = Infinity;
-                      const children = Array.from(scroller.children) as HTMLElement[];
-                      children.forEach((el, idx) => {
-                        const dist = Math.abs(el.offsetLeft - left);
-                        if (dist < min) {
-                          min = dist;
-                          nearest = idx;
-                        }
-                      });
-                      setActiveStat(nearest);
-                    });
-                  }}
-                >
-                  {stats.map((stat, i) => (
-                    <div
-                      key={`${stat.label || stat.value || i}`}
-                      className={cn(
-                        "relative min-w-[220px] snap-start rounded-[10px]",
-                        "bg-[color:var(--about-stats-mobile-surface)] backdrop-blur-[14px]",
-                        // remove per-card drop shadow; container overlay handles blending
-                        "px-4 py-3",
-                      )}
-                      
-                    >
-                      {stat.value ? (
-                        <div data-stat-value className="text-[length:var(--font-h3)] font-bold leading-none text-primary">{stat.value}</div>
-                      ) : null}
-                      {stat.label ? <div data-stat-label className="text-muted-foreground mt-1">{stat.label}</div> : null}
-                    </div>
-                  ))}
-                </div>
-                {/* Edge fade masks */}
-                <span aria-hidden className="pointer-events-none absolute left-0 top-0 z-[3] h-full w-6 bg-[linear-gradient(to_right,var(--background),transparent)]" />
-                <span aria-hidden className="pointer-events-none absolute right-0 top-0 z-[3] h-full w-6 bg-[linear-gradient(to_left,var(--background),transparent)]" />
-                {/* Pagination dots */}
-                <div className="relative z-[3] mb-1 mt-1.5 flex justify-center gap-1.5">
-                  {stats.map((_, idx) => (
-                    <span
-                      key={`dot-${idx}`}
-                      className={cn(
-                        "h-1.5 w-1.5 rounded-full transition-colors",
-                        idx === activeStat
-                          ? "bg-[color:var(--nav-shell-border)]/90"
-                          : "bg-[color:var(--nav-shell-border)]/40",
-                      )}
-                    />
-                  ))}
-                </div>
+            {/* Mobile: stack stats in responsive grid (matches media showcase) */}
+            <div className="about-stats-panel block md:hidden w-full pt-4">
+              <div className="grid grid-cols-1 gap-3 px-5 sm:grid-cols-2">
+                {stats.map((stat, i) => (
+                  <div
+                    key={`${stat.label || stat.value || i}`}
+                    className="rounded-[10px] bg-[color:var(--about-stats-mobile-surface)] px-4 py-3 backdrop-blur-[14px]"
+                  >
+                    {stat.value ? (
+                      <div data-stat-value className="text-[length:var(--font-h3)] font-bold leading-none text-primary">{stat.value}</div>
+                    ) : null}
+                    {stat.label ? <div data-stat-label className="text-muted-foreground mt-1">{stat.label}</div> : null}
+                  </div>
+                ))}
               </div>
             </div>
 

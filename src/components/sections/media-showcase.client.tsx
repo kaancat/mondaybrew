@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -34,6 +34,14 @@ type Props = {
 export default function MediaShowcaseClient({ eyebrow, headline, alignment = "start", image, video, cta, stats = [] }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < 768);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const hasVideo = !!video?.url;
   const hasImage = !!image?.src && !hasVideo;
@@ -70,7 +78,7 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
       </div>
 
       {/* Media card with 3D-ish elevation and top-notch CTA */}
-      <div className="relative isolate">
+      <div className={cn("relative isolate", isMobile ? "full-bleed" : undefined)}>
         {/* Notch pocket: white rectangular component that sits on top of the video card */}
         {cta?.label && cta?.href ? (
           <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-center">
@@ -104,23 +112,22 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
         {/* Card */}
         <motion.div
           className={cn(
-            "group relative overflow-hidden rounded-[5px] bg-[color:var(--card)]",
-            // Bottom/side-only depth using filter drop-shadow (avoids top halo under notch)
-            "drop-shadow-[0_36px_110px_rgba(8,6,20,0.28)]"
+            "group relative overflow-hidden bg-[color:var(--card)]",
+            isMobile ? "rounded-none" : "rounded-[5px] drop-shadow-[0_36px_110px_rgba(8,6,20,0.28)]",
           )}
-          whileHover={{ rotateX: 0.6, rotateY: -0.6 }}
-          transition={{ type: "spring", stiffness: 120, damping: 18 }}
-          style={{ transformStyle: "preserve-3d", marginTop: "0" } as CSSProperties}
+          whileHover={isMobile ? undefined : { rotateX: 0.6, rotateY: -0.6 }}
+          transition={isMobile ? undefined : { type: "spring", stiffness: 120, damping: 18 }}
+          style={isMobile ? ({ marginTop: "0" } as CSSProperties) : ({ transformStyle: "preserve-3d", marginTop: "0" } as CSSProperties)}
         >
           {/* aspect to keep layout stable */}
-          <div className="aspect-[16/9] md:aspect-[16/6]" />
+          <div className={cn(isMobile ? "aspect-[4/3]" : "aspect-[16/6]")} />
 
           {hasImage ? (
             <Image
               src={image!.src!}
               alt={image!.alt || "Media image"}
               fill
-              sizes="(min-width: 1280px) 1100px, (min-width: 1024px) 960px, (min-width: 768px) 720px, 92vw"
+              sizes="(min-width: 1280px) 1100px, (min-width: 1024px) 960px, (min-width: 768px) 720px, 100vw"
               placeholder={image?.blurDataURL ? "blur" : undefined}
               blurDataURL={image?.blurDataURL || undefined}
               className="absolute inset-0 object-cover"
@@ -159,15 +166,17 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
           ) : null}
 
           {/* Subtle sheen animation */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-0 md:opacity-100"
-            style={{
-              backgroundImage:
-                "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_55%, white 45%) 47%, transparent 55%)",
-              backgroundSize: "250% 250%",
-            }}
-          />
+          {!isMobile ? (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-0 md:opacity-100"
+              style={{
+                backgroundImage:
+                  "linear-gradient(120deg, transparent 40%, color-mix(in_oklch,var(--card)_55%, white 45%) 47%, transparent 55%)",
+                backgroundSize: "250% 250%",
+              }}
+            />
+          ) : null}
 
           {/* Gradient bottom fade for legibility */}
           <span
