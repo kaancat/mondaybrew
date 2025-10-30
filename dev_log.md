@@ -1,5 +1,42 @@
 # Dev Log
 
+## [2025-10-30] – Complete Embla Carousel Migration (Wrapper Removal)
+**Goal**: Migrate all carousels to use `useEmblaCarousel` directly, removing the problematic wrapper component
+
+### Migration Summary
+**Problem**: The `Carousel.tsx` wrapper component was causing style persistence issues, API instability, and unnecessary complexity. Direct Embla usage proved more reliable in the Case Study and Testimonials carousels.
+
+**Actions**:
+1. **Hero Feature Carousel** (`hero-feature-carousel.tsx`):
+   - Migrated from `Carousel` wrapper to `useEmblaCarousel` hook
+   - Replaced `Slide`, `PrevButton`, `NextButton` wrapper components with native Embla patterns
+   - Maintained all functionality: loop behavior, overlay controls, mobile controls, index tracking
+   - Converted to standard button elements with direct `scrollPrev`/`scrollNext` callbacks
+   - Preserved glass morphism UI and active slide indicators
+
+2. **Wrapper Deletion**:
+   - Deleted `src/components/carousel/Carousel.tsx` (no longer needed)
+   - Removed empty `src/components/carousel/` directory
+   - Verified no remaining imports across the codebase
+
+### Final State: All Carousels Using Direct Embla
+✅ **Hero Feature Carousel** → `useEmblaCarousel` (loop, overlay controls)  
+✅ **Case Study Carousel** → `useEmblaCarousel` (responsive peek, JS-calculated widths)  
+✅ **Testimonials Marquee** → `useEmblaCarousel` (auto-scroll, dual rows)  
+✅ **Clients Marquee** → `useEmblaCarousel` (auto-scroll, infinite loop)
+
+**Impact**: 
+- More maintainable: each carousel controls its own Embla instance directly
+- More reliable: no wrapper abstraction introducing style/API issues
+- Cleaner architecture: follows the same pattern as proven working carousels
+- No functional regressions: all features preserved
+
+**Files Modified**:
+- `src/components/sections/hero-feature-carousel.tsx` (refactored)
+- `src/components/carousel/Carousel.tsx` (deleted)
+
+---
+
 ## [2025-10-29] – Footer Contact Info Layout & Header Fade Targeting
 **Goal**: Restore large gaps in contact section and make header fade smarter
 

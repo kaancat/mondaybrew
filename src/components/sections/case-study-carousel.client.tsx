@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import type { CaseStudy } from "@/types/caseStudy";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import Carousel, { Slide, PrevButton, NextButton } from "@/components/carousel/Carousel";
+import useEmblaCarousel from "embla-carousel-react";
 
 export interface CaseStudyCarouselProps {
   items: CaseStudy[];
@@ -19,41 +19,100 @@ export interface CaseStudyCarouselProps {
 export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, exploreLabel = "Explore all cases", eyebrow, headlineText, intro }: CaseStudyCarouselProps) {
   const clampedInitial = Math.min(Math.max(initialIndex, 0), Math.max(items.length - 1, 0));
   const frameRef = useRef<HTMLDivElement>(null);
-  const apiRef = useRef<import("embla-carousel").EmblaCarouselType | null>(null);
   const [perView, setPerView] = useState(1);
-  const [gapPx, setGapPx] = useState(24);
-  const [peekPx, setPeekPx] = useState(80);
-  const [slideWidthPx, setSlideWidthPx] = useState<number | null>(null);
+  const [peek, setPeek] = useState(0);
+  const [gap, setGap] = useState(24);
 
-  // Compute sizing in JS for robustness (no CSS var dependency)
+  // Responsive items per view (1 / 2 / 3) and dynamic peek & gaps
   useEffect(() => {
     const el = frameRef.current;
     if (!el) return;
-    const compute = (w: number) => {
+    const update = () => {
+      const w = el.getBoundingClientRect().width;
       const pv = w >= 1200 ? 3 : w >= 768 ? 2 : 1;
-      const gap = w >= 1200 ? 32 : 24;
-      const peek = Math.min(Math.round(w * 0.1), 120);
-      const usable = Math.max(0, w - peek - (pv - 1) * gap);
-      const slideW = Math.floor(usable / pv);
       setPerView(pv);
-      setGapPx(gap);
-      setPeekPx(peek);
-      setSlideWidthPx(slideW);
-      apiRef.current?.reInit();
+      const gapSize = w >= 1200 ? 32 : 24;
+      setGap(gapSize);
+      const peekSize = Math.min(Math.round(w * 0.1), 120);
+      setPeek(peekSize);
     };
-    const ro = new ResizeObserver(([entry]) => compute(entry.contentRect.width));
+    update();
+    const ro = new ResizeObserver(update);
     ro.observe(el);
-    // initial
-    compute(el.getBoundingClientRect().width);
     return () => ro.disconnect();
   }, []);
 
+  // Calculate slide width
+  const slideWidth = useMemo(() => {
+    const el = frameRef.current;
+    if (!el) return 300;
+    const vpWidth = el.getBoundingClientRect().width;
+    // Width = (viewport - peek - gaps) / perView
+    return (vpWidth - peek - (perView - 1) * gap) / perView;
+  }, [peek, gap, perView]);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+    containScroll: "trimSnaps",
+    skipSnaps: false,
+    dragFree: false,
+  });
+
   const [selected, setSelected] = useState(0);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    
+    // Scroll to initial index
+    emblaApi.scrollTo(clampedInitial, true);
+    
+    const updateState = () => {
+      setSelected(emblaApi.selectedScrollSnap());
+      setCanPrev(emblaApi.canScrollPrev());
+      setCanNext(emblaApi.canScrollNext());
+    };
+    
+    updateState();
+    emblaApi.on("select", updateState);
+    emblaApi.on("scroll", updateState);
+    emblaApi.on("reInit", updateState);
+    
+    return () => {
+      emblaApi.off("select", updateState);
+      emblaApi.off("scroll", updateState);
+      emblaApi.off("reInit", updateState);
+    };
+  }, [emblaApi, clampedInitial]);
+
+  // ReInit when dimensions change
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit();
+  }, [emblaApi, slideWidth, peek, gap]);
+
   const announcement = useMemo(() => {
     const idx = Math.min(Math.max(selected, 0), Math.max(items.length - 1, 0));
     const current = items[idx];
     return current ? `Showing ${current.title}` : "";
   }, [selected, items]);
+
+  const scrollPrev = useCallback(() => {
+    if (!emblaApi) return;
+    const current = emblaApi.selectedScrollSnap();
+    const target = Math.max(0, current - perView);
+    emblaApi.scrollTo(target);
+  }, [emblaApi, perView]);
+
+  const scrollNext = useCallback(() => {
+    if (!emblaApi) return;
+    const current = emblaApi.selectedScrollSnap();
+    const maxIndex = emblaApi.scrollSnapList().length - 1;
+    const target = Math.min(maxIndex, current + perView);
+    emblaApi.scrollTo(target);
+  }, [emblaApi, perView]);
 
   return (
     <div className="group/section">
@@ -76,91 +135,96 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         )}
       </div>
 
-      <div ref={frameRef} className="relative" aria-roledescription="carousel" tabIndex={0}
-        onKeyDown={(e) => {
-          const api = apiRef.current;
-          if (!api) return;
-          const sel = api.selectedScrollSnap();
-          if (e.key === "ArrowLeft") api.scrollTo(Math.max(0, sel - perView));
-          if (e.key === "ArrowRight") api.scrollTo(Math.min(api.scrollSnapList().length - 1, sel + perView));
+      {/* Full-width carousel wrapper - breaks out of container padding */}
+      <div
+        ref={frameRef}
+        className="relative"
+        style={{
+          marginLeft: 'calc(var(--container-gutter) * -1)', // Break out to viewport edge (not beyond)
+          marginRight: 'calc(var(--container-gutter) * -1)',
         }}
-        style={{ paddingRight: `${peekPx}px` }}
+        aria-roledescription="carousel"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowLeft") scrollPrev();
+          if (e.key === "ArrowRight") scrollNext();
+        }}
       >
-        <Carousel
-          options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
-          className="overflow-hidden"
-          pauseOnDrawer={false}
-          // Peek pattern: viewport gets right padding, container gets negative right margin
-          viewportStyle={{ paddingRight: `${peekPx}px` }}
-          containerStyle={{ marginRight: `-${peekPx}px`, gap: `${gapPx}px` }}
-          onReady={(embla) => {
-            // Scroll to initial index on mount
-            const snap = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
-            embla.scrollTo(snap, false);
-            apiRef.current = embla;
-            // no-op in production; devs can inspect via __emblaCase if needed
-            try {
-              // @ts-expect-error debug handle only in dev
-              if (typeof window !== "undefined") (window).__emblaCase = embla;
-            } catch {}
-            setSelected(embla.selectedScrollSnap());
-            const onSelect = () => {
-              setSelected(embla.selectedScrollSnap());
-            };
-            embla.on("select", onSelect);
-            embla.on("scroll", onSelect);
-            embla.on("reInit", onSelect);
-            // Ensure snaps match final layout after initial paint
-            if (typeof window !== "undefined") {
-              requestAnimationFrame(() => embla.reInit());
-            }
+        <div
+          className="relative"
+          style={{
+            paddingLeft: 'var(--container-gutter)', // Shadow space comes from viewport edge naturally
+            paddingRight: 'var(--container-gutter)',
           }}
-          overlay={
-            <div className="mt-6 flex items-center justify-end gap-2">
-              <PrevButton
-                by={perView}
-                ariaLabel="Scroll left"
-                className={cn(
-                  "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
-                  "dark:text-[color:var(--brand-ink-strong)]",
-                  "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                )}
-              >
-                <ArrowLeftIcon />
-              </PrevButton>
-              <NextButton
-                by={perView}
-                ariaLabel="Scroll right"
-                className={cn(
-                  "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
-                  "dark:text-[color:var(--brand-ink-strong)]",
-                  "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                )}
-              >
-                <ArrowRightIcon />
-              </NextButton>
-            </div>
-          }
         >
-          {items.map((item, i) => (
-            <Slide
-              key={item._id || i}
-              className="px-0"
+          <div
+            ref={emblaRef}
+            className="overflow-hidden"
+            style={{
+              paddingLeft: '24px',
+              paddingRight: `${peek}px`,
+              touchAction: "pan-y pinch-zoom",
+            }}
+          >
+            <div
+              className="flex"
               style={{
-                width: slideWidthPx ? `${slideWidthPx}px` : undefined,
-                minWidth: slideWidthPx ? `${slideWidthPx}px` : undefined,
-                flex: slideWidthPx ? `0 0 ${slideWidthPx}px` : undefined,
-                marginRight: `${gapPx}px`,
+                marginLeft: '-24px',
+                marginRight: `-${peek}px`,
+                gap: `${gap}px`,
               }}
             >
-              <CaseCard item={item} />
-            </Slide>
-          ))}
-        </Carousel>
+              {items.map((item, i) => (
+                <div
+                  key={item._id || i}
+                  className="shrink-0"
+                  style={{
+                    width: slideWidth,
+                    minWidth: slideWidth,
+                    flex: `0 0 ${slideWidth}px`,
+                  }}
+                >
+                  <CaseCard item={item} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-      {/* Controls now rendered via Carousel overlay inside provider */}
+
+      {/* Controls bar below, fixed (not inside scroller) */}
+      <div className="mt-6 flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={scrollPrev}
+          disabled={!canPrev}
+          aria-label="Scroll left"
+          className={cn(
+            "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+            "dark:text-[color:var(--brand-ink-strong)]",
+            "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            "transition-opacity",
+          )}
+        >
+          <ArrowLeftIcon />
+        </button>
+        <button
+          type="button"
+          onClick={scrollNext}
+          disabled={!canNext}
+          aria-label="Scroll right"
+          className={cn(
+            "inline-flex h-11 w-11 items-center justify-center rounded-[5px] border bg-card text-foreground shadow-sm",
+            "dark:text-[color:var(--brand-ink-strong)]",
+            "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            "transition-opacity",
+          )}
+        >
+          <ArrowRightIcon />
+        </button>
+      </div>
       {/* polite announcement for screen readers */}
       <div aria-live="polite" className="sr-only" role="status">{announcement}</div>
     </div>
@@ -226,14 +290,14 @@ function VideoAuto({ src, poster }: { src: string; poster?: string }) {
     const el = ref.current;
     if (!el) return;
     const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return; // Respect reduced motion: no autoplay
+    if (reduce) return;
     let observer: IntersectionObserver | null = null;
     const onVisible = (entries: IntersectionObserverEntry[]) => {
       const entry = entries[0];
       if (!el) return;
       if (entry.isIntersecting) {
         el.muted = true;
-        el.play().catch(() => { });
+        el.play().catch(() => {});
       } else {
         el.pause();
       }
