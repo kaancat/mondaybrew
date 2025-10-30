@@ -72,7 +72,7 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
-    containScroll: false, // Allow scrolling beyond last slide to show peek
+    containScroll: "trimSnaps", // Prevent scrolling beyond last card while allowing peek
     skipSnaps: false,
     dragFree: false,
   });
