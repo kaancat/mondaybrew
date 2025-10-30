@@ -51,25 +51,28 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     };
   }, []);
 
-  // Calculate slide width - ensure 4th card peeks
+  // Calculate slide width - ensure 4th card peeks when perView = 3
   const slideWidth = useMemo(() => {
     const el = frameRef.current;
     if (!el) return 300;
     // Get the viewport element (the overflow-hidden div)
     const viewportEl = el.querySelector('[class*="overflow-hidden"]') as HTMLElement;
     if (!viewportEl) return 300;
-    // Use clientWidth to exclude padding (getBoundingClientRect includes padding)
-    const viewportInnerWidth = viewportEl.clientWidth;
-    // The container has negative margins (-24px left, -peek right) that extend slides
-    // So total slide area = viewportInnerWidth + peek
-    // Formula: (viewportInnerWidth + peek - gaps) / perView
-    return (viewportInnerWidth + peek - (perView - 1) * gap) / perView;
+    // Get the viewport's bounding rect width (includes padding)
+    const viewportTotalWidth = viewportEl.getBoundingClientRect().width;
+    // Viewport has paddingLeft: 24px and paddingRight: peek
+    // Container compensates with marginLeft: -24px, marginRight: -peek
+    // So slides can span: viewportTotalWidth (full width including padding, since container compensates)
+    // For peek: we want (perView * slideWidth) + ((perView-1) * gap) to be LESS than viewportTotalWidth by 'peek' amount
+    // So: (perView * slideWidth) + ((perView-1) * gap) = viewportTotalWidth - peek
+    // Therefore: slideWidth = (viewportTotalWidth - peek - (perView-1) * gap) / perView
+    return (viewportTotalWidth - peek - (perView - 1) * gap) / perView;
   }, [peek, gap, perView]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
-    containScroll: "trimSnaps",
+    containScroll: false, // Allow scrolling beyond last slide to show peek
     skipSnaps: false,
     dragFree: false,
   });
@@ -153,14 +156,17 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         )}
       </div>
 
-      {/* Full-width carousel wrapper - breaks out of container padding */}
+      {/* Full-width carousel wrapper - completely detached from page constraints */}
       <div
         ref={frameRef}
         className="relative"
         style={{
-          marginLeft: 'calc(var(--container-gutter) * -1)',
-          marginRight: 'calc(var(--container-gutter) * -1)',
-          width: 'calc(100% + var(--container-gutter) * 2)',
+          width: '100vw',
+          position: 'relative',
+          left: '50%',
+          right: '50%',
+          marginLeft: '-50vw',
+          marginRight: '-50vw',
         }}
         aria-roledescription="carousel"
         tabIndex={0}
