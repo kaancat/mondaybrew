@@ -4,7 +4,7 @@ import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
 import { TextImageSection } from "@/components/sections/text-image";
 import { TextOnlySection } from "@/components/sections/text-only";
 import { FAQSection, type FAQSectionProps } from "@/components/sections/faq";
-import { ContentBillboard, isContentBillboard } from "@/components/sections/content-billboard";
+import { ContentBillboard, type ContentBillboardData } from "@/components/sections/content-billboard";
 import { Section } from "@/components/layout/section";
 
 /**
@@ -159,7 +159,7 @@ export async function DynamicPage({
                 if (isContentBillboardSection(section)) {
                     return (
                         <div className="vr-section" key={key} id={key}>
-                            <ContentBillboard {...section} />
+                            <ContentBillboard {...(section as ContentBillboardData)} />
                         </div>
                     );
                 }
