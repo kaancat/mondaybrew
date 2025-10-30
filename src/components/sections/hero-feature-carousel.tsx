@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState, type ElementType } from "react";
+import { useCallback, useEffect, useMemo, useState, type ElementType } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import useEmblaCarousel from "embla-carousel-react";
 
 export type HeroFeatureDisplayItem = {
   key: string;
@@ -36,11 +37,41 @@ export function HeroFeatureCarousel({ items }: Props) {
     [items],
   );
   const [index, setIndex] = useState(0);
+  const [length, setLength] = useState(0);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: normalized.length > 1,
+    align: "start",
+    containScroll: "trimSnaps",
+  });
+
+  // Initialize state from API
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const updateState = () => {
+      setIndex(emblaApi.selectedScrollSnap());
+      setLength(emblaApi.scrollSnapList().length);
+      setCanPrev(emblaApi.canScrollPrev());
+      setCanNext(emblaApi.canScrollNext());
+    };
+
+    updateState();
+    emblaApi.on("select", updateState);
+    emblaApi.on("reInit", updateState);
+
+    return () => {
+      emblaApi.off("select", updateState);
+      emblaApi.off("reInit", updateState);
+    };
+  }, [emblaApi]);
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   if (!normalized.length) return null;
-
-  const goNext = () => setIndex((prev) => (prev + 1) % normalized.length);
-  const goPrev = () => setIndex((prev) => (prev - 1 + normalized.length) % normalized.length);
 
   return (
     <div
@@ -53,28 +84,25 @@ export function HeroFeatureCarousel({ items }: Props) {
 
       <div className="relative rounded-[5px] bg-gradient-to-br from-white/36 via-white/14 to-white/4 p-[1px]">
         <div className="relative flex h-full flex-col overflow-hidden rounded-[5px] border border-white/16 bg-[rgba(14,12,26,0.42)] shadow-[var(--shadow-glass-lg)] backdrop-blur-[22px]">
-          <div className="overflow-hidden">
-            <div
-              className="flex transition-transform duration-300 ease-out"
-              style={{ transform: `translateX(-${index * 100}%)` }}
-            >
+          {/* Embla viewport */}
+          <div ref={emblaRef} className="overflow-hidden">
+            <div className="flex">
               {normalized.map((item, itemIndex) => {
                 const cardHref = item.href?.trim();
                 const isLink = Boolean(cardHref);
                 const CardWrapper: ElementType = isLink ? Link : "div";
-
+                const isActive = itemIndex === index;
                 return (
-                  <article className="w-full shrink-0 p-[5px] md:p-[6px]" key={item.key || itemIndex}>
+                  <div key={item.key || itemIndex} className="w-full shrink-0 p-[5px] md:p-[6px]">
                     <CardWrapper
                       {...(isLink ? { href: cardHref } : {})}
                       className={cn(
                         "flex h-full overflow-hidden rounded-[5px] text-left outline-none",
-                        "flex-row md:flex-col", // 2-column on mobile, single column on desktop
+                        "flex-row md:flex-col",
                         isLink &&
-                        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
+                          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/55",
                       )}
                     >
-                      {/* Image - left side on mobile, top on desktop */}
                       {item.image?.src ? (
                         <div className="relative w-[42%] md:w-full aspect-square md:aspect-[4/3] shrink-0 overflow-hidden rounded-[5px]">
                           <Image
@@ -87,16 +115,15 @@ export function HeroFeatureCarousel({ items }: Props) {
                             className="object-cover"
                           />
                           <div className="pointer-events-none absolute inset-0 rounded-[5px] bg-gradient-to-b from-white/12 via-transparent to-black/42" />
-                          {itemIndex === index ? (
+                          {isActive ? (
                             <div className="absolute right-1.5 top-1.5 md:right-3 md:top-3 flex h-5 md:h-7 min-w-[2.6rem] md:min-w-[3.2rem] items-center justify-center rounded-full bg-black/35 px-1.5 md:px-3 text-[0.6rem] md:text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-white/85 leading-none">
-                              {String(index + 1).padStart(2, "0")} / {String(normalized.length).padStart(2, "0")}
+                              {String(index + 1).padStart(2, "0")} / {String((length || normalized.length)).padStart(2, "0")}
                             </div>
                           ) : null}
                         </div>
                       ) : null}
 
-                      {/* Text content - right side on mobile, bottom on desktop */}
-                      <div className="flex flex-1 flex-col justify-between gap-1.5 px-2.5 py-2.5 md:gap-3 md:px-6 md:pb-6 md:pt-4">
+                      <div className="flex flex-1 flex-col justify-between gap-1.5 px-2.5 py-2.5 md:gap-3 md:px-6 md:pb-16 md:pt-4">
                         <div className="flex flex-col gap-0.5 md:gap-2">
                           {item.title ? (
                             <h3 className="text-[0.85rem] sm:text-[0.95rem] md:text-[1.5rem] font-semibold leading-tight tracking-tight text-white line-clamp-2">
@@ -108,25 +135,27 @@ export function HeroFeatureCarousel({ items }: Props) {
                           ) : null}
                         </div>
 
-                        {/* Navigation buttons - shown in text column on mobile only */}
-                        {normalized.length > 1 && itemIndex === index ? (
+                        {/* Mobile controls */}
+                        {normalized.length > 1 && isActive ? (
                           <div className="flex justify-end md:hidden">
                             <div className="flex items-center gap-0 rounded-full border border-white/22 bg-white/12 p-[3px] backdrop-blur-sm">
                               <div className="flex items-center overflow-hidden rounded-full bg-black/24">
                                 <button
                                   type="button"
-                                  onClick={goPrev}
+                                  onClick={scrollPrev}
+                                  disabled={!canPrev}
                                   aria-label="Previous hero feature"
-                                  className="inline-flex h-[18px] w-6 items-center justify-center text-white/70 transition hover:text-white"
+                                  className="inline-flex h-[18px] w-6 items-center justify-center text-white/70 transition hover:text-white disabled:opacity-50"
                                 >
                                   <ArrowLeft className="size-[10px]" aria-hidden="true" />
                                 </button>
                                 <div className="h-3 w-px bg-white/18" aria-hidden="true" />
                                 <button
                                   type="button"
-                                  onClick={goNext}
+                                  onClick={scrollNext}
+                                  disabled={!canNext}
                                   aria-label="Next hero feature"
-                                  className="inline-flex h-[18px] w-6 items-center justify-center text-white transition hover:text-white"
+                                  className="inline-flex h-[18px] w-6 items-center justify-center text-white transition hover:text-white disabled:opacity-50"
                                 >
                                   <ArrowRight className="size-[10px]" aria-hidden="true" />
                                 </button>
@@ -136,31 +165,33 @@ export function HeroFeatureCarousel({ items }: Props) {
                         ) : null}
                       </div>
                     </CardWrapper>
-                  </article>
+                  </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Desktop navigation buttons only */}
+          {/* Desktop controls overlay - bottom-right, non-overlapping */}
           {normalized.length > 1 ? (
-            <div className="hidden md:flex justify-end px-6 pb-6">
+            <div className="absolute bottom-6 right-6 hidden md:flex pointer-events-auto z-10">
               <div className="flex items-center gap-0 rounded-full border border-white/22 bg-white/12 p-[4px] backdrop-blur-sm">
                 <div className="flex items-center overflow-hidden rounded-full bg-black/24">
                   <button
                     type="button"
-                    onClick={goPrev}
+                    onClick={scrollPrev}
+                    disabled={!canPrev}
                     aria-label="Previous hero feature"
-                    className="inline-flex h-6 w-8 items-center justify-center text-white/70 transition hover:text-white"
+                    className="inline-flex h-6 w-8 items-center justify-center text-white/70 transition hover:text-white disabled:opacity-50"
                   >
                     <ArrowLeft className="size-[12px]" aria-hidden="true" />
                   </button>
                   <div className="h-5 w-px bg-white/18" aria-hidden="true" />
                   <button
                     type="button"
-                    onClick={goNext}
+                    onClick={scrollNext}
+                    disabled={!canNext}
                     aria-label="Next hero feature"
-                    className="inline-flex h-6 w-8 items-center justify-center text-white transition hover:text-white"
+                    className="inline-flex h-6 w-8 items-center justify-center text-white transition hover:text-white disabled:opacity-50"
                   >
                     <ArrowRight className="size-[12px]" aria-hidden="true" />
                   </button>
