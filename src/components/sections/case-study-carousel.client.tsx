@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CaseStudy } from "@/types/caseStudy";
 import { cn } from "@/lib/utils";
-import { buildSanityImage } from "@/lib/sanity-image";
 import Image from "next/image";
 import Carousel, { Slide } from "@/components/carousel/Carousel";
 
@@ -86,9 +85,9 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
         <Carousel
           options={{ loop: false, align: "start", containScroll: "trimSnaps" }}
           className="overflow-hidden"
-          // Right-side peek equals measured `--peek`; cancel it on the track so slides can extend fully
-          viewportStyle={{ paddingRight: "var(--peek)" }}
-          containerStyle={{ marginRight: "calc(-1 * var(--peek))", gap: "var(--gap, 24px)" }}
+          // Peek pattern: viewport gets right padding, container gets negative right margin
+          viewportStyle={{ paddingRight: "var(--peek, 0px)" }}
+          containerStyle={{ marginRight: "calc(var(--peek, 0px) * -1)", gap: "var(--gap, 24px)" }}
           onReady={(embla) => {
             // Scroll to initial index on mount
             const snap = Math.min(Math.max(clampedInitial, 0), Math.max(items.length - 1, 0));
@@ -99,18 +98,6 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
               setSelected(embla.selectedScrollSnap());
               setCanPrev(embla.canScrollPrev());
               setCanNext(embla.canScrollNext());
-              // Fallback translate when Embla doesn't update transform (edge case we observed)
-              // Align selected slide with viewport left edge
-              const viewport = document.querySelector('.embla__container')?.parentElement as HTMLElement | null;
-              const container = document.querySelector('.embla__container') as HTMLElement | null;
-              if (viewport && container) {
-                const i = embla.selectedScrollSnap();
-                const slide = container.children[i] as HTMLElement | undefined;
-                if (slide) {
-                  const delta = slide.getBoundingClientRect().left - viewport.getBoundingClientRect().left;
-                  container.style.transform = `translate3d(${-Math.round(delta)}px,0,0)`;
-                }
-              }
             };
             embla.on("select", onSelect);
             embla.on("scroll", onSelect);
@@ -118,12 +105,10 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
             // Initial edge states
             setCanPrev(embla.canScrollPrev());
             setCanNext(embla.canScrollNext());
-            // Dev aid: expose for quick console testing (cleared on unmount)
-            (window as unknown as { __emblaCase?: typeof embla }).__emblaCase = embla;
           }}
         >
           {items.map((item, i) => {
-            const widthExpr = "calc((100% - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
+            const widthExpr = "calc((100% - var(--peek, 0px) - (var(--per-view, 1) - 1) * var(--gap, 24px)) / var(--per-view, 1))";
             return (
             <Slide key={item._id || i}
               className="px-0"
@@ -145,7 +130,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           type="button"
           onClick={() => {
             const api = apiRef.current; if (!api) return;
-            api.scrollTo(Math.max(0, api.selectedScrollSnap() - 1));
+            const sel = api.selectedScrollSnap();
+            api.scrollTo(Math.max(0, sel - perView));
           }}
           disabled={!canPrev}
           aria-label="Scroll left"
@@ -162,8 +148,8 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
           type="button"
           onClick={() => {
             const api = apiRef.current; if (!api) return;
-            const last = api.scrollSnapList().length - 1;
-            api.scrollTo(Math.min(last, api.selectedScrollSnap() + 1));
+            const sel = api.selectedScrollSnap();
+            api.scrollTo(Math.min(api.scrollSnapList().length - 1, sel + perView));
           }}
           disabled={!canNext}
           aria-label="Scroll right"
@@ -188,9 +174,8 @@ function CaseCard({ item }: { item: CaseStudy }) {
   const tags = (item.tags || []).slice(0, 3);
   const media = item.media;
 
-  const imageMeta = resolveCaseStudyMedia(media, item.title);
-  const poster = imageMeta?.src;
-  const imageAlt = imageMeta?.alt || item.title;
+  const poster = media?.poster?.image?.asset?.url || media?.image?.image?.asset?.url;
+  const imageAlt = media?.image?.alt || item.title;
   const videoSrc = media?.videoFile?.asset?.url || media?.videoUrl || undefined;
 
   return (
@@ -208,10 +193,8 @@ function CaseCard({ item }: { item: CaseStudy }) {
               src={poster}
               alt={imageAlt || ""}
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 33vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
-              placeholder={imageMeta?.blurDataURL ? "blur" : undefined}
-              blurDataURL={imageMeta?.blurDataURL}
             />
           ) : (
             <div className="h-full w-full bg-muted" />
@@ -236,34 +219,6 @@ function CaseCard({ item }: { item: CaseStudy }) {
       </div>
     </a>
   );
-}
-
-function resolveCaseStudyMedia(media: CaseStudy["media"] | null | undefined, fallbackAlt?: string) {
-  if (!media) return undefined;
-  const posterSource = media.poster ?? undefined;
-  const imageSource = media.image ?? undefined;
-
-  const built = buildSanityImage(
-    posterSource
-      ? {
-        alt: posterSource.alt ?? fallbackAlt ?? undefined,
-        image: posterSource.image ?? undefined,
-      }
-      : imageSource
-        ? {
-          alt: imageSource.alt ?? fallbackAlt ?? undefined,
-          image: imageSource.image ?? undefined,
-        }
-        : undefined,
-    { width: 1600, quality: 80 },
-  );
-
-  if (!built.src) return undefined;
-  return {
-    src: built.src,
-    alt: built.alt ?? fallbackAlt,
-    blurDataURL: built.blurDataURL,
-  };
 }
 
 function VideoAuto({ src, poster }: { src: string; poster?: string }) {
