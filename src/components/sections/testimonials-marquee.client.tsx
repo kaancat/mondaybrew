@@ -669,16 +669,28 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
   const { ref: containerRef, inView } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.08 });
 
   // Idle prefetch near viewport to avoid late decodes
-  const MOBILE_MAX_CARDS = 10;
-  const renderItems = useMemo(() => normalizedItems.slice(0, MOBILE_MAX_CARDS), [normalizedItems]);
   useIdlePrefetch(
-    renderItems.map((c) => c.image?.src || "").filter(Boolean) as string[],
+    normalizedItems.map((c) => c.image?.src || "").filter(Boolean) as string[],
     inView && !prefersReducedMotion,
   );
 
-  // Configure Embla with looping + drag-free for marquee feel
+  // Prepare repeated sequence like ClientsMarquee for seamless loop
+  const [repeatCount, setRepeatCount] = useState(3);
+  const displayItems = useMemo(() => {
+    if (!normalizedItems.length) return [] as { card: TCard; key: string }[];
+    const repeats = Math.max(1, repeatCount);
+    const sequence: { card: TCard; key: string }[] = [];
+    for (let setIndex = 0; setIndex < repeats; setIndex += 1) {
+      normalizedItems.forEach((card, cardIndex) => {
+        sequence.push({ card, key: `${setIndex}-${card.variant}-${cardIndex}` });
+      });
+    }
+    return sequence;
+  }, [normalizedItems, repeatCount]);
+
+  // Configure Embla with looping + drag-free for marquee feel (match ClientsMarquee)
   const autoScrollPlugin = useMemo(() => {
-    const pxPerFrame = Math.max(0.28, (speed * 2) / 60);
+    const pxPerFrame = Math.max(0.3, speed / 60);
     return AutoScroll({
       speed: pxPerFrame,
       direction: direction === -1 ? "backward" : "forward",
@@ -689,59 +701,52 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     });
   }, [direction, speed]);
 
+  const innerViewportRef = useRef<HTMLDivElement | null>(null);
   const [viewportRef, emblaApi] = useEmblaCarousel(
     {
-      loop: renderItems.length > 1,
+      loop: displayItems.length > 1,
       align: "start",
       dragFree: true,
       skipSnaps: true,
-      containScroll: "trimSnaps",
     },
     [autoScrollPlugin],
   );
 
-  // Keep autoplay stable: pause when not in view or when user dragging; never reInit on visibility
-  const [pointerActive, setPointerActive] = useState(false);
+  const setViewportNode = useCallback((node: HTMLDivElement | null) => {
+    innerViewportRef.current = node;
+    viewportRef(node);
+  }, [viewportRef]);
+
   useEffect(() => {
     if (!emblaApi) return;
-    const down = () => setPointerActive(true);
-    const release = () => setPointerActive(false);
-    emblaApi.on("pointerDown", down);
-    emblaApi.on("pointerUp", release);
-    emblaApi.on("settle", release);
-    emblaApi.on("scroll", release);
-    return () => {
-      emblaApi.off("pointerDown", down);
-      emblaApi.off("pointerUp", release);
-      emblaApi.off("settle", release);
-      emblaApi.off("scroll", release);
-    };
-  }, [emblaApi]);
+    emblaApi.reInit();
+  }, [emblaApi, displayItems.length]);
 
-  const autoScrollDisabled = prefersReducedMotion || renderItems.length <= 1;
-  useAutoScrollPlugin(emblaApi, autoScrollPlugin, { paused: pointerActive, disabled: autoScrollDisabled }, normalizedItems.length);
+  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1;
+  useAutoScrollPlugin(emblaApi, autoScrollPlugin, { paused: false, disabled: autoScrollDisabled }, displayItems.length);
 
-  // Re-init only on hard resizes/orientation changes to recalc slide sizes
+  // Measure and increase repeats until track width comfortably exceeds viewport
   useEffect(() => {
-    if (!emblaApi) return;
-    let raf = 0;
-    const onResize = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => emblaApi.reInit());
-    };
-    window.addEventListener("resize", onResize);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", onResize);
-    };
-  }, [emblaApi]);
+    const node = innerViewportRef.current;
+    if (!node) return;
+    const track = node.firstElementChild as HTMLElement | null;
+    if (!track) return;
+    const vp = node.getBoundingClientRect().width;
+    const trackWidth = track.scrollWidth;
+    if (!vp || !trackWidth || repeatCount > 12) return;
+    const perSet = trackWidth / Math.max(1, repeatCount);
+    if (!perSet) return;
+    const target = vp * 2.5;
+    const needed = Math.max(2, Math.ceil(target / perSet));
+    if (needed > repeatCount) setRepeatCount(needed);
+  }, [repeatCount, displayItems.length]);
 
   return (
     <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
-      <div ref={viewportRef} className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")} style={{ touchAction: "pan-y" }}>
-        <div className="flex py-3" style={{ willChange: "transform" }}>
-          {renderItems.map((card, idx) => (
-            <CardMobile key={`mobile-${idx}`} card={card} priority={idx < 2 && !!card.image?.src} />
+      <div ref={setViewportNode} className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")} style={{ touchAction: "pan-y" }}>
+        <div className="flex py-3">
+          {displayItems.map(({ card, key }, idx) => (
+            <CardMobile key={`mobile-${key}`} card={card} priority={idx < 2 && !!card.image?.src} />
           ))}
         </div>
       </div>
