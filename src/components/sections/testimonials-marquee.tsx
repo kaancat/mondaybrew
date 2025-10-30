@@ -1,5 +1,6 @@
 import TestimonialsMarqueeClient, { type TCard, type TImage } from "./testimonials-marquee.client";
 import { Section } from "@/components/layout/section";
+import { buildSanityImage } from "@/lib/sanity-image";
 
 type SanityImage = {
   alt?: string | null;
@@ -7,13 +8,22 @@ type SanityImage = {
 } | null;
 
 function resolveImage(img?: SanityImage): TImage {
-  const url = img?.image?.asset?.url || null;
-  const alt = img?.alt || null;
-  const lqip = img?.image?.asset?.metadata?.lqip || null;
-  const width = img?.image?.asset?.metadata?.dimensions?.width || undefined;
-  const height = img?.image?.asset?.metadata?.dimensions?.height || undefined;
-  if (!url) return null;
-  return { url, alt, lqip, width, height };
+  if (!img) return null;
+  const built = buildSanityImage(
+    {
+      alt: img.alt ?? undefined,
+      image: img.image ?? undefined,
+    },
+    { width: 720, quality: 80 },
+  );
+  if (!built.src && !built.alt) return null;
+  return {
+    src: built.src || null,
+    alt: built.alt || null,
+    blurDataURL: built.blurDataURL || null,
+    width: built.width,
+    height: built.height,
+  } satisfies TImage;
 }
 
 export type TestimonialsMarqueeData = {
@@ -54,7 +64,9 @@ export default function TestimonialsMarquee({ eyebrow, headline, subheading, spe
     <Section
       padding="none"
       width="full"
-      innerClassName="flex min-h-[100vh] flex-col gap-[calc(var(--flow-space)/1.6)]"
+      className="bg-transparent"
+      // Reduce vertical gap between header and marquee on mobile
+      innerClassName="flex min-h-[100vh] flex-col gap-2 md:gap-[calc(var(--flow-space)/1.6)] bg-transparent"
     >
       {/* Note: Section provides the padded Container already (width=full). Avoid nested Containers to prevent double gutters. */}
       <div className="flex flex-col gap-[calc(var(--flow-space)/1.4)] w-full lg:max-w-[78ch] xl:max-w-[82ch]">

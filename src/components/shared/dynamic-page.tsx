@@ -91,6 +91,8 @@ export async function DynamicPage({
                     return (
                         <div className="vr-section" key={key} id={key}>
                             <TextImageSection
+                                variant={section.variant as ("default" | "tabs" | null | undefined)}
+                                enableTabs={section.enableTabs as boolean | null | undefined}
                                 eyebrow={section.eyebrow as string | undefined}
                                 title={section.title as string | undefined}
                                 body={section.body as string | undefined}
@@ -108,6 +110,7 @@ export async function DynamicPage({
                                     } | null;
                                 } | null | undefined}
                                 imagePosition={section.imagePosition as "left" | "right" | null | undefined}
+                                tabs={section.tabs as Array<{ label?: string | null; title?: string | null; body?: string | null }> | null | undefined}
                                 cta={section.cta as {
                                     label?: string | null;
                                     href?: string | null;

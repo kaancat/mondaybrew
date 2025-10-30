@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CaseStudy } from "@/types/caseStudy";
 import { cn } from "@/lib/utils";
+import { buildSanityImage } from "@/lib/sanity-image";
 import Image from "next/image";
 
 export interface CaseStudyCarouselProps {
@@ -99,6 +100,12 @@ export function CaseStudyCarousel({ items, initialIndex = 0, exploreHref, explor
     const approx = Math.round(sl / Math.max(cardWidth + gapPx, 1));
     setIndex((prev) => (approx === prev ? prev : approx));
   }, [cardWidth, gapPx]);
+
+  useEffect(() => {
+    if (!scrollerRef.current) return;
+    const id = requestAnimationFrame(() => updateEdges());
+    return () => cancelAnimationFrame(id);
+  }, [updateEdges, cardWidth, gapPx, containerWidth, items.length]);
 
   const scrollByChunk = useCallback((dir: -1 | 1) => {
     const el = scrollerRef.current;
@@ -210,8 +217,9 @@ function CaseCard({ item }: { item: CaseStudy }) {
   const tags = (item.tags || []).slice(0, 3);
   const media = item.media;
 
-  const poster = media?.poster?.image?.asset?.url || media?.image?.image?.asset?.url;
-  const imageAlt = media?.image?.alt || item.title;
+  const imageMeta = resolveCaseStudyMedia(media, item.title);
+  const poster = imageMeta?.src;
+  const imageAlt = imageMeta?.alt || item.title;
   const videoSrc = media?.videoFile?.asset?.url || media?.videoUrl || undefined;
 
   return (
@@ -229,8 +237,10 @@ function CaseCard({ item }: { item: CaseStudy }) {
               src={poster}
               alt={imageAlt || ""}
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 33vw"
               className="object-cover"
+              placeholder={imageMeta?.blurDataURL ? "blur" : undefined}
+              blurDataURL={imageMeta?.blurDataURL}
             />
           ) : (
             <div className="h-full w-full bg-muted" />
@@ -255,6 +265,34 @@ function CaseCard({ item }: { item: CaseStudy }) {
       </div>
     </a>
   );
+}
+
+function resolveCaseStudyMedia(media: CaseStudy["media"] | null | undefined, fallbackAlt?: string) {
+  if (!media) return undefined;
+  const posterSource = media.poster ?? undefined;
+  const imageSource = media.image ?? undefined;
+
+  const built = buildSanityImage(
+    posterSource
+      ? {
+        alt: posterSource.alt ?? fallbackAlt ?? undefined,
+        image: posterSource.image ?? undefined,
+      }
+      : imageSource
+        ? {
+          alt: imageSource.alt ?? fallbackAlt ?? undefined,
+          image: imageSource.image ?? undefined,
+        }
+        : undefined,
+    { width: 1600, quality: 80 },
+  );
+
+  if (!built.src) return undefined;
+  return {
+    src: built.src,
+    alt: built.alt ?? fallbackAlt,
+    blurDataURL: built.blurDataURL,
+  };
 }
 
 function VideoAuto({ src, poster }: { src: string; poster?: string }) {

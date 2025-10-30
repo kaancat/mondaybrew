@@ -533,6 +533,8 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
       },
       _type == "textImage" => {
         _type,
+        variant,
+        enableTabs,
         eyebrow,
         title,
         body,
@@ -541,6 +543,7 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
           "alt": image.alt,
           "asset": image.image.asset->{ url, metadata{ lqip, dimensions } }
         },
+        tabs[]{ label, title, body },
         cta{ label, href, variant }
       },
       _type == "textOnly" => {
@@ -550,6 +553,26 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
         body,
         cta{ label, href, variant },
         cta2{ label, href, variant }
+      },
+      _type == "mediaShowcase" => {
+        _type,
+        sectionId,
+        eyebrow,
+        headline,
+        alignment,
+        cta{ label, href, variant, reference->{"slug": slug.current, locale} },
+        media{
+          mode,
+          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          videoUrl,
+          videoFile{ asset->{ url, mimeType } },
+          poster{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } }
+        },
+        stats[]{
+          value,
+          label,
+          icon{ alt, asset->{ url, metadata{ lqip, dimensions } } }
+        }
       },
       true => {}
     )
@@ -958,6 +981,8 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
       },
       _type == "textImage" => {
         _type,
+        variant,
+        enableTabs,
         eyebrow,
         title,
         body,
@@ -966,6 +991,7 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
           "alt": image.alt,
           "asset": image.image.asset->{ url, metadata{ lqip, dimensions } }
         },
+        tabs[]{ label, title, body },
         cta{ label, href, variant }
       },
       _type == "textOnly" => {

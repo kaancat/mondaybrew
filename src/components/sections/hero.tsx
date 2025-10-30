@@ -7,11 +7,10 @@ import type { PortableTextReactComponents } from "@portabletext/react";
 import type { ReactNode } from "react";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
+import { buildSanityImage } from "@/lib/sanity-image";
 import { HeroFeatureCarousel, type HeroFeatureDisplayItem } from "./hero-feature-carousel";
 
 const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "ghost", "link"]);
-
-type Dimensions = { width?: number; height?: number } | undefined;
 
 export type HeroButton = {
   label?: string;
@@ -26,7 +25,11 @@ type WithImageAsset = {
       url?: string;
       metadata?: {
         lqip?: string;
-        dimensions?: Dimensions;
+        dimensions?: {
+          width?: number;
+          height?: number;
+          aspectRatio?: number;
+        };
       };
     };
   } | null;
@@ -128,17 +131,30 @@ function resolveVariant(button: HeroButton, fallback: "default" | "ghost" = "def
   return ALLOWED_BUTTON_VARIANTS.has(button.variant) ? (button.variant as typeof fallback) : fallback;
 }
 
-function resolveImageAsset(media: WithImageAsset): {
-  url?: string;
-  alt?: string;
-  dimensions?: Dimensions;
-  lqip?: string;
-} {
-  const url = media?.image?.asset?.url;
-  const dimensions = media?.image?.asset?.metadata?.dimensions;
-  const lqip = media?.image?.asset?.metadata?.lqip;
-  const alt = media?.alt;
-  return { url, dimensions, lqip, alt };
+function resolveImageAsset(media: WithImageAsset, options?: { width?: number; height?: number; quality?: number }) {
+  if (!media) {
+    return { url: undefined, alt: undefined, lqip: undefined, width: undefined, height: undefined };
+  }
+  const built = buildSanityImage(
+    {
+      alt: media.alt ?? undefined,
+      image: media.image ?? undefined,
+    },
+    {
+      width: options?.width,
+      height: options?.height,
+      quality: options?.quality,
+      fit: "max",
+    },
+  );
+
+  return {
+    url: built.src,
+    alt: built.alt,
+    lqip: built.blurDataURL,
+    width: built.width,
+    height: built.height,
+  };
 }
 
 function buildReferenceHref(ref?: HeroFeatureReference | null): string | undefined {
@@ -179,9 +195,11 @@ export function HeroSection({
 }: HeroSectionProps) {
   const backgroundMedia = background?.image ?? media ?? null;
   const posterMedia = background?.poster ?? null;
-  const { url: backgroundUrl, lqip: backgroundLqip, alt: backgroundAlt } =
-    resolveImageAsset(backgroundMedia);
-  const poster = resolveImageAsset(posterMedia);
+  const { url: backgroundUrl, lqip: backgroundLqip, alt: backgroundAlt } = resolveImageAsset(backgroundMedia, {
+    width: 2400,
+    quality: 80,
+  });
+  const poster = resolveImageAsset(posterMedia, { width: 1920, quality: 75 });
   const videoUrl = background?.videoUrl;
 
   const ctaData = cta || primary;
@@ -222,9 +240,13 @@ export function HeroSection({
           : buildReferenceHref(reference) || manualHref || fallbackHref;
       if (!href) return null;
       const imageSource = item.image || reference?.image || null;
-      const resolvedImage = resolveImageAsset(imageSource);
+      const resolvedImage = resolveImageAsset(imageSource, { width: 960, quality: 80 });
       const image = resolvedImage.url
-        ? { url: resolvedImage.url, alt: resolvedImage.alt || title || undefined, lqip: resolvedImage.lqip }
+        ? {
+          src: resolvedImage.url,
+          alt: resolvedImage.alt || title || undefined,
+          blurDataURL: resolvedImage.lqip,
+        }
         : null;
       const referenceMeta = reference?._type ? FEATURE_META_BY_TYPE[reference._type]?.[locale] : undefined;
       const metaLabel = item.metaLabel || referenceMeta || FEATURE_META_FALLBACK[locale];

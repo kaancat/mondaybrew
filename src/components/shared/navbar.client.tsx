@@ -20,6 +20,7 @@ import { defaultThemeId, getThemeDefinition, themeOrder, ThemeId } from "@/theme
 import { useNavPhase } from "@/components/shared/use-nav-phase";
 import { DesktopMegaMenu } from "@/components/shared/desktop-mega-menu";
 import type { HeroFeatureDisplayItem } from "@/components/sections/hero-feature-carousel";
+import { buildSanityImage } from "@/lib/sanity-image";
 
 export type NavbarLink = {
   label: string;
@@ -77,6 +78,54 @@ export type NavbarBrand = {
     height?: number;
   } | null;
 };
+
+type NavLogoAsset = {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+};
+
+const NAV_LOGO_LIGHT_SRC = "/brand/mondaybrew_footer_logo.svg";
+const NAV_LOGO_DARK_SRC = "/brand/MondayBrew_footer_orange.svg";
+
+function resolveBrandLogo(
+  source: NavbarBrand["logoLight"],
+  fallbackSrc: string,
+  alt: string,
+): NavLogoAsset {
+  if (source?.url) {
+    const built = buildSanityImage(
+      {
+        alt: source.alt ?? alt,
+        asset: {
+          url: source.url,
+          metadata: {
+            dimensions: {
+              width: source.width ?? undefined,
+              height: source.height ?? undefined,
+            },
+          },
+        },
+      },
+      { width: source.width ?? 220, quality: 80 },
+    );
+
+    return {
+      src: built.src ?? source.url,
+      alt: built.alt ?? source.alt ?? alt,
+      width: source.width ?? built.width ?? 1000,
+      height: source.height ?? built.height ?? 200,
+    } satisfies NavLogoAsset;
+  }
+
+  return {
+    src: fallbackSrc,
+    alt,
+    width: 1000,
+    height: 200,
+  } satisfies NavLogoAsset;
+}
 
 export type NavbarCta = {
   label: string;
@@ -242,6 +291,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isOverFooter, setIsOverFooter] = useState(false);
   const [shouldFadeHeader, setShouldFadeHeader] = useState(false);
+  const brandTitle = brand.title || "MondayBrew";
+  const logos = useMemo(() => {
+    const base = resolveBrandLogo(brand.logo ?? null, NAV_LOGO_DARK_SRC, brandTitle);
+    const light = resolveBrandLogo(brand.logoLight ?? null, NAV_LOGO_LIGHT_SRC, brandTitle) || base;
+    const dark = resolveBrandLogo(brand.logoDark ?? null, NAV_LOGO_DARK_SRC, brandTitle) || base;
+    return { light, dark } as const;
+  }, [brand.logo, brand.logoDark, brand.logoLight, brandTitle]);
 
   useEffect(() => {
     setMounted(true);
@@ -441,8 +497,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
       const footerRect = footer.getBoundingClientRect();
       const ctaHeadingRect = ctaHeading.getBoundingClientRect();
 
-      const fadeOffset = 100; // Start fading 100px before intersection
-
       // Check if header and footer rectangles overlap (for icon color change)
       const isIntersecting = !(
         headerRect.bottom < footerRect.top ||
@@ -493,14 +547,12 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             >
               <Link href="/" className="inline-flex items-center">
                 {(() => {
-                  const chosen = isLightAlt
-                    ? brand.logoLight ?? brand.logo ?? brand.logoDark
-                    : brand.logoDark ?? brand.logo ?? brand.logoLight;
-                  if (chosen?.url) {
+                  const chosen = isLightAlt ? logos.light : logos.dark;
+                  if (chosen?.src) {
                     return (
                       <Image
-                        src={chosen.url}
-                        alt={chosen.alt || brand.title}
+                        src={chosen.src}
+                        alt={chosen.alt}
                         width={chosen.width ?? 150}
                         height={chosen.height ?? 32}
                         className="h-6 w-auto"
@@ -508,7 +560,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       />
                     );
                   }
-                  return <span className="text-sm font-normal">{brand.title}</span>;
+                  return <span className="text-sm font-normal">{brandTitle}</span>;
                 })()}
               </Link>
 
@@ -517,7 +569,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   <button
                     type="button"
                     aria-label="Open menu"
-                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-toggle-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-link-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
                   >
                     <Menu className="size-[18px]" aria-hidden="true" />
                   </button>
@@ -525,13 +577,14 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <SheetContent
                   side="left"
                   hideCloseButton
+                  forceMount
                   className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
                 >
                   {/* Accessibility: satisfy Radix requirements without changing visuals */}
                   <SheetTitle className="sr-only">Menu</SheetTitle>
                   <SheetDescription className="sr-only">Site navigation</SheetDescription>
                   <div className="flex h-full w-full items-stretch">
-                    <div className="mobile-nav-inner flex h-full min-h-0 w-[var(--mobile-nav-width)] flex-col px-6 py-8">
+                    <div className="mobile-nav-inner flex w-[var(--mobile-nav-width)] flex-col px-6 py-8">
                       {/* Header with close button */}
                       <div className="flex items-center justify-between pb-5 shrink-0">
                         <div className="flex flex-col">
@@ -550,14 +603,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       </div>
 
                       {/* Scrollable menu content */}
-                      <div className="mobile-nav-scroll no-scrollbar flex-1 min-h-0 overflow-y-auto pt-2">
-                        {mobileOpen && (
-                          <motion.div
-                            className="space-y-7"
-                            initial="hidden"
-                            animate="show"
-                            variants={mobileMenuVariants}
-                          >
+                      <div className="mobile-nav-scroll pt-2">
+                        <motion.div
+                          className="space-y-7"
+                          initial="hidden"
+                          animate={mobileOpen ? "show" : "hidden"}
+                          variants={mobileMenuVariants}
+                        >
                             {megaSections.map((section) => (
                               <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
                                 <motion.h2 variants={mobileItemVariants} className="text-sm font-normal uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
@@ -617,8 +669,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                                 </motion.ul>
                               </motion.section>
                             ) : null}
-                          </motion.div>
-                        )}
+                        </motion.div>
                       </div>
 
                       {/* Fixed bottom action buttons */}
@@ -664,14 +715,12 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             >
               <Link href="/" className="inline-flex items-center shrink-0">
                 {(() => {
-                  const chosen = isLightAlt
-                    ? brand.logoLight ?? brand.logo ?? brand.logoDark
-                    : brand.logoDark ?? brand.logo ?? brand.logoLight;
-                  if (chosen?.url) {
+                  const chosen = isLightAlt ? logos.light : logos.dark;
+                  if (chosen?.src) {
                     return (
                       <Image
-                        src={chosen.url}
-                        alt={chosen.alt || brand.title}
+                        src={chosen.src}
+                        alt={chosen.alt}
                         width={chosen.width ?? 150}
                         height={chosen.height ?? 32}
                         className="h-6 w-auto"
@@ -679,7 +728,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       />
                     );
                   }
-                  return <span className="text-sm font-normal">{brand.title}</span>;
+                  return <span className="text-sm font-normal">{brandTitle}</span>;
                 })()}
               </Link>
               <NavigationMenu

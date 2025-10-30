@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type TextImageResolvedImage = {
-    url: string;
+    src: string;
     alt: string | null;
-    lqip: string | null;
+    blurDataURL: string | null;
     width?: number;
     height?: number;
 };
@@ -81,71 +81,58 @@ export function TextImageClient({
     };
 
     return (
-        <div 
-            ref={sectionRef}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center min-h-[500px]"
-        >
-            {/* Text Content - All animated together as one block */}
-            <motion.div
-                className={cn("flex flex-col h-full justify-center relative", textOrder)}
-                {...animateText}
-            >
-                {/* Decorative gradient blur orb in background */}
-                <div className="absolute -left-20 top-20 w-64 h-64 bg-[color:var(--accent)] opacity-[0.03] blur-[80px] rounded-full pointer-events-none" />
-
-                {/* Text content - tightly spaced */}
-                <div className="flex flex-col gap-3">
-                    {/* Eyebrow - Small yellow label */}
+        <div ref={sectionRef} className="grid grid-cols-1 md:grid-cols-2 items-stretch gap-6 md:gap-10">
+            {/* Text panel box */}
+            <motion.div className={cn(textOrder)} {...animateText}>
+                <div
+                    className={cn(
+                        // Add mobile inner padding so content isn't edge-to-edge
+                        "h-full rounded-none p-4 md:rounded-[5px] md:p-6 services-card-surface text-image-card shadow-[var(--shadow-elevated-md)]"
+                    )}
+                    style={{ minHeight: 520 }}
+                >
                     {eyebrow && (
-                        <span className="eyebrow">
-                            {eyebrow}
-                        </span>
+                        <span className="text-xs font-semibold uppercase tracking-[0.22em] services-card-eyebrow">{eyebrow}</span>
                     )}
-
-                    {/* Title - Large and Bold */}
-                    {title && (
-                        <h2 className="text-[color:var(--foreground)]">
-                            {title}
-                        </h2>
-                    )}
-
-                    {/* Body Text - Normal size and weight */}
+                    {title && (<h2 data-ti-headline className="mt-2 font-semibold">{title}</h2>)}
+                    <div className="my-6 h-[1px] w-full services-card-divider" />
                     {body && (
-                        <p className="body-text">
-                            {body}
-                        </p>
+                        <p className="services-card-body text-[length:var(--font-body)] leading-relaxed">{body}</p>
                     )}
-
-                    {/* CTA Button */}
                     {cta && (
-                        <Button asChild variant={cta.variant} size="lg" className="self-start">
-                            <Link href={cta.href}>{cta.label}</Link>
-                        </Button>
+                        <div className="mt-6">
+                            <Button asChild variant={cta.variant} size="lg" className="self-start">
+                                <Link href={cta.href}>{cta.label}</Link>
+                            </Button>
+                        </div>
                     )}
                 </div>
             </motion.div>
 
-            {/* Image */}
-            {image?.url && (
-                <motion.div
-                    className={cn("relative w-full aspect-[4/3] md:aspect-auto md:h-[500px] lg:h-[600px]", imageOrder)}
-                    {...animateImage}
-                >
-                    <div className="relative w-full h-full overflow-hidden rounded-[5px] shadow-[0_20px_60px_rgb(0,0,0,0.4)]">
-                        <Image
-                            src={image.url}
-                            alt={image.alt || ""}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            placeholder={image.lqip ? "blur" : "empty"}
-                            blurDataURL={image.lqip || undefined}
-                            priority={false}
-                        />
-                    </div>
+            {/* Image panel */}
+            {image?.src && (
+                <motion.div className={cn(imageOrder)} {...animateImage}>
+                    <div
+                        className={cn(
+                            "relative h-full rounded-[5px] overflow-hidden shadow-[0_20px_60px_rgb(0,0,0,0.4)]",
+                            image ? "bg-black/5" : "bg-transparent",
+                            // Mobile image height set to 500px, desktop taller
+                            "min-h-[500px] md:min-h-[520px]"
+                        )}
+                        >
+                            <Image
+                                src={image.src}
+                                alt={image.alt || ""}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                                placeholder={image.blurDataURL ? "blur" : "empty"}
+                                blurDataURL={image.blurDataURL || undefined}
+                                priority={false}
+                            />
+                        </div>
                 </motion.div>
             )}
         </div>
     );
 }
-

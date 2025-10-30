@@ -17,9 +17,11 @@ export function FooterTabs() {
     const isLightAlt = resolvedTheme === "light-alt";
 
     return (
-        <div className="flex flex-col md:flex-row gap-40">
+        <div
+            className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-16 xl:gap-20"
+        >
             {/* Column 1: Marketing */}
-            <nav className="flex flex-col" aria-label="Marketing services">
+            <nav className="flex flex-col min-w-0" aria-label="Marketing services">
                 <h3 className={`text-lg font-bold uppercase tracking-wider mb-6 ${isLightAlt ? "text-black" : "text-white"}`}>
                     Marketing
                 </h3>
@@ -60,7 +62,7 @@ export function FooterTabs() {
             </nav>
 
             {/* Column 2: Web */}
-            <nav className="flex flex-col" aria-label="Web services">
+            <nav className="flex flex-col min-w-0" aria-label="Web services">
                 <h3 className={`text-lg font-bold uppercase tracking-wider mb-6 ${isLightAlt ? "text-black" : "text-white"}`}>
                     Web
                 </h3>
@@ -93,7 +95,7 @@ export function FooterTabs() {
             </nav>
 
             {/* Column 3: Virksomhed */}
-            <nav className="flex flex-col" aria-label="Virksomhed">
+            <nav className="flex flex-col min-w-0" aria-label="Virksomhed">
                 <h3 className={`text-lg font-bold uppercase tracking-wider mb-6 ${isLightAlt ? "text-black" : "text-white"}`}>
                     Virksomhed
                 </h3>
@@ -135,4 +137,3 @@ export function FooterTabs() {
         </div>
     );
 }
-

@@ -47,21 +47,11 @@
   --radius: 0.625rem;
 
   /* Nav animation tokens (single source of truth) */
-  --nav-anim-duration: 420ms;
+  --nav-anim-duration: 280ms;
   --nav-anim-ease: cubic-bezier(0.25, 0.62, 0.32, 1);
-  --nav-overlay-duration: 500ms;
+  --nav-overlay-duration: 280ms;
   --nav-overlay-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --nav-viewport-height: 100vh;
-  --nav-card-inset: 0px;
-  --nav-card-radius: 0px;
-  --nav-card-offset-y: 0px;
-  --nav-card-border-radius: 0px;
-  --nav-card-box-shadow: none;
-  --nav-card-overflow: visible;
-  --nav-card-pointer: auto;
-  --nav-card-background: var(--background);
-  --nav-card-height: var(--nav-viewport-height);
-  --nav-card-margin-block: 0;
 
   --layout-max: 86.5rem; /* ~1384px */
   --layout-tight: 60rem; /* ~960px */
@@ -112,10 +102,21 @@
 
   --site-shell-offset-x: 0px;
   --site-shell-scale: 1;
-  --site-shell-inset: 0px;
   --full-bleed-inline-start: calc(50% - 50vw);
   --full-bleed-inline-end: calc(50% - 50vw);
   --full-bleed-width: 100vw;
+
+  --site-dot-size: 0.85px;
+  --site-dot-spacing: 12px;
+  --site-dot-opacity: 0.14;
+  /* Surface pattern defaults; override these to test new overlays */
+  --surface-pattern-image: url("/patterns/bg-dots.png");
+  --surface-pattern-size: auto;
+  --surface-pattern-position: top left;
+  --surface-pattern-opacity: var(--site-dot-opacity);
+  --surface-pattern-blend-mode: normal;
+  --surface-pattern-transform: none;
+  --surface-pattern-color: var(--site-dot-color);
 
   --mobile-nav-surface: color-mix(in oklch, var(--mb-bg) 92%, white 8%);
   --mobile-nav-text: color-mix(in oklch, var(--mb-ink) 92%, black 8%);
@@ -171,6 +172,9 @@ html.light-primary {
   --mb-ink: #49444b;
   --mb-accent: #ff914d;
   --mb-bg: #f5f7fd;
+
+  --site-dot-color: color-mix(in oklch, var(--foreground) 56%, transparent);
+  --site-dot-opacity: 0.42;
 
   --surface-base: var(--mb-bg);
   --surface-elevated: color-mix(in oklch, white 30%, var(--mb-bg));
@@ -254,10 +258,13 @@ html.light-primary {
   --eyebrow-color: var(--mb-accent);
 }
 
+/* Primary theme: make About stats (value + label) off‑white for contrast */
+html.light-primary .about-stats-panel [data-stat-value],
+html.light-primary .about-stats-panel [data-stat-label] {
+  color: var(--brand-light) !important;
+}
+
 html.light-primary body[data-mobile-nav-open="true"] {
-  /* Keep the site card in brand background instead of transparent tint */
-  --nav-card-background: var(--background);
-  --nav-card-box-shadow: 0 48px 120px rgba(73, 68, 75, 0.24);
   --mobile-nav-overlay: rgba(73, 68, 75, 0.08);
   /* Brand the mobile menu section headings and top eyebrow in primary theme */
   --mobile-nav-heading: var(--mb-accent);
@@ -313,6 +320,9 @@ html.light-alt {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
+  --site-dot-color: color-mix(in oklch, var(--foreground) 54%, transparent);
+  --site-dot-opacity: 0.38;
+
   /* Navbar tokens tuned for Light Alt white/glass + black ink */
   /* Light Alt: nudge more see-through */
   /* Make header shell more transparent and subtle on Light Alt */
@@ -342,9 +352,9 @@ html.light-alt {
   /* Global eyebrow color on Light-Alt (brand orange) */
   --eyebrow-color: var(--mb-accent);
 
-  /* Header CTA (Light Alt): text-only, no orange */
+  /* Header CTA (Light Alt): text + solid black border */
   --nav-cta-bg: transparent;
-  --nav-cta-border: transparent;
+  --nav-cta-border: var(--brand-ink-strong);
   --nav-cta-text: var(--foreground);
   --nav-cta-hover-bg: transparent;
 
@@ -429,6 +439,9 @@ html.dark {
   --sidebar-accent-foreground: var(--brand-light);
   --sidebar-border: color-mix(in oklch, var(--brand-light) 18%, var(--mb-bg) 82%);
   --sidebar-ring: color-mix(in oklch, var(--mb-accent) 52%, var(--mb-bg) 48%);
+
+  --site-dot-color: color-mix(in oklch, var(--foreground) 38%, transparent);
+  --site-dot-opacity: 0.38;
 
   /* Dark glass header over #49444B */
   /* Dark: nudge more see-through */
@@ -526,6 +539,37 @@ html.dark {
     position: relative;
   }
 
+  .background-dots,
+  .background-dots-surface {
+    pointer-events: none;
+    background-color: var(--surface-pattern-color, transparent);
+    background-image: none;
+    mask-image: var(--surface-pattern-image);
+    mask-size: var(--surface-pattern-size);
+    mask-position: var(--surface-pattern-position);
+    mask-repeat: repeat;
+    -webkit-mask-image: var(--surface-pattern-image);
+    -webkit-mask-size: var(--surface-pattern-size);
+    -webkit-mask-position: var(--surface-pattern-position);
+    -webkit-mask-repeat: repeat;
+    opacity: var(--surface-pattern-opacity);
+    mix-blend-mode: var(--surface-pattern-blend-mode, normal);
+    transform: var(--surface-pattern-transform, none);
+    transform-origin: center;
+  }
+
+  .background-dots {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .background-dots-surface {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
   /* Global Typography System */
 
   /* H1 - Hero style (largest, semibold) */
@@ -583,108 +627,86 @@ html.dark {
   body[data-mobile-nav-open="true"] {
     overflow: hidden;
     --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
-    --site-shell-scale: 0.9;
-    --nav-card-inset: clamp(14px, 4vw, 24px);
-    --nav-card-radius: clamp(20px, 6vw, 32px);
-    --nav-card-offset-y: 0px;
-    --site-shell-inset: var(--nav-card-inset);
-    --nav-card-border-radius: var(--nav-card-radius);
-    --nav-card-box-shadow: 0 56px 160px rgba(8, 6, 20, 0.52);
-    --nav-card-overflow: hidden;
-    --nav-card-pointer: none;
-    --nav-card-background: transparent;
-    --nav-card-height: calc(var(--nav-viewport-height) - (var(--nav-card-inset) * 2));
-    --nav-card-margin-block: 0;
+    --site-shell-scale: 1;
   }
 
   /* Body::before overlay removed — rely on Radix Sheet overlay only */
-
-  /* Exiting phase: keep 'open' but return tokens to closed-state so removing
-     the attribute does not trigger another width/margin transition */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] {
-    --site-shell-offset-x: 0px;
-    --site-shell-scale: 1;
-    --nav-card-offset-y: 0px;
-    --nav-card-border-radius: 0px;
-    --nav-card-box-shadow: none;
-    --nav-card-overflow: visible;
-    --nav-card-pointer: auto;
-    --nav-card-background: var(--background);
-    --nav-card-height: var(--nav-viewport-height);
-    --nav-card-margin-block: 0;
-  }
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] .site-shell {
-    /* Ensure mirrored geometry: keep origin consistent while reversing */
-    transform-origin: left center !important;
-  }
-  /* Exiting: keep 'open' while reversing geometry and restoring presentation */
-
-  /* Exiting: keep open flag but drive vars back to rest so transition mirrors enter */
-  body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"],
-  html[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"] {
-    --site-shell-offset-x: 0px;
-    --site-shell-scale: 1;
-  }
-  body[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"]::before,
-  html[data-mobile-nav-open="true"][data-mobile-nav-exiting="true"]::before {
-    opacity: 0;
-  }
 
   .site-shell {
     position: relative;
     z-index: 50;
     min-height: var(--nav-viewport-height);
     background: var(--background);
-    transition: transform var(--nav-anim-duration) var(--nav-anim-ease), border-radius var(--nav-anim-duration) var(--nav-anim-ease), box-shadow var(--nav-anim-duration) var(--nav-anim-ease), background var(--nav-anim-duration) var(--nav-anim-ease);
-    transform-origin: left center;
-    /* Avoid creating a new containing block when nav is closed */
+    transition:
+      transform var(--nav-anim-duration) var(--nav-anim-ease),
+      background var(--nav-anim-duration) var(--nav-anim-ease),
+      box-shadow var(--nav-anim-duration) var(--nav-anim-ease),
+      filter var(--nav-anim-duration) var(--nav-anim-ease),
+      opacity var(--nav-anim-duration) var(--nav-anim-ease);
+    transform-origin: left top;
     transform: none;
-    border-radius: clamp(0px, var(--nav-card-radius), 0px);
     box-shadow: none;
+    filter: none;
     overflow: visible;
     pointer-events: auto;
-    background: var(--background);
-    /* Allow page to grow naturally while nav is closed to avoid dvh-driven jumps */
-    min-height: var(--nav-viewport-height);
     height: auto;
     margin-block: 0;
+    isolation: isolate;
+  }
+
+  .site-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-color: var(--surface-pattern-color, transparent);
+    mask-image: var(--surface-pattern-image);
+    mask-size: var(--surface-pattern-size);
+    mask-position: var(--surface-pattern-position);
+    mask-repeat: repeat;
+    -webkit-mask-image: var(--surface-pattern-image);
+    -webkit-mask-size: var(--surface-pattern-size);
+    -webkit-mask-position: var(--surface-pattern-position);
+    -webkit-mask-repeat: repeat;
+    opacity: var(--surface-pattern-opacity);
+    mix-blend-mode: var(--surface-pattern-blend-mode, normal);
+    transform: var(--surface-pattern-transform, none);
+    transform-origin: center;
+  }
+
+  .site-shell::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: clamp(6px, 2vw, 18px);
+    pointer-events: none;
+    background: linear-gradient(90deg, color-mix(in oklch, var(--mb-accent) 18%, transparent) 0%, transparent 80%);
+    opacity: 0.08;
+    transform: translateX(-30%);
+    transition:
+      opacity var(--nav-anim-duration) var(--nav-anim-ease),
+      transform var(--nav-anim-duration) var(--nav-anim-ease);
   }
 
   body[data-mobile-nav-open="true"] .site-shell {
-    transform-origin: left center !important;
-    /* Apply transform only while mobile nav is open */
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), var(--nav-card-offset-y, 0px), 0) scale(var(--site-shell-scale));
-    border-radius: var(--nav-card-border-radius);
-    box-shadow: var(--nav-card-box-shadow);
-    overflow: var(--nav-card-overflow);
-    height: var(--nav-card-height);
-    margin-block: var(--nav-card-margin-block);
+    transform-origin: left top !important;
+    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
     z-index: 60;
-    pointer-events: var(--nav-card-pointer);
-    background: var(--nav-card-background);
-
-    /* Remove isolation to prevent stacking context issues */
+    pointer-events: none;
+    background: var(--background);
+    box-shadow:
+      -18px 0 64px color-mix(in oklch, var(--mb-accent) 18%, transparent),
+      0 20px 60px rgba(8, 6, 20, 0.24);
+    filter: brightness(0.985);
     contain: layout style paint;
   }
 
-  body[data-nav-phase="cleanup"] {
-    --nav-card-border-radius: clamp(0px, var(--nav-card-radius), 0px);
-    --nav-card-box-shadow: none;
-    --nav-card-overflow: visible;
-    --nav-card-pointer: auto;
-    --nav-card-background: var(--background);
-    --nav-card-height: var(--nav-viewport-height);
-    --nav-card-margin-block: 0;
-    --site-shell-offset-x: 0px;
-    --site-shell-scale: 1;
-    --nav-card-offset-y: 0px;
-  }
-
-  body[data-nav-phase="cleanup"] [data-slot="sheet-content"].mobile-nav-panel {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transform: translateX(-100%) !important;
-    pointer-events: none !important;
+  body[data-mobile-nav-open="true"] .site-shell::after {
+    opacity: 0.22;
+    transform: translateX(-6%);
   }
 
   /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */
@@ -695,13 +717,14 @@ html.dark {
   [data-slot="sheet-content"].mobile-nav-panel {
     display: flex;
     align-items: stretch;
-    height: var(--nav-viewport-height);
+    min-height: var(--nav-viewport-height);
+    height: auto;
     width: 100vw;
     max-width: none;
     padding: 0;
     /* Disable exit animation by default; we add transitions only while open */
     transition: none;
-    /* Panel below shell to show the rounded card */
+    /* Panel stays beneath the translated page */
     z-index: 55 !important;
     position: relative;
     /* Default hidden so brief attribute gaps don't flash content */
@@ -724,18 +747,8 @@ html.dark {
     visibility: visible;
     pointer-events: auto;
     transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
+    background: var(--mobile-nav-surface);
   }
-
-
-
-  /* During exiting, keep the panel in DOM for Radix state but hide it immediately
-     to prevent menu items shining through the semi-transparent shell */
-body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-content"].mobile-nav-panel {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: none !important;
-  }
-
   [data-slot="sheet-overlay"] {
     background: transparent !important;
     pointer-events: auto;
@@ -752,14 +765,6 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
   body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
     opacity: 1;
     transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
-  }
-  /* Fade overlay during exiting while still open */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"] {
-    opacity: 0;
-  }
-  /* Add a slight delay so overlay masks color changes while shell begins to close */
-  body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-overlay"][data-state="open"] {
-    transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease) 120ms !important;
   }
 
   /* Remove old snapping guard (no longer used) */
@@ -804,6 +809,74 @@ body[data-mobile-nav-open="true"][data-nav-phase="exiting"] [data-slot="sheet-co
 }
 
 @layer utilities {
+  /* Shared Services card surface so components match 1:1 */
+  .services-card-surface {
+    background: var(--services-card-bg) !important;
+    border: 1px solid var(--services-ink-strong) !important;
+    box-shadow: var(--shadow-elevated-md);
+  }
+  .services-card-surface h1,
+  .services-card-surface h2,
+  .services-card-surface h3,
+  .services-card-surface h4,
+  .services-card-surface h5,
+  .services-card-surface h6 {
+    color: var(--services-ink-strong) !important;
+    font-weight: 600; /* match Services detail card */
+  }
+  .services-card-divider {
+    background: color-mix(in oklch, var(--services-ink-strong) 85%, white 15%) !important;
+  }
+  .services-card-muted {
+    color: color-mix(in oklch, var(--services-ink-strong) 84%, white 16%) !important;
+  }
+
+  /* Tabs inside Text+Image (tabs variant) — theme-aware label color */
+  /* Non-active tab label color */
+  html.light-alt .services-card-tab { color: color-mix(in oklch, var(--services-ink-strong) 68%, white 32%) !important; }
+  html.light-alt .services-card-tab:hover { color: var(--services-ink-strong) !important; }
+  html.light-primary .services-card-tab,
+  html.dark .services-card-tab { color: color-mix(in oklch, var(--mb-bg) 85%, var(--mb-ink) 15%) !important; }
+  html.light-primary .services-card-tab:hover,
+  html.dark .services-card-tab:hover { color: var(--mb-bg) !important; }
+
+  /* Active tab label should be strong ink on Light-Alt and brand white-ish on Primary/Dark */
+  html.light-alt .services-card-tab-active { color: var(--services-ink-strong) !important; }
+  html.light-primary .services-card-tab-active,
+  html.dark .services-card-tab-active { color: var(--mb-bg) !important; }
+
+  /* Tab number tint per theme */
+  html.light-alt .services-card-tab-num { color: color-mix(in oklch, var(--services-ink-strong) 65%, white 35%) !important; }
+  html.light-primary .services-card-tab-num,
+  html.dark .services-card-tab-num { color: color-mix(in oklch, var(--mb-bg) 70%, var(--mb-ink) 30%) !important; }
+
+  /* Text inside Text+Image cards should mirror Services detail card tokens */
+  /* Eyebrow: brand orange in all color modes */
+  .services-card-eyebrow {
+    color: var(--mb-accent) !important;
+  }
+
+  /* Body copy tone matches Services card across themes */
+  html.light-alt .services-card-body {
+    color: color-mix(in oklch, var(--services-ink-strong) 85%, white 15%) !important;
+  }
+  html.light-primary .services-card-body,
+  html.dark .services-card-body {
+    color: color-mix(in oklch, var(--mb-bg) 82%, var(--mb-ink) 18%) !important;
+  }
+
+  /* Text+Image heading parity with Services card */
+  /* Light-Alt: Services card uses strict ink on white */
+  html.light-alt .text-image-card :is(h1,h2,h3,h4,h5,h6) {
+    color: var(--services-ink-strong) !important;
+    font-weight: 600;
+  }
+  /* Primary + Dark: Services card uses brand light on dark surface */
+  html.light-primary .text-image-card :is(h1,h2,h3,h4,h5,h6),
+  html.dark .text-image-card :is(h1,h2,h3,h4,h5,h6) {
+    color: var(--mb-bg) !important;
+    font-weight: 600;
+  }
   /* Clients/Partners: primary theme uses page background color */
 html.light-primary .clients-hero-strip {
     /* Follow services card style on Primary (dark card) */
@@ -900,6 +973,22 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     padding-block: 0;
   }
 
+  @keyframes marquee-mobile {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .marquee-mobile-track {
+    animation-name: marquee-mobile;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
   .full-bleed {
     width: var(--full-bleed-width) !important;
     margin-left: var(--full-bleed-inline-start) !important;
@@ -910,16 +999,6 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
   .full-bleed > * {
     border-radius: 0;
   }
-
-  body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) .full-bleed {
-    border-radius: clamp(20px, 6vw, 32px);
-    box-shadow: 0 56px 160px rgba(8, 6, 20, 0.45);
-    overflow: hidden;
-  }
-
-  /* When mobile menu is open, prevent full-bleed from escaping the transformed container
-     Do NOT apply during exiting to avoid post-close snap */
-  /* Removed open-only full-bleed width/margin overrides; rely on shell clipping */
 
   /* Hide native scrollbars but keep scrolling accessible */
   .no-scrollbar {
@@ -944,6 +1023,56 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     }
     to {
       transform: translate3d(var(--marquee-distance, -50%), 0, 0);
+    }
+  }
+
+  .marquee-mobile-drag {
+    will-change: transform;
+    transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .marquee-mobile-dragging {
+    transition: none;
+  }
+
+  .marquee-mobile-track {
+    display: flex;
+    will-change: transform;
+  }
+
+  .marquee-mobile-track-forward {
+    animation-name: marquee-mobile-forward;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .marquee-mobile-track-reverse {
+    animation-name: marquee-mobile-reverse;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .marquee-mobile-set {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem var(--container-gutter);
+  }
+
+  @keyframes marquee-mobile-forward {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes marquee-mobile-reverse {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
     }
   }
 
@@ -1033,17 +1162,9 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
 
   /* Mobile only: hide header only while menu is fully open; show it during exiting for instant return */
   @media (max-width: 767px) {
-    body[data-mobile-nav-open="true"]:not([data-nav-phase="exiting"]) header[class*="fixed"] {
+    body[data-mobile-nav-open="true"] header[class*="fixed"] {
       display: none !important;
     }
-  }
-  /* Cleanup micro-phase: disable transitions for a brief moment during attribute removal */
-  body[data-nav-phase="cleanup"] .site-shell,
-  body[data-nav-phase="cleanup"] header[class*="fixed"],
-  body[data-nav-phase="cleanup"] .full-bleed,
-  body[data-nav-phase="cleanup"] .vr-hero,
-  body[data-nav-phase="cleanup"] .vr-hero .layout-container {
-    transition: none !important;
   }
 /* Light Alt: when mobile menu is open, make Contact CTA clearly outlined */
 html.light-alt body[data-mobile-nav-open="true"] {

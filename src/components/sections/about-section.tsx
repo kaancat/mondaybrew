@@ -4,6 +4,7 @@ import {
   type AboutSectionResolvedImage,
   type AboutSectionResolvedStat,
 } from "@/components/sections/about-section.client";
+import { buildSanityImage } from "@/lib/sanity-image";
 
 type SanityImageAsset = {
   alt?: string | null;
@@ -65,13 +66,13 @@ export function AboutSection({ eyebrow, headline, subheading, mainImage, stats, 
     process.env.ABOUT_IMAGE_URL?.trim() ||
     "/statistics_billede.png"; // Use new image by default
   const mergedImage: AboutSectionResolvedImage | null = overrideUrl
-    ? { url: overrideUrl, alt: image?.alt ?? "About image", lqip: image?.lqip, width: image?.width, height: image?.height }
+    ? { src: overrideUrl, alt: image?.alt ?? "About image", blurDataURL: image?.blurDataURL, width: image?.width, height: image?.height }
     : image;
   const sanitizedStats = (stats ?? []).reduce<AboutSectionResolvedStat[]>((acc, stat) => {
     const value = stat?.value?.trim();
     const label = stat?.label?.trim();
     const icon = stat?.icon ? resolveImage(stat.icon) : null;
-    if (!value && !label && !icon?.url) {
+    if (!value && !label && !icon?.src) {
       return acc;
     }
     acc.push({ value, label, icon });
@@ -93,17 +94,26 @@ export function AboutSection({ eyebrow, headline, subheading, mainImage, stats, 
 }
 
 function resolveImage(image?: SanityImageAsset | SanityIconImage | null): AboutSectionResolvedImage | null {
-  const url = image?.asset?.url?.trim() || null;
-  const alt = image?.alt?.trim() || null;
-  const lqip = image?.asset?.metadata?.lqip?.trim() || null;
-  const width = image?.asset?.metadata?.dimensions?.width || undefined;
-  const height = image?.asset?.metadata?.dimensions?.height || undefined;
+  if (!image) return null;
+  const built = buildSanityImage(
+    {
+      alt: image.alt ?? undefined,
+      asset: image.asset ?? undefined,
+    },
+    { width: 1400, quality: 80 },
+  );
 
-  if (!url && !alt) {
+  if (!built.src && !built.alt) {
     return null;
   }
 
-  return { url, alt, lqip, width, height } satisfies AboutSectionResolvedImage;
+  return {
+    src: built.src || null,
+    alt: built.alt || null,
+    blurDataURL: built.blurDataURL || null,
+    width: built.width,
+    height: built.height,
+  } satisfies AboutSectionResolvedImage;
 }
 
 function resolveHref(cta: AboutSectionData["cta"]) {

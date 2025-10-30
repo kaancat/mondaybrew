@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
+import { buildSanityImage } from "@/lib/sanity-image";
 import ClientsMarquee from "./clients.marquee.client";
 
 export type ClientLogo = {
@@ -198,22 +199,30 @@ function Logo({ logo }: { logo: ClientLogo; forceBlackLogos?: boolean }) {
   const alt = image?.alt || title || "Logo";
 
   if (image?.image?.asset?.url) {
-    const dims = image.image.asset.metadata?.dimensions as { width?: number; height?: number } | undefined;
-    const width = (dims?.width ?? 120) as number;
-    const height = (dims?.height ?? 60) as number;
-    const safeHeight = height === 0 ? 60 : height;
-    const aspectRatio = width / safeHeight;
+    const built = buildSanityImage(
+      {
+        alt,
+        image: image.image ?? undefined,
+      },
+      { width: 320, quality: 75 },
+    );
+    const naturalWidth = built.width ?? image.image.asset.metadata?.dimensions?.width ?? 160;
+    const naturalHeight = built.height ?? image.image.asset.metadata?.dimensions?.height ?? 80;
+    const safeHeight = naturalHeight <= 0 ? 80 : naturalHeight;
+    const aspectRatio = naturalWidth / safeHeight;
     const maxHeight = 40;
-    const w = maxHeight * aspectRatio;
-    const h = maxHeight;
+    const displayWidth = Math.max(24, Math.round(maxHeight * aspectRatio));
+    const displayHeight = maxHeight;
 
     return (
       <Image
-        src={image.image.asset.url}
+        src={built.src || image.image.asset.url!}
         alt={alt}
-        width={Math.round(w)}
-        height={Math.round(h)}
+        width={displayWidth}
+        height={displayHeight}
         sizes="160px"
+        placeholder={built.blurDataURL ? "blur" : undefined}
+        blurDataURL={built.blurDataURL || undefined}
         className="max-h-[40px] w-auto opacity-90 [filter:var(--clients-logo-filter,grayscale(100%))] group-hover:[filter:var(--clients-logo-hover-filter,none)]"
         style={{ mixBlendMode: "multiply" }}
       />

@@ -15,6 +15,20 @@ export default defineType({
                 maxLength: 50,
             },
         }),
+        // Old variant field kept hidden for compatibility
+        defineField({
+            name: "variant",
+            title: "Variant (deprecated)",
+            type: "string",
+            hidden: true,
+        }),
+        defineField({
+            name: "enableTabs",
+            title: "Use tabs",
+            type: "boolean",
+            description: "Enable tabbed items inside the text panel.",
+            initialValue: false,
+        }),
         defineField({
             name: "eyebrow",
             title: "Eyebrow",
@@ -39,6 +53,28 @@ export default defineType({
             title: "Image",
             type: "imageWithAlt",
             validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: "tabs",
+            title: "Tabs",
+            type: "array",
+            description: "Tabs shown when 'Use tabs' is enabled.",
+            hidden: ({ parent }) => parent?.enableTabs !== true,
+            of: [
+                defineField({
+                    type: "object",
+                    name: "tab",
+                    fields: [
+                        defineField({ name: "label", title: "Tab Label", type: "string", validation: (Rule) => Rule.required() }),
+                        defineField({ name: "title", title: "Title", type: "string" }),
+                        defineField({ name: "body", title: "Body", type: "text", rows: 4 }),
+                    ],
+                    preview: {
+                        select: { title: "label" },
+                        prepare({ title }) { return { title: title || "Tab" }; },
+                    },
+                }),
+            ],
         }),
         defineField({
             name: "imagePosition",

@@ -1,24 +1,18 @@
 "use client";
 
-import {
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-  type WheelEvent as ReactWheelEvent,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import useEmblaCarousel from "embla-carousel-react";
+import AutoScroll from "embla-carousel-auto-scroll";
+import type { EmblaCarouselType } from "embla-carousel";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "framer-motion";
 
 export type TImage = {
-  url?: string | null;
+  src?: string | null;
   alt?: string | null;
-  lqip?: string | null;
+  blurDataURL?: string | null;
   width?: number;
   height?: number;
 } | null;
@@ -69,6 +63,9 @@ const CARD_WIDTHS: Record<TCard["variant"], number> = {
 
 const CARD_GAP = 32; // px spacing applied symmetrically around each card
 
+// Single source of truth for mobile card height so top/bottom rows match exactly
+const MOBILE_CARD_HEIGHT = "clamp(220px, 54vw, 300px)" as const;
+
 // Map Service card presets (Primary, Light Alt, Dark) to concrete tones
 const MODE_PRESETS: Record<ModeKey, ToneStyle> = {
   primary: {
@@ -81,11 +78,11 @@ const MODE_PRESETS: Record<ModeKey, ToneStyle> = {
   },
   lightAlt: {
     background: "var(--services-card-bg, oklch(1 0 0))",
-    ink: "var(--services-ink-strong, #0a0a0a)",
-    sub: "color-mix(in oklch, var(--services-ink-strong, #0a0a0a) 65%, transparent 35%)",
-    divider: "color-mix(in oklch, var(--services-ink-strong, #0a0a0a) 18%, transparent 82%)",
+    ink: "var(--services-ink-strong, var(--brand-ink-strong))",
+    sub: "color-mix(in oklch, var(--services-ink-strong, var(--brand-ink-strong)) 65%, transparent 35%)",
+    divider: "color-mix(in oklch, var(--services-ink-strong, var(--brand-ink-strong)) 18%, transparent 82%)",
     border: "var(--nav-shell-border, oklch(0.922 0 0))",
-    ctaInk: "var(--services-ink-strong, #0a0a0a)",
+    ctaInk: "var(--services-ink-strong, var(--brand-ink-strong))",
   },
   dark: {
     background: "var(--services-card-bg, var(--brand-light))",
@@ -99,11 +96,56 @@ const MODE_PRESETS: Record<ModeKey, ToneStyle> = {
 
 const MODE_SEQUENCE: ModeKey[] = ["primary", "lightAlt", "dark"];
 
+type AutoScrollPluginApi = ReturnType<typeof AutoScroll>;
+
+// (removed) manual RAF auto-scroll in favour of official AutoScroll plugin
+
+function useAutoScrollPlugin(
+  emblaApi: EmblaCarouselType | undefined,
+  plugin: AutoScrollPluginApi | undefined,
+  { paused, disabled }: { paused: boolean; disabled: boolean },
+  watch?: unknown,
+) {
+  useEffect(() => {
+    if (!emblaApi || !plugin) return;
+
+    const syncState = () => {
+      if (disabled) {
+        plugin.stop();
+        return;
+      }
+      if (paused) {
+        plugin.stop();
+        return;
+      }
+      plugin.play();
+    };
+
+    syncState();
+
+    const handleReInit = () => {
+      syncState();
+    };
+    const handleAutoScrollStop = () => {
+      if (!disabled && !paused) plugin.play();
+    };
+
+    emblaApi.on("reInit", handleReInit);
+    emblaApi.on("autoScroll:stop", handleAutoScrollStop);
+
+    return () => {
+      emblaApi.off("reInit", handleReInit);
+      emblaApi.off("autoScroll:stop", handleAutoScrollStop);
+      plugin.stop();
+    };
+  }, [emblaApi, plugin, paused, disabled, watch]);
+}
+
 function CardLogo({ card, className }: { card: TCard; className?: string }) {
-  if (!card.logo?.url) return null;
+  if (!card.logo?.src) return null;
   return (
     <div className={cn("relative h-6 w-24 opacity-90", className)}>
-      <Image src={card.logo.url} alt={card.logo.alt || ""} fill className="object-contain" sizes="96px" />
+      <Image src={card.logo.src} alt={card.logo.alt || ""} fill className="object-contain" sizes="96px" />
     </div>
   );
 }
@@ -136,9 +178,10 @@ function CardFrameMobile({ children }: { children: ReactNode }) {
     <div
       className="group/card relative shrink-0"
       style={{
-        width: "300px",
-        minWidth: "300px",
+        width: "clamp(240px, 82vw, 300px)",
+        minWidth: "clamp(240px, 82vw, 300px)",
         flex: "0 0 auto",
+        marginInline: 14,
       }}
     >
       {children}
@@ -170,7 +213,7 @@ function QuoteCard({ card }: { card: TCard }) {
       <div
         className={cn(
           "card-inner relative flex h-full min-h=[400px] flex-col rounded-[5px] p-8",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          "ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
         style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
@@ -205,15 +248,17 @@ function QuoteCardMobile({ card }: { card: TCard }) {
     <CardFrameMobile>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[360px] flex-col rounded-[8px] p-6",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          // Fixed height on mobile to keep all marquee rows identical
+          "card-inner relative flex h-full flex-col rounded-[5px] p-5 overflow-hidden",
+          // lightweight shadow on mobile (compositor-friendly)
+          "shadow-[0_4px_12px_rgba(0,0,0,0.12)]",
         )}
-        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
+        style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT, background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
         <CardLogo card={card} className="mb-6 self-start" />
         <div className="flex flex-1 flex-col gap-4">
           {card.quote ? (
-            <blockquote className="text-balance text-[clamp(18px,5vw,22px)] leading-snug" style={{ color: colors.ink }}>
+            <blockquote className="text-balance text-[clamp(16px,4.6vw,20px)] leading-snug" style={{ color: colors.ink }}>
               “{card.quote}”
             </blockquote>
           ) : null}
@@ -230,7 +275,7 @@ function QuoteCardMobile({ card }: { card: TCard }) {
 }
 
 function ImageQuoteCard({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
   const colors = card.colors ?? MODE_PRESETS[tone];
 
@@ -239,20 +284,20 @@ function ImageQuoteCard({ card }: { card: TCard }) {
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[400px] overflow-hidden rounded-[5px]",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          "ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
         style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
         <div className="relative flex-[0_0_44%] min-w-[210px]">
           <Image
-            src={card.image.url}
+            src={card.image.src!}
             alt={card.image.alt || ""}
             draggable={false}
             fill
             sizes="(max-width: 768px) 70vw, 360px"
-            placeholder={card.image.lqip ? "blur" : undefined}
-            blurDataURL={card.image.lqip || undefined}
+            placeholder={card.image.blurDataURL ? "blur" : undefined}
+            blurDataURL={card.image.blurDataURL || undefined}
             className="h-full w-full object-cover"
           />
         </div>
@@ -281,27 +326,28 @@ function ImageQuoteCard({ card }: { card: TCard }) {
 }
 
 function ImageQuoteCardMobile({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   const tone = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[0]) as ModeKey;
   const colors = card.colors ?? MODE_PRESETS[tone];
   return (
     <CardFrameMobile>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[360px] overflow-hidden rounded-[8px]",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          // Fixed height on mobile
+          "card-inner relative flex h-full overflow-hidden rounded-[5px]",
+          "shadow-[0_4px_12px_rgba(0,0,0,0.12)]",
         )}
-        style={{ background: colors.background, color: colors.ink, borderColor: colors.border }}
+        style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT, background: colors.background, color: colors.ink, borderColor: colors.border }}
       >
-        <div className="relative flex-[0_0_48%] min-w-[180px]">
+        <div className="relative flex-[0_0_42%] min-w-[150px]">
           <Image
-            src={card.image.url}
+            src={card.image.src!}
             alt={card.image.alt || ""}
             draggable={false}
             fill
             sizes="70vw"
-            placeholder={card.image.lqip ? "blur" : undefined}
-            blurDataURL={card.image.lqip || undefined}
+            placeholder={card.image.blurDataURL ? "blur" : undefined}
+            blurDataURL={card.image.blurDataURL || undefined}
             className="h-full w-full object-cover"
           />
         </div>
@@ -309,7 +355,7 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
           <CardLogo card={card} className="mb-6 self-start" />
           <div className="flex flex-col gap-4">
             {card.quote ? (
-              <blockquote className="text-balance text-[clamp(18px,5vw,22px)] leading-snug">
+              <blockquote className="text-balance text-[clamp(16px,4.6vw,20px)] leading-snug">
                 “{card.quote}”
               </blockquote>
             ) : null}
@@ -327,24 +373,24 @@ function ImageQuoteCardMobile({ card }: { card: TCard }) {
 }
 
 function ImageOnlyCard({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   return (
     <CardFrame card={card}>
       <div
         className={cn(
           "card-inner relative flex h-full min-h-[400px] overflow-hidden rounded-[5px]",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          "ring-1 ring-black/10 dark:ring-white/10",
           "transition-transform duration-200 ease-out will-change-transform hover:scale-[1.03]",
         )}
       >
         <Image
-          src={card.image.url}
+          src={card.image.src!}
           alt={card.image.alt || ""}
           draggable={false}
           fill
           sizes="(max-width: 768px) 80vw, 480px"
-          placeholder={card.image.lqip ? "blur" : undefined}
-          blurDataURL={card.image.lqip || undefined}
+          placeholder={card.image.blurDataURL ? "blur" : undefined}
+          blurDataURL={card.image.blurDataURL || undefined}
           className="h-full w-full object-cover"
         />
         <CardLogo card={card} className="absolute left-6 top-6 z-20" />
@@ -377,25 +423,44 @@ function ImageOnlyCard({ card }: { card: TCard }) {
 }
 
 function ImageOnlyCardMobile({ card }: { card: TCard }) {
-  if (!card.image?.url) return null;
+  if (!card.image?.src) return null;
   return (
     <CardFrameMobile>
       <div
         className={cn(
-          "card-inner relative flex h-full min-h-[360px] overflow-hidden rounded-[8px]",
-          "shadow-[var(--shadow-elevated-md)] ring-1 ring-black/10 dark:ring-white/10",
+          // Fixed height on mobile
+          "card-inner relative flex h-full overflow-hidden rounded-[5px]",
+          "shadow-[0_4px_12px_rgba(0,0,0,0.12)]",
         )}
+        style={{ height: MOBILE_CARD_HEIGHT, minHeight: MOBILE_CARD_HEIGHT }}
       >
         <Image
-          src={card.image.url}
+          src={card.image.src!}
           alt={card.image.alt || ""}
           draggable={false}
           fill
           sizes="80vw"
-          placeholder={card.image.lqip ? "blur" : undefined}
-          blurDataURL={card.image.lqip || undefined}
+          placeholder={card.image.blurDataURL ? "blur" : undefined}
+          blurDataURL={card.image.blurDataURL || undefined}
           className="h-full w-full object-cover"
         />
+        {/* Bottom gradient for legibility */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24"
+          style={{ backgroundImage: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.42) 60%, transparent 100%)" }}
+        />
+        {/* Mobile CTA overlay (if provided) */}
+        {card.cta?.label && card.cta?.href ? (
+          <div
+            className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between border-t px-4 py-3 text-sm"
+            style={{ borderColor: "rgba(255,255,255,0.22)", background: "rgba(0,0,0,0.66)", color: "var(--mb-accent)" }}
+          >
+            <Link href={card.cta.href} className="pointer-events-auto font-medium underline-offset-4 hover:underline">
+              {card.cta.label}
+            </Link>
+            <span aria-hidden style={{ opacity: 0.95, color: "var(--mb-accent)" }}>→</span>
+          </div>
+        ) : null}
       </div>
     </CardFrameMobile>
   );
@@ -408,147 +473,116 @@ function Card({ card }: { card: TCard }) {
   return <QuoteCard card={card} />;
 }
 
-// Desktop marquee row with auto animation, drag and wheel support
+// Desktop marquee row powered by Embla
 function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: number; direction?: 1 | -1 }) {
   const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
       const preset = MODE_PRESETS[toneKey];
-      return { ...card, tone: toneKey, background: preset.background, colors: preset };
+      return { ...card, tone: toneKey, colors: preset };
     });
   }, [items]);
 
-  const clones = [0, 1, 2]; // 3 repeats ensures seamless wrap on large screens
-  const viewportRef = useRef<HTMLDivElement | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const [setWidth, setSetWidth] = useState<number>(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isInteracting, setIsInteracting] = useState(false);
-  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pointerIdRef = useRef<number | null>(null);
-  const startXRef = useRef(0);
-  const startOffsetRef = useRef(0);
-
-  const setRef = useCallback((node: HTMLDivElement | null) => {
-    trackRef.current = node;
-    if (!node) return;
-    const rect = node.getBoundingClientRect();
-    setSetWidth(rect.width);
-  }, []);
-
-  // Use exact measured width of one set (including margins) for wrap distance
-  const totalWidth = setWidth;
-
-  const wrapTx = useCallback((tx: number) => {
-    if (!totalWidth) return tx;
-    let v = tx;
-    const w = totalWidth;
-    while (v <= -w) v += w;
-    while (v > 0) v -= w;
-    return v;
-  }, [totalWidth]);
-
-  const directionFactor = direction === -1 ? -1 : 1;
-
-  useLayoutEffect(() => {
-    const refresh = () => {
-      const node = trackRef.current;
-      if (!node) return;
-      const rect = node.getBoundingClientRect();
-      setSetWidth(rect.width);
-    };
-    refresh();
-    window.addEventListener("resize", refresh);
-    return () => window.removeEventListener("resize", refresh);
-  }, []);
-
-  const clearInteractionTimeout = useCallback(() => {
-    if (interactionTimeoutRef.current) {
-      clearTimeout(interactionTimeoutRef.current);
-      interactionTimeoutRef.current = null;
+  const [repeatCount, setRepeatCount] = useState(3);
+  const displayItems = useMemo(() => {
+    if (!normalizedItems.length) return [] as { card: TCard; key: string }[];
+    const repeats = Math.max(1, repeatCount);
+    const sequence: { card: TCard; key: string }[] = [];
+    for (let setIndex = 0; setIndex < repeats; setIndex += 1) {
+      normalizedItems.forEach((card, cardIndex) => {
+        sequence.push({ card, key: `${setIndex}-${card.variant}-${cardIndex}` });
+      });
     }
-  }, []);
+    return sequence;
+  }, [normalizedItems, repeatCount]);
 
-  const onWheel = useCallback((e: ReactWheelEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return; // native scroll
-    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-    e.preventDefault();
-    setIsInteracting(true);
-    setDragOffset((v) => wrapTx(v - e.deltaX));
-    clearInteractionTimeout();
-    interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 200);
-  }, [prefersReducedMotion, wrapTx, clearInteractionTimeout]);
+  const innerViewportRef = useRef<HTMLDivElement | null>(null);
+  const autoScrollPlugin = useMemo(() => {
+    const pxPerFrame = Math.max(0.35, (speed * 2) / 60);
+    return AutoScroll({
+      speed: pxPerFrame,
+      direction: direction === -1 ? "backward" : "forward",
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      playOnInit: true,
+      startDelay: 0,
+    });
+  }, [direction, speed]);
 
-  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    pointerIdRef.current = e.pointerId;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    startXRef.current = e.clientX;
-    startOffsetRef.current = dragOffset;
-    setIsInteracting(true);
-  }, [prefersReducedMotion, dragOffset]);
-
-  const onPointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    if (pointerIdRef.current !== e.pointerId) return;
-    e.preventDefault();
-    const dx = e.clientX - startXRef.current;
-    // Intuitive drag: translate equals dx
-    setDragOffset(wrapTx(startOffsetRef.current + dx));
-  }, [prefersReducedMotion, wrapTx]);
-
-  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    if (pointerIdRef.current !== e.pointerId) return;
-    pointerIdRef.current = null;
-    e.currentTarget.releasePointerCapture(e.pointerId);
-    clearInteractionTimeout();
-    interactionTimeoutRef.current = setTimeout(() => setIsInteracting(false), 150);
-  }, [prefersReducedMotion, clearInteractionTimeout]);
-
-  const wrapperStyle = useMemo(
-    () => ({ transform: `translate3d(${dragOffset}px,0,0)`, willChange: "transform" }),
-    [dragOffset],
+  const [viewportRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: displayItems.length > 1,
+      align: "start",
+      dragFree: true,
+      skipSnaps: true,
+    },
+    [autoScrollPlugin],
   );
 
-  // Drive marquee with requestAnimationFrame for robust infinite loop (no CSS keyframe drift)
-  useLayoutEffect(() => {
-    if (prefersReducedMotion || !totalWidth) return;
-    let rafId: number | null = null;
-    let last = performance.now();
-    const pxPerSec = speed * 2; // match legacy CSS-driven speed mapping
-    const step = (now: number) => {
-      const dt = Math.max(0, (now - last) / 1000);
-      last = now;
-      if (!isInteracting) {
-        setDragOffset((v) => wrapTx(v + directionFactor * pxPerSec * dt));
-      }
-      rafId = requestAnimationFrame(step);
-    };
-    rafId = requestAnimationFrame(step);
+  const setViewportNode = useCallback((node: HTMLDivElement | null) => {
+    innerViewportRef.current = node;
+    viewportRef(node);
+  }, [viewportRef]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit();
+  }, [emblaApi, displayItems.length]);
+
+  const [hovering, setHovering] = useState(false);
+  const [pointerActive, setPointerActive] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const handlePointerDown = () => setPointerActive(true);
+    const handlePointerRelease = () => setPointerActive(false);
+    emblaApi.on("pointerDown", handlePointerDown);
+    emblaApi.on("pointerUp", handlePointerRelease);
+    emblaApi.on("settle", handlePointerRelease);
+    emblaApi.on("scroll", handlePointerRelease);
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
+      emblaApi.off("pointerDown", handlePointerDown);
+      emblaApi.off("pointerUp", handlePointerRelease);
+      emblaApi.off("settle", handlePointerRelease);
+      emblaApi.off("scroll", handlePointerRelease);
     };
-  }, [prefersReducedMotion, totalWidth, speed, directionFactor, isInteracting, wrapTx]);
+  }, [emblaApi]);
+
+  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1;
+  useAutoScrollPlugin(emblaApi, autoScrollPlugin, {
+    paused: hovering || pointerActive,
+    disabled: autoScrollDisabled,
+  }, displayItems.length);
+
+  useEffect(() => {
+    // Auto-measure and increase repeats until track width comfortably exceeds viewport
+    const node = innerViewportRef.current;
+    if (!node) return;
+    const track = node.firstElementChild as HTMLElement | null;
+    if (!track) return;
+    const vp = node.getBoundingClientRect().width;
+    const trackWidth = track.scrollWidth;
+    if (!vp || !trackWidth || repeatCount > 12) return;
+    const perSet = trackWidth / Math.max(1, repeatCount);
+    if (!perSet) return;
+    const target = vp * 2.5; // ensure plenty of headroom to loop seamlessly
+    const needed = Math.max(2, Math.ceil(target / perSet));
+    if (needed > repeatCount) setRepeatCount(needed);
+  }, [repeatCount, displayItems.length]);
 
   return (
-    <div ref={viewportRef} className={cn("relative overflow-hidden", prefersReducedMotion && "no-scrollbar overflow-x-auto")}
-      onWheel={onWheel}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-      style={{ touchAction: "pan-y" }}
-    >
-      <div className="flex py-2" style={wrapperStyle}>
-        <div className={cn("flex w-max")}> 
-          {clones.map((_, idx) => (
-            <div key={idx} ref={idx === 0 ? setRef : undefined} className="flex" aria-hidden={idx > 0}>
-              {normalizedItems.map((card, i) => (
-                <Card key={`${idx}-${i}`} card={card} />
-              ))}
-            </div>
+    <div className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
+      <div
+        ref={setViewportNode}
+        className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+        style={{ touchAction: "pan-y" }}
+      >
+        <div className="flex py-2">
+          {displayItems.map(({ card, key }) => (
+            <Card key={`desktop-${key}`} card={card} />
           ))}
         </div>
       </div>
@@ -556,33 +590,111 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   );
 }
 
-function RowMobile({ items }: { items: TCard[] }) {
+function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direction?: 1 | -1; speed?: number }) {
+  const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
     return items.map((card, i) => {
       const toneKey: ModeKey = (card.tone && card.tone !== "auto" ? card.tone : MODE_SEQUENCE[i % MODE_SEQUENCE.length]) as ModeKey;
       const preset = MODE_PRESETS[toneKey];
-      return { ...card, tone: toneKey, background: preset.background, colors: preset };
+      return { ...card, tone: toneKey, colors: preset };
     });
   }, [items]);
 
+  const [repeatCount, setRepeatCount] = useState(3);
+  const displayItems = useMemo(() => {
+    if (!normalizedItems.length) return [] as { card: TCard; key: string }[];
+    const repeats = Math.max(1, repeatCount);
+    const sequence: { card: TCard; key: string }[] = [];
+    for (let setIndex = 0; setIndex < repeats; setIndex += 1) {
+      normalizedItems.forEach((card, cardIndex) => {
+        sequence.push({ card, key: `${setIndex}-${card.variant}-${cardIndex}` });
+      });
+    }
+    return sequence;
+  }, [normalizedItems, repeatCount]);
+
+  const innerViewportRef = useRef<HTMLDivElement | null>(null);
+  const autoScrollPlugin = useMemo(() => {
+    const pxPerFrame = Math.max(0.3, (speed * 2) / 60);
+    return AutoScroll({
+      speed: pxPerFrame,
+      direction: direction === -1 ? "backward" : "forward",
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      playOnInit: true,
+      startDelay: 0,
+    });
+  }, [direction, speed]);
+
+  const [viewportRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: displayItems.length > 1,
+      align: "start",
+      dragFree: true,
+      skipSnaps: true,
+    },
+    [autoScrollPlugin],
+  );
+
+  const setViewportNode = useCallback((node: HTMLDivElement | null) => {
+    innerViewportRef.current = node;
+    viewportRef(node);
+  }, [viewportRef]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit();
+  }, [emblaApi, displayItems.length]);
+
+  const [pointerActive, setPointerActive] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const handlePointerDown = () => setPointerActive(true);
+    const handlePointerRelease = () => setPointerActive(false);
+    emblaApi.on("pointerDown", handlePointerDown);
+    emblaApi.on("pointerUp", handlePointerRelease);
+    emblaApi.on("settle", handlePointerRelease);
+    emblaApi.on("scroll", handlePointerRelease);
+    return () => {
+      emblaApi.off("pointerDown", handlePointerDown);
+      emblaApi.off("pointerUp", handlePointerRelease);
+      emblaApi.off("settle", handlePointerRelease);
+      emblaApi.off("scroll", handlePointerRelease);
+    };
+  }, [emblaApi]);
+
+  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1;
+  useAutoScrollPlugin(emblaApi, autoScrollPlugin, {
+    paused: pointerActive,
+    disabled: autoScrollDisabled,
+  }, displayItems.length);
+
+  useEffect(() => {
+    const node = innerViewportRef.current;
+    if (!node) return;
+    const track = node.firstElementChild as HTMLElement | null;
+    if (!track) return;
+    const vp = node.getBoundingClientRect().width;
+    const trackWidth = track.scrollWidth;
+    if (!vp || !trackWidth || repeatCount > 12) return;
+    const perSet = trackWidth / Math.max(1, repeatCount);
+    if (!perSet) return;
+    const target = vp * 2.5;
+    const needed = Math.max(2, Math.ceil(target / perSet));
+    if (needed > repeatCount) setRepeatCount(needed);
+  }, [repeatCount, displayItems.length]);
+
   return (
-    <div className="relative -mx-[var(--container-gutter)]">
-      {/* Fade overlays for scroll indication */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent" />
-      
-      <div 
-        className="no-scrollbar overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory touch-pan-x"
-        style={{
-          WebkitOverflowScrolling: "touch",
-          touchAction: "pan-x pan-y"
-        }}
+    <div className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
+      <div
+        ref={setViewportNode}
+        className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
+        style={{ touchAction: "pan-y" }}
       >
-        <div className="flex gap-4 py-2 px-[var(--container-gutter)]" style={{ width: "max-content" }}>
-          {normalizedItems.map((card, i) => (
-            <div key={i} className="snap-start">
-              <CardMobile card={card} />
-            </div>
+        <div className="flex py-3">
+          {displayItems.map(({ card, key }) => (
+            <CardMobile key={`mobile-${key}`} card={card} />
           ))}
         </div>
       </div>
@@ -590,20 +702,21 @@ function RowMobile({ items }: { items: TCard[] }) {
   );
 }
 
+// (Removed) Alternate mobile row (manual scroll). Keeping codebase lean.
+
 export default function TestimonialsMarqueeClient({ top, bottom, speedTop = 30, speedBottom = 24 }: TestimonialsClientProps) {
+  const mobileTopSpeed = Math.max(8, speedTop * 0.18);
+  const mobileBottomSpeed = Math.max(7, speedBottom * 0.16);
+
   return (
-    <div className="relative flex flex-1 flex-col justify-end">
-      {/* subtle peek of bottom row */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[12vh] bg-gradient-to-t from-background to-transparent hidden md:block" />
-      {/* Desktop/original marquee */}
-      <div className="hidden md:flex flex-col gap-3 pb-3">
+    <div className="relative flex flex-1 flex-col justify-start md:justify-end bg-transparent min-w-0">
+      <div className="hidden md:flex flex-col gap-3 pb-3 bg-transparent min-w-0">
         <Row items={top} speed={speedTop} direction={1} />
         <Row items={bottom} speed={speedBottom} direction={-1} />
       </div>
-      {/* Mobile scrollable rows */}
-      <div className="md:hidden flex flex-col gap-4 pb-2 justify-start" style={{ height: "auto", minHeight: "400px" }}>
-        <RowMobile items={top} />
-        <RowMobile items={bottom} />
+      <div className="md:hidden flex flex-col gap-3 pb-3 justify-start bg-transparent min-w-0" style={{ minHeight: "320px" }}>
+        <RowMobile items={top} direction={1} speed={mobileTopSpeed} />
+        <RowMobile items={bottom} direction={-1} speed={mobileBottomSpeed} />
       </div>
     </div>
   );
