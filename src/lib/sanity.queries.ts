@@ -554,6 +554,46 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
         cta{ label, href, variant },
         cta2{ label, href, variant }
       },
+      _type == "contentBillboard" => {
+        _type,
+        sectionId,
+        eyebrow,
+        backgroundMode,
+        tone,
+        "backgroundImage": {
+          "alt": backgroundImage.alt,
+          "asset": backgroundImage.image.asset->{ url, metadata{ lqip, dimensions } }
+        },
+        contentType,
+        quote,
+        author,
+        role,
+        "logo": { "alt": logo.alt, "asset": logo.image.asset->{ url, metadata{ lqip, dimensions } } },
+        body,
+        ctas[]{ label, href, variant },
+        heading,
+        description
+      },
+      _type == "contentBillboard" => {
+        _type,
+        sectionId,
+        eyebrow,
+        backgroundMode,
+        tone,
+        "backgroundImage": {
+          "alt": backgroundImage.alt,
+          "asset": backgroundImage.image.asset->{ url, metadata{ lqip, dimensions } }
+        },
+        contentType,
+        quote,
+        author,
+        role,
+        "logo": { "alt": logo.alt, "asset": logo.image.asset->{ url, metadata{ lqip, dimensions } } },
+        body,
+        ctas[]{ label, href, variant },
+        heading,
+        description
+      },
       _type == "mediaShowcase" => {
         _type,
         sectionId,

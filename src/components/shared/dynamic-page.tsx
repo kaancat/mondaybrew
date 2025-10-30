@@ -4,6 +4,7 @@ import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
 import { TextImageSection } from "@/components/sections/text-image";
 import { TextOnlySection } from "@/components/sections/text-only";
 import { FAQSection, type FAQSectionProps } from "@/components/sections/faq";
+import { ContentBillboard, isContentBillboard } from "@/components/sections/content-billboard";
 import { Section } from "@/components/layout/section";
 
 /**
@@ -44,6 +45,10 @@ function isTextOnlySection(section: PageSection): boolean {
 
 function isFAQSection(section: PageSection): boolean {
     return section?._type === "faq";
+}
+
+function isContentBillboardSection(section: PageSection): boolean {
+    return section?._type === "contentBillboard";
 }
 
 export async function DynamicPage({
@@ -151,6 +156,14 @@ export async function DynamicPage({
                     );
                 }
 
+                if (isContentBillboardSection(section)) {
+                    return (
+                        <div className="vr-section" key={key} id={key}>
+                            <ContentBillboard {...section} />
+                        </div>
+                    );
+                }
+
                 // Unknown section type - skip silently
                 return null;
             })}
@@ -159,4 +172,3 @@ export async function DynamicPage({
 }
 
 export const revalidate = 60;
-

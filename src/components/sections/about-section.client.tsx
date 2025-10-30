@@ -175,10 +175,23 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
           >
             {/* Mobile: horizontal glass chips below image */}
             <div className="about-stats-panel block md:hidden w-full pt-2">
-              <div className="relative -mx-5 px-5 overflow-hidden pb-3">
+              <div className={cn("relative -mx-5 px-5 overflow-hidden pb-10")}> 
+                {/* Bottom overlay to blend cards into page background (no hard line) */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-5 bottom-0 h-16 z-[2]"
+                  style={{
+                    background: "linear-gradient(to_bottom, transparent 0%, var(--background) 85%)",
+                  }}
+                />
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-5 bottom-0 h-16 rounded-b-[12px]"
+                  style={{ background: "var(--about-stats-mobile-fade)" }}
+                />
                 <div
                   className={cn(
-                    "flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2",
+                    "relative z-[1] flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2",
                     "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
                   )}
                   aria-label="About stats"
@@ -207,25 +220,25 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
                     <div
                       key={`${stat.label || stat.value || i}`}
                       className={cn(
-                        "min-w-[220px] snap-start rounded-[5px]",
-                        "bg-[color-mix(in_oklch,var(--nav-shell-bg)_60%,transparent)] border border-[color:var(--nav-shell-border)] backdrop-blur-[10px]",
-                        // Softer mobile shadow so it doesn't spill into next section
-                        "px-4 py-3 drop-shadow-[0_6px_18px_rgba(8,6,20,0.16)]",
+                        "relative min-w-[220px] snap-start rounded-[10px]",
+                        "bg-[color:var(--about-stats-mobile-surface)] backdrop-blur-[14px]",
+                        // remove per-card drop shadow; container overlay handles blending
+                        "px-4 py-3",
                       )}
-                      style={{ boxShadow: "var(--nav-shell-shadow)" }}
+                      
                     >
                       {stat.value ? (
-                        <div data-stat-value className="text-[length:var(--font-h3)] leading-none text-primary">{stat.value}</div>
+                        <div data-stat-value className="text-[length:var(--font-h3)] font-bold leading-none text-primary">{stat.value}</div>
                       ) : null}
                       {stat.label ? <div data-stat-label className="text-muted-foreground mt-1">{stat.label}</div> : null}
                     </div>
                   ))}
                 </div>
                 {/* Edge fade masks */}
-                <span aria-hidden className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-[linear-gradient(to_right,var(--background),transparent)]" />
-                <span aria-hidden className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-[linear-gradient(to_left,var(--background),transparent)]" />
+                <span aria-hidden className="pointer-events-none absolute left-0 top-0 z-[3] h-full w-6 bg-[linear-gradient(to_right,var(--background),transparent)]" />
+                <span aria-hidden className="pointer-events-none absolute right-0 top-0 z-[3] h-full w-6 bg-[linear-gradient(to_left,var(--background),transparent)]" />
                 {/* Pagination dots */}
-                <div className="mt-1.5 mb-1 flex justify-center gap-1.5">
+                <div className="relative z-[3] mb-1 mt-1.5 flex justify-center gap-1.5">
                   {stats.map((_, idx) => (
                     <span
                       key={`dot-${idx}`}

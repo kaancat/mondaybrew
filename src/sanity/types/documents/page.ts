@@ -31,6 +31,7 @@ export default defineType({
         { type: "textImage" },
         { type: "textOnly" },
         { type: "faq" },
+        { type: "contentBillboard" },
       ],
     }),
     defineField({ name: "seo", type: "seo" }),

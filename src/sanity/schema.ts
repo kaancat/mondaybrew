@@ -15,6 +15,7 @@ import testimonialsMarquee from "./types/sections/testimonialsMarquee";
 import textImage from "./types/sections/textImage";
 import textOnly from "./types/sections/textOnly";
 import faq from "./types/sections/faq";
+import contentBillboard from "./types/sections/contentBillboard";
 
 import seo from "./types/objects/seo";
 import cta from "./types/objects/cta";
@@ -52,6 +53,7 @@ const schemas = [
   textImage,
   textOnly,
   faq,
+  contentBillboard,
   // objects
   seo,
   cta,

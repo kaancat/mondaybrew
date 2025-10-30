@@ -100,6 +100,17 @@
   --shadow-glass-lg: 0 36px 110px rgba(6,5,16,0.32);
   --mobile-nav-width: min(80vw, 360px);
 
+  /* About section mobile stats visuals */
+  --about-stats-mobile-surface: color-mix(in oklch, var(--surface-base) 82%, white 18%);
+  --about-stats-mobile-shadow: 0 20px 52px rgba(18, 16, 36, 0.18);
+  --about-stats-mobile-fade: linear-gradient(
+    to bottom,
+    color-mix(in oklch, var(--surface-base) 78%, transparent) 0%,
+    color-mix(in oklch, var(--surface-base) 46%, transparent) 36%,
+    transparent 85%
+  );
+  --about-stats-mobile-border: color-mix(in oklch, var(--nav-shell-border) 72%, transparent);
+
   --site-shell-offset-x: 0px;
   --site-shell-scale: 1;
   --full-bleed-inline-start: calc(50% - 50vw);
@@ -995,6 +1006,11 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     margin-right: var(--full-bleed-inline-end) !important;
     transition: margin var(--nav-anim-duration) var(--nav-anim-ease), width var(--nav-anim-duration) var(--nav-anim-ease);
   }
+  /* Right-only bleed helper: break container on the inline end (RTL-safe via variables) */
+  .bleed-right {
+    margin-right: calc(var(--full-bleed-inline-end) - var(--container-gutter)) !important;
+    transition: margin var(--nav-anim-duration) var(--nav-anim-ease);
+  }
   /* Allow full-bleed children to have rounded corners individually */
   .full-bleed > * {
     border-radius: 0;
@@ -1201,3 +1217,12 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
 html.light-alt body[data-mobile-nav-open="true"] {
   --nav-cta-border: var(--brand-ink-strong);
 }
+/* Ticker marquee animation for mobile testimonials */
+@keyframes ticker-left {
+  from { transform: translate3d(0,0,0); }
+  to { transform: translate3d(calc(-1 * var(--ticker-span-px, 50%)), 0, 0); }
+}
+
+.ticker-track { animation-play-state: running; }
+.ticker-wrap { position: relative; }
+.ticker-set > * { flex: 0 0 auto; }
