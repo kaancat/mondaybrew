@@ -55,5 +55,3 @@ export function FAQSection({
   );
 }
 
-export type { FAQSectionProps };
-
