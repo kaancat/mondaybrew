@@ -49,8 +49,20 @@ export function TextImageClient({
     // Animation setup
     const sectionRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(sectionRef, { once: true, margin: "0px 0px -200px 0px" });
+    // Detect when the section is near viewport to prefetch image and raise fetch priority
+    const isNear = useInView(sectionRef, { amount: 0, margin: "600px 0px 600px 0px" });
     const shouldReduceMotion = useReducedMotion();
     const [isMobile, setIsMobile] = useState(true);
+    const [imgLoaded, setImgLoaded] = useState(false);
+
+    // Idle prefetch when near viewport to avoid abrupt reveal on mobile
+    useEffect(() => {
+        if (!isNear || imgLoaded || !image?.src) return;
+        if (typeof window === "undefined") return;
+        const img = new window.Image();
+        try { (img as HTMLImageElement).decoding = "async"; } catch {}
+        img.src = image.src;
+    }, [isNear, imgLoaded, image?.src]);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -120,16 +132,23 @@ export function TextImageClient({
                             "min-h-[500px] md:min-h-[520px]"
                         )}
                         >
+                            {/* Progressive reveal: subtle fade once decoded */}
                             <Image
                                 src={image.src}
                                 alt={image.alt || ""}
                                 fill
-                                className="object-cover"
+                                className={cn("object-cover transition-opacity duration-500", imgLoaded ? "opacity-100" : "opacity-0")}
                                 sizes="(max-width: 768px) 100vw, 50vw"
                                 placeholder={image.blurDataURL ? "blur" : "empty"}
                                 blurDataURL={image.blurDataURL || undefined}
+                                fetchPriority={isNear ? "high" : "auto"}
                                 priority={false}
+                                onLoadingComplete={() => setImgLoaded(true)}
                             />
+                            {/* Lightweight skeleton to mask abrupt swap when no blur is present */}
+                            {!imgLoaded ? (
+                              <span aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.06)_0%,transparent_50%,rgba(0,0,0,0.06)_100%)] animate-pulse" />
+                            ) : null}
                         </div>
                 </motion.div>
             )}

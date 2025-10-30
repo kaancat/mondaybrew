@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { TextImageResolvedImage } from "./text-image.client";
+import { useInView } from "framer-motion";
 
 type Tab = { id: string; label: string; title?: string; body?: string };
 
@@ -40,6 +41,7 @@ export function TextImageTabs({
   const [imgHeight, setImgHeight] = useState(BASE_HEIGHT);
 
   const [isMobile, setIsMobile] = useState(true);
+  const [imgLoaded, setImgLoaded] = useState(false);
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
@@ -97,8 +99,20 @@ export function TextImageTabs({
     }
   };
 
+  // Near-viewport hint to boost fetch priority & allow idle prefetch
+  const tabsRootRef = useRef<HTMLDivElement | null>(null);
+  const isNear = useInView(tabsRootRef, { amount: 0, margin: "600px 0px 600px 0px" });
+
+  useEffect(() => {
+    if (!isNear || imgLoaded || !image?.src) return;
+    if (typeof window === "undefined") return;
+    const img = new window.Image();
+    try { (img as HTMLImageElement).decoding = "async"; } catch {}
+    img.src = image.src;
+  }, [isNear, imgLoaded, image?.src]);
+
   return (
-    <div className={cn("grid gap-2 md:gap-4", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
+    <div ref={tabsRootRef} className={cn("grid gap-2 md:gap-4", "grid-cols-1 md:grid-cols-2 items-stretch")}> 
       {/* Text panel */}
       <div className={cn(leftFirst ? "order-1" : "order-2", "relative")}> 
         <div
@@ -191,11 +205,16 @@ export function TextImageTabs({
                 src={image.src}
                 alt={image.alt || ""}
                 fill
-                className="object-cover scale-[1.06] md:scale-[1.08] will-change-transform"
+                className={cn("object-cover scale-[1.06] md:scale-[1.08] will-change-transform transition-opacity duration-500", imgLoaded ? "opacity-100" : "opacity-0")}
                 sizes="(min-width: 768px) 50vw, 100vw"
                 placeholder={image.blurDataURL ? "blur" : "empty"}
                 blurDataURL={image.blurDataURL || undefined}
+                fetchPriority={isNear ? "high" : "auto"}
+                onLoadingComplete={() => setImgLoaded(true)}
               />
+              {!imgLoaded ? (
+                <span aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.06)_0%,transparent_50%,rgba(0,0,0,0.06)_100%)] animate-pulse" />
+              ) : null}
             </div>
           ) : null}
         </div>
