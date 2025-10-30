@@ -131,7 +131,7 @@ function useIdlePrefetch(urls: string[], enabled = true) {
     const prefetch = () => {
       urls.slice(0, 4).forEach((u) => {
         if (!u) return;
-        const img = new Image();
+        const img = new window.Image();
         // These properties are widely supported in modern browsers
         // and help hint the decoder, but are optional.
         try { img.decoding = "async"; } catch {}
