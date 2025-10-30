@@ -149,7 +149,7 @@ export function AboutSectionClient({ eyebrow, headline, subheading, image, stats
               />
             </motion.div>
           ) : null}
-          {!prefersReducedMotion ? (
+          {!prefersReducedMotion && !isMobile ? (
             <motion.span
               aria-hidden
               className="pointer-events-none absolute inset-0 opacity-0 md:opacity-100"

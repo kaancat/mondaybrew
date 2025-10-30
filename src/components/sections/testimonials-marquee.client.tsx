@@ -124,6 +124,30 @@ function useInView<T extends Element>(
   return { ref, inView } as const;
 }
 
+// Prefetch a small set of image URLs during idle time to avoid decode jank
+function useIdlePrefetch(urls: string[], enabled = true) {
+  useEffect(() => {
+    if (!enabled || typeof window === "undefined") return;
+    const prefetch = () => {
+      urls.slice(0, 4).forEach((u) => {
+        if (!u) return;
+        const img = new Image();
+        img.decoding = "async" as any;
+        img.loading = "eager" as any;
+        img.src = u;
+      });
+    };
+    // Prefer idle callback; fall back to timeout
+    const id = (window as any).requestIdleCallback
+      ? (window as any).requestIdleCallback(prefetch, { timeout: 1200 })
+      : window.setTimeout(prefetch, 400);
+    return () => {
+      if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(id);
+      else clearTimeout(id);
+    };
+  }, [enabled, urls.join("|")]);
+}
+
 function useAutoScrollPlugin(
   emblaApi: EmblaCarouselType | undefined,
   plugin: AutoScrollPluginApi | undefined,
@@ -621,6 +645,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
   );
 }
 
+// Ultra-light mobile marquee: CSS-only animation, no carousel runtime
 function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direction?: 1 | -1; speed?: number }) {
   const prefersReducedMotion = useReducedMotion();
   const normalizedItems = useMemo(() => {
@@ -630,93 +655,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
       return { ...card, tone: toneKey, colors: preset };
     });
   }, [items]);
-
-  const [repeatCount, setRepeatCount] = useState(3);
-  const displayItems = useMemo(() => {
-    if (!normalizedItems.length) return [] as { card: TCard; key: string }[];
-    const repeats = Math.max(1, repeatCount);
-    const sequence: { card: TCard; key: string }[] = [];
-    for (let setIndex = 0; setIndex < repeats; setIndex += 1) {
-      normalizedItems.forEach((card, cardIndex) => {
-        sequence.push({ card, key: `${setIndex}-${card.variant}-${cardIndex}` });
-      });
-    }
-    return sequence;
-  }, [normalizedItems, repeatCount]);
-
-  const innerViewportRef = useRef<HTMLDivElement | null>(null);
   const { ref: containerRef, inView } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.1 });
-  const autoScrollPlugin = useMemo(() => {
-    const pxPerFrame = Math.max(0.3, (speed * 2) / 60);
-    return AutoScroll({
-      speed: pxPerFrame,
-      direction: direction === -1 ? "backward" : "forward",
-      stopOnInteraction: false,
-      stopOnMouseEnter: true,
-      playOnInit: true,
-      startDelay: 0,
-    });
-  }, [direction, speed]);
-
-  const [viewportRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: displayItems.length > 1,
-      align: "start",
-      dragFree: true,
-      skipSnaps: true,
-    },
-    [autoScrollPlugin],
-  );
-
-  const setViewportNode = useCallback((node: HTMLDivElement | null) => {
-    innerViewportRef.current = node;
-    viewportRef(node);
-  }, [viewportRef]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    emblaApi.reInit();
-  }, [emblaApi, displayItems.length]);
-
-  const [pointerActive, setPointerActive] = useState(false);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    const handlePointerDown = () => setPointerActive(true);
-    const handlePointerRelease = () => setPointerActive(false);
-    emblaApi.on("pointerDown", handlePointerDown);
-    emblaApi.on("pointerUp", handlePointerRelease);
-    emblaApi.on("settle", handlePointerRelease);
-    emblaApi.on("scroll", handlePointerRelease);
-    return () => {
-      emblaApi.off("pointerDown", handlePointerDown);
-      emblaApi.off("pointerUp", handlePointerRelease);
-      emblaApi.off("settle", handlePointerRelease);
-      emblaApi.off("scroll", handlePointerRelease);
-    };
-  }, [emblaApi]);
-
-  const autoScrollDisabled = prefersReducedMotion || displayItems.length <= 1 || !inView;
-  useAutoScrollPlugin(emblaApi, autoScrollPlugin, {
-    paused: pointerActive,
-    disabled: autoScrollDisabled,
-  }, displayItems.length);
-
-  useEffect(() => {
-    const node = innerViewportRef.current;
-    if (!node) return;
-    const track = node.firstElementChild as HTMLElement | null;
-    if (!track) return;
-    const vp = node.getBoundingClientRect().width;
-    const trackWidth = track.scrollWidth;
-    if (!vp || !trackWidth || repeatCount > 12) return;
-    const perSet = trackWidth / Math.max(1, repeatCount);
-    if (!perSet) return;
-    const target = vp * 1.8; // reduce DOM size on mobile
-    const needed = Math.max(2, Math.ceil(target / perSet));
-    if (needed > repeatCount) setRepeatCount(needed);
-  }, [repeatCount, displayItems.length]);
-
   // Eager-load the first few unique images to avoid initial blank cards
   const eagerImageIndexes = useMemo(() => {
     const eager: number[] = [];
@@ -726,21 +665,56 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     return new Set(eager);
   }, [normalizedItems]);
 
+  // Background prefetch when section is near view
+  useIdlePrefetch(
+    normalizedItems.map((c) => c.image?.src || "").filter(Boolean) as string[],
+    inView && !prefersReducedMotion,
+  );
+
+  // Choose duration based on provided speed (lower = faster)
+  const durationMs = Math.max(12000, Math.min(48000, Math.round(26000 / Math.max(1, speed)))) ;
+  const trackClass = direction === -1 ? "marquee-mobile-track-reverse" : "marquee-mobile-track-forward";
+
+  // Pause-on-touch handlers to avoid "fighting" with finger while inspecting a card
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const node = trackRef.current;
+    if (!node) return;
+    const down = () => { node.style.animationPlayState = "paused"; };
+    const up = () => { node.style.animationPlayState = "running"; };
+    node.addEventListener("pointerdown", down, { passive: true });
+    window.addEventListener("pointerup", up, { passive: true });
+    return () => {
+      node.removeEventListener("pointerdown", down);
+      window.removeEventListener("pointerup", up);
+    };
+  }, []);
+
   const mobileContainerStyle: React.CSSProperties = {
     contentVisibility: inView ? "visible" : "auto",
     containIntrinsicSize: "320px",
   };
   return (
     <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0" style={mobileContainerStyle}>
-      <div
-        ref={setViewportNode}
-        className={cn("overflow-hidden px-[var(--container-gutter)] w-full", prefersReducedMotion && "no-scrollbar")}
-        style={{ touchAction: "pan-y" }}
-      >
-        <div className="flex py-3" style={{ willChange: inView ? "transform" : undefined }}>
-          {displayItems.map(({ card, key }, idx) => (
-            <CardMobile key={`mobile-${key}`} card={card} priority={eagerImageIndexes.has(idx % Math.max(1, normalizedItems.length))} />
-          ))}
+      <div className={cn("w-full", prefersReducedMotion && "no-scrollbar")} style={{ touchAction: "pan-y" }}>
+        <div
+          ref={trackRef}
+          className={cn("marquee-mobile-track flex py-3", trackClass)}
+          style={{
+            animationDuration: prefersReducedMotion || !inView ? "0s" : `${Math.round(durationMs / 1000)}s`,
+          }}
+        >
+          {/* Two identical sets enable seamless -50% translate looping */}
+          <div className="marquee-mobile-set flex">
+            {normalizedItems.map((card, idx) => (
+              <CardMobile key={`mobile-a-${idx}`} card={card} priority={eagerImageIndexes.has(idx)} />
+            ))}
+          </div>
+          <div className="marquee-mobile-set flex" aria-hidden>
+            {normalizedItems.map((card, idx) => (
+              <CardMobile key={`mobile-b-${idx}`} card={card} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
