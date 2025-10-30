@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
 import { buildSanityImage } from "@/lib/sanity-image";
@@ -47,10 +47,12 @@ function Logo({ logo }: { logo: ClientLogo }) {
 
 function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direction?: 1 | -1; speed?: number }) {
   const cleaned = useMemo(() => items.filter((l) => l?.title || l?.image?.image?.asset?.url), [items]);
-  const [repeatCount, setRepeatCount] = useState(3);
   const displayItems = useMemo(() => {
+    if (!cleaned.length) return [] as { logo: ClientLogo; key: string }[];
+    const MIN_LOOP_SLIDES = 20;
+    const loops = Math.max(2, Math.ceil(MIN_LOOP_SLIDES / cleaned.length));
     const seq: { logo: ClientLogo; key: string }[] = [];
-    for (let setIndex = 0; setIndex < repeatCount; setIndex += 1) {
+    for (let setIndex = 0; setIndex < loops; setIndex += 1) {
       const source = direction === -1 ? [...cleaned].reverse() : cleaned;
       source.forEach((logo, idx) => {
         const id = logo.title || logo.image?.image?.asset?.url || `${idx}`;
@@ -58,7 +60,7 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
       });
     }
     return seq;
-  }, [cleaned, repeatCount, direction]);
+  }, [cleaned, direction]);
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const autoScrollPlugin = useMemo(() => {
@@ -78,7 +80,7 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: displayItems.length > 1,
     align: "start",
-    dragFree: true,
+    dragFree: false,
     skipSnaps: true,
   }, [autoScrollPlugin]);
 
@@ -132,21 +134,6 @@ function Row({ items, direction = 1, speed = 42 }: { items: ClientLogo[]; direct
       emblaApi.off("settle", onUp);
     };
   }, [emblaApi]);
-
-  useEffect(() => {
-    const node = viewportRef.current;
-    if (!node) return;
-    const track = node.firstElementChild as HTMLElement | null;
-    if (!track) return;
-    const vp = node.getBoundingClientRect().width;
-    const trackWidth = track.scrollWidth;
-    if (!vp || !trackWidth || repeatCount > 12) return;
-    const perSet = trackWidth / Math.max(1, repeatCount);
-    if (!perSet) return;
-    const target = vp * 2.5;
-    const needed = Math.max(2, Math.ceil(target / perSet));
-    if (needed > repeatCount) setRepeatCount(needed);
-  }, [repeatCount, displayItems.length]);
 
   return (
     <div className="clients-marquee-row relative border-t border-[color:var(--color-border)] first:border-t-0">

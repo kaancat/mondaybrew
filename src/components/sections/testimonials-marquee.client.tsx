@@ -544,18 +544,18 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     });
   }, [items]);
 
-  const [repeatCount, setRepeatCount] = useState(3);
   const displayItems = useMemo(() => {
     if (!normalizedItems.length) return [] as { card: TCard; key: string }[];
-    const repeats = Math.max(1, repeatCount);
+    const MIN_LOOP_SLIDES = 12;
+    const loops = Math.max(2, Math.ceil(MIN_LOOP_SLIDES / normalizedItems.length));
     const sequence: { card: TCard; key: string }[] = [];
-    for (let setIndex = 0; setIndex < repeats; setIndex += 1) {
+    for (let setIndex = 0; setIndex < loops; setIndex += 1) {
       normalizedItems.forEach((card, cardIndex) => {
-        sequence.push({ card, key: `${setIndex}-${card.variant}-${cardIndex}` });
+        sequence.push({ card, key: `${setIndex}-${cardIndex}-${card.variant}` });
       });
     }
     return sequence;
-  }, [normalizedItems, repeatCount]);
+  }, [normalizedItems]);
 
   const innerViewportRef = useRef<HTMLDivElement | null>(null);
   const { ref: containerRef, inView } = useInView<HTMLDivElement>({ rootMargin: "150px 0px", threshold: 0.15 });
@@ -565,7 +565,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
       speed: pxPerFrame,
       direction: direction === -1 ? "backward" : "forward",
       stopOnInteraction: false,
-      stopOnMouseEnter: true,
+      stopOnMouseEnter: false,
       playOnInit: true,
       startDelay: 0,
     });
@@ -575,7 +575,7 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     {
       loop: displayItems.length > 1,
       align: "start",
-      dragFree: true,
+      dragFree: false,
       skipSnaps: true,
     },
     [autoScrollPlugin],
@@ -615,22 +615,6 @@ function Row({ items, speed = 30, direction = 1 }: { items: TCard[]; speed?: num
     paused: hovering || pointerActive,
     disabled: autoScrollDisabled,
   }, displayItems.length);
-
-  useEffect(() => {
-    // Auto-measure and increase repeats until track width comfortably exceeds viewport
-    const node = innerViewportRef.current;
-    if (!node) return;
-    const track = node.firstElementChild as HTMLElement | null;
-    if (!track) return;
-    const vp = node.getBoundingClientRect().width;
-    const trackWidth = track.scrollWidth;
-    if (!vp || !trackWidth || repeatCount > 12) return;
-    const perSet = trackWidth / Math.max(1, repeatCount);
-    if (!perSet) return;
-    const target = vp * 2.5; // ensure plenty of headroom to loop seamlessly
-    const needed = Math.max(2, Math.ceil(target / perSet));
-    if (needed > repeatCount) setRepeatCount(needed);
-  }, [repeatCount, displayItems.length]);
 
   const desktopContainerStyle: React.CSSProperties = {
     contentVisibility: inView ? "visible" : "auto",
@@ -674,28 +658,28 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     inView && !prefersReducedMotion,
   );
 
-  // Prepare repeated sequence like ClientsMarquee for seamless loop
-  const [repeatCount, setRepeatCount] = useState(3);
+  // Prepare repeated sequence for seamless loop (fixed multiplier to prevent runtime churn)
   const displayItems = useMemo(() => {
     if (!normalizedItems.length) return [] as { card: TCard; key: string }[];
-    const repeats = Math.max(1, repeatCount);
+    const MIN_LOOP_SLIDES = 12;
+    const loops = Math.max(2, Math.ceil(MIN_LOOP_SLIDES / normalizedItems.length));
     const sequence: { card: TCard; key: string }[] = [];
-    for (let setIndex = 0; setIndex < repeats; setIndex += 1) {
+    for (let setIndex = 0; setIndex < loops; setIndex += 1) {
       normalizedItems.forEach((card, cardIndex) => {
-        sequence.push({ card, key: `${setIndex}-${card.variant}-${cardIndex}` });
+        sequence.push({ card, key: `${setIndex}-${cardIndex}-${card.variant}` });
       });
     }
     return sequence;
-  }, [normalizedItems, repeatCount]);
+  }, [normalizedItems]);
 
-  // Configure Embla with looping + drag-free for marquee feel (match ClientsMarquee)
+  // Configure Embla with looping + drag-free for marquee feel (without momentum)
   const autoScrollPlugin = useMemo(() => {
     const pxPerFrame = Math.max(0.3, speed / 60);
     return AutoScroll({
       speed: pxPerFrame,
       direction: direction === -1 ? "backward" : "forward",
       stopOnInteraction: false,
-      stopOnMouseEnter: true,
+      stopOnMouseEnter: false,
       playOnInit: true,
       startDelay: 0,
     });
@@ -706,7 +690,7 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
     {
       loop: displayItems.length > 1,
       align: "start",
-      dragFree: true,
+      dragFree: false,
       skipSnaps: true,
     },
     [autoScrollPlugin],
@@ -741,22 +725,6 @@ function RowMobile({ items, direction = 1, speed = 12 }: { items: TCard[]; direc
       emblaApi.off("settle", onRelease);
     };
   }, [emblaApi]);
-
-  // Measure and increase repeats until track width comfortably exceeds viewport
-  useEffect(() => {
-    const node = innerViewportRef.current;
-    if (!node) return;
-    const track = node.firstElementChild as HTMLElement | null;
-    if (!track) return;
-    const vp = node.getBoundingClientRect().width;
-    const trackWidth = track.scrollWidth;
-    if (!vp || !trackWidth || repeatCount > 12) return;
-    const perSet = trackWidth / Math.max(1, repeatCount);
-    if (!perSet) return;
-    const target = vp * 2.5;
-    const needed = Math.max(2, Math.ceil(target / perSet));
-    if (needed > repeatCount) setRepeatCount(needed);
-  }, [repeatCount, displayItems.length]);
 
   return (
     <div ref={containerRef} className="relative -mx-[var(--container-gutter)] overflow-hidden min-w-0">
