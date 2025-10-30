@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 
@@ -14,7 +14,14 @@ import { useTheme } from "next-themes";
  */
 export function FooterTabs() {
     const { resolvedTheme } = useTheme();
-    const isLightAlt = resolvedTheme === "light-alt";
+    const [mounted, setMounted] = useState(false);
+
+    // Prevent hydration mismatch by only applying theme classes after mount
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isLightAlt = mounted && resolvedTheme === "light-alt";
 
     return (
         <div

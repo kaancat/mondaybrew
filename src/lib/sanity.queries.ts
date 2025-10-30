@@ -574,6 +574,26 @@ export const homePageQuery = `*[_type=="page" && isHome == true && locale==$loca
           icon{ alt, asset->{ url, metadata{ lqip, dimensions } } }
         }
       },
+      _type == "faq" => {
+        _type,
+        title,
+        subheading,
+        titleAlignment,
+        categories[]{
+          "id": id.current,
+          label,
+          questions[]{
+            question,
+            answer,
+            cta{
+              label,
+              href,
+              variant,
+              reference->{"slug": slug.current, locale}
+            }
+          }
+        }
+      },
       true => {}
     )
   }
@@ -1001,6 +1021,26 @@ export const pageBySlugQuery = `*[_type=="page" && slug.current==$slug && (!defi
         body,
         cta{ label, href, variant },
         cta2{ label, href, variant }
+      },
+      _type == "faq" => {
+        _type,
+        title,
+        subheading,
+        titleAlignment,
+        categories[]{
+          "id": id.current,
+          label,
+          questions[]{
+            question,
+            answer,
+            cta{
+              label,
+              href,
+              variant,
+              reference->{"slug": slug.current, locale}
+            }
+          }
+        }
       },
       true => {}
     )

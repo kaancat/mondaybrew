@@ -1,5 +1,61 @@
 # Dev Log
 
+## [2025-10-30] – FAQ Component Implementation
+**Goal**: Create a new FAQ component with category navigation and expandable questions for design review
+
+### Component Structure
+**Created Files**:
+- `src/components/sections/faq.client.tsx`: Client component with interactive accordion and category switching
+- `src/components/sections/faq.tsx`: Server wrapper for future Sanity CMS integration
+
+**Features Implemented**:
+- Left sidebar: Category navigation (Marketing, Web & Development, Cases & Resultater, Om MondayBrew)
+- Right panel: Expandable questions using Radix UI Accordion for accessibility
+- Smooth animations: 300ms accordion expand/collapse with cubic-bezier easing
+- Responsive layout with proper spacing and hover states
+- Placeholder content (Danish) covering common questions about services, process, and company
+- **5px border radius** on all boxes for subtle corners
+- **ChevronDown icons** matching header navigation (rotates 180° when open)
+- **Orange CTA button** ("Kontakt os") inside each FAQ answer linking to /kontakt
+- Danish heading: "Ofte Stillede Spørgsmål"
+
+**Technical Details**:
+- Used Radix UI Accordion for accessible, keyboard-navigable expansion
+- Added custom `@keyframes` animations (`accordion-down`, `accordion-up`) to `globals.css`
+- Category state management with smooth transitions
+- Theme-aware styling using CSS variables:
+  - `--background`: Section background color
+  - `--surface-base`: Box backgrounds (active states)
+  - `--surface-muted`: Box backgrounds (inactive/hover states)
+  - `--foreground`: Primary text color
+  - `--text-secondary`: Muted text (descriptions, inactive states)
+  - `--border`: Border colors
+- Temporary placement on homepage (above footer) for design review
+
+**Styling Updates**:
+- Clean design with no background overlays or decorative elements
+- Category buttons: Site's standard gray (`#49444b` - same as services section)
+- Question boxes: Matching dark gray (`#49444b`)
+- Text colors use `var(--mb-bg)` (#f5f7fd - light blue) matching services section exactly
+- Simple, clean aesthetic matching site's existing box patterns
+- 5px border radius on all boxes
+- Proper color-mix opacity for inactive states (70-80%)
+
+**Integration**:
+- Added FAQ component import and rendering in `src/app/page.tsx`
+- Used `.vr-section` wrapper for consistent vertical rhythm
+- Ready for Sanity CMS wiring (schema/queries to be defined later)
+
+**Impact**: FAQ component uses simple gray boxes for clean, professional appearance. No background distractions, focus on content.
+
+**Next Steps**:
+- Review design with stakeholder
+- Define Sanity schema for FAQ categories and questions
+- Determine final placement (dedicated FAQ page vs. homepage section)
+- Wire up CMS queries
+
+---
+
 ## [2025-10-29] – Footer Contact Info Layout & Header Fade Targeting
 **Goal**: Restore large gaps in contact section and make header fade smarter
 
