@@ -46,8 +46,6 @@ export function MobileBottomSheet({
     onOpenChange(false);
   }, [onOpenChange]);
 
-  if (!open) return null;
-
   return (
     <AnimatePresence mode="wait">
       {open && (

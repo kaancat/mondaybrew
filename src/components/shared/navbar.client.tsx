@@ -608,17 +608,18 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 })()}
               </Link>
 
-              {/* Mobile navigation: Custom bottom-sheet */}
-              <>
-                <MobileBottomSheetTrigger
-                  onClick={() => onOpenChange(true)}
-                  className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-link-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                  aria-label="Open menu"
-                >
-                  <Menu className="size-[18px]" aria-hidden="true" />
-                </MobileBottomSheetTrigger>
+              {/* Mobile navigation trigger */}
+              <MobileBottomSheetTrigger
+                onClick={() => onOpenChange(true)}
+                className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-link-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                aria-label="Open menu"
+              >
+                <Menu className="size-[18px]" aria-hidden="true" />
+              </MobileBottomSheetTrigger>
+            </div>
 
-                <MobileBottomSheet open={mobileOpen} onOpenChange={handleOpenChange}>
+            {/* Mobile bottom-sheet menu (rendered at portal level) */}
+            <MobileBottomSheet open={mobileOpen} onOpenChange={handleOpenChange}>
                   <div className="flex w-full max-w-screen-sm mx-auto flex-col px-6 py-8 h-full">
                     {/* Header with close button */}
                     <div className="flex items-center justify-end pb-4 shrink-0">
@@ -772,8 +773,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                       </div>
                     </div>
                   </MobileBottomSheet>
-                </>
-              </div>
 
             {/* Desktop header */}
             <div
