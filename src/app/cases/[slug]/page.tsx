@@ -4,16 +4,19 @@ import { getCaseStudyBySlug } from "@/lib/caseStudy";
 import { SectionRenderer } from "@/components/sections/section-renderer";
 import type { Metadata } from "next";
 
-type Props = { params: { slug: string } };
+type RouteParams = { slug: string };
+type PageProps = { params: Promise<RouteParams> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const cs = await getCaseStudyBySlug(params.slug);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const cs = await getCaseStudyBySlug(slug);
   if (!cs) return { title: "Case Study Not Found" };
   return { title: cs.title, description: cs.excerpt || cs.summary || undefined };
 }
 
-export default async function CaseStudyPage({ params }: Props) {
-  const cs = await getCaseStudyBySlug(params.slug);
+export default async function CaseStudyPage({ params }: PageProps) {
+  const { slug } = await params;
+  const cs = await getCaseStudyBySlug(slug);
   if (!cs) notFound();
   const blocks = Array.isArray(cs.pageBlocks) ? cs.pageBlocks : [];
   type Block = { _key: string; _type: string } & Record<string, unknown>;
