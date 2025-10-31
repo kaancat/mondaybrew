@@ -17,40 +17,19 @@ export default defineType({
         layout: "radio",
       },
       initialValue: "image",
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "image",
       title: "Image",
       type: "imageWithAlt",
       hidden: ({ parent }) => (parent as { mode?: string } | undefined)?.mode !== "image",
-      validation: (Rule) =>
-        Rule.custom((value, context) => {
-          const parent = context.parent as { mode?: string } | undefined;
-          const media = value as { image?: { asset?: unknown } } | undefined;
-          if (parent?.mode === "image" && !media?.image?.asset) {
-            return "Select an image";
-          }
-          return true;
-        }),
     }),
     defineField({
       name: "videoUrl",
       title: "Video URL",
       type: "url",
       hidden: ({ parent }) => (parent as { mode?: string } | undefined)?.mode !== "video",
-      validation: (Rule) =>
-        Rule.custom((value, context) => {
-          const parent = context.parent as {
-            mode?: string;
-            videoFile?: { asset?: unknown } | null;
-          } | undefined;
-          const url = value as string | undefined;
-          if (parent?.mode === "video" && !url && !parent?.videoFile) {
-            return "Provide a video URL or upload a file";
-          }
-          return true;
-        }).uri({ allowRelative: false, scheme: ["http", "https"] }),
+      validation: (Rule) => Rule.uri({ allowRelative: false, scheme: ["http", "https"] }),
     }),
     defineField({
       name: "videoFile",
