@@ -55,7 +55,7 @@ export function CasesStickyScroll({ cases }: CasesStickyScrollProps) {
     useEffect(() => {
         const lenis = new Lenis({
             duration: 1.0, // Smooth scroll duration (lower = snappier, higher = slower)
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing for cinematic feel
+            easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing for cinematic feel
             orientation: "vertical",
             gestureOrientation: "vertical",
             smoothWheel: true,
