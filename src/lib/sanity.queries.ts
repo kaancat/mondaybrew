@@ -1158,42 +1158,117 @@ export const caseStudyBySlugQuery = `*[_type=="caseStudy" && slug.current==$slug
         subheading,
         helper,
         alignment,
-        cta{ label, href, variant },
+        cta { label, href, variant },
         background {
           alt,
           videoUrl,
           image { alt, image { asset->{ url, metadata{ lqip, dimensions } } } },
           poster { alt, image { asset->{ url, metadata{ lqip, dimensions } } } }
+        },
+        feature {
+          title,
+          excerpt,
+          href,
+          metaLabel,
+          image { alt, image { asset->{ url, metadata{ lqip, dimensions } } } },
+          reference->{
+            _type,
+            title,
+            locale,
+            "slug": slug.current,
+            "excerpt": coalesce(excerpt, summary, description),
+            "image": coalesce(
+              mainImage{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } },
+              heroImage.image{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } },
+              coverImage{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } }
+            )
+          },
+          items[]{
+            linkType,
+            title,
+            excerpt,
+            href,
+            metaLabel,
+            image { alt, image { asset->{ url, metadata{ lqip, dimensions } } } },
+            reference->{
+              _type,
+              title,
+              locale,
+              "slug": slug.current,
+              "excerpt": coalesce(excerpt, summary, description),
+              "image": coalesce(
+                mainImage{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } },
+                heroImage.image{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } },
+                coverImage{ alt, "image": { "asset": asset->{ url, metadata{ lqip, dimensions } } } }
+              )
+            }
+          }
         }
       },
-      _type == "mediaShowcase" => {
-        _type,
-        sectionId,
+      _type == "heroPage" => {
         eyebrow,
-        headline,
-        alignment,
-        cta{ label, href, variant, reference->{"slug": slug.current, locale} },
-        media{
-          mode,
-          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+        heading,
+        subheading,
+        media {
+          mediaType,
+          image { alt, asset->{ url, metadata{ lqip, dimensions } } },
+          video { asset->{ url, mimeType } },
           videoUrl,
-          videoFile{ asset->{ url, mimeType } },
-          poster{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } }
+          poster { alt, asset->{ url, metadata{ lqip, dimensions } } }
         },
+        breadcrumbs[]{ _key, label, anchor }
+      },
+      _type == "textImage" => {
+        variant,
+        enableTabs,
+        eyebrow,
+        title,
+        body,
+        imagePosition,
+        "image": { "alt": image.alt, "asset": image.image.asset->{ url, metadata{ lqip, dimensions } } },
+        tabs[]{ label, title, body },
+        cta{ label, href, variant }
+      },
+      _type == "textOnly" => {
+        eyebrow,
+        title,
+        body,
+        cta{ label, href, variant },
+        cta2{ label, href, variant }
+      },
+      _type == "servicesSplit" => {
+        eyebrow,
+        title,
+        description,
+        marketing{ label, intro, services[]{ _key, key, title, detailTitle, summary, description,
+          media{ mode, image{ alt, image{asset->{url,metadata{lqip,dimensions}}}}, videoUrl, videoFile{asset->{url,mimeType}}, poster{ alt, image{asset->{url,metadata{lqip,dimensions}}}} },
+          ctas[]{ _key, label, href, variant } } },
+        web{ label, intro, services[]{ _key, key, title, detailTitle, summary, description,
+          media{ mode, image{ alt, image{asset->{url,metadata{lqip,dimensions}}}}, videoUrl, videoFile{asset->{url,mimeType}}, poster{ alt, image{asset->{url,metadata{lqip,dimensions}}}} },
+          ctas[]{ _key, label, href, variant } } }
+      },
+      _type == "contentBillboard" => {
+        sectionId, eyebrow, backgroundMode, tone,
+        "backgroundImage": { "alt": backgroundImage.alt, "asset": backgroundImage.image.asset->{ url, metadata{ lqip, dimensions } } },
+        contentType, quote, author, role,
+        "logo": { "alt": logo.alt, "asset": logo.image.asset->{ url, metadata{ lqip, dimensions } } },
+        body, ctas[]{ label, href, variant }, heading, description
+      },
+      _type == "mediaShowcase" => {
+        sectionId, eyebrow, headline, alignment,
+        cta{ label, href, variant, reference->{"slug": slug.current, locale} },
+        media{ mode, image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } }, videoUrl, videoFile{ asset->{ url, mimeType } }, poster{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } } },
         stats[]{ value, label, icon{ alt, asset->{ url, metadata{ lqip, dimensions } } } }
       },
       _type == "bentoGallery" => {
-        _type,
-        images[]{
-          _key,
-          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
-          position{ columnStart, columnSpan, rowStart, rowSpan }
-        },
-        columns,
-        rows,
-        showGridLines
+        images[]{ _key, image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } }, position{ columnStart, columnSpan, rowStart, rowSpan } },
+        columns, rows, showGridLines
       },
-      true => {}
+      _type == "clientsSection" => { eyebrow, headline, description, intro, logos[]{ _key, label, href, image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } } }, explore{ label, href, variant } },
+      _type == "caseStudyCarousel" => { eyebrow, headlineText, intro, items[]->{ _id, title, client, "excerpt": coalesce(excerpt, summary), "slug": slug.current, media{ mode, image{ alt, image{asset->{url,metadata{lqip,dimensions}}}}, videoUrl, videoFile{asset->{url,mimeType}}, poster{ alt, image{asset->{url,metadata{lqip,dimensions}}}} } }, explore{ label, href, variant } },
+      _type == "faq" => { title, subheading, titleAlignment, categories[]{ "id": id.current, label, questions[]{ question, answer, cta{ label, href, variant, reference->{"slug": slug.current, locale} } } } },
+      _type == "testimonialsMarquee" => { eyebrow, headline, subheading }
+      , true => {}
     )
   }
 }`;
