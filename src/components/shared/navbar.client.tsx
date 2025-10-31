@@ -586,8 +586,15 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
   return (
     <>
-      <header
+      <motion.header
         ref={headerRef}
+        animate={{
+          y: mobileOpen ? "-100%" : "0%",
+        }}
+        transition={{
+          duration: 0.4,
+          ease: [0.25, 0.62, 0.32, 1],
+        }}
         className={cn(
           "fixed inset-x-0 top-0 z-[9999] transition-opacity duration-300",
           shouldFadeHeader ? "opacity-0 pointer-events-none" : "opacity-100"
@@ -918,7 +925,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Shared mega menu dropdown - rendered outside header for proper positioning */}
       <SharedMegaMenuDropdown

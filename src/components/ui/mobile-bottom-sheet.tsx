@@ -80,28 +80,26 @@ export function MobileBottomSheet({
           />
 
           {/* Container for close button + bottom sheet */}
-          <div className="absolute inset-x-0 bottom-0 flex flex-col">
+          <motion.div
+            className="absolute inset-x-0 bottom-0 flex flex-col"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ duration: 0.4, ease: [0.25, 0.62, 0.32, 1] }}
+          >
             {/* Close button positioned above the sheet */}
             <div className="flex justify-end px-6 pb-3">
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2, ease: [0.22, 0.61, 0.36, 1] }}
+              <button
                 onClick={() => onOpenChange(false)}
                 className="inline-flex items-center justify-center rounded-full bg-[color:var(--mobile-nav-surface)] border border-[color:var(--mobile-nav-border)] p-2.5 text-[color:var(--mobile-nav-muted)] shadow-lg transition hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2"
                 aria-label="Close menu"
               >
                 <X className="size-5" aria-hidden="true" />
-              </motion.button>
+              </button>
             </div>
 
             {/* Bottom Sheet */}
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ duration: 0.4, ease: [0.25, 0.62, 0.32, 1] }}
+            <div
               className={cn(
                 "flex flex-col bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)]",
                 "max-h-[82vh] overflow-hidden",
@@ -111,8 +109,8 @@ export function MobileBottomSheet({
               )}
             >
               {children}
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       )}
     </AnimatePresence>
