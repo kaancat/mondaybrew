@@ -1132,3 +1132,68 @@ export const caseStudiesQuery = `*[_type=="caseStudy"] | order(coalesce(publishe
     }
   }
 }`;
+
+export const caseStudyBySlugQuery = `*[_type=="caseStudy" && slug.current==$slug][0]{
+  _id,
+  title,
+  client,
+  excerpt,
+  summary,
+  "slug": slug.current,
+  media{
+    mode,
+    image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+    videoUrl,
+    videoFile{ asset->{ url, mimeType } },
+    poster{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } }
+  },
+  pageBlocks[]{
+    _type,
+    _key,
+    ...select(
+      _type == "hero" => {
+        eyebrow,
+        headline,
+        heading,
+        subheading,
+        helper,
+        alignment,
+        cta{ label, href, variant },
+        background {
+          alt,
+          videoUrl,
+          image { alt, image { asset->{ url, metadata{ lqip, dimensions } } } },
+          poster { alt, image { asset->{ url, metadata{ lqip, dimensions } } } }
+        }
+      },
+      _type == "mediaShowcase" => {
+        _type,
+        sectionId,
+        eyebrow,
+        headline,
+        alignment,
+        cta{ label, href, variant, reference->{"slug": slug.current, locale} },
+        media{
+          mode,
+          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          videoUrl,
+          videoFile{ asset->{ url, mimeType } },
+          poster{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } }
+        },
+        stats[]{ value, label, icon{ alt, asset->{ url, metadata{ lqip, dimensions } } } }
+      },
+      _type == "bentoGallery" => {
+        _type,
+        images[]{
+          _key,
+          image{ alt, image{ asset->{ url, metadata{ lqip, dimensions } } } },
+          position{ columnStart, columnSpan, rowStart, rowSpan }
+        },
+        columns,
+        rows,
+        showGridLines
+      },
+      true => {}
+    )
+  }
+}`;
