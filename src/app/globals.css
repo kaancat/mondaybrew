@@ -1278,13 +1278,6 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     transform: none !important;
     transition: none !important;
   }
-
-  /* Mobile only: hide header only while menu is fully open; show it during exiting for instant return */
-  @media (max-width: 767px) {
-    body[data-mobile-nav-open="true"] header[class*="fixed"] {
-      display: none !important;
-    }
-  }
 /* Light Alt: when mobile menu is open, make Contact CTA clearly outlined */
 html.light-alt body[data-mobile-nav-open="true"] {
   --nav-cta-border: var(--brand-ink-strong);
