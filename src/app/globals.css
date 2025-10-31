@@ -878,9 +878,9 @@ html.dark {
   /* Bottom-sheet variant: enable when SheetContent[data-side="bottom"] is used */
   [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"] {
     inset-inline: 0;
-    inset-block-start: 70px;
+    inset-block-start: auto;
     inset-block-end: 0;
-    min-height: auto;
+    max-height: 82vh;
     height: auto;
     border-top-left-radius: var(--nav-card-radius, 16px);
     border-top-right-radius: var(--nav-card-radius, 16px);
@@ -889,6 +889,7 @@ html.dark {
     border-left: 0;
     box-shadow: 0 -12px 48px rgba(8,6,20,0.2);
     transform: translateY(100%);
+    transition: transform var(--nav-overlay-duration, 400ms) var(--nav-overlay-ease, cubic-bezier(0.25, 0.62, 0.32, 1));
   }
 
   [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="closed"] { transform: translateY(100%); }
