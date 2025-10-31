@@ -875,6 +875,45 @@ html.dark {
     transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
   }
 
+  /* Bottom-sheet variant: enable when SheetContent[data-side="bottom"] is used */
+  [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"] {
+    inset-inline: 0;
+    inset-block-start: 70px;
+    inset-block-end: 0;
+    min-height: auto;
+    height: auto;
+    border-top-left-radius: var(--nav-card-radius, 16px);
+    border-top-right-radius: var(--nav-card-radius, 16px);
+    border-top: 1px solid var(--mobile-nav-border);
+    border-right: 0;
+    border-left: 0;
+    box-shadow: 0 -12px 48px rgba(8,6,20,0.2);
+    transform: translateY(100%);
+  }
+
+  [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="closed"] { transform: translateY(100%); }
+  body[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="open"] {
+    transform: translateY(0);
+    transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
+  }
+
+  /* When bottom-sheet is open, keep the site shell stationary (no sideways translate) */
+  @supports(selector(:has(*))) {
+    body[data-mobile-nav-open="true"]:has([data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="open"]) .site-shell {
+      transform: none !important;
+      box-shadow: none !important;
+      filter: none !important;
+      pointer-events: none !important; /* keep interactions on the sheet */
+    }
+  }
+
+  /* Bottom-sheet overlay: backdrop blur and tinted background */
+  body[data-mobile-nav-open="true"]:has([data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="open"]) [data-slot="sheet-overlay"] {
+    background: var(--mobile-nav-overlay) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
   /* Remove old snapping guard (no longer used) */
   /* Remove old snapping guard (no longer used) */
 

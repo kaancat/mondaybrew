@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
+import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X, Target, Search, Share2, Mail, ShoppingBag, Sparkles, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import {
@@ -144,6 +144,42 @@ type Props = {
 
 const DEFAULT_CTA_LABEL = "Let's talk";
 const FALLBACK_LOCALE = "da";
+
+// Icon mapping aligned with desktop mega menu
+const ICON_MAP: Record<string, typeof Target> = {
+  "Full-Funnel Performance": Target,
+  "full-funnel": Target,
+  "Paid Search": Search,
+  "paid-search": Search,
+  "Paid Social": Share2,
+  "paid-social": Share2,
+  "E-Mail Marketing": Mail,
+  "email": Mail,
+  "Hjemmesider": Globe,
+  "websites": Globe,
+  "CRM": Target,
+  "crm": Target,
+  "AI": Sparkles,
+  "ai": Sparkles,
+  "eCommerce": ShoppingBag,
+  "ecommerce": ShoppingBag,
+  "Services": Target,
+  "Cases": Target,
+  "About": Target,
+  "People": Target,
+  "Career": Target,
+  "Events": Target,
+};
+
+function getIconForLabel(label?: string): typeof Target {
+  if (!label) return Target;
+  if (ICON_MAP[label]) return ICON_MAP[label];
+  const lower = label.toLowerCase();
+  for (const [key, Icon] of Object.entries(ICON_MAP)) {
+    if (lower.includes(key.toLowerCase())) return Icon;
+  }
+  return Target;
+}
 
 /**
  * MegaMenuTrigger: Simplified trigger button for mega menus
@@ -564,6 +600,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 })()}
               </Link>
 
+              {/* Mobile navigation: supports experimental bottom-sheet variant via NEXT_PUBLIC_MOBILE_NAV_VARIANT=bottom */}
               <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
                 <SheetTrigger asChild>
                   <button
@@ -575,23 +612,19 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   </button>
                 </SheetTrigger>
                 <SheetContent
-                  side={process.env.NEXT_PUBLIC_MOBILE_NAV_VARIANT === "left" ? "left" : "bottom"}
+                  // Bottom-sheet by default for mobile
+                  side="bottom"
                   hideCloseButton
                   forceMount
-                  className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
+                  className={cn(
+                    "mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0 mobile-nav--bottom",
+                  )}
                 >
                   {/* Accessibility: satisfy Radix requirements without changing visuals */}
                   <SheetTitle className="sr-only">Menu</SheetTitle>
                   <SheetDescription className="sr-only">Site navigation</SheetDescription>
                   <div className="flex h-full w-full items-stretch">
-                    <div
-                      className={cn(
-                        "mobile-nav-inner flex flex-col px-6 py-8",
-                        process.env.NEXT_PUBLIC_MOBILE_NAV_VARIANT === "left"
-                          ? "w-[var(--mobile-nav-width)]"
-                          : "w-full max-w-screen-sm mx-auto"
-                      )}
-                    >
+                    <div className={cn("mobile-nav-inner flex w-full max-w-screen-sm mx-auto flex-col px-6 py-8")}> 
                       {/* Header with close button */}
                       <div className="flex items-center justify-between pb-5 shrink-0">
                         <div className="flex flex-col">
@@ -627,19 +660,31 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                                     group.items.map((item) => {
                                       const href = item.href ?? "#";
                                       const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                                      const Icon = getIconForLabel(item.label);
                                       return (
                                         <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
                                           <Link
                                             href={href}
                                             className={cn(
-                                              "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
+                                              "group flex items-center gap-3 rounded-[10px] border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors",
                                               active
-                                                ? "text-[color:var(--mobile-nav-text)] font-normal"
-                                                : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                                ? "ring-1 ring-[color:var(--mobile-nav-border)]"
+                                                : "hover:bg-[color:var(--mobile-nav-hover)]",
                                             )}
                                           >
-                                            <span>{item.label}</span>
-                                            <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
+                                            {/* Left icon tile */}
+                                            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
+                                              <Icon className="h-4.5 w-4.5" aria-hidden="true" />
+                                            </span>
+                                            {/* Label */}
+                                            <span className={cn(
+                                              "flex-1 text-[1.05rem] leading-tight",
+                                              active ? "text-[color:var(--mobile-nav-text)]" : "text-[color:var(--mobile-nav-link)] group-hover:text-[color:var(--mobile-nav-text)]"
+                                            )}>{item.label}</span>
+                                            {/* Chevron */}
+                                            <span className="ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[color:var(--mobile-nav-muted)] group-hover:text-[color:var(--mobile-nav-text)]">
+                                              <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+                                            </span>
                                           </Link>
                                         </motion.li>
                                       );
@@ -657,18 +702,28 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                                   {simpleLinks.map((link) => {
                                     const href = link.href ?? "#";
                                     const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                                    const Icon = getIconForLabel(link.label);
                                     return (
                                       <motion.li key={link.label} variants={mobileItemVariants}>
                                         <Link
                                           href={href}
                                           className={cn(
-                                            "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
+                                            "group flex items-center gap-3 rounded-[10px] border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors",
                                             active
-                                              ? "text-[color:var(--mobile-nav-text)] font-normal"
-                                              : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
+                                              ? "ring-1 ring-[color:var(--mobile-nav-border)]"
+                                              : "hover:bg-[color:var(--mobile-nav-hover)]",
                                           )}
                                         >
-                                          {link.label}
+                                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
+                                            <Icon className="h-4.5 w-4.5" aria-hidden="true" />
+                                          </span>
+                                          <span className={cn(
+                                            "flex-1 text-[1.05rem] leading-tight",
+                                            active ? "text-[color:var(--mobile-nav-text)]" : "text-[color:var(--mobile-nav-link)] group-hover:text-[color:var(--mobile-nav-text)]"
+                                          )}>{link.label}</span>
+                                          <span className="ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[color:var(--mobile-nav-muted)] group-hover:text-[color:var(--mobile-nav-text)]">
+                                            <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+                                          </span>
                                         </Link>
                                       </motion.li>
                                     );
