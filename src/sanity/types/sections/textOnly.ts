@@ -9,9 +9,9 @@ export default defineType({
             name: "sectionId",
             title: "Section ID (for navigation)",
             type: "slug",
-            description: "Optional ID for this section. Click 'Generate' to create from title. Used by breadcrumb navigation.",
+            description: "Optional ID for this section. Used by breadcrumb navigation.",
             options: {
-                source: "title",
+                source: "eyebrow",
                 maxLength: 50,
             },
         }),
@@ -19,56 +19,40 @@ export default defineType({
             name: "eyebrow",
             title: "Eyebrow",
             type: "string",
-            description: "Small label above the title",
+            description: "Small label above the first section",
         }),
         defineField({
-            name: "title",
-            title: "Title",
-            type: "string",
-            description: "Appears in the left column",
-            validation: (Rule) => Rule.required(),
-        }),
-        defineField({
-            name: "subheading",
-            title: "Subheading",
-            type: "string",
-            description: "Optional subheading in the right column",
-        }),
-        defineField({
-            name: "body",
-            title: "Body text",
-            type: "text",
-            rows: 6,
-            description: "Main content text in the right column",
-            validation: (Rule) => Rule.required(),
-        }),
-        defineField({
-            name: "cta",
-            title: "Primary CTA",
-            type: "button",
-            description: "Primary call to action button",
-        }),
-        defineField({
-            name: "cta2",
-            title: "Secondary CTA",
-            type: "button",
-            description: "Optional secondary call to action button",
+            name: "sections",
+            title: "Content Sections",
+            type: "array",
+            description: "Add rich text, images, CTAs, and dividers in any order",
+            of: [
+                { type: "textOnlyRichText" },
+                { type: "textOnlyRichTextImage" },
+                { type: "textOnlyCta1" },
+                { type: "textOnlyCta2" },
+                { type: "textOnlyDivider" },
+            ],
+            validation: (Rule) => Rule.required().min(1),
         }),
     ],
     preview: {
         select: {
-            title: "title",
-            sectionId: "sectionId.current",
             eyebrow: "eyebrow",
+            sectionId: "sectionId.current",
+            sections: "sections",
         },
-        prepare({ title, sectionId, eyebrow }) {
+        prepare({ eyebrow, sectionId, sections }) {
             const parts = [];
             if (eyebrow) parts.push(eyebrow);
             if (sectionId) parts.push(`ID: ${sectionId}`);
             
+            const count = sections?.length || 0;
+            const subtitle = count > 0 ? `${count} section${count !== 1 ? 's' : ''}` : "No sections";
+            
             return {
-                title: title || "Text Only",
-                subtitle: parts.length > 0 ? parts.join(" · ") : "No Section ID set",
+                title: eyebrow || "Text Only",
+                subtitle: parts.length > 0 ? `${subtitle} · ${parts.join(" · ")}` : subtitle,
             };
         },
     },

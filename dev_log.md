@@ -1,5 +1,214 @@
 # Dev Log
 
+## [2025-10-31] – Case Study Schema Reorganization with Tabs
+**Goal**: Create clear separation between listing card fields and individual page fields in Sanity Studio
+
+### Problem
+- All Case Study fields were shown in a single flat list
+- No clear distinction between fields for `/cases` (listing card) vs `/cases/[slug]` (individual page)
+- Confusing for content editors to know which fields affect which view
+
+### Solution Implemented
+Reorganized Case Study schema into **3 tabs using Sanity groups**:
+
+**1. 📋 Listing Card (shown on /cases)** - Default tab
+- Title
+- Client Name
+- Card Description (excerpt) - max 200 chars, required
+- Tags (badges) - max 3 displayed on card
+- Card Background Media (image/video for sticky scroll card)
+
+**2. 📄 Individual Page (shown on /cases/[slug])**
+- Page Summary (longer "About This Project" text)
+- Page Content Sections (array of content blocks: hero, text, media, FAQ, etc.)
+
+**3. ⚙️ Settings**
+- URL Slug (required, auto-generated from title)
+- Language (da/en radio buttons, default: da)
+- Published Date (controls sort order, auto-set to now)
+- SEO & Social Sharing (meta tags)
+
+### Technical Details
+**File**: `src/sanity/types/documents/caseStudy.ts`
+
+Added groups configuration:
+```typescript
+groups: [
+  { name: "listing", title: "📋 Listing Card (shown on /cases)", default: true },
+  { name: "individual", title: "📄 Individual Page (shown on /cases/[slug])" },
+  { name: "settings", title: "⚙️ Settings" },
+]
+```
+
+Each field now has a `group` property to assign it to the correct tab.
+
+### Benefits
+✅ **Clearer UX**: Content editors immediately know which fields affect which page
+✅ **Default tab**: Opens on "Listing Card" - the most commonly edited fields
+✅ **Visual icons**: Emoji icons make tabs easy to scan
+✅ **Better descriptions**: Each field has context-aware help text
+✅ **Validation**: Required fields and character limits guide content entry
+✅ **Organized**: Technical settings separated from content fields
+
+### Deployment
+Schema deployed to production Sanity Studio: https://mondaybrew.sanity.studio/
+
+### Impact
+- Content editors can now easily distinguish between:
+  - Card content (what shows on /cases)
+  - Page content (what shows on /cases/[slug])
+  - Technical settings (slug, locale, SEO)
+- Reduces confusion and content entry errors
+- Makes Case Study editing workflow more intuitive
+
+### Files Modified
+- `src/sanity/types/documents/caseStudy.ts`: Added groups and reorganized fields with descriptions
+
+---
+
+## [2025-10-31] – Cases Page GROQ Query Fix
+**Goal**: Fix case studies not appearing on `/cases` page due to GROQ query syntax error
+
+### Problem
+- Cases page showed "No Case Studies Yet" even though 7 case studies existed in Sanity Studio
+- Diagnostic API endpoint revealed GROQ query parse error
+- Initial attempt to filter by locale using `(!defined(locale) || locale==$locale)` caused syntax error
+
+### Root Cause
+- GROQ query syntax for locale filtering was invalid
+- The negation pattern wasn't supported or had syntax issues in the Sanity GROQ parser
+
+### Solution Implemented
+Changed from GROQ-level filtering to application-level filtering:
+
+**1. Simplified GROQ Query** (`src/lib/sanity.queries.ts`):
+```groq
+*[_type=="caseStudy"] | order(coalesce(publishedAt,_updatedAt) desc){
+  _id,
+  title,
+  client,
+  "excerpt": coalesce(excerpt, summary),
+  "slug": slug.current,
+  tags,
+  locale,  // Added locale field to response
+  media{ ... }
+}
+```
+
+**2. Client-Side Locale Filtering** (`src/lib/caseStudies.ts`):
+```typescript
+export async function getCaseStudies(locale?: string) {
+  const data = await fetchSanity<CaseStudy[]>(caseStudiesQuery, {});
+  
+  // Filter by locale if specified
+  if (locale && Array.isArray(data)) {
+    return data.filter(caseStudy => {
+      return !caseStudy.locale || caseStudy.locale === locale;
+    });
+  }
+  
+  return data;
+}
+```
+
+**3. Updated TypeScript Type** (`src/types/caseStudy.ts`):
+- Added `locale?: string | null` field to `CaseStudy` type
+
+**4. Created Diagnostic Endpoint** (`src/app/api/cases/diagnostics/route.ts`):
+- API endpoint to debug Sanity queries: `/api/cases/diagnostics`
+- Returns query results, error messages, and count
+
+### Why This Approach
+- **Simpler**: Removes complex GROQ syntax that caused parsing errors
+- **Flexible**: Application-level filtering provides more control
+- **Compatible**: Works regardless of GROQ version or syntax limitations
+- **Debuggable**: Easy to log and inspect filtering logic
+
+### Impact
+✅ Cases page now displays all 7 case studies with sticky scroll effect
+✅ Locale filtering works correctly (Danish cases shown on DA pages)
+✅ No GROQ query parse errors
+✅ Diagnostic endpoint available for troubleshooting
+
+### Files Modified
+- `src/lib/sanity.queries.ts`: Simplified query, added locale field
+- `src/lib/caseStudies.ts`: Added client-side locale filtering with documentation
+- `src/types/caseStudy.ts`: Added locale field to type definition
+- `src/app/api/cases/diagnostics/route.ts`: Created diagnostic endpoint (new file)
+
+### Testing
+To verify:
+1. Navigate to `http://localhost:3000/cases` - Should show 7 cases with sticky scroll
+2. Check diagnostics at `http://localhost:3000/api/cases/diagnostics` - Should show `"success": true`
+3. Scroll down cases page - Should see smooth GSAP animations with stacking cards
+
+---
+
+## [2025-10-31] – FAQ Duplicate Key Fix
+**Goal**: Fix React duplicate key error when FAQ categories have duplicate IDs in Sanity
+
+### Problem
+- React console error: "Encountered two children with the same key, `Yoyo`"
+- Error occurred when rendering FAQ category buttons
+- Root cause: Sanity data contained duplicate category IDs (slug field)
+
+### Solution Implemented
+**File**: `src/components/sections/faq.tsx`
+
+**Changes**:
+1. Added duplicate detection using `Set<string>` to track seen IDs
+2. When duplicate ID detected, append index to make it unique: `${uniqueId}-${index}`
+3. Added development-only console warning to alert developers about duplicates
+4. Ensures categories always have unique keys for React reconciliation
+
+**Code**:
+```typescript
+const seenIds = new Set<string>();
+const duplicates: string[] = [];
+
+const transformedCategories = categories?.map((cat, index) => {
+  let uniqueId = cat.id || `category-${index}`;
+  
+  // Handle duplicate IDs by appending index
+  if (seenIds.has(uniqueId)) {
+    duplicates.push(uniqueId);
+    uniqueId = `${uniqueId}-${index}`;
+  }
+  seenIds.add(uniqueId);
+  
+  return { id: uniqueId, label: cat.label || "", questions: cat.questions || [] };
+});
+
+// Warn in development
+if (duplicates.length > 0 && process.env.NODE_ENV === "development") {
+  console.warn(`[FAQ Section] Duplicate category IDs detected: ${duplicates.join(", ")}`);
+}
+```
+
+### Impact
+✅ Fixes React key error - no more console warnings
+✅ Component renders correctly even with duplicate IDs in Sanity
+✅ Development warning helps identify data issues
+✅ Defensive coding prevents future errors
+
+### Action Required
+**Fix in Sanity Studio**: Navigate to the page with FAQ section and regenerate the slug for duplicate categories:
+1. Go to http://localhost:3000/studio
+2. Find the page with FAQ section
+3. Look for categories with duplicate IDs (check console warning)
+4. Click "Generate" button next to the Category ID field for each duplicate
+5. Save and publish
+
+**Why duplicates happen**: Sanity slug fields can have duplicates if:
+- Categories were copied/pasted
+- Slugs were manually set to the same value
+- Auto-generation created conflicts
+
+### Files Modified
+- `src/components/sections/faq.tsx`: Added duplicate ID handling and warnings
+
+---
+
 ## [2025-10-30] – FAQ Component Implementation
 **Goal**: Create a new FAQ component with category navigation and expandable questions for design review
 

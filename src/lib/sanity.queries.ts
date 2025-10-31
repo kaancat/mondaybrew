@@ -1078,6 +1078,9 @@ export const caseStudiesQuery = `*[_type=="caseStudy"] | order(coalesce(publishe
   "excerpt": coalesce(excerpt, summary),
   "slug": slug.current,
   tags,
+  locale,
+  publishedAt,
+  _updatedAt,
   media{
     mode,
     image{
@@ -1090,5 +1093,135 @@ export const caseStudiesQuery = `*[_type=="caseStudy"] | order(coalesce(publishe
       alt,
       image{asset->{url,metadata{lqip,dimensions}}}
     }
+  }
+}`;
+
+export const caseStudyBySlugQuery = `*[_type=="caseStudy" && slug.current == $slug][0]{
+  _id,
+  title,
+  client,
+  summary,
+  "excerpt": coalesce(excerpt, summary),
+  "slug": slug.current,
+  tags,
+  publishedAt,
+  media{
+    mode,
+    image{
+      alt,
+      image{asset->{url,metadata{lqip,dimensions}}}
+    },
+    videoUrl,
+    videoFile{asset->{url,mimeType}},
+    poster{
+      alt,
+      image{asset->{url,metadata{lqip,dimensions}}}
+    }
+  },
+  pageBlocks[]{
+    _type,
+    _key,
+    ...,
+    // Expand image fields for all components
+    image{
+      alt,
+      image{asset->{url,metadata{lqip,dimensions}}}
+    },
+    media{
+      mode,
+      image{
+        alt,
+        image{asset->{url,metadata{lqip,dimensions}}}
+      },
+      videoUrl,
+      videoFile{asset->{url,mimeType}},
+      poster{
+        alt,
+        image{asset->{url,metadata{lqip,dimensions}}}
+      }
+    },
+    // Expand nested arrays
+    images[]{
+      alt,
+      image{asset->{url,metadata{lqip,dimensions}}}
+    },
+    stats[]{
+      ...,
+      icon{
+        alt,
+        image{asset->{url,metadata{lqip,dimensions}}}
+      }
+    },
+    // Expand textOnly sections array
+    sections[]{
+      _type,
+      _key,
+      ...,
+      image{
+        alt,
+        image{asset->{url,metadata{lqip,dimensions}}}
+      },
+      button{
+        ...,
+      },
+      button1{
+        ...,
+      },
+      button2{
+        ...,
+      }
+    },
+    // Expand bentoGallery images array
+    images[]{
+      _key,
+      image{
+        alt,
+        image{asset->{url,metadata{lqip,dimensions}}}
+      },
+      position{
+        columnStart,
+        columnSpan,
+        rowStart,
+        rowSpan
+      }
+    },
+    caseStudies[]->{
+      _id,
+      title,
+      client,
+      "slug": slug.current,
+      "excerpt": coalesce(excerpt, summary),
+      media{
+        mode,
+        image{
+          alt,
+          image{asset->{url,metadata{lqip,dimensions}}}
+        }
+      }
+    },
+    clients[]->{
+      name,
+      logo{asset->{url,metadata{dimensions}}}
+    },
+    testimonials[]->{
+      quote,
+      author,
+      role,
+      company,
+      avatar{asset->{url}}
+    },
+    categories[]->{
+      _id,
+      title,
+      questions[]{
+        question,
+        answer
+      }
+    }
+  },
+  seo{
+    title,
+    description,
+    ogImage{asset->{url}}
   }
 }`;

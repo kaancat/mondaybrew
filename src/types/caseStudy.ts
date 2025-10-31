@@ -10,9 +10,18 @@ export type CaseStudy = {
   _id: string;
   title: string;
   client?: string | null;
+  summary?: string | null;
   excerpt?: string | null;
   slug?: string | null;
   tags?: string[];
+  locale?: string | null;
+  publishedAt?: string | null;
   media?: CaseStudyMedia | null;
+  pageBlocks?: any[] | null; // Page building blocks/components from Sanity
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    ogImage?: { asset?: { url: string } } | null;
+  } | null;
 };
 

@@ -1,46 +1,142 @@
 import { Section } from "@/components/layout/section";
 import { TextOnlyClient } from "./text-only.client";
 
-export type TextOnlySectionData = {
-    eyebrow?: string | null;
+type ButtonData = {
+    label?: string | null;
+    href?: string | null;
+    variant?: string | null;
+} | null;
+
+type RichTextSection = {
+    _type: "textOnlyRichText";
+    _key: string;
     title?: string | null;
     body?: string | null;
-    cta?: {
-        label?: string | null;
-        href?: string | null;
-        variant?: string | null;
+};
+
+type RichTextImageSection = {
+    _type: "textOnlyRichTextImage";
+    _key: string;
+    title?: string | null;
+    order?: "textFirst" | "imageFirst" | null;
+    body?: string | null;
+    image?: {
+        alt?: string | null;
+        image?: {
+            asset?: {
+                url?: string | null;
+                metadata?: {
+                    lqip?: string | null;
+                    dimensions?: {
+                        width?: number | null;
+                        height?: number | null;
+                    } | null;
+                } | null;
+            } | null;
+        } | null;
     } | null;
-    cta2?: {
-        label?: string | null;
-        href?: string | null;
-        variant?: string | null;
-    } | null;
+};
+
+type Cta1Section = {
+    _type: "textOnlyCta1";
+    _key: string;
+    button?: ButtonData;
+};
+
+type Cta2Section = {
+    _type: "textOnlyCta2";
+    _key: string;
+    button1?: ButtonData;
+    button2?: ButtonData;
+};
+
+type DividerSection = {
+    _type: "textOnlyDivider";
+    _key: string;
+    style?: "solid" | "dashed" | "dotted" | null;
+    width?: "full" | "constrained" | null;
+};
+
+type TextOnlyContentSection = RichTextSection | RichTextImageSection | Cta1Section | Cta2Section | DividerSection;
+
+export type TextOnlySectionData = {
+    eyebrow?: string | null;
+    sections?: TextOnlyContentSection[] | null;
 };
 
 const ALLOWED_BUTTON_VARIANTS = new Set(["default", "secondary", "outline", "ghost", "link"]);
 
 /**
  * Text Only Section Component
- * Displays text content in a two-column layout with decorative accent line
+ * Displays flexible text content with rich text, CTAs, and dividers
  * 
- * Why: Provides a content block for text-heavy sections without images
- * Useful for mission statements, descriptions, or informational content
+ * Why: Provides a flexible content block for text-heavy sections
+ * Allows mixing of text, buttons, and dividers in any order
  */
 export function TextOnlySection({
     eyebrow,
-    title,
-    body,
-    cta,
-    cta2,
+    sections,
 }: TextOnlySectionData) {
+    if (!sections || sections.length === 0) {
+        return null;
+    }
+
+    const mappedSections = sections.map((section) => {
+        switch (section._type) {
+            case "textOnlyRichText":
+                return {
+                    _key: section._key,
+                    type: "richText" as const,
+                    title: section.title?.trim(),
+                    body: section.body?.trim(),
+                };
+            case "textOnlyRichTextImage":
+                const imageUrl = section.image?.image?.asset?.url;
+                if (!imageUrl) return null;
+                return {
+                    _key: section._key,
+                    type: "richTextImage" as const,
+                    title: section.title?.trim(),
+                    order: section.order || "textFirst",
+                    body: section.body?.trim(),
+                    image: {
+                        url: imageUrl,
+                        alt: section.image?.alt || section.title || "Image",
+                        lqip: section.image?.image?.asset?.metadata?.lqip,
+                        width: section.image?.image?.asset?.metadata?.dimensions?.width,
+                        height: section.image?.image?.asset?.metadata?.dimensions?.height,
+                    },
+                };
+            case "textOnlyCta1":
+                return {
+                    _key: section._key,
+                    type: "cta1" as const,
+                    button: buildCta(section.button),
+                };
+            case "textOnlyCta2":
+                return {
+                    _key: section._key,
+                    type: "cta2" as const,
+                    button1: buildCta(section.button1),
+                    button2: buildCta(section.button2),
+                };
+            case "textOnlyDivider":
+                return {
+                    _key: section._key,
+                    type: "divider" as const,
+                    style: section.style || "solid",
+                    width: section.width || "full",
+                };
+            default:
+                return null;
+        }
+    }).filter(Boolean);
+
     return (
         <Section innerClassName="flex flex-col gap-[var(--flow-space)]">
             <TextOnlyClient
                 eyebrow={eyebrow?.trim()}
-                title={title?.trim()}
-                body={body?.trim()}
-                cta={buildCta(cta)}
-                cta2={buildCta(cta2)}
+                sections={mappedSections}
             />
         </Section>
     );
@@ -61,7 +157,7 @@ function resolveButtonVariant(variant?: string | null): "default" | "secondary" 
  * Builds CTA object with resolved href and variant
  * Returns null if label or href is missing
  */
-function buildCta(cta: TextOnlySectionData["cta"]) {
+function buildCta(cta: ButtonData) {
     const href = cta?.href?.trim();
     if (!cta?.label || !href) return null;
     return {
