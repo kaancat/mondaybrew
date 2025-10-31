@@ -15,6 +15,29 @@ export default defineType({
       },
     }),
     defineField({
+      name: "columns",
+      title: "Number of Columns",
+      type: "number",
+      description: "How many columns the grid should have (1-15)",
+      validation: (Rule) => Rule.required().min(1).max(15),
+      initialValue: 5,
+    }),
+    defineField({
+      name: "rows",
+      title: "Number of Rows",
+      type: "number",
+      description: "How many rows the grid should have (1-25)",
+      validation: (Rule) => Rule.required().min(1).max(25),
+      initialValue: 10,
+    }),
+    defineField({
+      name: "showGridLines",
+      title: "Show Grid Lines",
+      type: "boolean",
+      description: "Show red grid lines overlay to visualize rows and columns",
+      initialValue: true,
+    }),
+    defineField({
       name: "images",
       title: "Gallery Images",
       type: "array",
@@ -65,12 +88,14 @@ export default defineType({
   preview: {
     select: {
       images: "images",
+      columns: "columns",
+      rows: "rows",
     },
-    prepare({ images }) {
+    prepare({ images, columns, rows }) {
       const count = images?.length || 0;
       return {
         title: "Bento Grid Gallery",
-        subtitle: `${count} image${count !== 1 ? 's' : ''} • 5 columns (fixed)`,
+        subtitle: `${count} image${count !== 1 ? 's' : ''} • ${columns || 5}×${rows || 10} grid`,
       };
     },
   },

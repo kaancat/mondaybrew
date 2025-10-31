@@ -1185,6 +1185,9 @@ export const caseStudyBySlugQuery = `*[_type=="caseStudy" && slug.current == $sl
         rowSpan
       }
     },
+    columns,
+    rows,
+    showGridLines,
     caseStudies[]->{
       _id,
       title,

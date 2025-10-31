@@ -1107,6 +1107,65 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
     animation: accordion-up 300ms cubic-bezier(0.87, 0, 0.13, 1);
   }
 
+  /* Shine effect for bento grid gallery */
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shine {
+    animation: shine 1.2s ease-in-out;
+  }
+
+  /* Bento Grid Responsive Styles */
+  /* Mobile: 1 column, stack vertically */
+  .bento-grid-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  
+  .bento-grid-item {
+    grid-column: span 1;
+    grid-row: auto;
+    min-height: 250px; /* Ensure decent height on mobile */
+  }
+
+  /* Tablet: 2 columns */
+  @media (min-width: 768px) {
+    .bento-grid-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .bento-grid-item {
+      grid-column: span 1;
+      min-height: 300px;
+    }
+  }
+
+  /* Desktop: Full bento grid with manual positioning */
+  @media (min-width: 1024px) {
+    .bento-grid-container {
+      grid-template-columns: repeat(var(--bento-columns), 1fr);
+      grid-template-rows: repeat(var(--bento-rows), minmax(150px, auto));
+    }
+    
+    .bento-grid-item {
+      /* Use manual positioning on desktop */
+      grid-column: var(--col-start) / span var(--col-span);
+      grid-row: var(--row-start) / span var(--row-span);
+      min-height: auto;
+    }
+    
+    /* If no manual position set (auto), just use span */
+    .bento-grid-item[style*="--col-start: auto"] {
+      grid-column: span var(--col-span);
+      grid-row: span var(--row-span);
+    }
+  }
+
   /* Vertical rhythm helpers (margin-based; avoid double stacking) */
   /* Hero uses medium gap on all breakpoints */
   .vr-hero { margin-bottom: var(--section-gap-md); }

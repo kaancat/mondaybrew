@@ -17,9 +17,11 @@ type BentoImage = {
 type BentoGalleryClientProps = {
   images: BentoImage[];
   columns: number;
+  rows: number;
+  showGridLines: boolean;
 };
 
-export function BentoGalleryClient({ images, columns }: BentoGalleryClientProps) {
+export function BentoGalleryClient({ images, columns, rows, showGridLines }: BentoGalleryClientProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const openLightbox = (index: number) => {
@@ -46,73 +48,93 @@ export function BentoGalleryClient({ images, columns }: BentoGalleryClientProps)
 
   return (
     <>
-      {/* Bento Grid - Single responsive grid */}
+      {/* Bento Grid - Responsive grid */}
       <div className="relative">
-        {/* Grid Lines Overlay - 10 rows */}
-        <div
-          className="absolute pointer-events-none grid gap-3 md:gap-4"
-          style={{
-            gridTemplateColumns: `repeat(${columns}, 1fr)`,
-            gridTemplateRows: `repeat(10, minmax(150px, auto))`,
-            zIndex: 50,
-            top: 0,
-            left: 0,
-            right: 0,
-          }}
-        >
-          {/* Create grid cells with borders - 5 columns x 10 rows = 50 cells */}
-          {Array.from({ length: columns * 10 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                border: "1px solid red",
-              }}
-            />
-          ))}
-        </div>
+        {/* Grid Lines Overlay - only show on desktop when enabled */}
+        {showGridLines && (
+          <div
+            className="hidden lg:grid absolute pointer-events-none gap-3 md:gap-4"
+            style={{
+              gridTemplateColumns: `repeat(${columns}, 1fr)`,
+              gridTemplateRows: `repeat(${rows}, minmax(150px, auto))`,
+              zIndex: 50,
+              top: 0,
+              left: 0,
+              right: 0,
+            }}
+          >
+            {/* Create grid cells with borders */}
+            {Array.from({ length: columns * rows }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  border: "1px solid red",
+                }}
+              />
+            ))}
+          </div>
+        )}
 
-        {/* Actual Content Grid - constrained to 10 rows */}
+        {/* Actual Content Grid - responsive */}
         <div
-          className="grid gap-3 md:gap-4"
+          className="bento-grid-container grid gap-3 md:gap-4"
           style={{
-            gridTemplateColumns: `repeat(${columns}, 1fr)`,
-            gridTemplateRows: `repeat(10, minmax(150px, auto))`,
-            gridAutoRows: "minmax(150px, auto)",
-            gridAutoFlow: "dense", // Fill gaps smartly
-          }}
+            // CSS custom properties for responsive columns
+            "--bento-columns": columns,
+            "--bento-rows": rows,
+            gridTemplateColumns: "repeat(1, 1fr)", // Mobile default
+            gridAutoRows: "minmax(200px, auto)",
+            gridAutoFlow: "dense",
+          } as React.CSSProperties}
         >
         {images.map((image, index) => (
-          <motion.div
+          <div
             key={index}
-            className="relative overflow-hidden rounded-lg bg-muted cursor-pointer group"
+            className="bento-grid-item relative overflow-hidden rounded-lg bg-muted cursor-pointer group"
             style={{
-              gridColumn: image.colStart 
-                ? `${image.colStart} / span ${image.colSpan}` 
-                : `span ${image.colSpan}`,
-              gridRow: image.rowStart 
-                ? `${image.rowStart} / span ${image.rowSpan}` 
-                : `span ${image.rowSpan}`,
-            }}
-            whileHover={{ scale: 0.98 }}
-            transition={{ duration: 0.2 }}
+              // On mobile/tablet: just span 1 column
+              // On desktop: use configured positioning
+              "--col-start": image.colStart || 'auto',
+              "--col-span": image.colSpan,
+              "--row-start": image.rowStart || 'auto',
+              "--row-span": image.rowSpan,
+              gridColumn: 'span 1', // Mobile default
+              gridRow: 'auto',
+            } as React.CSSProperties}
             onClick={() => openLightbox(index)}
           >
             <Image
               src={image.url}
               alt={image.alt}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-all duration-500 group-hover:brightness-110"
               placeholder={image.lqip ? "blur" : undefined}
               blurDataURL={image.lqip}
               sizes={`${100 / columns * image.colSpan}vw`}
             />
             
-            {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+            {/* Shine effect on hover - sweeps from left to right */}
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                transform: 'translateX(-100%)',
+              }}
+            >
+              <div 
+                className="w-full h-full group-hover:animate-shine"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+                }}
+              />
+            </div>
+            
+            {/* Subtle overlay for depth */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
             
             {/* Zoom icon on hover */}
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-lg">
                 <svg
                   className="w-6 h-6 text-gray-900"
                   fill="none"
@@ -128,7 +150,7 @@ export function BentoGalleryClient({ images, columns }: BentoGalleryClientProps)
                 </svg>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
         </div>
       </div>

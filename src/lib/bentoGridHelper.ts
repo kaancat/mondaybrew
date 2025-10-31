@@ -122,9 +122,9 @@ export function optimizeBentoLayout(sizes: GridSize[], columns: number): GridSiz
   for (let i = 0; i < optimized.length; i++) {
     const current = optimized[i];
     
-    // Clamp to grid width, but NEVER allow full width (columns - 1 max)
-    if (current.colSpan >= columns) {
-      current.colSpan = columns - 1;
+    // Clamp to grid width (allow full width now)
+    if (current.colSpan > columns) {
+      current.colSpan = columns;
     }
     
     // Find first available position
@@ -149,8 +149,8 @@ export function optimizeBentoLayout(sizes: GridSize[], columns: number): GridSiz
           
           // If small gap would remain and we're not the last item, adjust
           if (availableSpace > 0 && availableSpace <= 2 && i < optimized.length - 1) {
-            // Expand to fill the gap, but NEVER to full width
-            const newColSpan = Math.min(current.colSpan + availableSpace, columns - 1);
+            // Expand to fill the gap (allow full width now)
+            const newColSpan = Math.min(current.colSpan + availableSpace, columns);
             current.colSpan = newColSpan;
           }
           

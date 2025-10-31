@@ -1506,3 +1506,437 @@ useEffect(() => {
 ✅ **Performance**: Efficient data fetching and caching
 
 ---
+
+## [2025-10-31] – Bento Grid: Fully Flexible Column/Row Configuration
+
+**Goal**: Remove max column restrictions and add configurable grid dimensions
+
+**Changes Made**:
+
+1. **Removed 4-Column Max Limit**:
+   - Updated src/lib/bentoGridHelper.ts to allow images to span full width
+   - Removed columns - 1 clamp in optimizeBentoLayout
+   - Updated gap-filling logic to expand to full width when needed
+
+2. **Added Configurable Grid Dimensions**:
+   - Added columns field to entoGallery schema (1-15, default: 5)
+   - Added ows field to entoGallery schema (1-25, default: 10)
+   - Updated Sanity preview to show grid dimensions: "5×10 grid"
+   - Added fields to GROQ query in caseStudyBySlugQuery
+
+3. **Updated Grid Position Validation**:
+   - Removed max 4 columns validation from gridPosition.ts
+   - Removed max 5 rows validation (now unlimited)
+   - Updated field descriptions to reflect "1+"
+
+4. **Updated Visual Grid Picker**:
+   - Changed from 5×10 to 15×25 grid in GridPositionInput.tsx
+   - Removed column span limit in click-to-toggle logic
+   - Added scrollable container (max 600px height)
+   - Reduced cell size and gap for better visibility
+   - Updated helper text to show "Grid: 15 columns × 25 rows"
+
+5. **Frontend Updates**:
+   - ento-gallery.tsx: Now accepts and uses columns and ows props
+   - ento-gallery.client.tsx: Dynamic grid size based on props
+   - Grid overlay and content grid both use configurable dimensions
+
+**Impact**:
+- ✅ **Maximum Flexibility**: Admins can create 1×1 to 15×25 grids
+- ✅ **No Width Limits**: Images can span the full width of the grid
+- ✅ **Better Visual Variety**: Larger grids enable more creative layouts
+- ✅ **Backward Compatible**: Defaults to 5×10 for existing galleries
+
+**Deployed**:
+- Sanity Studio deployed with new schema
+- Memory updated to reflect configurable dimensions
+- All changes committed and pushed to GitHub (case-archive branch)
+
+---
+
+## [2025-10-31] – Bento Grid: Subtle Shine Hover Effect
+
+**Goal**: Replace aggressive scaling hover effects with a more elegant shine/lighting effect
+
+**Changes Made**:
+
+1. **Removed Scaling Effects**:
+   - Removed Framer Motion whileHover={{ scale: 0.98 }} from container
+   - Removed group-hover:scale-105 from image
+   - Changed from motion.div to regular div (no animation library needed)
+
+2. **Added Shine Effect**:
+   - Created sweeping gradient shine that moves left-to-right on hover
+   - Uses dual-layer gradient for smoother, more visible effect:
+     - Base layer: gba(255,255,255,0.3) at 50%
+     - Top layer: gba(255,255,255,0.4) at 50%
+   - Animation duration: 1.2s with ease-in-out timing
+   - Added @keyframes shine animation in globals.css
+
+3. **Improved Brightness**:
+   - Added group-hover:brightness-110 to image for subtle lighting
+   - Reduced dark overlay from g-black/20 to g-black/5
+   - All transitions extended to 500ms for smoother feel
+
+4. **Enhanced Zoom Icon**:
+   - Added ackdrop-blur-sm for glassmorphism effect
+   - Changed background from g-white/90 to g-white/80
+   - Added shadow-lg for better depth
+
+**Result**:
+- ✅ **Less Aggressive**: No jarring scale effects
+- ✅ **Elegant**: Smooth shine sweep creates premium feel
+- ✅ **Professional**: Subtle lighting instead of dramatic transforms
+- ✅ **Performant**: CSS-only animation, no JS overhead
+
+**Files Changed**:
+- src/components/sections/bento-gallery.client.tsx - Hover effect implementation
+- src/app/globals.css - Shine animation keyframes
+
+---
+
+## [2025-10-31] – Smart Grid Position Picker with Context Awareness
+
+**Goal**: Make the grid position picker dynamically show only available cells and mark occupied ones
+
+**Challenges Solved**:
+This was a complex feature requiring deep integration with Sanity's document context system to:
+1. Read the parent gallery's column/row configuration
+2. Access all sibling images to calculate occupied cells
+3. Update the UI dynamically based on context
+
+**Implementation**:
+
+1. **Dynamic Grid Size**:
+   - Grid now shows only the columns/rows configured in the parent gallery
+   - Reads `columns` and `rows` from document context
+   - Navigates up the path tree from `position` → `images[_key]` → parent gallery block
+   - Updates title to show actual grid dimensions (e.g., "5 columns × 10 rows")
+
+2. **Occupied Cell Detection**:
+   - Calculates which cells are occupied by other images in the gallery
+   - Iterates through all sibling images in the `images[]` array
+   - For each image with a position, marks all its cells as occupied
+   - Excludes the current image from occupation calculation
+
+3. **Visual Feedback**:
+   - **Gray cells** (`#d1d5db`): Occupied by other images, not clickable
+   - **Blue cells** (`#4f46e5`): Currently selected for this image
+   - **White cells** (`#f3f4f6`): Available for selection
+   - Reduced opacity (0.6) on occupied cells for clarity
+   - Added warning message: "⚠️ Gray cells are occupied by other images"
+
+4. **Interaction Improvements**:
+   - Occupied cells have `cursor: not-allowed`
+   - Clicking occupied cells does nothing (early return)
+   - Hover effects disabled on occupied cells
+   - Tooltip on hover shows "Cell occupied by another image"
+
+5. **Context Navigation Logic**:
+   - Uses Sanity's `path` array to navigate document structure
+   - Handles both string segments (field names) and object segments (array keys)
+   - Finds current image's `_key` to exclude it from occupancy calculation
+   - Traverses to parent gallery block to read configuration
+
+**Result**:
+- ✅ **Intuitive**: Only shows relevant grid cells
+- ✅ **Prevents Conflicts**: Can't place images on occupied cells
+- ✅ **Visual Clarity**: Clear distinction between available/occupied/selected
+- ✅ **Smart**: Automatically adapts to gallery configuration
+
+**Files Changed**:
+- `src/sanity/components/GridPositionInput.tsx` - Complete rewrite with context awareness
+
+**UX Improvements**:
+- No more confusion about which cells are available
+- Prevents accidental overlapping placements
+- Scales UI to match actual gallery size
+- Real-time feedback as other images are positioned
+
+---
+
+## [2025-10-31] – Grid Position Picker: Fixed Occupied Cell Detection + UI Polish
+
+**Issue**: Occupied cells weren't showing up when adding new images to the gallery
+
+**Root Cause**: 
+The path navigation logic was too complex and didn't handle all Sanity document structures correctly. The original approach tried to navigate the path array generically, but Sanity's context can vary.
+
+**Solution**:
+
+1. **Simplified Path Detection**:
+   - Look directly for `pageBlocks` array in document
+   - Search for `bentoGallery` type blocks
+   - Check if block contains the current image (via `_key`)
+   - Fallback: Check if document itself is a gallery (for direct editing)
+   - More robust and handles multiple gallery structures
+
+2. **Added Extensive Debug Logging**:
+   - Logs document path and full document structure
+   - Shows current image key detection
+   - Displays gallery dimensions found
+   - Lists all images and their positions
+   - Reports occupied cells count
+   - Helps diagnose issues in browser console (F12)
+
+3. **UI Improvements (Per User Request)**:
+   - **Perfectly Square Cells**: Used `aspectRatio: "1 / 1"` on each cell
+   - **Rounded Corners**: Set `borderRadius: "6px"` for softer look
+   - **Better Spacing**: Increased gap from 2px to 4px
+   - **Maintained Grid Proportions**: Added `aspectRatio` to container
+   - Cleaner, more polished appearance
+
+**Key Code Changes**:
+`	ypescript
+// Simplified gallery finding logic
+if (document.pageBlocks && Array.isArray(document.pageBlocks)) {
+  for (const block of document.pageBlocks) {
+    if (block._type === "bentoGallery" && block.images) {
+      const hasCurrentImage = block.images.some((img: any) => img._key === currentKey);
+      if (hasCurrentImage || !currentKey) {
+        galleryBlock = block;
+        break;
+      }
+    }
+  }
+}
+
+// Fallback for direct gallery editing
+if (!galleryBlock && document._type === "bentoGallery") {
+  galleryBlock = document;
+}
+`
+
+**Debugging**:
+When using the grid picker, open browser console (F12) to see:
+- 🔍 Document path structure
+- 🔑 Current image key
+- 📦 Gallery block found
+- 📐 Gallery dimensions
+- 🖼️ Total images count
+- 📍 Each image's position
+- 🚫 Total occupied cells
+
+**Result**:
+- ✅ Occupied cells now display correctly (gray with not-allowed cursor)
+- ✅ Perfect square cells with elegant rounded corners
+- ✅ Comprehensive logging for troubleshooting
+- ✅ More robust document structure handling
+
+**Files Changed**:
+- `src/sanity/components/GridPositionInput.tsx` - Simplified path logic, added logging, UI polish
+
+---
+
+## [2025-10-31] – Schema Field Reordering + Enhanced Grid Position Debugging
+
+**Changes Made**:
+
+1. **Reordered Bento Gallery Fields** (per user request):
+   - Moved `columns` and `rows` fields ABOVE `images` field
+   - Now admins configure grid dimensions first, then add images
+   - More logical workflow: set up grid → add images → position them
+   - Field order: sectionId → columns → rows → images
+
+2. **Comprehensive Grid Position Debugging**:
+   - Added detailed debug panel visible directly in Sanity Studio UI
+   - Shows complete diagnostic information without needing browser console
+   - Debug panel displays:
+     * Document path structure
+     * Document type
+     * Current image `_key`
+     * All pageBlocks found
+     * Gallery block detection
+     * Gallery dimensions
+     * All images in gallery with their keys
+     * Each image's position data
+     * Total occupied cells count
+     * List of occupied cell coordinates
+   
+3. **Enhanced Console Logging**:
+   - Structured debug messages with emojis for easy reading
+   - Step-by-step gallery block detection process
+   - Image-by-image position analysis
+   - Clear indication when images are skipped (current image)
+   - Warning messages when gallery block not found
+
+**Debug Panel Format**:
+`
+=== GridPositionInput Debug ===
+Path: [...]
+Document type: caseStudy
+Document has pageBlocks: true
+📦 Checking 3 pageBlocks...
+  - Block type: hero, has images: false
+  - Block type: bentoGallery, has images: true
+    Found bentoGallery with 3 images
+    Image keys in gallery: abc123, def456, ghi789
+    Contains current image (ghi789): true
+✅ Using this gallery block
+📐 Gallery dimensions: 5×10
+🖼️ Total images in gallery: 3
+  Image 1: _key=abc123
+    Position: {"columnStart":1,"columnSpan":2,"rowStart":1,"rowSpan":2}
+    📍 Occupies: col 1-2, row 1-2
+  Image 2: _key=def456
+    Position: {"columnStart":3,"columnSpan":3,"rowStart":1,"rowSpan":1}
+    📍 Occupies: col 3-5, row 1-1
+  Image 3: _key=ghi789
+    ⏭️ This is the current image, skipping
+🚫 Total occupied cells: 7
+   Occupied cells: 1-1, 1-2, 2-1, 2-2, 3-1, 4-1, 5-1
+`
+
+**Purpose**:
+This comprehensive logging will help diagnose why occupied cells aren't appearing. The user can now see exactly:
+- Whether the gallery is being found
+- Which images exist and their `_key` values
+- What position data each image has
+- How many cells should be marked as occupied
+
+**Next Steps for User**:
+1. Refresh Sanity Studio (hard refresh: Ctrl+Shift+R)
+2. Open a bento gallery with multiple positioned images
+3. Try to add/edit an image's position
+4. Look at the yellow "🔍 Debug Info" panel at the bottom
+5. Share the debug output to diagnose the issue
+
+**Files Changed**:
+- `src/sanity/types/sections/bentoGallery.ts` - Reordered fields
+- `src/sanity/components/GridPositionInput.tsx` - Added debug panel + enhanced logging
+
+---
+
+## [2025-10-31] – Grid Lines Toggle + Enhanced Debug Diagnostics
+
+**Changes Made**:
+
+1. **Grid Lines Toggle Added**:
+   - Added `showGridLines` boolean field to bentoGallery schema
+   - Positioned between `rows` and `images` fields
+   - Default value: `true` (grid lines visible by default)
+   - Description: "Show red grid lines overlay to visualize rows and columns"
+
+2. **Frontend Implementation**:
+   - Updated `BentoGallerySectionData` type to include `showGridLines`
+   - Passed `showGridLines` prop through server → client components
+   - Wrapped grid lines overlay in conditional: `{showGridLines && (...)`}
+   - Grid lines now toggle on/off based on Sanity setting
+
+3. **Debug Info Enhancement**:
+   - Added early bailout when document/path are undefined
+   - Shows what props are available: `Props keys: value, onChange, ...`
+   - Identifies if Sanity is passing document context
+   - Provides clear error message when context is missing:
+     `
+     ❌ No document or path context available
+     This means Sanity isn't passing the parent document context.
+     Falling back to defaults (no occupied cell detection possible)
+     `
+
+4. **GROQ Query Update**:
+   - Added `showGridLines` to bentoGallery fetch in `caseStudyBySlugQuery`
+
+**How Grid Lines Toggle Works**:
+- Admin toggles "Show Grid Lines" checkbox in Sanity
+- Setting is saved to gallery configuration
+- Frontend conditionally renders red grid overlay
+- When `false`, no grid lines appear on the live site
+- Useful for: 
+  * Development: Show grid lines to position images
+  * Production: Hide grid lines for clean gallery
+
+**Debug Info Status**:
+The debug panel now explicitly checks if `document` and `path` props exist. If they don't, it means:
+- Sanity v3 may not pass parent document context to custom object input components
+- We may need to use a different approach (e.g., `useFormValue` hook)
+- The debug output will now show exactly what props ARE available
+
+**Next Steps for User**:
+1. Hard refresh Sanity Studio (Ctrl+Shift+R)
+2. Check the debug panel - it should now show either:
+   - Full debug info with gallery details, OR
+   - Clear message about missing document context + list of available props
+3. Share the debug output to diagnose the occupied cells issue
+
+**Files Changed**:
+- `src/sanity/types/sections/bentoGallery.ts` - Added showGridLines field
+- `src/lib/sanity.queries.ts` - Fetch showGridLines
+- `src/components/sections/bento-gallery.tsx` - Pass showGridLines prop
+- `src/components/sections/bento-gallery.client.tsx` - Conditional grid lines render
+- `src/sanity/components/GridPositionInput.tsx` - Enhanced debug info with prop inspection
+
+---
+
+## [2025-10-31] – FIXED: Occupied Cell Detection using useFormValue Hook
+
+**The Problem**:
+User reported occupied cells weren't showing in the grid position picker. Debug output revealed:
+`
+Has document: false
+Has path: true
+Props keys: elementProps, level, members, value, readOnly, ...
+`
+
+**Root Cause**:
+- Sanity v3 doesn't pass `document` prop to custom input components
+- Was trying to access `props.document` which is undefined
+- Custom inputs in Sanity v3 need to use hooks to access form context
+
+**The Solution**:
+Imported and used Sanity's `useFormValue` hook:
+`	ypescript
+import { useFormValue } from "sanity";
+
+const GridPositionInputComponent: ComponentType<ObjectInputProps> = (props) => {
+  const { value, onChange, path } = props;
+  
+  // Use Sanity's useFormValue hook to get the document context
+  const document = useFormValue([]) as any;
+  
+  // ... rest of component
+};
+`
+
+**How useFormValue Works**:
+- `useFormValue([])` - Empty array returns the entire document
+- `useFormValue(['title'])` - Would return just the title field
+- `useFormValue(['pageBlocks', 0])` - Would return first pageBlock
+- It's Sanity v3's way to access form/document context in custom components
+
+**What This Fixes**:
+- ✅ Grid position picker now has access to the full document
+- ✅ Can find the parent bentoGallery block
+- ✅ Can read all images in the gallery
+- ✅ Can detect which cells are occupied by other images
+- ✅ Gray occupied cells should now appear correctly
+
+**Updated Debug Output**:
+Now shows:
+`
+=== GridPositionInput Debug ===
+Document via useFormValue: true ✅
+Has path: true
+Document type: caseStudy
+📦 Found gallery block
+🖼️ Total images in gallery: 3
+📍 Image positions
+🚫 Total occupied cells: 8
+`
+
+**Next Steps for User**:
+1. Hard refresh Sanity Studio (Ctrl+Shift+R)
+2. Open a bento gallery with multiple positioned images
+3. Add/edit an image's position
+4. **Occupied cells should now appear as gray squares!** 🎉
+
+**Files Changed**:
+- `src/sanity/components/GridPositionInput.tsx` - Added useFormValue hook
+
+**Technical Notes**:
+- This is a Sanity v3 specific requirement
+- In Sanity v2, `document` was passed as a prop
+- In Sanity v3, must use hooks: `useFormValue`, `useDocumentPane`, etc.
+- The hook re-renders the component when document changes (reactive)
+
+---

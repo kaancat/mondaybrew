@@ -28,12 +28,16 @@ type SanityImage = {
 
 export type BentoGallerySectionData = {
   images?: SanityImage[] | null;
-  columns?: number | null; // Kept for backwards compatibility but always override to 5
+  columns?: number | null;
+  rows?: number | null;
+  showGridLines?: boolean | null;
 };
 
-export function BentoGallerySection({ images }: BentoGallerySectionData) {
-  // Always use 5 columns - hardcoded rule
-  const columns = 5;
+export function BentoGallerySection({ images, columns = 5, rows = 10, showGridLines = true }: BentoGallerySectionData) {
+  // Use columns and rows from Sanity, with defaults
+  const gridColumns = columns || 5;
+  const gridRows = rows || 10;
+  const showLines = showGridLines ?? true;
   if (!images || images.length === 0) return null;
 
   // Process images and calculate grid sizes
@@ -104,7 +108,7 @@ export function BentoGallerySection({ images }: BentoGallerySectionData) {
       colSpan: img.colSpan,
       rowSpan: img.rowSpan,
     }));
-    const optimizedSizes = optimizeBentoLayout(gridSizes, columns);
+    const optimizedSizes = optimizeBentoLayout(gridSizes, gridColumns);
 
     // Apply optimized sizes
     finalImages = processedImages.map((img, i) => ({
@@ -116,7 +120,7 @@ export function BentoGallerySection({ images }: BentoGallerySectionData) {
 
   return (
     <Section>
-      <BentoGalleryClient images={finalImages} columns={columns} />
+      <BentoGalleryClient images={finalImages} columns={gridColumns} rows={gridRows} showGridLines={showLines} />
     </Section>
   );
 }
