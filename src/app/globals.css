@@ -98,7 +98,6 @@
   --shadow-elevated-lg: 0 36px 110px rgba(18,15,33,0.28);
   --shadow-hero: 0 50px 120px rgba(8,6,20,0.35);
   --shadow-glass-lg: 0 36px 110px rgba(6,5,16,0.32);
-  --mobile-nav-width: min(80vw, 360px);
 
   /* About section mobile stats visuals */
   --about-stats-mobile-surface: color-mix(in oklch, var(--surface-base) 82%, white 18%);
@@ -117,8 +116,6 @@
   --about-stats-card-value: var(--foreground);
   --about-stats-card-label: color-mix(in oklch, var(--foreground) 65%, transparent);
 
-  --site-shell-offset-x: 0px;
-  --site-shell-scale: 1;
   --full-bleed-inline-start: calc(50% - 50vw);
   --full-bleed-inline-end: calc(50% - 50vw);
   --full-bleed-width: 100vw;
@@ -732,13 +729,7 @@ html.dark {
     font-family: var(--font-body);
   }
 
-  body[data-mobile-nav-open="true"] {
-    overflow: hidden;
-    --site-shell-offset-x: calc(var(--mobile-nav-width) + clamp(6px, 3vw, 18px));
-    --site-shell-scale: 1;
-  }
-
-  /* Body::before overlay removed — rely on Radix Sheet overlay only */
+  /* Body overflow is handled by MobileBottomSheet component */
 
   .site-shell {
     position: relative;
@@ -799,84 +790,10 @@ html.dark {
       transform var(--nav-anim-duration) var(--nav-anim-ease);
   }
 
-  body[data-mobile-nav-open="true"]:has([data-slot="sheet-content"].mobile-nav-panel[data-side="left"][data-state="open"]) .site-shell {
-    transform-origin: left top !important;
-    transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
-    z-index: 60;
-    pointer-events: none;
-    background: var(--background);
-    box-shadow:
-      -18px 0 64px color-mix(in oklch, var(--mb-accent) 18%, transparent),
-      0 20px 60px rgba(8, 6, 20, 0.24);
-    filter: brightness(0.985);
-    contain: layout style paint;
-  }
-
-  body[data-mobile-nav-open="true"]:has([data-slot="sheet-content"].mobile-nav-panel[data-side="left"][data-state="open"]) .site-shell::after {
-    opacity: 0.22;
-    transform: translateX(-6%);
-  }
-
   /* Header is sticky within .site-shell and inherits its transform; no separate rule needed */
 
   /* Opt-in helper: wrap any custom embed/component you want to keep stable while opened */
   body[data-mobile-nav-open="true"] .nav-isolate { transform: none !important; will-change: auto !important; isolation: auto !important; }
-
-  [data-slot="sheet-content"].mobile-nav-panel {
-    display: flex;
-    align-items: stretch;
-    min-height: var(--nav-viewport-height);
-    height: auto;
-    width: 100vw;
-    max-width: none;
-    padding: 0;
-    /* Disable exit animation by default; we add transitions only while open */
-    transition: none;
-    /* Panel stays beneath the translated page */
-    z-index: 55 !important;
-    position: relative;
-    /* Default hidden so brief attribute gaps don't flash content */
-    transform: translateX(-100%);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-
-  [data-slot="sheet-content"].mobile-nav-panel[data-state="closed"] {
-    transform: translateX(-100%);
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-  }
-
-  body[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-state="open"] {
-    transform: translateX(0);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
-    background: var(--mobile-nav-surface);
-  }
-  [data-slot="sheet-overlay"] {
-    background: transparent !important;
-    pointer-events: auto;
-    /* Disable exit animation by default */
-    transition: none;
-    /* Overlay below panel for click handling */
-    z-index: 50 !important;
-  }
-
-  [data-slot="sheet-overlay"][data-state="closed"] {
-    opacity: 0;
-  }
-
-  body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
-    opacity: 1;
-    transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
-  }
-
-  /* Remove old snapping guard (no longer used) */
-  /* Remove old snapping guard (no longer used) */
 
   h1,
   h2,
@@ -1360,13 +1277,6 @@ html.dark .clients-hero-strip { --clients-hero-title: color-mix(in oklch, var(--
   body[data-mobile-nav-open="true"] header[class*="fixed"] {
     transform: none !important;
     transition: none !important;
-  }
-
-  /* Mobile only: hide header only while menu is fully open; show it during exiting for instant return */
-  @media (max-width: 767px) {
-    body[data-mobile-nav-open="true"] header[class*="fixed"] {
-      display: none !important;
-    }
   }
 /* Light Alt: when mobile menu is open, make Contact CTA clearly outlined */
 html.light-alt body[data-mobile-nav-open="true"] {

@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X } from "lucide-react";
+import { ArrowRight, Globe, Moon, Palette, Sun, Menu, Target, Search, Share2, Mail, ShoppingBag, Sparkles, ChevronRight, TrendingUp, Code, Briefcase, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { MobileBottomSheet, MobileBottomSheetTrigger } from "@/components/ui/mobile-bottom-sheet";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -144,6 +144,53 @@ type Props = {
 
 const DEFAULT_CTA_LABEL = "Let's talk";
 const FALLBACK_LOCALE = "da";
+
+// Icon mapping aligned with desktop mega menu
+const ICON_MAP: Record<string, typeof Target> = {
+  // Main categories
+  "Marketing": TrendingUp,
+  "Web": Code,
+  "Cases": Briefcase,
+  "Om os": Users,
+  "About": Users,
+
+  // Marketing sub-items
+  "Full-Funnel Performance": Target,
+  "full-funnel": Target,
+  "Paid Search": Search,
+  "paid-search": Search,
+  "Paid Social": Share2,
+  "paid-social": Share2,
+  "E-Mail Marketing": Mail,
+  "email": Mail,
+
+  // Web sub-items
+  "Hjemmesider": Globe,
+  "Websites": Globe,
+  "websites": Globe,
+  "CRM": Target,
+  "crm": Target,
+  "AI": Sparkles,
+  "ai": Sparkles,
+  "eCommerce": ShoppingBag,
+  "ecommerce": ShoppingBag,
+
+  // Other
+  "Services": Target,
+  "People": Users,
+  "Career": Briefcase,
+  "Events": Target,
+};
+
+function getIconForLabel(label?: string): typeof Target {
+  if (!label) return Target;
+  if (ICON_MAP[label]) return ICON_MAP[label];
+  const lower = label.toLowerCase();
+  for (const [key, Icon] of Object.entries(ICON_MAP)) {
+    if (lower.includes(key.toLowerCase())) return Icon;
+  }
+  return Target;
+}
 
 /**
  * MegaMenuTrigger: Simplified trigger button for mega menus
@@ -285,6 +332,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { mobileOpen, onOpenChange } = useNavPhase();
+  const [mobileMenuLevel, setMobileMenuLevel] = useState<string | null>(null);
   const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
   const [megaMenuContent, setMegaMenuContent] = useState<React.ReactNode>(null);
   const desktopNavRef = useRef<HTMLDivElement>(null);
@@ -346,6 +394,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     }
     prevPathRef.current = normalizedPath;
   }, [mobileOpen, normalizedPath, onOpenChange, mounted]);
+
+  // Reset mobile menu level when menu closes
+  useEffect(() => {
+    if (!mobileOpen) {
+      setMobileMenuLevel(null);
+    }
+  }, [mobileOpen]);
 
   // Cleanup handled by useNavPhase
 
@@ -564,156 +619,185 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 })()}
               </Link>
 
-              <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
-                <SheetTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="Open menu"
-                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-link-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                  >
-                    <Menu className="size-[18px]" aria-hidden="true" />
-                  </button>
-                </SheetTrigger>
-                <SheetContent
-                  side={process.env.NEXT_PUBLIC_MOBILE_NAV_VARIANT === "left" ? "left" : "bottom"}
-                  hideCloseButton
-                  forceMount
-                  className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
-                >
-                  {/* Accessibility: satisfy Radix requirements without changing visuals */}
-                  <SheetTitle className="sr-only">Menu</SheetTitle>
-                  <SheetDescription className="sr-only">Site navigation</SheetDescription>
-                  <div className="flex h-full w-full items-stretch">
-                    <div
-                      className={cn(
-                        "mobile-nav-inner flex flex-col px-6 py-8",
-                        process.env.NEXT_PUBLIC_MOBILE_NAV_VARIANT === "left"
-                          ? "w-[var(--mobile-nav-width)]"
-                          : "w-full max-w-screen-sm mx-auto"
-                      )}
-                    >
-                      {/* Header with close button */}
-                      <div className="flex items-center justify-between pb-5 shrink-0">
-                        <div className="flex flex-col">
-                          <span className="text-[11px] font-normal uppercase tracking-[0.32em] text-[color:var(--mobile-nav-muted)]">Menu</span>
-                        </div>
-                        <SheetClose asChild>
-                          <button
-                            type="button"
-                            aria-label="Luk menu"
-                            className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                          >
-                            <X className="size-[18px]" aria-hidden="true" />
-                            <span className="sr-only">Luk</span>
-                          </button>
-                        </SheetClose>
-                      </div>
-
-                      {/* Scrollable menu content */}
-                      <div className="mobile-nav-scroll pt-2">
-                        <motion.div
-                          className="space-y-7"
-                          initial="hidden"
-                          animate={mobileOpen ? "show" : "hidden"}
-                          variants={mobileMenuVariants}
-                        >
-                            {megaSections.map((section) => (
-                              <motion.section key={section.label} variants={mobileGroupVariants} className="space-y-3">
-                                <motion.h2 variants={mobileItemVariants} className="text-sm font-normal uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                                  {section.label}
-                                </motion.h2>
-                                <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                                  {section.groups.flatMap((group) =>
-                                    group.items.map((item) => {
-                                      const href = item.href ?? "#";
-                                      const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                                      return (
-                                        <motion.li key={`${section.label}-${item.label}`} variants={mobileItemVariants}>
-                                          <Link
-                                            href={href}
-                                            className={cn(
-                                              "group flex items-center justify-between rounded-[8px] px-3 py-2 text-[1.05rem] leading-tight transition",
-                                              active
-                                                ? "text-[color:var(--mobile-nav-text)] font-normal"
-                                                : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                            )}
-                                          >
-                                            <span>{item.label}</span>
-                                            <span className="ml-3 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[color:var(--mobile-nav-border)] text-[10px] opacity-0 transition group-hover:opacity-100">↗</span>
-                                          </Link>
-                                        </motion.li>
-                                      );
-                                    }),
-                                  )}
-                                </motion.ul>
-                              </motion.section>
-                            ))}
-                            {simpleLinks.length ? (
-                              <motion.section key="primary-links" variants={mobileGroupVariants} className="space-y-3 pt-2">
-                                <motion.h2 variants={mobileItemVariants} className="text-sm font-normal uppercase tracking-[0.28em] text-[color:var(--mobile-nav-heading)]">
-                                  Mere
-                                </motion.h2>
-                                <motion.ul variants={mobileGroupVariants} className="flex flex-col gap-1.5">
-                                  {simpleLinks.map((link) => {
-                                    const href = link.href ?? "#";
-                                    const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                                    return (
-                                      <motion.li key={link.label} variants={mobileItemVariants}>
-                                        <Link
-                                          href={href}
-                                          className={cn(
-                                            "rounded-[8px] px-3 py-2 text-[1.05rem] transition",
-                                            active
-                                              ? "text-[color:var(--mobile-nav-text)] font-normal"
-                                              : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)] hover:bg-[color:var(--mobile-nav-hover)]",
-                                          )}
-                                        >
-                                          {link.label}
-                                        </Link>
-                                      </motion.li>
-                                    );
-                                  })}
-                                </motion.ul>
-                              </motion.section>
-                            ) : null}
-                        </motion.div>
-                      </div>
-
-                      {/* Fixed bottom action buttons */}
-                      <div className="mt-auto pt-6 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] shrink-0 space-y-3">
-                        <Link
-                          href={ctaHref}
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-normal text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                        >
-                          <span>{ctaLabel}</span>
-                          <ArrowRight className="size-[16px]" aria-hidden="true" />
-                        </Link>
-                        <div className="flex items-center justify-between gap-2 text-[13px]">
-                          <button
-                            type="button"
-                            onClick={() => setTheme(nextThemeId)}
-                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[color:var(--mobile-nav-secondary-link)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                          >
-                            {themeIcon}
-                            <span>Skift tema</span>
-                          </button>
-                          <Link
-                            href={localeConfig.href}
-                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[color:var(--mobile-nav-secondary-link)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                          >
-                            <Globe className="size-[16px]" aria-hidden="true" />
-                            <span>{localeConfig.target}</span>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                    <SheetClose asChild>
-                      <button type="button" tabIndex={-1} aria-hidden="true" className="flex-1 bg-transparent" />
-                    </SheetClose>
-                  </div>
-                </SheetContent>
-              </Sheet>
+              {/* Mobile navigation trigger */}
+              <MobileBottomSheetTrigger
+                onClick={() => onOpenChange(true)}
+                className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-link-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                aria-label="Open menu"
+              >
+                <Menu className="size-[18px]" aria-hidden="true" />
+              </MobileBottomSheetTrigger>
             </div>
+
+            {/* Mobile bottom-sheet menu (rendered at portal level) */}
+            <MobileBottomSheet open={mobileOpen} onOpenChange={handleOpenChange}>
+              <div className="flex w-full max-w-screen-sm mx-auto flex-col px-6 h-full">
+                {/* Header with theme + locale controls */}
+                <div className="flex items-center justify-between pt-6 pb-4 shrink-0">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-[color:var(--mobile-nav-muted)]">{localeConfig.active === "en" ? "23:27" : "23.27"}</span>
+                    {mounted && (
+                      <span className="text-[color:var(--mobile-nav-muted)]">
+                        {currentThemeId === "dark" ? "🌙" : currentThemeId === "light-alt" ? "🎨" : "☀️"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* Locale toggle */}
+                    <Link
+                      href={localeConfig.href}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--mobile-nav-surface)] border border-[color:var(--mobile-nav-border)] px-3 py-1.5 text-xs font-normal text-[color:var(--mobile-nav-text)] transition hover:bg-[color:var(--mobile-nav-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)]"
+                    >
+                      <span className={cn(localeConfig.active === "en" ? "text-[color:var(--mobile-nav-text)]" : "text-[color:var(--mobile-nav-muted)]")}>EN</span>
+                      <div className="w-7 h-4 rounded-full bg-[color:var(--mobile-nav-border)] relative">
+                        <motion.div
+                          className="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-[color:var(--mobile-nav-text)]"
+                          animate={{ x: localeConfig.active === "da" ? 12 : 0 }}
+                          transition={{ duration: 0.2, ease: [0.22, 0.61, 0.36, 1] }}
+                        />
+                      </div>
+                      <span className={cn(localeConfig.active === "da" ? "text-[color:var(--mobile-nav-text)]" : "text-[color:var(--mobile-nav-muted)]")}>DA</span>
+                    </Link>
+                    {/* Theme toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setTheme(nextThemeId)}
+                      className="inline-flex items-center justify-center rounded-full bg-[color:var(--mobile-nav-surface)] border border-[color:var(--mobile-nav-border)] p-2 text-[color:var(--mobile-nav-muted)] transition hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)]"
+                      aria-label={`Switch to ${nextTheme.label}`}
+                    >
+                      {themeIcon}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Menu label */}
+                <div className="pb-4 shrink-0">
+                  <h2 className="text-sm font-normal text-[color:var(--mobile-nav-muted)]">Menu</h2>
+                </div>
+
+                {/* Scrollable menu content with cards */}
+                <div className="mobile-nav-scroll flex-1 overflow-y-auto pb-6">
+                  <AnimatePresence mode="wait" initial={false}>
+                    {mobileMenuLevel === null ? (
+                      <motion.div
+                        key="main-menu"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
+                        className="space-y-2"
+                      >
+                        {/* Main menu: Section cards */}
+                        {megaSections.map((section) => {
+                          const Icon = getIconForLabel(section.label);
+                          return (
+                            <button
+                              key={section.label}
+                              type="button"
+                              onClick={() => setMobileMenuLevel(section.label)}
+                              className="group flex w-full items-center gap-2.5 rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors hover:bg-[color:var(--mobile-nav-hover)]"
+                            >
+                              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
+                                <Icon className="h-4 w-4" aria-hidden="true" />
+                              </span>
+                              <span className="flex-1 text-left text-[0.95rem] font-normal text-[color:var(--mobile-nav-text)]">{section.label}</span>
+                              <ChevronRight className="h-4 w-4 text-[color:var(--mobile-nav-muted)] group-hover:text-[color:var(--mobile-nav-text)]" aria-hidden="true" />
+                            </button>
+                          );
+                        })}
+                        {/* Simple links on main menu */}
+                        {simpleLinks.map((link) => {
+                          const href = link.href ?? "#";
+                          const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                          const Icon = getIconForLabel(link.label);
+                          return (
+                            <Link
+                              key={link.label}
+                              href={href}
+                              className={cn(
+                                "group flex w-full items-center gap-2.5 rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors",
+                                active ? "ring-1 ring-[color:var(--mobile-nav-border)]" : "hover:bg-[color:var(--mobile-nav-hover)]"
+                              )}
+                            >
+                              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
+                                <Icon className="h-4 w-4" aria-hidden="true" />
+                              </span>
+                              <span className="flex-1 text-left text-[0.95rem] font-normal text-[color:var(--mobile-nav-link)] group-hover:text-[color:var(--mobile-nav-text)]">{link.label}</span>
+                              <ChevronRight className="h-4 w-4 text-[color:var(--mobile-nav-muted)] group-hover:text-[color:var(--mobile-nav-text)]" aria-hidden="true" />
+                            </Link>
+                          );
+                        })}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key={`submenu-${mobileMenuLevel}`}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
+                        className="space-y-3"
+                      >
+                        {/* Back button */}
+                        <button
+                          type="button"
+                          onClick={() => setMobileMenuLevel(null)}
+                          className="group -ml-2 inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-[color:var(--mobile-nav-muted)] transition hover:text-[color:var(--mobile-nav-text)]"
+                        >
+                          <ChevronRight className="h-4 w-4 rotate-180" aria-hidden="true" />
+                          <span className="text-sm">Tilbage</span>
+                        </button>
+                        {/* Section heading */}
+                        <h2 className="text-xs font-normal uppercase tracking-[0.24em] text-[color:var(--mobile-nav-heading)]">
+                          {mobileMenuLevel}
+                        </h2>
+                        {/* Submenu items as cards */}
+                        <div className="space-y-2">
+                          {megaSections
+                            .find((s) => s.label === mobileMenuLevel)
+                            ?.groups.flatMap((group) =>
+                              group.items.map((item) => {
+                                const href = item.href ?? "#";
+                                const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                                const Icon = getIconForLabel(item.label);
+                                return (
+                                  <Link
+                                    key={item.label}
+                                    href={href}
+                                    className={cn(
+                                      "group flex w-full items-center gap-2.5 rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors",
+                                      active ? "ring-1 ring-[color:var(--mobile-nav-border)]" : "hover:bg-[color:var(--mobile-nav-hover)]"
+                                    )}
+                                  >
+                                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
+                                      <Icon className="h-4 w-4" aria-hidden="true" />
+                                    </span>
+                                    <span className={cn(
+                                      "flex-1 text-left text-[0.95rem] font-normal leading-snug",
+                                      active ? "text-[color:var(--mobile-nav-text)]" : "text-[color:var(--mobile-nav-link)] group-hover:text-[color:var(--mobile-nav-text)]"
+                                    )}>{item.label}</span>
+                                    <ChevronRight className="h-4 w-4 text-[color:var(--mobile-nav-muted)] group-hover:text-[color:var(--mobile-nav-text)]" aria-hidden="true" />
+                                  </Link>
+                                );
+                              })
+                            )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Fixed bottom CTA */}
+                <div className="pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] shrink-0">
+                  <Link
+                    href={ctaHref}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-[5px] bg-[color:var(--nav-cta-bg)] border border-[color:var(--nav-cta-border)] px-4 py-2.5 text-sm font-normal text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)]"
+                  >
+                    <span>{ctaLabel}</span>
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </div>
+              </div>
+            </MobileBottomSheet>
 
             {/* Desktop header */}
             <div
