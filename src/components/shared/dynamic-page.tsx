@@ -4,7 +4,7 @@ import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
 import { TextImageSection } from "@/components/sections/text-image";
 import { TextOnlySection } from "@/components/sections/text-only";
 import { FAQSection, type FAQSectionProps } from "@/components/sections/faq";
-import { BentoGallerySection } from "@/components/sections/bento-gallery";
+import { BentoGallerySection, type BentoGallerySectionData } from "@/components/sections/bento-gallery";
 import { Section } from "@/components/layout/section";
 
 /**
@@ -157,14 +157,10 @@ export async function DynamicPage({
                 }
 
                 if (isBentoGallerySection(section)) {
+                    const bento = section as Partial<BentoGallerySectionData>;
                     return (
                         <div className="vr-section" key={key} id={key}>
-                            <BentoGallerySection
-                                images={section.images as any}
-                                columns={section.columns as number | null | undefined}
-                                rows={section.rows as number | null | undefined}
-                                showGridLines={section.showGridLines as boolean | null | undefined}
-                            />
+                            <BentoGallerySection images={bento.images} columns={bento.columns} rows={bento.rows} showGridLines={bento.showGridLines} />
                         </div>
                     );
                 }

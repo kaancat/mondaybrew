@@ -18,7 +18,9 @@ const GridPositionInputComponent: ComponentType<ObjectInputProps> = (props) => {
   const { value = {}, onChange, path } = props;
   
   // Use Sanity's useFormValue hook to get the document context
-  const document = useFormValue([]) as any;
+  interface SanityGalleryBlock { _type?: string; images?: ImageItem[]; columns?: number; rows?: number }
+  interface SanityDoc { _type?: string; pageBlocks?: SanityGalleryBlock[] }
+  const document = useFormValue([]) as SanityDoc | null;
   
   const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
 
@@ -84,7 +86,7 @@ const GridPositionInputComponent: ComponentType<ObjectInputProps> = (props) => {
 
       // Find the gallery block - walk through the path to find it
       // We're looking for the parent that contains both "images" array and "columns"/"rows"
-      let galleryBlock: any = null;
+      let galleryBlock: SanityGalleryBlock | null = null;
 
       // Try to find the gallery in pageBlocks
       if (document.pageBlocks && Array.isArray(document.pageBlocks)) {
@@ -98,11 +100,11 @@ const GridPositionInputComponent: ComponentType<ObjectInputProps> = (props) => {
             debug.push(`    Found bentoGallery with ${block.images.length} images`);
             
             // List all image keys in this gallery
-            const imageKeys = block.images.map((img: any) => img._key);
+            const imageKeys = block.images.map((img: ImageItem) => img._key);
             debug.push(`    Image keys in gallery: ${imageKeys.join(", ")}`);
             
             // Check if this block contains our current image
-            const hasCurrentImage = block.images.some((img: any) => img._key === currentKey);
+            const hasCurrentImage = block.images.some((img: ImageItem) => img._key === currentKey);
             debug.push(`    Contains current image (${currentKey}): ${hasCurrentImage}`);
             
             if (hasCurrentImage || !currentKey) {

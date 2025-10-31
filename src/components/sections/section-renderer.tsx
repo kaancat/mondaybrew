@@ -15,7 +15,7 @@ import TestimonialsMarquee from "./testimonials-marquee";
 type SectionBlock = {
   _type: string;
   _key: string;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 type SectionRendererProps = {
@@ -77,4 +77,3 @@ export function SectionRenderer({ block }: SectionRendererProps) {
       );
   }
 }
-

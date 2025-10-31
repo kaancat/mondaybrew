@@ -108,18 +108,13 @@ export function CasesStickyScroll({ cases }: CasesStickyScrollProps) {
         "bg-[#BB8FCE]", // Purple
     ];
 
-    if (!cases || cases.length === 0) {
-        return (
-            <div className="py-32 text-center">
-                <p className="text-muted-foreground">No cases found.</p>
-            </div>
-        );
-    }
+    const hasCases = Array.isArray(cases) && cases.length > 0;
 
     // STACKING CARDS ON SCROLL EFFECT
     // Setup GSAP ScrollTrigger animations for stacked cards
     useEffect(() => {
-        if (!containerRef.current || cardRefs.current.length === 0) return;
+        const containerEl = containerRef.current;
+        if (!containerEl || cardRefs.current.length === 0) return;
 
         // ========================================
         // CONFIGURATION: Adjust these values
@@ -133,7 +128,7 @@ export function CasesStickyScroll({ cases }: CasesStickyScrollProps) {
         // CARD GAP: Space between cards before they start overlaying (pixels)
         // This gap is visible at the bottom of the viewport before next card overlays
         // Adjust: 32-64px typical (2-4rem)
-        const CARD_GAP = 48; // pixels (3rem)
+        // const CARD_GAP = 48; // pixels (3rem)
 
         // ========================================
         // Setup animations for each card
@@ -239,7 +234,7 @@ export function CasesStickyScroll({ cases }: CasesStickyScrollProps) {
                     typeof triggerElement !== "string" &&
                     !Array.isArray(triggerElement) &&
                     "parentElement" in triggerElement &&
-                    triggerElement.parentElement === containerRef.current
+                    triggerElement.parentElement === containerEl
                 ) {
                     trigger.kill();
                 }
@@ -255,7 +250,12 @@ export function CasesStickyScroll({ cases }: CasesStickyScrollProps) {
                 marginTop: "2rem",
             }}
         >
-            {cases.map((caseStudy, index) => {
+            {!hasCases ? (
+                <div className="py-32 text-center">
+                    <p className="text-muted-foreground">No cases found.</p>
+                </div>
+            ) : (
+            cases.map((caseStudy, index) => {
                 const imageMeta = resolveCaseStudyMedia(caseStudy.media, caseStudy.title);
                 const videoSrc = caseStudy.media?.videoFile?.asset?.url || caseStudy.media?.videoUrl;
                 const placeholderColor = placeholderColors[index % placeholderColors.length];
@@ -380,8 +380,7 @@ export function CasesStickyScroll({ cases }: CasesStickyScrollProps) {
                         </section>
                     </div>
                 );
-            })}
+            }))}
         </div>
     );
 }
-
