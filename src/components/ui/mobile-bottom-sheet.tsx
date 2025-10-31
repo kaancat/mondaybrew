@@ -74,7 +74,10 @@ export function MobileBottomSheet({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
             className="absolute inset-0 bg-[color:var(--mobile-nav-overlay)] backdrop-blur-[8px]"
-            style={{ WebkitBackdropFilter: "blur(8px)" }}
+            style={{
+              WebkitBackdropFilter: "blur(8px)",
+              willChange: "opacity",
+            }}
             onClick={handleOverlayClick}
             aria-hidden="true"
           />
@@ -86,6 +89,10 @@ export function MobileBottomSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ duration: 0.4, ease: [0.25, 0.62, 0.32, 1] }}
+            style={{
+              willChange: "transform",
+              transform: "translate3d(0, 0, 0)",
+            }}
           >
             {/* Close button positioned above the sheet */}
             <div className="flex justify-end px-6 pb-3">

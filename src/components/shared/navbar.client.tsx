@@ -599,7 +599,11 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
           "fixed inset-x-0 top-0 z-[9999] transition-opacity duration-300",
           shouldFadeHeader ? "opacity-0 pointer-events-none" : "opacity-100"
         )}
-        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}
+        style={{
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
+          willChange: mobileOpen ? "transform" : "auto",
+          transform: "translate3d(0, 0, 0)",
+        }}
       >
         <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

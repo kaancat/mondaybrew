@@ -731,6 +731,12 @@ html.dark {
 
   /* Body overflow is handled by MobileBottomSheet component */
 
+  /* Force GPU acceleration for mobile menu animations */
+  .mobile-nav-scroll {
+    -webkit-overflow-scrolling: touch;
+    transform: translate3d(0, 0, 0);
+  }
+
   .site-shell {
     position: relative;
     z-index: 50;
