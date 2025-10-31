@@ -16,16 +16,17 @@ export default async function CaseStudyPage({ params }: Props) {
   const cs = await getCaseStudyBySlug(params.slug);
   if (!cs) notFound();
   const blocks = Array.isArray(cs.pageBlocks) ? cs.pageBlocks : [];
+  type Block = { _key: string; _type: string } & Record<string, unknown>;
   return (
     <>
       {blocks.length ? (
-        blocks.map((block: any) => <SectionRenderer key={block._key} block={block} />)
+        (blocks as Block[]).map((block) => <SectionRenderer key={block._key} block={block} />)
       ) : (
         <div className="min-h-[60vh] flex items-center justify-center">
           <div className="text-center max-w-md px-6">
             <h1 className="text-3xl font-bold mb-4">{cs.title || "Case Study"}</h1>
             <p className="text-muted-foreground">
-              No content sections added yet. Add components in the "📄 Individual Page" tab in Studio.
+              No content sections added yet. Add components in the &quot;📄 Individual Page&quot; tab in Studio.
             </p>
           </div>
         </div>
@@ -33,4 +34,3 @@ export default async function CaseStudyPage({ params }: Props) {
     </>
   );
 }
-

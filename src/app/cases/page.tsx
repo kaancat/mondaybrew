@@ -7,7 +7,7 @@ export default async function CasesPage() {
   let cases;
   try {
     cases = await getCaseStudies("da");
-  } catch (e) {
+  } catch {
     cases = [];
   }
 
@@ -39,7 +39,7 @@ export default async function CasesPage() {
           </span>
           <h1 style={{ lineHeight: "1", margin: 0 }}>Vores cases</h1>
           <p className="text-muted-foreground max-w-2xl" style={{ lineHeight: "1.5", margin: 0 }}>
-            Discover our portfolio of successful projects and innovative solutions we've delivered for our clients.
+            Discover our portfolio of successful projects and innovative solutions we&#39;ve delivered for our clients.
           </p>
         </div>
       </Section>
