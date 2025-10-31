@@ -695,9 +695,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                               key={section.label}
                               type="button"
                               onClick={() => setMobileMenuLevel(section.label)}
-                              className="group flex w-full items-center gap-2.5 rounded-lg border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors hover:bg-[color:var(--mobile-nav-hover)]"
+                              className="group flex w-full items-center gap-2.5 rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors hover:bg-[color:var(--mobile-nav-hover)]"
                             >
-                              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
+                              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
                                 <Icon className="h-4 w-4" aria-hidden="true" />
                               </span>
                               <span className="flex-1 text-left text-[0.95rem] font-normal text-[color:var(--mobile-nav-text)]">{section.label}</span>
@@ -715,11 +715,11 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                               key={link.label}
                               href={href}
                               className={cn(
-                                "group flex w-full items-center gap-2.5 rounded-lg border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors",
+                                "group flex w-full items-center gap-2.5 rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors",
                                 active ? "ring-1 ring-[color:var(--mobile-nav-border)]" : "hover:bg-[color:var(--mobile-nav-hover)]"
                               )}
                             >
-                              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
+                              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
                                 <Icon className="h-4 w-4" aria-hidden="true" />
                               </span>
                               <span className="flex-1 text-left text-[0.95rem] font-normal text-[color:var(--mobile-nav-link)] group-hover:text-[color:var(--mobile-nav-text)]">{link.label}</span>
@@ -764,11 +764,11 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                                     key={item.label}
                                     href={href}
                                     className={cn(
-                                      "group flex w-full items-center gap-2.5 rounded-lg border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors",
+                                      "group flex w-full items-center gap-2.5 rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2.5 transition-colors",
                                       active ? "ring-1 ring-[color:var(--mobile-nav-border)]" : "hover:bg-[color:var(--mobile-nav-hover)]"
                                     )}
                                   >
-                                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
+                                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
                                       <Icon className="h-4 w-4" aria-hidden="true" />
                                     </span>
                                     <span className={cn(
@@ -790,7 +790,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 <div className="pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] shrink-0">
                   <Link
                     href={ctaHref}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-[color:var(--nav-cta-bg)] border border-[color:var(--nav-cta-border)] px-4 py-2.5 text-sm font-normal text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)]"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-[5px] bg-[color:var(--nav-cta-bg)] border border-[color:var(--nav-cta-border)] px-4 py-2.5 text-sm font-normal text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)]"
                   >
                     <span>{ctaLabel}</span>
                     <ArrowRight className="size-4" aria-hidden="true" />
