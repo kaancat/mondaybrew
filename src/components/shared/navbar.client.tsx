@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe, Moon, Palette, Sun, Menu, Target, Search, Share2, Mail, ShoppingBag, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowRight, Globe, Moon, Palette, Sun, Menu, Target, Search, Share2, Mail, ShoppingBag, Sparkles, ChevronRight, TrendingUp, Code, Briefcase, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileBottomSheet, MobileBottomSheetTrigger } from "@/components/ui/mobile-bottom-sheet";
 import {
@@ -147,6 +147,14 @@ const FALLBACK_LOCALE = "da";
 
 // Icon mapping aligned with desktop mega menu
 const ICON_MAP: Record<string, typeof Target> = {
+  // Main categories
+  "Marketing": TrendingUp,
+  "Web": Code,
+  "Cases": Briefcase,
+  "Om os": Users,
+  "About": Users,
+
+  // Marketing sub-items
   "Full-Funnel Performance": Target,
   "full-funnel": Target,
   "Paid Search": Search,
@@ -155,7 +163,10 @@ const ICON_MAP: Record<string, typeof Target> = {
   "paid-social": Share2,
   "E-Mail Marketing": Mail,
   "email": Mail,
+
+  // Web sub-items
   "Hjemmesider": Globe,
+  "Websites": Globe,
   "websites": Globe,
   "CRM": Target,
   "crm": Target,
@@ -163,11 +174,11 @@ const ICON_MAP: Record<string, typeof Target> = {
   "ai": Sparkles,
   "eCommerce": ShoppingBag,
   "ecommerce": ShoppingBag,
+
+  // Other
   "Services": Target,
-  "Cases": Target,
-  "About": Target,
-  "People": Target,
-  "Career": Target,
+  "People": Users,
+  "Career": Briefcase,
   "Events": Target,
 };
 
