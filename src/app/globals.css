@@ -855,6 +855,33 @@ html.dark {
 }
 
 @layer utilities {
+  /* Bento Gallery grid utilities */
+  .bento-grid-container {
+    /* Mobile-first: simple responsive grid */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 160px;
+  }
+
+  @media (min-width: 640px) {
+    .bento-grid-container { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 768px) {
+    .bento-grid-container { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .bento-grid-container {
+      /* Desktop: use provided columns/rows via CSS vars */
+      grid-template-columns: repeat(var(--bento-columns, 5), 1fr);
+      grid-template-rows: repeat(var(--bento-rows, 10), minmax(140px, auto));
+      grid-auto-rows: unset;
+    }
+
+    .bento-grid-item {
+      /* Position items on the desktop grid using CSS vars */
+      grid-column: var(--col-start, auto) / span var(--col-span, 1);
+      grid-row: var(--row-start, auto) / span var(--row-span, 2);
+    }
+  }
   /* Shared Services card surface so components match 1:1 */
   .services-card-surface {
     background: var(--services-card-bg) !important;
