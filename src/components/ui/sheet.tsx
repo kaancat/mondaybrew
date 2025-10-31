@@ -62,6 +62,7 @@ function SheetContent({
       <SheetPrimitive.Content
         forceMount={forceMount}
         data-slot="sheet-content"
+        data-side={side}
         className={cn(
           "bg-background fixed z-50 flex flex-col gap-4 shadow-lg",
           side === "right" &&

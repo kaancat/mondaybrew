@@ -4,6 +4,7 @@ import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
 import { TextImageSection } from "@/components/sections/text-image";
 import { TextOnlySection } from "@/components/sections/text-only";
 import { FAQSection, type FAQSectionProps } from "@/components/sections/faq";
+import { BentoGallerySection } from "@/components/sections/bento-gallery";
 import { ContentBillboard, type ContentBillboardData } from "@/components/sections/content-billboard";
 import { Section } from "@/components/layout/section";
 
@@ -45,6 +46,10 @@ function isTextOnlySection(section: PageSection): boolean {
 
 function isFAQSection(section: PageSection): boolean {
     return section?._type === "faq";
+}
+
+function isBentoGallerySection(section: PageSection): boolean {
+    return section?._type === "bentoGallery";
 }
 
 function isContentBillboardSection(section: PageSection): boolean {
@@ -151,6 +156,19 @@ export async function DynamicPage({
                                 subheading={section.subheading as string | undefined}
                                 titleAlignment={section.titleAlignment as "left" | "center" | "right" | undefined}
                                 categories={section.categories as FAQSectionProps["categories"]}
+                            />
+                        </div>
+                    );
+                }
+
+                if (isBentoGallerySection(section)) {
+                    return (
+                        <div className="vr-section" key={key} id={key}>
+                            <BentoGallerySection
+                                images={section.images as any}
+                                columns={section.columns as number | null | undefined}
+                                rows={section.rows as number | null | undefined}
+                                showGridLines={section.showGridLines as boolean | null | undefined}
                             />
                         </div>
                     );
