@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X, Target, Search, Share2, Mail, ShoppingBag, Sparkles, ChevronRight, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { MobileBottomSheet, MobileBottomSheetTrigger, MobileBottomSheetClose } from "@/components/ui/mobile-bottom-sheet";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -608,43 +608,29 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 })()}
               </Link>
 
-              {/* Mobile navigation: supports experimental bottom-sheet variant via NEXT_PUBLIC_MOBILE_NAV_VARIANT=bottom */}
-              <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
-                <SheetTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="Open menu"
-                    className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-link-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                  >
-                    <Menu className="size-[18px]" aria-hidden="true" />
-                  </button>
-                </SheetTrigger>
-                <SheetContent
-                  // Bottom-sheet by default for mobile
-                  side="bottom"
-                  hideCloseButton
-                  className={cn(
-                    "mobile-nav-panel flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0",
-                  )}
+              {/* Mobile navigation: Custom bottom-sheet */}
+              <>
+                <MobileBottomSheetTrigger
+                  onClick={() => onOpenChange(true)}
+                  className="inline-flex items-center justify-center rounded-[5px] border border-[color:var(--nav-toggle-border)] bg-transparent p-2 text-[color:var(--nav-link-text)] transition hover:border-[color:var(--nav-toggle-hover-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                  aria-label="Open menu"
                 >
-                  {/* Accessibility: satisfy Radix requirements without changing visuals */}
-                  <SheetTitle className="sr-only">Menu</SheetTitle>
-                  <SheetDescription className="sr-only">Site navigation</SheetDescription>
-                  <div className="flex h-full w-full items-stretch">
-                    <div className={cn("mobile-nav-inner flex w-full max-w-screen-sm mx-auto flex-col px-6 py-8")}> 
-                      {/* Header with close button */}
-                      <div className="flex items-center justify-end pb-4 shrink-0">
-                        <SheetClose asChild>
-                          <button
-                            type="button"
-                            aria-label="Luk menu"
-                            className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                          >
-                            <X className="size-[20px]" aria-hidden="true" />
-                            <span className="sr-only">Luk</span>
-                          </button>
-                        </SheetClose>
-                      </div>
+                  <Menu className="size-[18px]" aria-hidden="true" />
+                </MobileBottomSheetTrigger>
+
+                <MobileBottomSheet open={mobileOpen} onOpenChange={handleOpenChange}>
+                  <div className="flex w-full max-w-screen-sm mx-auto flex-col px-6 py-8 h-full">
+                    {/* Header with close button */}
+                    <div className="flex items-center justify-end pb-4 shrink-0">
+                      <MobileBottomSheetClose
+                        onClose={() => onOpenChange(false)}
+                        className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
+                        aria-label="Luk menu"
+                      >
+                        <X className="size-[20px]" aria-hidden="true" />
+                        <span className="sr-only">Luk</span>
+                      </MobileBottomSheetClose>
+                    </div>
 
                       {/* Scrollable menu content with multi-level navigation */}
                       <div className="mobile-nav-scroll flex-1 overflow-y-auto">
@@ -785,13 +771,9 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                         </div>
                       </div>
                     </div>
-                    <SheetClose asChild>
-                      <button type="button" tabIndex={-1} aria-hidden="true" className="flex-1 bg-transparent" />
-                    </SheetClose>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
+                  </MobileBottomSheet>
+                </>
+              </div>
 
             {/* Desktop header */}
             <div

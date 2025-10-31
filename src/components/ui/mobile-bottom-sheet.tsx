@@ -1,0 +1,123 @@
+"use client";
+
+import { useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type MobileBottomSheetProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+  className?: string;
+};
+
+export function MobileBottomSheet({
+  open,
+  onOpenChange,
+  children,
+  className,
+}: MobileBottomSheetProps) {
+  // Handle ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        onOpenChange(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [open, onOpenChange]);
+
+  // Prevent body scroll when open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  const handleOverlayClick = useCallback(() => {
+    onOpenChange(false);
+  }, [onOpenChange]);
+
+  if (!open) return null;
+
+  return (
+    <AnimatePresence mode="wait">
+      {open && (
+        <div className="fixed inset-0 z-[9999]" role="dialog" aria-modal="true">
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
+            className="absolute inset-0 bg-[color:var(--mobile-nav-overlay)] backdrop-blur-[8px]"
+            style={{ WebkitBackdropFilter: "blur(8px)" }}
+            onClick={handleOverlayClick}
+            aria-hidden="true"
+          />
+
+          {/* Bottom Sheet */}
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ duration: 0.4, ease: [0.25, 0.62, 0.32, 1] }}
+            className={cn(
+              "absolute inset-x-0 bottom-0 flex flex-col bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)]",
+              "max-h-[82vh] overflow-hidden",
+              "rounded-t-[16px] border-t border-[color:var(--mobile-nav-border)]",
+              "shadow-[0_-12px_48px_rgba(8,6,20,0.2)]",
+              className
+            )}
+          >
+            {children}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+type MobileBottomSheetTriggerProps = {
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+};
+
+export function MobileBottomSheetTrigger({
+  children,
+  onClick,
+  className,
+}: MobileBottomSheetTriggerProps) {
+  return (
+    <button type="button" onClick={onClick} className={className}>
+      {children}
+    </button>
+  );
+}
+
+type MobileBottomSheetCloseProps = {
+  children: React.ReactNode;
+  onClose: () => void;
+  className?: string;
+};
+
+export function MobileBottomSheetClose({
+  children,
+  onClose,
+  className,
+}: MobileBottomSheetCloseProps) {
+  return (
+    <button type="button" onClick={onClose} className={className}>
+      {children}
+    </button>
+  );
+}
