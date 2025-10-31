@@ -882,7 +882,7 @@ html.dark {
   /* Bottom-sheet variant: enable when SheetContent[data-side="bottom"] is used (env flag) */
   [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"] {
     inset-inline: 0;
-    inset-block-start: auto;
+    inset-block-start: 70px;
     inset-block-end: 0;
     min-height: auto;
     height: auto;
@@ -926,6 +926,13 @@ html.dark {
   body[data-mobile-nav-open="true"] [data-slot="sheet-overlay"][data-state="open"] {
     opacity: 1;
     transition: opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
+  }
+
+  /* Bottom-sheet overlay: backdrop blur and tinted background */
+  body[data-mobile-nav-open="true"]:has([data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="open"]) [data-slot="sheet-overlay"] {
+    background: var(--mobile-nav-overlay) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   /* Remove old snapping guard (no longer used) */
