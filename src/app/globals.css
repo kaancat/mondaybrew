@@ -737,7 +737,7 @@ html.dark {
       transform var(--nav-anim-duration) var(--nav-anim-ease);
   }
 
-  body[data-mobile-nav-open="true"] .site-shell {
+  body[data-mobile-nav-open="true"]:has([data-slot="sheet-content"].mobile-nav-panel[data-side="left"][data-state="open"]) .site-shell {
     transform-origin: left top !important;
     transform: translate3d(clamp(0px, var(--site-shell-offset-x), 100vw), 0, 0) scale(var(--site-shell-scale));
     z-index: 60;
@@ -750,7 +750,7 @@ html.dark {
     contain: layout style paint;
   }
 
-  body[data-mobile-nav-open="true"] .site-shell::after {
+  body[data-mobile-nav-open="true"]:has([data-slot="sheet-content"].mobile-nav-panel[data-side="left"][data-state="open"]) .site-shell::after {
     opacity: 0.22;
     transform: translateX(-6%);
   }
