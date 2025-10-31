@@ -2046,3 +2046,67 @@ Document type: caseStudy
 **Commit**: 6731ee7
 
 ---
+
+## [2025-10-31] – HOTFIX: Desktop Bento Grid Showing 1 Column
+
+**Issue**: 
+User reported desktop was showing 1 column stack (like mobile) instead of the full bento grid.
+
+**Root Cause**:
+Inline styles in the component had higher specificity than CSS media queries:
+`jsx
+style={{
+  gridTemplateColumns: "repeat(1, 1fr)", // ❌ This overrides CSS!
+  gridColumn: 'span 1',
+  gridRow: 'auto',
+}}
+`
+
+**The Problem with Inline Styles**:
+- Inline styles have specificity of 1,0,0,0
+- CSS media queries have lower specificity
+- Even with `!important` in CSS, inline styles win
+- Result: Desktop stuck at mobile layout
+
+**The Fix**:
+Removed ALL inline grid positioning styles from JSX:
+`jsx
+// BEFORE (broken):
+style={{
+  gridTemplateColumns: "repeat(1, 1fr)",
+  gridColumn: 'span 1',
+  gridRow: 'auto',
+}}
+
+// AFTER (working):
+style={{
+  "--bento-columns": columns,
+  "--bento-rows": rows,
+  // Let CSS media queries handle all grid properties
+}}
+`
+
+**How It Works Now**:
+1. **JSX**: Only sets CSS custom properties (`--bento-columns`, etc.)
+2. **CSS**: Uses media queries to apply those properties:
+   - Mobile: `grid-template-columns: repeat(1, 1fr)` ✅
+   - Desktop: `grid-template-columns: repeat(var(--bento-columns), 1fr)` ✅
+3. **Result**: CSS has full control, responsive behavior works perfectly
+
+**Key Learning**:
+When building responsive components:
+- ❌ Don't mix inline styles with CSS media queries
+- ✅ Use CSS custom properties for dynamic values
+- ✅ Let CSS handle all breakpoint logic
+- ✅ Inline styles only for truly dynamic properties
+
+**Testing**:
+- Mobile (< 768px): 1 column ✅
+- Tablet (768-1024px): 2 columns ✅
+- Desktop (≥ 1024px): Full configured grid (5×10 default) ✅
+- Manual positioning: Only applies on desktop ✅
+
+**Commit**: 84268c3
+**Branch**: case-archive
+
+---
