@@ -82,9 +82,7 @@ export function BentoGalleryClient({ images, columns, rows, showGridLines }: Ben
             // CSS custom properties for responsive columns
             "--bento-columns": columns,
             "--bento-rows": rows,
-            gridTemplateColumns: "repeat(1, 1fr)", // Mobile default
-            gridAutoRows: "minmax(200px, auto)",
-            gridAutoFlow: "dense",
+            // Don't set gridTemplateColumns inline - let CSS media queries handle it
           } as React.CSSProperties}
         >
         {images.map((image, index) => (
@@ -92,14 +90,13 @@ export function BentoGalleryClient({ images, columns, rows, showGridLines }: Ben
             key={index}
             className="bento-grid-item relative overflow-hidden rounded-lg bg-muted cursor-pointer group"
             style={{
-              // On mobile/tablet: just span 1 column
-              // On desktop: use configured positioning
+              // Pass positioning as CSS custom properties
+              // CSS media queries will apply them only on desktop
               "--col-start": image.colStart || 'auto',
               "--col-span": image.colSpan,
               "--row-start": image.rowStart || 'auto',
               "--row-span": image.rowSpan,
-              gridColumn: 'span 1', // Mobile default
-              gridRow: 'auto',
+              // Don't set gridColumn/gridRow inline - let CSS media queries handle it
             } as React.CSSProperties}
             onClick={() => openLightbox(index)}
           >

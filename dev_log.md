@@ -1940,3 +1940,109 @@ Document type: caseStudy
 - The hook re-renders the component when document changes (reactive)
 
 ---
+
+## [2025-10-31] – Mobile-First Responsive Bento Grid Gallery
+
+**User Request**: "Very fucking nice, this work is insane - WE LOVE IT! Can you make it mobile friendly?"
+
+**Implementation**: Complete responsive redesign with mobile-first approach
+
+**Responsive Breakpoints**:
+
+1. **Mobile (< 768px)**:
+   - **1 column layout** - images stack vertically
+   - Min height: 250px per image
+   - No manual positioning (ignored)
+   - Grid lines hidden (`display: none`)
+   - Optimized for portrait viewing
+
+2. **Tablet (768px - 1024px)**:
+   - **2 column layout** - side-by-side images
+   - Min height: 300px per image
+   - Manual positioning ignored
+   - Grid lines hidden
+   - Better use of landscape space
+
+3. **Desktop (≥ 1024px)**:
+   - **Full configured grid** (5-15 columns, 1-25 rows)
+   - Manual positioning enabled (grid picker positions apply)
+   - Grid lines visible (if enabled)
+   - Full bento grid experience
+
+**Technical Approach**:
+
+1. **CSS-Only Solution**:
+   - No JavaScript window checks (avoids hydration issues)
+   - Pure CSS media queries in `globals.css`
+   - CSS custom properties for dynamic values:
+     `css
+     --bento-columns: 5;
+     --bento-rows: 10;
+     --col-start: 1;
+     --col-span: 2;
+     --row-start: 1;
+     --row-span: 2;
+     `
+
+2. **Responsive CSS Structure**:
+   `css
+   /* Mobile: Stack vertically */
+   .bento-grid-container {
+     grid-template-columns: repeat(1, 1fr);
+   }
+   
+   /* Tablet: 2 columns */
+   @media (min-width: 768px) {
+     .bento-grid-container {
+       grid-template-columns: repeat(2, 1fr);
+     }
+   }
+   
+   /* Desktop: Full bento grid */
+   @media (min-width: 1024px) {
+     .bento-grid-container {
+       grid-template-columns: repeat(var(--bento-columns), 1fr);
+     }
+     
+     .bento-grid-item {
+       grid-column: var(--col-start) / span var(--col-span);
+       grid-row: var(--row-start) / span var(--row-span);
+     }
+   }
+   `
+
+3. **Grid Lines Behavior**:
+   - Mobile/Tablet: `hidden` (not useful on vertical layout)
+   - Desktop: `lg:grid` (visible only if `showGridLines` is true)
+   - Red overlay only appears when positioning makes sense
+
+**User Experience**:
+
+- **Mobile Users**: Clean vertical gallery, easy scrolling
+- **Tablet Users**: Side-by-side viewing, compact layout
+- **Desktop Users**: Full creative bento grid with manual control
+- **Admins**: Set positions in Sanity, they only apply on desktop
+- **Consistency**: Same content, optimized presentation per device
+
+**Performance**:
+- No JavaScript overhead for responsiveness
+- CSS-only transforms (GPU accelerated)
+- No layout shift between breakpoints
+- Smooth transitions with `grid-auto-flow: dense`
+
+**Files Changed**:
+- `src/components/sections/bento-gallery.client.tsx` - CSS custom properties, responsive classes
+- `src/app/globals.css` - Bento grid responsive media queries
+
+**Result**:
+✅ **Mobile-first design** that works beautifully on all devices
+✅ **Vertical stacking** on phones for easy browsing
+✅ **2-column layout** on tablets for better space usage
+✅ **Full bento grid** on desktop with manual positioning
+✅ **Grid lines** only show when relevant (desktop)
+✅ **Zero JavaScript** - pure CSS solution
+
+**Committed & Pushed**: case-archive branch
+**Commit**: 6731ee7
+
+---
