@@ -286,6 +286,37 @@ html.light-primary .about-stats-panel [data-stat-label] {
   color: var(--brand-light) !important;
 }
 
+.stat-aura {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  --_aura: var(--mb-accent);
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--_aura) 85%, white 15%) 0 40%, transparent 42%),
+    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--_aura) 40%, transparent) 0 70%, transparent 72%);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--_aura) 35%, transparent),
+    0 0 24px color-mix(in oklch, var(--_aura) 28%, transparent);
+}
+
+.stat-aura::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: radial-gradient(circle, color-mix(in oklch, var(--_aura) 25%, transparent) 0 55%, transparent 60%);
+  opacity: 0.55;
+  filter: blur(6px);
+  animation: auraPulse 2800ms var(--nav-anim-ease) infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) { .stat-aura::after { animation: none; } }
+
+@keyframes auraPulse { from { transform: scale(0.96); opacity: 0.45; } to { transform: scale(1.05); opacity: 0.75; } }
+
 .about-stats-card {
   border-radius: var(--about-stats-card-radius);
   background: var(--about-stats-card-bg);
@@ -299,6 +330,37 @@ html.light-primary .about-stats-panel [data-stat-label] {
 
 .about-stats-card [data-stat-label] {
   color: var(--about-stats-card-label);
+}
+
+/* Media Showcase: glass/white variant for stats cards */
+.about-stats-card--glass {
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in oklch, white 8%, transparent) 0%,
+      color-mix(in oklch, black 6%, transparent) 100%
+    ),
+    color-mix(in oklch, var(--nav-shell-bg) 42%, transparent);
+  border: 1px solid color-mix(in oklch, var(--nav-shell-border) 85%, transparent);
+  box-shadow: var(--nav-shell-shadow), inset 0 1px 0 color-mix(in oklch, white 22%, transparent);
+  backdrop-filter: blur(12px) saturate(1.05);
+  -webkit-backdrop-filter: blur(12px) saturate(1.05);
+}
+
+/* Primary theme: solid white + strict border (per request) */
+html.light-primary .about-stats-card--glass {
+  background: var(--brand-light);
+  border: 1px solid var(--brand-ink-strong);
+  box-shadow: 0 12px 28px -18px rgba(21, 18, 36, 0.12);
+  backdrop-filter: none;
+}
+
+/* Light Alt theme: solid white + strict black border */
+html.light-alt .about-stats-card--glass {
+  background: var(--services-card-bg);
+  border: 1px solid var(--services-ink-strong);
+  box-shadow: 0 12px 28px -18px rgba(21, 18, 36, 0.14);
+  backdrop-filter: none;
 }
 
 html.light-primary body[data-mobile-nav-open="true"] {
