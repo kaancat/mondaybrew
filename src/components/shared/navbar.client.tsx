@@ -623,9 +623,8 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   // Bottom-sheet by default for mobile
                   side="bottom"
                   hideCloseButton
-                  forceMount
                   className={cn(
-                    "mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0 mobile-nav--bottom",
+                    "mobile-nav-panel flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0",
                   )}
                 >
                   {/* Accessibility: satisfy Radix requirements without changing visuals */}
