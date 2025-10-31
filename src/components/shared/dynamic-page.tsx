@@ -4,6 +4,7 @@ import { HeroPage, isHeroPage } from "@/components/sections/hero-page";
 import { TextImageSection } from "@/components/sections/text-image";
 import { TextOnlySection } from "@/components/sections/text-only";
 import { FAQSection, type FAQSectionProps } from "@/components/sections/faq";
+import { BentoGallerySection } from "@/components/sections/bento-gallery";
 import { Section } from "@/components/layout/section";
 
 /**
@@ -44,6 +45,10 @@ function isTextOnlySection(section: PageSection): boolean {
 
 function isFAQSection(section: PageSection): boolean {
     return section?._type === "faq";
+}
+
+function isBentoGallerySection(section: PageSection): boolean {
+    return section?._type === "bentoGallery";
 }
 
 export async function DynamicPage({
@@ -151,6 +156,19 @@ export async function DynamicPage({
                     );
                 }
 
+                if (isBentoGallerySection(section)) {
+                    return (
+                        <div className="vr-section" key={key} id={key}>
+                            <BentoGallerySection
+                                images={section.images as any}
+                                columns={section.columns as number | null | undefined}
+                                rows={section.rows as number | null | undefined}
+                                showGridLines={section.showGridLines as boolean | null | undefined}
+                            />
+                        </div>
+                    );
+                }
+
                 // Unknown section type - skip silently
                 return null;
             })}
@@ -159,4 +177,3 @@ export async function DynamicPage({
 }
 
 export const revalidate = 60;
-
