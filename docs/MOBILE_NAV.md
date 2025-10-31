@@ -1,56 +1,29 @@
-# Mobile Navigation — Implementation Contract
+# Mobile Nav — Bottom‑Sheet Experiment
 
-This document explains how the mobile menu works and how to change it safely.
+This branch introduces a switchable variant for the mobile menu that mimics a bottom‑sheet pattern (inspired by dwarf.dk) while respecting our guardrails in `web/AGENTS.md`.
 
-## Ownership
+## How to enable
 
-- Geometry (translate/scale of the page): CSS on `.site-shell` only.
-- Drawer panel + overlay: Radix Sheet (data-state), no effect on shell geometry.
-- Menu content animation: Framer (optional), must not change shell geometry.
+- Set `NEXT_PUBLIC_MOBILE_NAV_VARIANT=bottom` in your environment.
+- Restart the dev server to pick up the env var.
 
-## Phases
+When the flag is not set, the existing left drawer remains unchanged.
 
-`<body data-nav-phase="closed|entering|opened|exiting">`
+## Implementation notes
 
-- entering: sets `data-mobile-nav-open` and animates shell to the open state.
-- opened: shell is resting at open geometry.
-- exiting: keeps `data-mobile-nav-open`, animates shell back to closed geometry, fades overlay.
-- cleanup (internal): disables transitions for one frame while attributes are removed.
+- We keep the single source of truth: `body[data-mobile-nav-open="true"]` via `use-nav-phase`.
+- The sheet uses Radix `SheetContent` with `side="bottom"` when the flag is enabled.
+- CSS in `globals.css` adds variant‑specific rules for `[data-side="bottom"]`, including rounded top corners, upward slide animation, and safe overlay handling.
+- While the bottom sheet is open, the `.site-shell` does not translate sideways (gated with `:has()` so the left drawer behavior stays the same).
 
-The shell uses a single transition with tokens:
+## Styling
 
-```css
---nav-anim-duration: 420ms;
---nav-anim-ease: cubic-bezier(0.25,0.62,0.32,1);
-```
+- Reuses existing tokens: `--mobile-nav-surface`, `--mobile-nav-text`, `--mobile-nav-border`, etc.
+- The inner content width is constrained to `max-width: 640px` for comfortable reading while filling the viewport width on small screens.
+- CTA, theme toggle, and locale switch mirror the desktop setup.
 
-Overlay uses:
+## Accessibility
 
-```css
---nav-overlay-duration: 500ms;
---nav-overlay-ease: cubic-bezier(0.22,0.61,0.36,1);
-```
+- `SheetTitle` and `SheetDescription` remain in the DOM (visually hidden) to satisfy dialog semantics.
+- Focus is handled by Radix; focus returns to the hamburger on close via the existing `onOpenChange` handler.
 
-## Do / Don’t
-
-- Do: change timing by editing the tokens above.
-- Do: keep header sticky inside `.site-shell` so it inherits the transform.
-- Do: use locally scoped wrappers (e.g. `.nav-isolate`) for embeds that should not move while opened (utility is defined in CSS).
-- Don’t: add global selectors like `body[data-mobile-nav-open] [style*="transform"] { … }`.
-- Don’t: write CSS vars from JS; only phase attributes are set from JS.
-
-## Safe points for changes
-
-- Want different curves? Edit the tokens only. No JS changes needed.
-- Want to isolate a new component during open? Wrap it and add a scoped rule under the existing component list.
-- Want to adjust how the overlay behaves? Change the overlay tokens or the `[data-slot="sheet-overlay"]` rules.
-
-## Tests (local)
-
-Playwright checks live under `web/tmp/`. They open/close on `/` and `/kontakt`, asserting:
-
-- shell transform matrix ≈ (open → closed)
-- overlay opacity transitions
-- page is clickable after close
-
-> If a regression is found, first confirm phases are correct, then check for any new open‑only rules that still apply during `exiting`.

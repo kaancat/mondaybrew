@@ -17,6 +17,7 @@ import textOnly from "./types/sections/textOnly";
 import faq from "./types/sections/faq";
 import contentBillboard from "./types/sections/contentBillboard";
 import mediaShowcase from "./types/sections/mediaShowcase";
+import bentoGallery from "./types/sections/bentoGallery";
 
 import seo from "./types/objects/seo";
 import cta from "./types/objects/cta";
@@ -34,6 +35,12 @@ import servicesSplitService from "./types/objects/servicesSplitService";
 import servicesSplitMedia from "./types/objects/servicesSplitMedia";
 import clientLogo from "./types/objects/clientLogo";
 import testimonialCard from "./types/objects/testimonialCard";
+import textOnlyRichText from "./types/objects/textOnlyRichText";
+import textOnlyRichTextImage from "./types/objects/textOnlyRichTextImage";
+import textOnlyCta1 from "./types/objects/textOnlyCta1";
+import textOnlyCta2 from "./types/objects/textOnlyCta2";
+import textOnlyDivider from "./types/objects/textOnlyDivider";
+import gridPosition from "./types/objects/gridPosition";
 
 const schemas = [
   // documents
@@ -56,6 +63,7 @@ const schemas = [
   faq,
   contentBillboard,
   mediaShowcase,
+  bentoGallery,
   // objects
   seo,
   cta,
@@ -73,6 +81,12 @@ const schemas = [
   servicesSplitMedia,
   clientLogo,
   testimonialCard,
+  textOnlyRichText,
+  textOnlyRichTextImage,
+  textOnlyCta1,
+  textOnlyCta2,
+  textOnlyDivider,
+  gridPosition,
 ];
 
 export default schemas;

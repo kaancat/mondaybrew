@@ -564,6 +564,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                 })()}
               </Link>
 
+              {/* Mobile navigation: supports experimental bottom-sheet variant via NEXT_PUBLIC_MOBILE_NAV_VARIANT=bottom */}
               <Sheet open={mobileOpen} onOpenChange={handleOpenChange}>
                 <SheetTrigger asChild>
                   <button
@@ -575,16 +576,27 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
                   </button>
                 </SheetTrigger>
                 <SheetContent
-                  side="left"
+                  // Pick variant at build-time from env; default keeps existing left drawer
+                  side={process.env.NEXT_PUBLIC_MOBILE_NAV_VARIANT === "bottom" ? "bottom" : "left"}
                   hideCloseButton
                   forceMount
-                  className="mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0"
+                  className={cn(
+                    "mobile-nav-panel fixed inset-0 flex w-screen bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)] shadow-none border-r-0",
+                    process.env.NEXT_PUBLIC_MOBILE_NAV_VARIANT === "bottom" && "mobile-nav--bottom"
+                  )}
                 >
                   {/* Accessibility: satisfy Radix requirements without changing visuals */}
                   <SheetTitle className="sr-only">Menu</SheetTitle>
                   <SheetDescription className="sr-only">Site navigation</SheetDescription>
                   <div className="flex h-full w-full items-stretch">
-                    <div className="mobile-nav-inner flex w-[var(--mobile-nav-width)] flex-col px-6 py-8">
+                    <div
+                      className={cn(
+                        "mobile-nav-inner flex flex-col px-6 py-8",
+                        process.env.NEXT_PUBLIC_MOBILE_NAV_VARIANT === "bottom"
+                          ? "w-full max-w-screen-sm mx-auto"
+                          : "w-[var(--mobile-nav-width)]"
+                      )}
+                    >
                       {/* Header with close button */}
                       <div className="flex items-center justify-between pb-5 shrink-0">
                         <div className="flex flex-col">

@@ -301,6 +301,89 @@ html.light-primary .about-stats-panel [data-stat-label] {
   color: var(--about-stats-card-label);
 }
 
+/* Decorative accent aura for stat cards (theme-aware) */
+.stat-aura {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  /* Core + soft ring using brand accent */
+  --_aura: var(--mb-accent);
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--_aura) 85%, white 15%) 0 40%, transparent 42%),
+    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--_aura) 40%, transparent) 0 70%, transparent 72%);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--_aura) 35%, transparent),
+    0 0 24px color-mix(in oklch, var(--_aura) 28%, transparent);
+}
+
+.stat-aura::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: radial-gradient(circle, color-mix(in oklch, var(--_aura) 25%, transparent) 0 55%, transparent 60%);
+  opacity: 0.55;
+  filter: blur(6px);
+  animation: auraPulse 2800ms var(--nav-anim-ease) infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-aura::after { animation: none; }
+}
+
+@keyframes auraPulse {
+  from { transform: scale(0.96); opacity: 0.45; }
+  to   { transform: scale(1.05); opacity: 0.75; }
+}
+
+/* Media Showcase: glass variant for stats cards (mobile + desktop)
+   Slightly more see-through than About overlay */
+.about-stats-card--glass {
+  /* Stronger glass presence: layered tint + subtle specular highlight */
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in oklch, white 8%, transparent) 0%,
+      color-mix(in oklch, black 6%, transparent) 100%
+    ),
+    color-mix(in oklch, var(--nav-shell-bg) 42%, transparent);
+  border: 1px solid color-mix(in oklch, var(--nav-shell-border) 85%, transparent);
+  box-shadow:
+    var(--nav-shell-shadow),
+    inset 0 1px 0 color-mix(in oklch, white 22%, transparent);
+  backdrop-filter: blur(12px) saturate(1.05);
+  -webkit-backdrop-filter: blur(12px) saturate(1.05);
+}
+
+/* Primary theme: lighter glass plate + softer shadow */
+html.light-primary .about-stats-card--glass {
+  /* Requested: solid white like Text+Image card */
+  background: var(--brand-light);
+  border: 1px solid var(--brand-ink-strong);
+  box-shadow: 0 12px 28px -18px rgba(21, 18, 36, 0.12);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Primary theme: aura a bit subtler on light background */
+html.light-primary .stat-aura {
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--_aura) 28%, transparent),
+    0 0 18px color-mix(in oklch, var(--_aura) 18%, transparent);
+}
+
+/* Light Alt theme: strict white card with black border */
+html.light-alt .about-stats-card--glass {
+  background: var(--services-card-bg); /* pure white */
+  border: 1px solid var(--services-ink-strong); /* strict black */
+  box-shadow: 0 12px 28px -18px rgba(21, 18, 36, 0.14);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 html.light-primary body[data-mobile-nav-open="true"] {
   --mobile-nav-overlay: rgba(73, 68, 75, 0.08);
   /* Brand the mobile menu section headings and top eyebrow in primary theme */
@@ -794,6 +877,38 @@ html.dark {
     pointer-events: auto;
     transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
     background: var(--mobile-nav-surface);
+  }
+
+  /* Bottom-sheet variant: enable when SheetContent[data-side="bottom"] is used (env flag) */
+  [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"] {
+    inset-inline: 0;
+    inset-block-start: auto;
+    inset-block-end: 0;
+    min-height: auto;
+    height: auto;
+    border-top-left-radius: var(--nav-card-radius, 16px);
+    border-top-right-radius: var(--nav-card-radius, 16px);
+    border-top: 1px solid var(--mobile-nav-border);
+    border-right: 0;
+    border-left: 0;
+    box-shadow: 0 -12px 48px rgba(8,6,20,0.2);
+    transform: translateY(100%);
+  }
+
+  [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="closed"] { transform: translateY(100%); }
+  body[data-mobile-nav-open="true"] [data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="open"] {
+    transform: translateY(0);
+    transition: transform var(--nav-overlay-duration) var(--nav-overlay-ease), opacity var(--nav-overlay-duration) var(--nav-overlay-ease);
+  }
+
+  /* When bottom-sheet is open, keep the site shell stationary (no sideways translate) */
+  @supports(selector(:has(*))) {
+    body[data-mobile-nav-open="true"]:has([data-slot="sheet-content"].mobile-nav-panel[data-side="bottom"][data-state="open"]) .site-shell {
+      transform: none !important;
+      box-shadow: none !important;
+      filter: none !important;
+      pointer-events: none !important; /* keep interactions on the sheet */
+    }
   }
   [data-slot="sheet-overlay"] {
     background: transparent !important;

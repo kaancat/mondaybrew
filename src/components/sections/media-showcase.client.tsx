@@ -189,19 +189,24 @@ export default function MediaShowcaseClient({ eyebrow, headline, alignment = "st
       {stats.length ? (
         <div className={cn("grid gap-x-8 gap-y-3 md:gap-y-2", gridCols)}>
           {stats.map((s, i) => (
-            <div key={`${s.label || s.value || i}`} className="about-stats-card flex items-start gap-3 px-4 py-3 md:flex-col md:items-center md:text-center">
+            <div
+              key={`${s.label || s.value || i}`}
+              className="about-stats-card about-stats-card--glass flex items-center gap-3 px-4 py-3"
+            >
               {s.icon?.src ? (
                 <Image
                   src={s.icon.src}
                   alt={s.icon.alt || ""}
                   width={24}
                   height={24}
-                  className="mt-[2px] size-6 object-contain opacity-80 md:mt-0"
+                  className="size-6 object-contain opacity-80"
                 />
-              ) : null}
-              <div className="text-left md:text-center">
-                {s.value ? <div data-stat-value className="text-[length:var(--font-h3)] leading-none">{s.value}</div> : null}
-                {s.label ? <div data-stat-label className="mt-1 text-sm leading-relaxed">{s.label}</div> : null}
+              ) : (
+                <span aria-hidden className="stat-aura md:mb-1" />
+              )}
+              <div className="text-left">
+                {s.value ? <div data-stat-value className="text-[length:var(--font-h3)] leading-none font-semibold">{s.value}</div> : null}
+                {s.label ? <div data-stat-label className="mt-0.5 text-sm leading-snug">{s.label}</div> : null}
               </div>
             </div>
           ))}
