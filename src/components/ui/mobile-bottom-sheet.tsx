@@ -62,22 +62,40 @@ export function MobileBottomSheet({
             aria-hidden="true"
           />
 
-          {/* Bottom Sheet */}
-          <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ duration: 0.4, ease: [0.25, 0.62, 0.32, 1] }}
-            className={cn(
-              "absolute inset-x-0 bottom-0 flex flex-col bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)]",
-              "max-h-[82vh] overflow-hidden",
-              "rounded-t-[16px] border-t border-[color:var(--mobile-nav-border)]",
-              "shadow-[0_-12px_48px_rgba(8,6,20,0.2)]",
-              className
-            )}
-          >
-            {children}
-          </motion.div>
+          {/* Container for close button + bottom sheet */}
+          <div className="absolute inset-x-0 bottom-0 flex flex-col">
+            {/* Close button positioned above the sheet */}
+            <div className="flex justify-end px-6 pb-3">
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2, ease: [0.22, 0.61, 0.36, 1] }}
+                onClick={() => onOpenChange(false)}
+                className="inline-flex items-center justify-center rounded-full bg-[color:var(--mobile-nav-surface)] border border-[color:var(--mobile-nav-border)] p-2.5 text-[color:var(--mobile-nav-muted)] shadow-lg transition hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2"
+                aria-label="Close menu"
+              >
+                <X className="size-5" aria-hidden="true" />
+              </motion.button>
+            </div>
+
+            {/* Bottom Sheet */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.4, ease: [0.25, 0.62, 0.32, 1] }}
+              className={cn(
+                "flex flex-col bg-[color:var(--mobile-nav-surface)] text-[color:var(--mobile-nav-text)]",
+                "max-h-[82vh] overflow-hidden",
+                "rounded-t-[16px] border-t border-[color:var(--mobile-nav-border)]",
+                "shadow-[0_-12px_48px_rgba(8,6,20,0.2)]",
+                className
+              )}
+            >
+              {children}
+            </motion.div>
+          </div>
         </div>
       )}
     </AnimatePresence>

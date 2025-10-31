@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe, Moon, Palette, Sun, Menu, X, Target, Search, Share2, Mail, ShoppingBag, Sparkles, ChevronRight, ChevronLeft } from "lucide-react";
+import { ArrowRight, Globe, Moon, Palette, Sun, Menu, Target, Search, Share2, Mail, ShoppingBag, Sparkles, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MobileBottomSheet, MobileBottomSheetTrigger, MobileBottomSheetClose } from "@/components/ui/mobile-bottom-sheet";
+import { MobileBottomSheet, MobileBottomSheetTrigger } from "@/components/ui/mobile-bottom-sheet";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -321,7 +321,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { mobileOpen, onOpenChange } = useNavPhase();
-  const [mobileMenuLevel, setMobileMenuLevel] = useState<string | null>(null); // null = main menu, string = section label
   const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
   const [megaMenuContent, setMegaMenuContent] = useState<React.ReactNode>(null);
   const desktopNavRef = useRef<HTMLDivElement>(null);
@@ -383,13 +382,6 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
     }
     prevPathRef.current = normalizedPath;
   }, [mobileOpen, normalizedPath, onOpenChange, mounted]);
-
-  // Reset mobile menu level when menu closes
-  useEffect(() => {
-    if (!mobileOpen) {
-      setMobileMenuLevel(null);
-    }
-  }, [mobileOpen]);
 
   // Cleanup handled by useNavPhase
 
@@ -620,159 +612,122 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
             {/* Mobile bottom-sheet menu (rendered at portal level) */}
             <MobileBottomSheet open={mobileOpen} onOpenChange={handleOpenChange}>
-                  <div className="flex w-full max-w-screen-sm mx-auto flex-col px-6 py-8 h-full">
-                    {/* Header with close button */}
-                    <div className="flex items-center justify-end pb-4 shrink-0">
-                      <MobileBottomSheetClose
-                        onClose={() => onOpenChange(false)}
-                        className="inline-flex items-center justify-center rounded-full border border-transparent p-2 text-[color:var(--mobile-nav-muted)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                        aria-label="Luk menu"
-                      >
-                        <X className="size-[20px]" aria-hidden="true" />
-                        <span className="sr-only">Luk</span>
-                      </MobileBottomSheetClose>
-                    </div>
-
-                      {/* Scrollable menu content with multi-level navigation */}
-                      <div className="mobile-nav-scroll flex-1 overflow-y-auto">
-                        <AnimatePresence mode="wait" initial={false}>
-                          {mobileMenuLevel === null ? (
-                            <motion.div
-                              key="main-menu"
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: -20 }}
-                              transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
-                              className="space-y-2"
-                            >
-                              {/* Main menu: Section cards */}
-                              {megaSections.map((section) => {
-                                const Icon = getIconForLabel(section.label);
-                                return (
-                                  <button
-                                    key={section.label}
-                                    type="button"
-                                    onClick={() => setMobileMenuLevel(section.label)}
-                                    className="group flex w-full items-center gap-2.5 rounded-lg border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2 transition-colors hover:bg-[color:var(--mobile-nav-hover)]"
-                                  >
-                                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
-                                      <Icon className="h-4 w-4" aria-hidden="true" />
-                                    </span>
-                                    <span className="flex-1 text-left text-[0.95rem] font-normal text-[color:var(--mobile-nav-text)]">{section.label}</span>
-                                    <ChevronRight className="h-4 w-4 text-[color:var(--mobile-nav-muted)] group-hover:text-[color:var(--mobile-nav-text)]" aria-hidden="true" />
-                                  </button>
-                                );
-                              })}
-                              {/* Simple links on main menu */}
-                              {simpleLinks.map((link) => {
-                                const href = link.href ?? "#";
-                                const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                                const Icon = getIconForLabel(link.label);
-                                return (
-                                  <Link
-                                    key={link.label}
-                                    href={href}
-                                    className={cn(
-                                      "group flex w-full items-center gap-2.5 rounded-lg border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2 transition-colors",
-                                      active ? "ring-1 ring-[color:var(--mobile-nav-border)]" : "hover:bg-[color:var(--mobile-nav-hover)]"
-                                    )}
-                                  >
-                                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
-                                      <Icon className="h-4 w-4" aria-hidden="true" />
-                                    </span>
-                                    <span className="flex-1 text-left text-[0.95rem] font-normal text-[color:var(--mobile-nav-link)] group-hover:text-[color:var(--mobile-nav-text)]">{link.label}</span>
-                                    <ChevronRight className="h-4 w-4 text-[color:var(--mobile-nav-muted)] group-hover:text-[color:var(--mobile-nav-text)]" aria-hidden="true" />
-                                  </Link>
-                                );
-                              })}
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              key={`submenu-${mobileMenuLevel}`}
-                              initial={{ opacity: 0, x: 20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: 20 }}
-                              transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
-                              className="space-y-3"
-                            >
-                              {/* Back button */}
-                              <button
-                                type="button"
-                                onClick={() => setMobileMenuLevel(null)}
-                                className="group -ml-2 inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-[color:var(--mobile-nav-muted)] transition hover:text-[color:var(--mobile-nav-text)]"
-                              >
-                                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                                <span className="text-sm">Tilbage</span>
-                              </button>
-                              {/* Section heading */}
-                              <h2 className="text-xs font-normal uppercase tracking-[0.24em] text-[color:var(--mobile-nav-heading)]">
-                                {mobileMenuLevel}
-                              </h2>
-                              {/* Submenu items */}
-                              <div className="space-y-1.5">
-                                {megaSections
-                                  .find((s) => s.label === mobileMenuLevel)
-                                  ?.groups.flatMap((group) =>
-                                    group.items.map((item) => {
-                                      const href = item.href ?? "#";
-                                      const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
-                                      const Icon = getIconForLabel(item.label);
-                                      return (
-                                        <Link
-                                          key={item.label}
-                                          href={href}
-                                          className={cn(
-                                            "group flex w-full items-center gap-2.5 rounded-lg border border-[color:var(--mobile-nav-border)] bg-[color:var(--mobile-nav-surface)] px-3 py-2 transition-colors",
-                                            active ? "ring-1 ring-[color:var(--mobile-nav-border)]" : "hover:bg-[color:var(--mobile-nav-hover)]"
-                                          )}
-                                        >
-                                          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[color:var(--mobile-nav-border)] bg-[color:color-mix(in_oklch,var(--mobile-nav-surface)_94%,white_6%)] text-[color:var(--mobile-nav-muted)]">
-                                            <Icon className="h-4 w-4" aria-hidden="true" />
-                                          </span>
-                                          <span className={cn(
-                                            "flex-1 text-left text-[0.95rem] font-normal leading-snug",
-                                            active ? "text-[color:var(--mobile-nav-text)]" : "text-[color:var(--mobile-nav-link)] group-hover:text-[color:var(--mobile-nav-text)]"
-                                          )}>{item.label}</span>
-                                          <ChevronRight className="h-4 w-4 text-[color:var(--mobile-nav-muted)] group-hover:text-[color:var(--mobile-nav-text)]" aria-hidden="true" />
-                                        </Link>
-                                      );
-                                    })
-                                  )}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+              <div className="flex w-full max-w-screen-sm mx-auto flex-col h-full">
+                {/* Header with theme + locale controls */}
+                <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[color:var(--mobile-nav-border)]">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-[color:var(--mobile-nav-muted)]">{localeConfig.active === "en" ? "23:27" : "23.27"}</span>
+                    {mounted && (
+                      <span className="text-[color:var(--mobile-nav-muted)]">
+                        {currentThemeId === "dark" ? "🌙" : currentThemeId === "light-alt" ? "🎨" : "☀️"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* Locale toggle */}
+                    <Link
+                      href={localeConfig.href}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--mobile-nav-surface)] border border-[color:var(--mobile-nav-border)] px-3 py-1.5 text-xs font-normal text-[color:var(--mobile-nav-text)] transition hover:bg-[color:var(--mobile-nav-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)]"
+                    >
+                      <span className={cn(localeConfig.active === "en" ? "text-[color:var(--mobile-nav-text)]" : "text-[color:var(--mobile-nav-muted)]")}>EN</span>
+                      <div className="w-7 h-4 rounded-full bg-[color:var(--mobile-nav-border)] relative">
+                        <motion.div
+                          className="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-[color:var(--mobile-nav-text)]"
+                          animate={{ x: localeConfig.active === "da" ? 12 : 0 }}
+                          transition={{ duration: 0.2, ease: [0.22, 0.61, 0.36, 1] }}
+                        />
                       </div>
+                      <span className={cn(localeConfig.active === "da" ? "text-[color:var(--mobile-nav-text)]" : "text-[color:var(--mobile-nav-muted)]")}>DA</span>
+                    </Link>
+                    {/* Theme toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setTheme(nextThemeId)}
+                      className="inline-flex items-center justify-center rounded-full bg-[color:var(--mobile-nav-surface)] border border-[color:var(--mobile-nav-border)] p-2 text-[color:var(--mobile-nav-muted)] transition hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)]"
+                      aria-label={`Switch to ${nextTheme.label}`}
+                    >
+                      {themeIcon}
+                    </button>
+                  </div>
+                </div>
 
-                      {/* Fixed bottom action buttons */}
-                      <div className="mt-auto pt-6 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] shrink-0 space-y-3">
+                {/* Menu label */}
+                <div className="px-6 pt-6 pb-4">
+                  <h2 className="text-sm font-normal text-[color:var(--mobile-nav-muted)]">Menu</h2>
+                </div>
+
+                {/* Scrollable menu content - tree structure */}
+                <div className="mobile-nav-scroll flex-1 overflow-y-auto px-6 pb-6">
+                  <nav className="space-y-1">
+                    {/* Marketing section */}
+                    {megaSections.map((section) => (
+                      <div key={section.label} className="space-y-1">
                         <Link
-                          href={ctaHref}
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-[6px] border border-[color:var(--nav-cta-border)] bg-[color:var(--nav-cta-bg)] px-3 py-2 text-sm font-normal text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
+                          href="#"
+                          className="group flex items-center justify-between py-3 transition-colors hover:text-[color:var(--mobile-nav-text)]"
                         >
-                          <span>{ctaLabel}</span>
-                          <ArrowRight className="size-[16px]" aria-hidden="true" />
+                          <span className="text-[15px] font-normal text-[color:var(--mobile-nav-text)]">{section.label}</span>
+                          <ChevronRight className="h-4 w-4 text-[color:var(--mobile-nav-muted)] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                         </Link>
-                        <div className="flex items-center justify-between gap-2 text-[13px]">
-                          <button
-                            type="button"
-                            onClick={() => setTheme(nextThemeId)}
-                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[color:var(--mobile-nav-secondary-link)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--nav-toggle-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav-toggle-ring-offset)]"
-                          >
-                            {themeIcon}
-                            <span>Skift tema</span>
-                          </button>
-                          <Link
-                            href={localeConfig.href}
-                            className="inline-flex items-center gap-2 rounded-[6px] border border-transparent px-2 py-1 text-[color:var(--mobile-nav-secondary-link)] transition hover:border-[color:var(--mobile-nav-border)] hover:text-[color:var(--mobile-nav-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-locale-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nav-cta-ring-offset)]"
-                          >
-                            <Globe className="size-[16px]" aria-hidden="true" />
-                            <span>{localeConfig.target}</span>
-                          </Link>
+                        {/* Sub-items with indentation */}
+                        <div className="pl-4 space-y-1 border-l border-[color:var(--mobile-nav-border)]">
+                          {section.groups.flatMap((group) =>
+                            group.items.map((item) => {
+                              const href = item.href ?? "#";
+                              const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                              return (
+                                <Link
+                                  key={item.label}
+                                  href={href}
+                                  className={cn(
+                                    "block py-2.5 pl-4 text-[14px] transition-colors",
+                                    active
+                                      ? "text-[color:var(--mobile-nav-text)] font-normal"
+                                      : "text-[color:var(--mobile-nav-link)] hover:text-[color:var(--mobile-nav-text)]"
+                                  )}
+                                >
+                                  {item.label}
+                                </Link>
+                              );
+                            })
+                          )}
                         </div>
                       </div>
-                    </div>
-                  </MobileBottomSheet>
+                    ))}
+
+                    {/* Simple links */}
+                    {simpleLinks.map((link) => {
+                      const href = link.href ?? "#";
+                      const active = href !== "#" && (normalizedPath === href || normalizedPath === `${href}/`);
+                      return (
+                        <Link
+                          key={link.label}
+                          href={href}
+                          className={cn(
+                            "group flex items-center justify-between py-3 transition-colors",
+                            active ? "text-[color:var(--mobile-nav-text)]" : "hover:text-[color:var(--mobile-nav-text)]"
+                          )}
+                        >
+                          <span className="text-[15px] font-normal text-[color:var(--mobile-nav-text)]">{link.label}</span>
+                          <ChevronRight className="h-4 w-4 text-[color:var(--mobile-nav-muted)] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </div>
+
+                {/* Fixed bottom CTA */}
+                <div className="px-6 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] border-t border-[color:var(--mobile-nav-border)]">
+                  <Link
+                    href={ctaHref}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-[color:var(--nav-cta-bg)] px-4 py-3 text-sm font-normal text-[color:var(--nav-cta-text)] transition hover:bg-[color:var(--nav-cta-hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nav-cta-ring)]"
+                  >
+                    <span>{ctaLabel}</span>
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </div>
+              </div>
+            </MobileBottomSheet>
 
             {/* Desktop header */}
             <div
