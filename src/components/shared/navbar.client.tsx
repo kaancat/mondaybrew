@@ -918,7 +918,7 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
             </div>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       {/* Shared mega menu dropdown - rendered outside header for proper positioning */}
       <SharedMegaMenuDropdown
