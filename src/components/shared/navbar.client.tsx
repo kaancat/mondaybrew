@@ -586,24 +586,13 @@ export function NavbarClient({ brand, sections, cta, locales }: Props) {
 
   return (
     <>
-      <motion.header
+      <header
         ref={headerRef}
-        animate={{
-          y: mobileOpen ? "-100%" : "0%",
-        }}
-        transition={{
-          duration: 0.4,
-          ease: [0.25, 0.62, 0.32, 1],
-        }}
         className={cn(
           "fixed inset-x-0 top-0 z-[9999] transition-opacity duration-300",
           shouldFadeHeader ? "opacity-0 pointer-events-none" : "opacity-100"
         )}
-        style={{
-          paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
-          willChange: mobileOpen ? "transform" : "auto",
-          transform: "translate3d(0, 0, 0)",
-        }}
+        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}
       >
         <div className="layout-container px-2 sm:px-3 md:px-[var(--container-gutter)]">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
