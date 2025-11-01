@@ -1,7 +1,7 @@
 import React from "react";
 import { Section } from "@/components/layout/section";
 import { getCaseStudies } from "@/lib/caseStudies";
-import { CasesStickyScroll } from "@/components/sections/cases-sticky-scroll-v2.client";
+import { CasesStickyScroll } from "@/components/sections/cases-sticky-scroll.client";
 import type { CaseStudy } from "@/types/caseStudy";
 
 export default async function CasesPage() {
