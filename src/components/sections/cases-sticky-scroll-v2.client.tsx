@@ -101,10 +101,8 @@ function StickyCard({
     ];
     const placeholderColor = placeholderColors[index % placeholderColors.length];
 
-    // Calculate progressive top offset for stacking
-    const BASE_TOP = 120; // Base top position in pixels
-    const STACK_OFFSET = 25; // How much each subsequent card is offset
-    const topOffset = BASE_TOP + (index * STACK_OFFSET);
+    // All cards stick at the same position for consistent stacking
+    const CARD_STICK_POSITION = 80; // All cards pin at this position from top
 
     return (
         <div
@@ -112,13 +110,13 @@ function StickyCard({
             className="relative w-full"
             style={{
                 height: "100vh",
-                paddingBottom: "48px",
+                paddingBottom: "0px",
             }}
         >
             <motion.section
                 className="sticky top-0 w-full flex items-center overflow-hidden px-[var(--container-gutter)] rounded-[5px]"
                 style={{
-                    top: `${topOffset}px`,
+                    top: `${CARD_STICK_POSITION}px`,
                     height: "80vh",
                     scale,
                     opacity,
